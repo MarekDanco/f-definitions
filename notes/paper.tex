@@ -18,5 +18,13 @@
 }
 \begin{document}
 \maketitle
+\section*{Motivation}
+Consider the following UFLIA formula:
+\[
+    (f(3, a) \geq 4 + g(b)) \,\land \,(\forall x, y. \,f(x, y) < x + g(y)) \,\land \,(\forall x. \,g(x) = g(x + 2))
+\]
+Note that currently, \textsc{Z3} cannot prove this formula is satisfiable.
+However, we show there is an algorithmic way of proving the satisfiability of this formula and try to identify UFLIA
+fragments in which this algorithm is applicable.
 
 \end{document}
