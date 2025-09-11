@@ -1,0 +1,8 @@
+(set-logic UFLIA)
+(declare-fun f (Int Int) Int)
+(declare-fun g (Int) Int)
+(declare-const a Int)
+(declare-const b Int)
+(assert (>= (f 3 a) (+ 4 (g b))))
+(assert (< (f 3 a) (+ 3 (g b))))
+(check-sat)
