@@ -1,0 +1,116 @@
+\documentclass[a4paper,11pt]{article}
+
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+
+\begin{document}
+
+\section{Basic Setup}
+
+Goal: Proving satisfiability of UFLIA formulas (or UFNIA) formulas (which may prove unsat on the way).
+
+In the following, a formula will always refer to a UFNIA formula whose only quantifiers are universal quantifiers over integer variables.
+
+\begin{definition}
+  An \emph{entity} of a formula is either a numerical variable or a pair consisting of an  uninterpreted function symbol and an integer (which models an index of the uninterpreted function symbol).
+\end{definition}
+
+Idea: View quantifiers as something that expresses infinitely many constraints on entities. The problem is that a single entity may occur in several such constraints and we must avoid assigning different values to the very same entity. To prove satisfiability of a formula, order these constraints and use a symbolic representation of the satisfying assignment that assigns values to entities in such a way that following the order of constraint avoids assigning different values to the very same entity.
+
+\begin{definition}
+  Given a formula $\phi$, a \emph{satisfiability certificate} is
+  \begin{itemize}
+  \item an order\footnote{For now, I assume this order to be total.} on all instantiations of quantified sub-formulas of $\phi$, viewing the quantifier-free part as ONE quantified formula with an empty tuple of quantified variables, hence having one instantiation, and
+  \item for each instantiation of a quantified formula
+    \begin{itemize}
+    \item a subset of its entities marked as existential such that the existential entities do not occur in any formula instantiation occurring before according to the given order, and
+    \item a certificate showing that for all values of the non-existential entities there exist values for all other entities satisfying this instantiation, which we will call \emph{satisfiability propagator}.
+    \end{itemize}
+  \end{itemize}
+\end{definition}
+
+The satisfiability propagators typical have the form entity=term, where the left-hand sides are the existential  variables\footnote{At some point, we might allow satisfiability propagators of a different form, for example, to represent real-algebraic number solutions in the case of the reals}.
+
+
+\begin{example}
+  \[ \forall x \:.\: g(x+2)=g(x)+1 \]
+  \begin{itemize}
+  \item order: $0,1,\dots, -1, -2, \dots$
+  \item corresponding existential entities: $g(2), g(3), \dots, g(-1), g(-2), \dots$   (note that g(0) and g(1) are not existential anywhere, and hence can be chosen arbitrarily)
+  \item satisfiability propagators for the two blocks in the order: $g(x)=g(x-2)+1$, $g(x)= g(x+2)-1$
+  \end{itemize}
+
+\end{example}
+
+\begin{example}
+  \[f(3, a) \geq 4 + g(b) \wedge (\forall x, y \:.\: f(x, y) <x + g(y)) \wedge (\forall x \:.\: g(x) = g(x+2))\]
+  \begin{itemize}
+  \item order on constraints, block-wise:
+    \begin{enumerate}
+    \item     $f(3, a) \geq 4 + g(b)$, 
+    \item $f(x,y) <x+g(y)$ for $(x,y)= (3,0)$
+    \item $g(x) = g(x + 2)$ for $x= 0, 1, \dots$
+    \item $g(x) = g(x + 2)$, for $x= -1, -2, \dots$,
+    \item  any order on the rest of $\forall x,y \:.\: f(x,y)<x+g(y)$ (i.e., $(x,y) \not=(3,0)$)
+    \end{enumerate}
+
+  \item corresponding existential entities:
+    \begin{enumerate}
+    \item  $\{a, b, f(3,0), g(1)\}$
+    \item $\{ g(0)\}$
+    \item $\{ g(2) \}, \{ g(3) \}, \dots$
+    \item $\{ g(-1) \}, \{ g(-2) \}, \dots$
+    \end{enumerate}
+
+  \item satisfiability propagators:
+    \begin{enumerate}
+    \item $a=0, b=1, f(3,0)=4, g(1)=0$
+    \item $g(0)=2$
+    \item $g(x)= g(x-2)$
+    \item $g(x)=g(x+2)$
+    \item $f(x,y)=x+g(y)-1$
+    \end{enumerate}
+
+  \end{itemize}
+
+
+  
+\end{example}
+
+
+\section{Constructing Certificates}
+
+Very rough idea:
+\begin{enumerate}
+\item solve quantifier-free part
+\item check solution against instantiations of quantified part with all entities already assigned, if not satisfied, learn a clause and backtrack to solving
+\item  order all other instantiations and construct the necessary certificates
+
+\end{enumerate}
+
+
+% *** example:
+
+% attempt 1:
+% - solve part without quantifiers: a=0, b=0, g(b)=g(0)=0, f(3,a)=f(3,0)=4, then f(3,0)>= 4+g(0)
+% - this violates  (\forall 𝑥, 𝑦. 𝑓 (𝑥, 𝑦) < 𝑥 + 𝑔(𝑦)) since for x=3, y=0 this is f(3,0)<3+g(0), since not f(3,0)=4<3=3+g(0)
+% - backtrack, learn f(3,0)<3+g(0), which excludes attempt 1 (clause learning might learn something more general, e.g., including a and b)
+% attempt 2:
+% - solve (𝑓 (3, 𝑎) ≥ 4 + 𝑔(𝑏)), f(3,0)<3+g(0) resulting in  a=0, b=1, g(b)=g(1)=0, f(3,a)=f(3,0)=4, g(a)=g(0)=2
+% - now try to satisfy \forall 𝑥. 𝑔(𝑥) = 𝑔(𝑥 + 2):
+%     for x in { 0, 1 }, this is satisfied by the assignment already constructed
+%     for all x>=2, set g(x)=g(x-2)
+%     for all x<0, set g(x)=g(x+2)
+% - now try to satisfy (\forall 𝑥, 𝑦. 𝑓 (𝑥, 𝑦) < 𝑥 + 𝑔(𝑦)):
+%     for x=3,y=0 this is satisfied by the assignment already constructed: f(3,0)=4<5=3+2=3+g(0) that is 4<3+2
+%     for all other x,y: set f(x,y)=x+g(y)-1
+
+
+
+\end{document}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
