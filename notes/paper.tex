@@ -7,6 +7,7 @@
 \usepackage{numprint}
 \npthousandsep{,}
 
+\newcommand{\gmodel}{\mathcal{M}_G}
 
 \title{
     Iterative Function Definitions
@@ -16,15 +17,34 @@
 \titlerunning{Iterative Function Definitions}
 \institute{
 }
+
 \begin{document}
+
 \maketitle
+
 \section*{Motivation}
 Consider the following UFLIA formula:
 \[
-    (f(3, a) \geq 4 + g(b)) \,\land \,(\forall x, y. \,f(x, y) < x + g(y)) \,\land \,(\forall x. \,g(x) = g(x + 2))
+    \underbrace{(f(3, a) \geq 4 + g(b))}_{\varphi_G}\,\land \,
+    \underbrace{(\forall x, y. \,f(x, y) < x + g(y))}_{\varphi_1}\,\land \,
+    \underbrace{(\forall x. \,g(x) = g(x + 2))}_{\varphi_2}
 \]
 Note that currently, \textsc{Z3} cannot prove this formula is satisfiable.
-However, we show there is an algorithmic way of proving the satisfiability of this formula and try to identify UFLIA
-fragments in which this algorithm is applicable.
+However, we show there is an algorithmic way of proving the satisfiability
+of this formula and try to identify UFLIA fragments in which this algorithm is applicable.
+
+Let $\gmodel$ be the following partial model of the ground part $\varphi_G$:
+\begin{gather*}
+    a = 0, \\
+    b = 0, \\
+    f = \{(3, 0) \mapsto 5\}, \\
+    g = \{0 \mapsto 1\}.
+\end{gather*}
+The definitions of $f, g$ on the rest of the domain are not interesting at this point.
+Notice that because $g(0) = 0$ and the structure of $\varphi_2$, we can now define $g$
+using $\gmodel$ on all even integers.
+Specifically, we can order the arguments of $g$ in $\varphi_2$, that is $x \prec x+2$, and define
+$g(2), g(4), g(6), \dots$ by unifying $x$ with $0, 2, 4, \dots$ and then define $g(-2), g(-4), g(-6), \dots$
+by unifying $x+2$ with $0, -2, -4, \dots$
 
 \end{document}
