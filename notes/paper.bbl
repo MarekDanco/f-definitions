@@ -1,0 +1,12 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{hozzova-ijcar24}
+Hozzov{\'{a}}, P., Amrollahi, D., Hajd{\'{u}}, M., Kov{\'{a}}cs, L., Voronkov, A., Wagner, E.M.: Synthesis of recursive programs in saturation. In: Benzm{\"{u}}ller, C., Heule, M.J.H., Schmidt, R.A. (eds.) Automated Reasoning - 12th International Joint Conference, {IJCAR} 2024, Nancy, France, July 3-6, 2024, Proceedings, Part {I}. Lecture Notes in Computer Science, vol. 14739, pp. 154--171. Springer (2024). \doi{10.1007/978-3-031-63498-7\_10}, \url{https://doi.org/10.1007/978-3-031-63498-7\_10}
+
+\bibitem{kincaid-cav24}
+Murphy, C., Kincaid, Z.: Quantified linear arithmetic satisfiability via fine-grained strategy improvement. In: Gurfinkel, A., Ganesh, V. (eds.) Computer Aided Verification - 36th International Conference, {CAV} 2024, Montreal, QC, Canada, July 24-27, 2024, Proceedings, Part {I}. Lecture Notes in Computer Science, vol. 14681, pp. 89--109. Springer (2024). \doi{10.1007/978-3-031-65627-9\_5}, \url{https://doi.org/10.1007/978-3-031-65627-9\_5}
+
+\end{thebibliography}
