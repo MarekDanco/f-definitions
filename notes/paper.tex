@@ -1,11 +1,12 @@
-%!TeX program = latexmk
 \documentclass{easychair}
 \usepackage{todonotes}
-\usepackage{doc}
 \usepackage[utf8]{inputenc}
 \usepackage{amssymb}
 \usepackage{numprint}
 \npthousandsep{,}
+
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
 
 \newcommand{\gmodel}{\mathcal{M}}
 
@@ -45,9 +46,9 @@ The definitions of $f^\gmodel, g^\gmodel$ on the rest of the domain are not inte
 Notice that because of the structure of $\varphi_2$ and the fact that $g^{\gmodel}(0) = 0$,
 we can now define $g^{\gmodel}$ on all even integers.
 Specifically, we can first order the arguments of $g$ in $\varphi_2$ with $x \prec x+2$, and define
-$g(2), g(4), g(6), \dots$ by unifying $x$ with $0, 2, 4, \dots$ and then set $x+2 \prec x$ and define
-$g(-2), g(-4), g(-6), \dots$ by unifying $x+2$ with $0, -2, -4, \dots$ That is, we can define
-$g(A_2)$ using $g(A_1)$ if we have $A_1 \prec A_2$.
+$g^\gmodel(2), g^\gmodel(4), g^\gmodel(6), \dots$ by unifying $x$ with $0, 2, 4, \dots$ and then set $x+2 \prec x$ and define
+$g^\gmodel(-2), g^\gmodel(-4), g^\gmodel(-6), \dots$ by unifying $x+2$ with $0, -2, -4, \dots$ That is, we can define
+$g^\gmodel(A_2)$ using $g^\gmodel(A_1)$ if we have $A_1 \prec A_2$.
 This way we can expand $\gmodel$ to also be a partial model of $\varphi_2$.
 
 Since $f^{\gmodel}(3,1) = 5$ and it must hold that $f(3,1) < 3 + g(1)$, we can set $g^{\gmodel}(1) = 3$.
@@ -65,12 +66,96 @@ after each step of our procedure and when a conflict is found,
 we can learn the new ground literals from the \textsc{unsat} core and
 restart the procedure with the updated ground part.
 
+\section*{Definitions}
+
+Goal: Proving satisfiability of UFLIA formulas (or UFNIA) formulas (which may prove unsat on the way).
+In the following, a formula will always refer to a UFNIA formula whose only quantifiers are universal
+quantifiers over integer variables.
+
+\begin{definition}
+    An \emph{entity} of a formula is either a numerical variable or a pair consisting of an  uninterpreted
+    function symbol and an integer (which models an index of the uninterpreted function symbol).
+\end{definition}
+
+Idea: View quantifiers as something that expresses infinitely many constraints on entities. The problem is that a
+single entity may occur in several such constraints and we must avoid assigning different values to the very same entity.
+To prove satisfiability of a formula, order these constraints and use a symbolic representation of the satisfying assignment
+that assigns values to entities in such a way that following the order of constraint avoids assigning different
+values to the very same entity.
+
+\begin{definition}
+    Given a formula $\phi$, a \emph{satisfiability certificate} is
+    \begin{itemize}
+        \item an order\footnote{For now, I assume this order to be total.} on all instantiations of quantified
+              sub-formulas of $\phi$, viewing the quantifier-free part as ONE quantified formula with an empty tuple of quantified
+              variables, hence having one instantiation, and
+        \item for each instantiation of a quantified formula
+              \begin{itemize}
+                  \item a subset of its entities marked as existential such that the existential entities do not occur in any
+                        formula instantiation occurring before according to the given order, and
+                  \item a certificate showing that for all values of the non-existential entities there exist values for
+                        all other entities satisfying this instantiation, which we will call \emph{satisfiability propagator}.
+              \end{itemize}
+    \end{itemize}
+\end{definition}
+
+The satisfiability propagators typical have the form entity=term, where the left-hand sides are the existential
+variables\footnote{At some point, we might allow satisfiability propagators of a different form, for example,
+    to represent real-algebraic number solutions in the case of the reals}.
+
+\begin{example}
+    \[ \forall x \:.\: g(x+2)=g(x)+1 \]
+    \begin{itemize}
+        \item order: $0,1,\dots, -1, -2, \dots$
+        \item corresponding existential entities: $g(2), g(3), \dots, g(-1), g(-2), \dots$   (note that g(0) and g(1) are not
+              existential anywhere, and hence can be chosen arbitrarily)
+        \item satisfiability propagators for the two blocks in the order: $g(x)=g(x-2)+1$, $g(x)= g(x+2)-1$
+    \end{itemize}
+\end{example}
+
+\begin{example}
+    \[f(3, a) \geq 4 + g(b) \wedge (\forall x, y \:.\: f(x, y) <x + g(y)) \wedge (\forall x \:.\: g(x) = g(x+2))\]
+    \begin{itemize}
+        \item order on constraints, block-wise:
+              \begin{enumerate}
+                  \item     $f(3, a) \geq 4 + g(b)$,
+                  \item $f(x,y) <x+g(y)$ for $(x,y)= (3,0)$
+                  \item $g(x) = g(x + 2)$ for $x= 0, 1, \dots$
+                  \item $g(x) = g(x + 2)$, for $x= -1, -2, \dots$,
+                  \item  any order on the rest of $\forall x,y \:.\: f(x,y)<x+g(y)$ (i.e., $(x,y) \not=(3,0)$)
+              \end{enumerate}
+        \item corresponding existential entities:
+              \begin{enumerate}
+                  \item  $\{a, b, f(3,0), g(1)\}$
+                  \item $\{ g(0)\}$
+                  \item $\{ g(2) \}, \{ g(3) \}, \dots$
+                  \item $\{ g(-1) \}, \{ g(-2) \}, \dots$
+              \end{enumerate}
+        \item satisfiability propagators:
+              \begin{enumerate}
+                  \item $a=0, b=1, f(3,0)=4, g(1)=0$
+                  \item $g(0)=2$
+                  \item $g(x)= g(x-2)$
+                  \item $g(x)=g(x+2)$
+                  \item $f(x,y)=x+g(y)-1$
+              \end{enumerate}
+    \end{itemize}
+\end{example}
+
+\section*{Constructing Certificates}
+
+Very rough idea:
+\begin{enumerate}
+    \item solve quantifier-free part
+    \item check solution against instantiations of quantified part with all entities already assigned,
+          if not satisfied, learn a clause and backtrack to solving
+    \item order all other instantiations and construct the necessary certificates
+
+\end{enumerate}
+
 \section*{Algorithm}
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Related Work}\label{sec:related_work}
+\section*{Related Work}\label{sec:related_work}
 Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
 Synthesis of strategies on LIA problems Murphy and Kincaid~\cite{kincaid-cav24}.
 Synthesis, single invocation Kun\v cak et
