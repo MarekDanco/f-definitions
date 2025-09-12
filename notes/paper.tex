@@ -1,7 +1,7 @@
 \documentclass{easychair}
 \usepackage{todonotes}
 \usepackage[utf8]{inputenc}
-\usepackage{amssymb}
+\usepackage{amssymb, amsthm, amsmath}
 \usepackage{numprint}
 \npthousandsep{,}
 
@@ -14,7 +14,7 @@
     Iterative Function Definitions
 }
 \author{Stefan Ratschan \and Marek Dančo \and Mikoláš Janota}
-\authorrunning{Dančo et al.}
+\authorrunning{Ratschan et al.}
 \titlerunning{Iterative Function Definitions}
 \institute{
 }
@@ -23,7 +23,7 @@
 
 \maketitle
 
-\section*{Motivation}
+\section*{Motivating Example}
 Consider the following UFLIA formula:
 \[
     \varphi =
@@ -37,25 +37,25 @@ of this formula and try to identify UFLIA fragments in which this algorithm is a
 
 Let $\gmodel$ be the following partial model of the ground part $\varphi_G$:
 \begin{gather*}
-    a^\gmodel = 1, \\
-    b^\gmodel= 0, \\
-    f^\gmodel= \{(3, 1) \mapsto 5\}, \\
-    g^\gmodel= \{0 \mapsto 1\}.
+    a^\gmodel = 0, \\
+    b^\gmodel = 1, \\
+    f^\gmodel = \{(3, 0) \mapsto 4\}, \\
+    g^\gmodel = \{1 \mapsto 0\}.
 \end{gather*}
 The definitions of $f^\gmodel, g^\gmodel$ on the rest of the domain are not interesting at this point.
-Notice that because of the structure of $\varphi_2$ and the fact that $g^{\gmodel}(0) = 0$,
-we can now define $g^{\gmodel}$ on all even integers.
+Notice that because of the structure of $\varphi_2$ and the fact that $g^{\gmodel}(1) = 0$,
+we can now define $g^{\gmodel}$ on all odd integers.
 Specifically, we can first order the arguments of $g$ in $\varphi_2$ with $x \prec x+2$, and define
-$g^\gmodel(2), g^\gmodel(4), g^\gmodel(6), \dots$ by unifying $x$ with $0, 2, 4, \dots$ and then set $x+2 \prec x$ and define
-$g^\gmodel(-2), g^\gmodel(-4), g^\gmodel(-6), \dots$ by unifying $x+2$ with $0, -2, -4, \dots$ That is, we can define
+$g^\gmodel(3), g^\gmodel(5), g^\gmodel(7), \dots$ by unifying $x$ with $1, 3, 5, \dots$ and then set $x+2 \prec x$ and define
+$g^\gmodel(-1), g^\gmodel(-3), g^\gmodel(-5), \dots$ by unifying $x+2$ with $1, -1, -3, \dots$ That is, we can define
 $g^\gmodel(A_2)$ using $g^\gmodel(A_1)$ if we have $A_1 \prec A_2$.
 This way we can expand $\gmodel$ to also be a partial model of $\varphi_2$.
 
-Since $f^{\gmodel}(3,1) = 5$ and it must hold that $f(3,1) < 3 + g(1)$, we can set $g^{\gmodel}(1) = 3$.
-Just like above, we can now define $g^{\gmodel}$ on all odd integers and thus obtain a total
+Since $f^{\gmodel}(3,0) = 4$ and it must hold that $f(3,0) < 3 + g(0)$, we can set $g^{\gmodel}(0) = 2$.
+Just like above, we can now define $g^{\gmodel}$ on all even integers and thus obtain a total
 interpretation of $g$.
-Now, for any pair $(i, j) \not= (3, 1)$ of integers, we can define $f^{\gmodel}(i, j)$ to be
-$i - 1$ or $i + 2$ for even or odd $j$ respectively. In the end, we can expand $\gmodel$
+Now, for any pair $(i, j) \not= (3, 0)$ of integers, we can define $f^{\gmodel}(i, j)$ to be
+$i + 1$ or $i - 1$ for even or odd $j$ respectively. In the end, we can expand $\gmodel$
 to a model of $\varphi$.
 
 Observe it must be that $a \not= b$, otherwise
@@ -66,24 +66,25 @@ after each step of our procedure and when a conflict is found,
 we can learn the new ground literals from the \textsc{unsat} core and
 restart the procedure with the updated ground part.
 
-\section*{Definitions}
-
-Goal: Proving satisfiability of UFLIA formulas (or UFNIA) formulas (which may prove unsat on the way).
+\bigskip
+\emph{Goal}: Proving satisfiability of UFLIA formulas (or UFNIA) formulas (which may prove unsat on the way).
 In the following, a formula will always refer to a UFNIA formula whose only quantifiers are universal
 quantifiers over integer variables.
 
-\begin{definition}
-    An \emph{entity} of a formula is either a numerical variable or a pair consisting of an  uninterpreted
-    function symbol and an integer (which models an index of the uninterpreted function symbol).
-\end{definition}
-
-Idea: View quantifiers as something that expresses infinitely many constraints on entities. The problem is that a
+\emph{Idea}: View quantifiers as something that expresses infinitely many constraints on entities. The problem is that a
 single entity may occur in several such constraints and we must avoid assigning different values to the very same entity.
 To prove satisfiability of a formula, order these constraints and use a symbolic representation of the satisfying assignment
 that assigns values to entities in such a way that following the order of constraint avoids assigning different
 values to the very same entity.
 
-\begin{definition}
+\section*{Definitions}
+
+\begin{definition}[Entity]
+    An \emph{entity} of a formula is either a numerical variable or a pair consisting of an  uninterpreted
+    function symbol and an integer (which models an index of the uninterpreted function symbol).
+\end{definition}
+
+\begin{definition}[Satisfiability Certificate, Propagator]
     Given a formula $\phi$, a \emph{satisfiability certificate} is
     \begin{itemize}
         \item an order\footnote{For now, I assume this order to be total.} on all instantiations of quantified
@@ -109,7 +110,7 @@ variables\footnote{At some point, we might allow satisfiability propagators of a
         \item order: $0,1,\dots, -1, -2, \dots$
         \item corresponding existential entities: $g(2), g(3), \dots, g(-1), g(-2), \dots$   (note that g(0) and g(1) are not
               existential anywhere, and hence can be chosen arbitrarily)
-        \item satisfiability propagators for the two blocks in the order: $g(x)=g(x-2)+1$, $g(x)= g(x+2)-1$
+        \item satisfiability propagators for the two blocks in the order: $g(x) = g(x-2)+1$, $g(x) = g(x+2)-1$
     \end{itemize}
 \end{example}
 
@@ -118,7 +119,7 @@ variables\footnote{At some point, we might allow satisfiability propagators of a
     \begin{itemize}
         \item order on constraints, block-wise:
               \begin{enumerate}
-                  \item     $f(3, a) \geq 4 + g(b)$,
+                  \item $f(3, a) \geq 4 + g(b)$,
                   \item $f(x,y) <x+g(y)$ for $(x,y)= (3,0)$
                   \item $g(x) = g(x + 2)$ for $x= 0, 1, \dots$
                   \item $g(x) = g(x + 2)$, for $x= -1, -2, \dots$,
@@ -126,7 +127,7 @@ variables\footnote{At some point, we might allow satisfiability propagators of a
               \end{enumerate}
         \item corresponding existential entities:
               \begin{enumerate}
-                  \item  $\{a, b, f(3,0), g(1)\}$
+                  \item $\{a, b, f(3,0), g(1)\}$
                   \item $\{ g(0)\}$
                   \item $\{ g(2) \}, \{ g(3) \}, \dots$
                   \item $\{ g(-1) \}, \{ g(-2) \}, \dots$
@@ -154,7 +155,9 @@ Very rough idea:
 \end{enumerate}
 
 \section*{Algorithm}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section*{Related Work}\label{sec:related_work}
 Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
 Synthesis of strategies on LIA problems Murphy and Kincaid~\cite{kincaid-cav24}.
@@ -163,4 +166,5 @@ al.~\cite{kuncak-pldi10,kuncak-sttt13}.
 
 \bibliographystyle{splncs04}
 \bibliography{refs}
+
 \end{document}
