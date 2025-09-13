@@ -1,4 +1,4 @@
-\documentclass{easychair}
+\documentclass{article}
 \usepackage{todonotes}
 \usepackage[utf8]{inputenc}
 \usepackage{amssymb, amsthm, amsmath}
@@ -7,17 +7,13 @@
 
 \newtheorem{definition}{Definition}
 \newtheorem{example}{Example}
-
 \newcommand{\gmodel}{\mathcal{M}}
 
 \title{
     Iterative Function Definitions
 }
 \author{Stefan Ratschan \and Marek Dančo \and Mikoláš Janota}
-\authorrunning{Ratschan et al.}
-\titlerunning{Iterative Function Definitions}
-\institute{
-}
+\date{}
 
 \begin{document}
 
@@ -54,8 +50,8 @@ This way we can expand $\gmodel$ to also be a partial model of $\varphi_2$.
 Since $f^{\gmodel}(3,0) = 4$ and it must hold that $f(3,0) < 3 + g(0)$, we can set $g^{\gmodel}(0) = 2$.
 Just like above, we can now define $g^{\gmodel}$ on all even integers and thus obtain a total
 interpretation of $g$.
-Now, for any pair $(i, j) \not= (3, 0)$ of integers, we can define $f^{\gmodel}(i, j)$ to be
-$i + 1$ or $i - 1$ for even or odd $j$ respectively. In the end, we can expand $\gmodel$
+Now, for any pair $(x, y)$ of integers, we can define $f^{\gmodel}(x, y)$ to be
+$x + 1$ or $x - 1$ for even or odd $y$ respectively. In the end, we can expand $\gmodel$
 to a model of $\varphi$.
 
 Observe it must be that $a \not= b$, otherwise
@@ -66,7 +62,6 @@ after each step of our procedure and when a conflict is found,
 we can learn the new ground literals from the \textsc{unsat} core and
 restart the procedure with the updated ground part.
 
-\bigskip
 \emph{Goal}: Proving satisfiability of UFLIA formulas (or UFNIA) formulas (which may prove unsat on the way).
 In the following, a formula will always refer to a UFNIA formula whose only quantifiers are universal
 quantifiers over integer variables.
@@ -84,12 +79,14 @@ values to the very same entity.
     function symbol and an integer (which models an index of the uninterpreted function symbol).
 \end{definition}
 
-\begin{definition}[Satisfiability Certificate, Propagator]
+\begin{definition}[Satisfiability Certificate]
     Given a formula $\phi$, a \emph{satisfiability certificate} is
+
     \begin{itemize}
-        \item an order\footnote{For now, I assume this order to be total.} on all instantiations of quantified
-              sub-formulas of $\phi$, viewing the quantifier-free part as ONE quantified formula with an empty tuple of quantified
-              variables, hence having one instantiation, and
+        \item an order\footnote{For now, I assume this order to be total.} on all instantiations
+              \todo{Do you mean an order on constraints these instantiations produce? Marek} of quantified
+              sub-formulas of $\phi$, viewing the quantifier-free part as ONE quantified formula with
+              an empty tuple of quantified variables, hence having one instantiation, and
         \item for each instantiation of a quantified formula
               \begin{itemize}
                   \item a subset of its entities marked as existential such that the existential entities do not occur in any
@@ -123,7 +120,7 @@ variables\footnote{At some point, we might allow satisfiability propagators of a
                   \item $f(x,y) <x+g(y)$ for $(x,y)= (3,0)$
                   \item $g(x) = g(x + 2)$ for $x= 0, 1, \dots$
                   \item $g(x) = g(x + 2)$, for $x= -1, -2, \dots$,
-                  \item  any order on the rest of $\forall x,y \:.\: f(x,y)<x+g(y)$ (i.e., $(x,y) \not=(3,0)$)
+                  \item any order on the rest of $\forall x,y. \;f(x,y) < x + g(y)$ (i.e., (x,y) $\not=$ (3,0))
               \end{enumerate}
         \item corresponding existential entities:
               \begin{enumerate}
