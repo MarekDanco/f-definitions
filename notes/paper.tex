@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage{todonotes}
+\usepackage[textwidth=3cm]{todonotes}
 \usepackage[utf8]{inputenc}
 \usepackage{amssymb, amsthm, amsmath}
 \usepackage{numprint}
@@ -84,7 +84,7 @@ values to the very same entity.
 
     \begin{itemize}
         \item an order\footnote{For now, I assume this order to be total.} on all instantiations
-              \todo{Do you mean an order on constraints these instantiations produce? Marek} of quantified
+              \todo{Do you mean an order on the constraints these instantiations produce? -Marek} of quantified
               sub-formulas of $\phi$, viewing the quantifier-free part as ONE quantified formula with
               an empty tuple of quantified variables, hence having one instantiation, and
         \item for each instantiation of a quantified formula
@@ -138,6 +138,10 @@ variables\footnote{At some point, we might allow satisfiability propagators of a
                   \item $f(x,y)=x+g(y)-1$
               \end{enumerate}
     \end{itemize}
+\end{example}
+
+\begin{example}
+    \[f(x) + f(x+3) < f(x+2)\]
 \end{example}
 
 \section*{Constructing Certificates}
