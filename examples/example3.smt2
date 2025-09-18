@@ -6,10 +6,10 @@
        (f (+ x 2)))
   )
 )
-(assert
-  (forall ((x Int))
-    (= (f x)
-       (- (f (- x 1)) (f (- x 3)) 1))
-  )
-)
+;(assert
+;  (forall ((x Int))
+;    (= (f x)
+;       (- (f (- x 1)) (f (- x 3)) 1))
+;  )
+;)
 (check-sat)
