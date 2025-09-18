@@ -142,6 +142,24 @@ variables\footnote{At some point, we might allow satisfiability propagators of a
 
 \begin{example}
     \[f(x) + f(x+3) < f(x+2)\]
+    \begin{itemize}
+        \item order on constraints:
+              \begin{enumerate}
+                  \item $f(0) + f(3) < f(2)$
+                  \item $f(1) + f(4) < f(3)$
+                  \item $f(x) + f(x + 3) < f(x + 2)$ for $x = 2, 3, \dots$ and $x = -1, -2, \dots$
+              \end{enumerate}
+        \item corresponding existential entities:
+              \begin{enumerate}
+                  \item $\{f(0), f(2)\}$
+                  \item $\{f(1)\}$
+              \end{enumerate}
+        \item satisfiability propagators:
+              \begin{enumerate}
+                  \item $f(0) = 0, f(1) = 1, f(2) = 2$
+                  \item $f(x) = f(x-1) - f(x-3) - 1$
+              \end{enumerate}
+    \end{itemize}
 \end{example}
 
 \section*{Constructing Certificates}
