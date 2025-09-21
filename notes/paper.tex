@@ -3,10 +3,15 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amssymb, amsthm, amsmath}
 \usepackage{numprint}
-\npthousandsep{,}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
 
 \newtheorem{definition}{Definition}
 \newtheorem{example}{Example}
+\npthousandsep{,}
 \newcommand{\gmodel}{\mathcal{M}}
 
 \title{
@@ -116,7 +121,7 @@ variables\footnote{At some point, we might allow satisfiability propagators of a
     \begin{itemize}
         \item order on constraints, block-wise:
               \begin{enumerate}
-                  \item $f(3, a) \geq 4 + g(b)$,
+                  \item $f(3, a) \geq 4 + g(b)$
                   \item $f(x,y) <x+g(y)$ for $(x,y)= (3,0)$
                   \item $g(x) = g(x + 2)$ for $x= 0, 1, \dots$
                   \item $g(x) = g(x + 2)$, for $x= -1, -2, \dots$,
@@ -162,22 +167,53 @@ variables\footnote{At some point, we might allow satisfiability propagators of a
     \end{itemize}
 \end{example}
 
-\section*{Constructing Certificates}
+\addtocounter{example}{-1}
+\begin{example}[Continued]
+    Another approach in solving the problem in the previous example is the following.
+    Let us assume that $f$ is a linear map. Then,
+    \[f(x) + f(x+3) - f(x+2) = f(x+1)\]
+    We can then rewrite the problem as
+    \[f(y) < 0\]
+    Here, $f$ is a so called \emph{single invocation} symbol. That means we can deskolemize $f$
+    and get
+    \[\exists z. \, z<0\]
+    Next, we can eliminate $z$ and get the formula $-1<0$, which simplifies to $\top$.
 
+    The original problem is thus satisfiable. What's more, the value for $z$ after
+    elimination gives us a satisfying assignment to $f$:
+    \[f = \{\mapsto -1\}\]
+\end{example}
+
+\section*{Constructing Certificates}
 Very rough idea:
 \begin{enumerate}
     \item solve quantifier-free part
     \item check solution against instantiations of quantified part with all entities already assigned,
           if not satisfied, learn a clause and backtrack to solving
     \item order all other instantiations and construct the necessary certificates
-
 \end{enumerate}
 
 \section*{Algorithm}
 
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \Require $\psi = \forall x. \,\varphi(x, f(x))$, where $f$ is single invocation and
+        $\psi$ is satisfiable
+        \Ensure A satisfying assignment to $f$
+        \State $\psi_1 \gets \forall x \exists y . \, \varphi(x, y)$
+        \Comment{deskolemize $f$ in $\psi$}
+        \State $\psi_2 \gets \bigvee_{c \in S} \forall x. \,\varphi(x)[c]$
+        \Comment{eliminite $y$ from $\psi_1$}
+        \State $\psi_3 \gets \bigwedge_{d \in T}\bigvee_{c \in S}  \,\varphi[d, c]$
+        \Comment{eliminite $x$ from $\psi_2$}
+        \State $\{(d_1, c_1), \dots, (d_n, c_n)\} \gets$ values of $c, d$ in the true literals of $\psi_3$
+        \State \Return $f = \{d_1 \mapsto c_1, \dots, d_n \mapsto c_n\}$
+    \end{algorithmic}
+\end{algorithm}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Related Work}\label{sec:related_work}
+\section*{Related Work}\label{}
 Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
 Synthesis of strategies on LIA problems Murphy and Kincaid~\cite{kincaid-cav24}.
 Synthesis, single invocation Kun\v cak et
