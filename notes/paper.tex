@@ -5,6 +5,7 @@
 \usepackage{numprint}
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
+\usepackage{hyperref}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
@@ -106,6 +107,15 @@ The satisfiability propagators typical have the form entity=term, where the left
 variables\footnote{At some point, we might allow satisfiability propagators of a different form, for example,
     to represent real-algebraic number solutions in the case of the reals}.
 
+\section*{Constructing Certificates}
+Very rough idea:
+\begin{enumerate}
+    \item solve quantifier-free part
+    \item check solution against instantiations of quantified part with all entities already assigned,
+          if not satisfied, learn a clause and backtrack to solving
+    \item order all other instantiations and construct the necessary certificates
+\end{enumerate}
+
 \begin{example}
     \[ \forall x \:.\: g(x+2)=g(x)+1 \]
     \begin{itemize}
@@ -184,29 +194,42 @@ variables\footnote{At some point, we might allow satisfiability propagators of a
     \[f = \{\mapsto -1\}\]
 \end{example}
 
-\section*{Constructing Certificates}
-Very rough idea:
-\begin{enumerate}
-    \item solve quantifier-free part
-    \item check solution against instantiations of quantified part with all entities already assigned,
-          if not satisfied, learn a clause and backtrack to solving
-    \item order all other instantiations and construct the necessary certificates
-\end{enumerate}
+\begin{example}
+    \[f(x) + g(x-1) > x\]
+
+    \begin{itemize}
+        \item deskolemize $f \longrightarrow \exists y. \;y + g(x - 1) > x$
+        \item deskolemize $g \longrightarrow \exists y, z. \;y + z > x$
+        \item we have the formula $\psi = \forall x \exists y, z. \; y + z > x$
+        \item eliminate $z$ from $\psi \longrightarrow \forall x \exists y. \; x - y + 1 > x - y$
+        \item we get the formula $\forall x \exists y. \; 1 > 0$, which simplifies to $\top$
+        \item $f$ is unconstrained and $g(x-1) = x - f(x) + 1$
+        \item a possible model is then
+    \end{itemize}
+    \begin{gather*}
+        f = \{\mapsto 0\} \\
+        g = \{x \mapsto x + 2\}
+    \end{gather*}
+\end{example}
+
 
 \section*{Algorithm}
+~\ref{alg}
 
 \begin{algorithm}
+    \caption{Algorithm Prototype}\label{alg}
     \begin{algorithmic}[1]
         \Require $\psi = \forall x. \,\varphi(x, f(x))$, where $f$ is single invocation and
         $\psi$ is satisfiable
         \Ensure A satisfying assignment to $f$
         \State $\psi_1 \gets \forall x \exists y . \, \varphi(x, y)$
         \Comment{deskolemize $f$ in $\psi$}
-        \State $\psi_2 \gets \bigvee_{c \in S} \forall x. \,\varphi(x)[c]$
+        \State $\psi_2 \gets \bigvee_{} \forall x. \,\varphi(x)[c]$
         \Comment{eliminite $y$ from $\psi_1$}
         \State $\psi_3 \gets \bigwedge_{d \in T}\bigvee_{c \in S}  \,\varphi[d, c]$
         \Comment{eliminite $x$ from $\psi_2$}
-        \State $\{(d_1, c_1), \dots, (d_n, c_n)\} \gets$ values of $c, d$ in the true literals of $\psi_3$
+        \State $\mathcal{L} \gets$ true literals in \textsc{sat}($\psi_3$)
+        \State $\{(d_1, c_1), \dots, (d_n, c_n)\} \gets$ values of $d, c$ in $\mathcal{L}$
         \State \Return $f = \{d_1 \mapsto c_1, \dots, d_n \mapsto c_n\}$
     \end{algorithmic}
 \end{algorithm}
