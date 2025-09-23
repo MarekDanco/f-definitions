@@ -15,6 +15,8 @@
 \npthousandsep{,}
 \newcommand{\gmodel}{\mathcal{M}}
 
+\newcommand{\todoSR}[1]{\todo[color=blue!40]{#1}}
+
 \title{
     Iterative Function Definitions
 }
@@ -90,7 +92,7 @@ values to the very same entity.
 
     \begin{itemize}
         \item an order\footnote{For now, I assume this order to be total.} on all instantiations
-              \todo{Do you mean an order on the constraints these instantiations produce? -Marek} of quantified
+              \todo{Do you mean an order on the constraints these instantiations produce? -Marek}\todoSR{I used the term ``constraint'' only to express (my own) intuition. I also had the feeling that for a formal definition via ``instantiation of quantifier'' may be more straightforward. None of this is set in stone, of cource.} of quantified
               sub-formulas of $\phi$, viewing the quantifier-free part as ONE quantified formula with
               an empty tuple of quantified variables, hence having one instantiation, and
         \item for each instantiation of a quantified formula
@@ -246,3 +248,8 @@ al.~\cite{kuncak-pldi10,kuncak-sttt13}.
 \bibliography{refs}
 
 \end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
