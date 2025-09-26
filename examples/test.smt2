@@ -1,0 +1,16 @@
+(set-logic UFLIA)
+(declare-fun g (Int) Int)
+(assert
+  (forall ((x Int))
+    (and
+      (< (g (+ x 2)) (+ (g (+ x 2)) 1))
+      (exists ((y Int) (z Int))
+        (> y (g (+ x z)))
+      )
+      (exists ((w Int))
+        (> x (g w))
+      )
+    )
+  )
+)
+(check-sat)
