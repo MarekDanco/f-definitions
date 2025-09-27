@@ -4,8 +4,8 @@ import z3
 class Formula:
     def __init__(self, formula) -> None:
         self.formula = formula
-        self.collect_symbs_cache = {}
         self.symbol_args = {}
+        self.collect_symbs_cache = {}
         self.symbols = self.collect_symbs(formula, [])
 
     def _translate_var_id(self, var, scope):
@@ -29,10 +29,10 @@ class Formula:
     def _add_arg(self, symbol, scope, arg_vector):
         if not symbol in self.symbol_args:
             self.symbol_args[symbol] = {}
-            self.symbol_args[symbol][scope] = set(arg_vector)
+            self.symbol_args[symbol][scope] = {arg_vector}
             return
         if not scope in self.symbol_args[symbol]:
-            self.symbol_args[symbol][scope] = set(arg_vector)
+            self.symbol_args[symbol][scope] = {arg_vector}
             return
         self.symbol_args[symbol][scope].add(arg_vector)
 
@@ -55,16 +55,29 @@ class Formula:
         symbs = set()
         if z3.is_app(expr) and expr.decl().kind() == z3.Z3_OP_UNINTERPRETED:
             symbs.add(expr.decl())
-            if expr.decl().arity() > 0:
+            if scope and expr.decl().arity() > 0:
                 self._collect_symbs_args(expr, scope)
         for child in expr.children():
             symbs |= self.collect_symbs(child, scope)
         self.collect_symbs_cache[expr_id] = symbs
         return symbs
 
-    def is_single_invocation(self, symbol) -> bool:
+    def is_single_invocation(self, symbol, scope=None) -> bool:
         """Check if symbol is single invocation within the scope of a quantifier."""
+        assert symbol in self.symbol_args, f"Symbol {symbol!r} not found in symbol_args"
+        if scope is not None:
+            return len(self.symbol_args[symbol][scope]) == 1
         for _, args in self.symbol_args[symbol].items():
             if len(args) > 1:
                 return False
         return True
+
+    def deskolemize(self, scope, symbol):
+        """Deskolemize a single invocation function symbol."""
+        assert self.is_single_invocation(
+            symbol, scope
+        ), f"{symbol!r} is not single invocation within the scope of {scope!r}"
+        assert z3.is_quantifier(scope)
+        # TODO check the universally quantified variables used in arguments
+        # TODO place an existential variable after the last such universal variable
+        # TODO substitute
