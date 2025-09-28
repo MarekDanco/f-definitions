@@ -88,6 +88,7 @@ class Formula:
             symbol, scope
         ), f"{symbol!r} is not single invocation within the scope of {scope!r}"
         assert z3.is_quantifier(scope)
+        # TODO use self.formula instead of formula
         # TODO check the universally quantified variables used in arguments
         # TODO place an existential variable after the last such universal variable
         # TODO substitute
