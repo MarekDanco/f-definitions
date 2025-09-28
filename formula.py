@@ -2,6 +2,7 @@ import z3
 
 
 class Formula:
+    # TODO NNF conversion
     def __init__(self, formula) -> None:
         self.formula = formula
         self.symbol_args = {}
@@ -69,7 +70,19 @@ class Formula:
             return len(self.symbol_args[symbol][scope]) == 1
         return all(len(args) == 1 for _, args in self.symbol_args[symbol].items())
 
-    def deskolemize(self, scope, symbol):
+    def get_var_chain(self, formula, scope, chain):
+        """Return chain of universally quantified variables in a formula until scope is reached."""
+        vs = []
+        if formula.is_forall():
+            vs = [formula.var_name(i) for i in range(formula.num_vars())]
+        if formula.get_id() == scope.get_id():
+            return chain + vs
+        for c in formula.children():
+            result = self.get_var_chain(c, scope, chain + vs)
+            if result is not None:
+                return result
+
+    def deskolemize(self, formula, scope, symbol):
         """Deskolemize a single invocation function symbol."""
         assert self.is_single_invocation(
             symbol, scope
