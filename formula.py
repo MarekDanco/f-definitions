@@ -67,10 +67,7 @@ class Formula:
         assert symbol in self.symbol_args, f"Symbol {symbol!r} not found in symbol_args"
         if scope is not None:
             return len(self.symbol_args[symbol][scope]) == 1
-        for _, args in self.symbol_args[symbol].items():
-            if len(args) > 1:
-                return False
-        return True
+        return all(len(args) == 1 for _, args in self.symbol_args[symbol].items())
 
     def deskolemize(self, scope, symbol):
         """Deskolemize a single invocation function symbol."""
