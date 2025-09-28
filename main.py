@@ -50,6 +50,7 @@ def main():
     for cons in constraints:
         f = Formula(cons)
         display_formula(f.formula)
+        print(f.get_var_chain(cons, cons, []))
         symbs = f.symbols
         for s in symbs:
             print(s, f"is single invocation? {f.is_single_invocation(s)}")
