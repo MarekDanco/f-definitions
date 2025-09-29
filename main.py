@@ -8,6 +8,10 @@ import z3
 from formula import Formula
 
 
+def test_var_chain(formula):
+    return formula.get_var_chain(formula.formula, formula.formula.body().arg(1), [])
+
+
 def parse_command_line() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Tool for function synthesis")
     parser.add_argument(
@@ -50,10 +54,7 @@ def main():
     for cons in constraints:
         f = Formula(cons)
         display_formula(f.formula)
-        print(f.get_var_chain(cons, cons, []))
-        symbs = f.symbols
-        for s in symbs:
-            print(s, f"is single invocation? {f.is_single_invocation(s)}")
+        f.test_deskolemize(f.formula)
 
 
 if __name__ == "__main__":

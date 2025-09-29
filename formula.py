@@ -2,10 +2,10 @@ import z3
 
 
 class Formula:
-    # TODO NNF conversion
     def __init__(self, formula) -> None:
-        self.formula = formula
+        self.formula = formula  # TODO NNF conversion
         self.symbol_args = {}
+        self.symbol_expr = {}
         self.collect_symbs_cache = {}
         self.symbols = self.collect_symbs(formula, [])
 
@@ -27,39 +27,47 @@ class Formula:
             vs |= self._find_vars(arg)
         return vs
 
-    def _add_arg(self, symbol, scope, arg_vector):
+    def _add_arg(self, symbol, scope, arg_vector, expr):
         if not symbol in self.symbol_args:
             self.symbol_args[symbol] = {}
             self.symbol_args[symbol][scope] = {arg_vector}
+            self.symbol_expr[symbol] = {}
+            self.symbol_expr[symbol][scope] = {expr}
             return
         if not scope in self.symbol_args[symbol]:
             self.symbol_args[symbol][scope] = {arg_vector}
+            self.symbol_expr[symbol][scope] = {expr}
             return
         self.symbol_args[symbol][scope].add(arg_vector)
+        self.symbol_expr[symbol][scope].add(expr)
 
     def _collect_symbs_args(self, expr, scope):
         arg_vector = []
+        new_expr = expr
         for arg in expr.children():
             vs = self._find_vars(arg)
             var_subs = [(v, self._translate_var_id(v, scope)) for v in vs]
             new_arg = z3.substitute(arg, var_subs)
-            arg_vector.append(z3.simplify(new_arg))
-        self._add_arg(expr.decl(), tuple(scope), tuple(arg_vector))
+            new_expr = z3.substitute(new_expr, var_subs)
+            arg_vector.append(new_arg)
+        self._add_arg(expr.decl(), scope[-1], tuple(arg_vector), expr)
 
     def collect_symbs(self, expr, scope):
         """Extract all variables/constants from a Z3 formula"""
         expr_id = expr.get_id()
         if z3.is_quantifier(expr):
-            scope.append(expr)
+            new_scope = scope + [expr]
+        else:
+            new_scope = scope
         if expr_id in self.collect_symbs_cache:
             return self.collect_symbs_cache[expr_id]
         symbs = set()
         if z3.is_app(expr) and expr.decl().kind() == z3.Z3_OP_UNINTERPRETED:
             symbs.add(expr.decl())
             if scope and expr.decl().arity() > 0:
-                self._collect_symbs_args(expr, scope)
+                self._collect_symbs_args(expr, new_scope)
         for child in expr.children():
-            symbs |= self.collect_symbs(child, scope)
+            symbs |= self.collect_symbs(child, new_scope)
         self.collect_symbs_cache[expr_id] = symbs
         return symbs
 
@@ -73,7 +81,7 @@ class Formula:
     def get_var_chain(self, formula, scope, chain):
         """Return chain of universally quantified variables in a formula until scope is reached."""
         vs = []
-        if formula.is_forall():
+        if z3.is_quantifier(formula) and formula.is_forall():
             vs = [formula.var_name(i) for i in range(formula.num_vars())]
         if formula.get_id() == scope.get_id():
             return chain + vs
@@ -82,13 +90,59 @@ class Formula:
             if result is not None:
                 return result
 
-    def deskolemize(self, formula, scope, symbol):
+    def child_is_scope(self, child, scope):
+        if child.get_id() == scope.get_id():
+            return True
+        return False
+
+    def test_deskolemize(self, formula):
+        for scope in formula.children():
+            self.test_deskolemize(scope)
+        if z3.is_quantifier(formula):
+            print(f"scope {formula}")
+            for symbol in self.symbols:
+                res = self.is_single_invocation(symbol, formula)
+                print(f"{symbol} is single invocation? {res}")
+                if res:
+                    args = list(self.symbol_args[symbol][formula])[0]
+                    print(f"arguments {args}")
+                    var_name = f"deskolem_{symbol.name()}_{hash(args) % 10000}"
+                    deskolem_var = z3.Const(var_name, symbol.range())
+                    expr = list(self.symbol_expr[symbol][formula])[0]
+                    f_deskolem = z3.substitute(
+                        formula.body(),
+                        [
+                            (
+                                expr,
+                                deskolem_var,
+                            )
+                        ],
+                    )
+                    print("deskolem", f_deskolem)
+                    vs = [
+                        z3.Const(formula.var_name(i), formula.var_sort(i))
+                        for i in range(formula.num_vars())
+                    ]
+                    new_f = z3.ForAll(
+                        vs,
+                        z3.Exists([deskolem_var], f_deskolem),
+                    )
+                    print("new f", new_f)
+                    new_f_body = new_f.body()
+                    print("new f body", new_f_body)
+                    print("is new f body quant?", z3.is_quantifier(new_f_body))
+                    print(
+                        "new f body vars",
+                        [new_f_body.var_name(i) for i in range(new_f_body.num_vars())],
+                    )
+            print()
+
+    def deskolemize(self, scope, symbol):
         """Deskolemize a single invocation function symbol."""
         assert self.is_single_invocation(
             symbol, scope
         ), f"{symbol!r} is not single invocation within the scope of {scope!r}"
         assert z3.is_quantifier(scope)
-        # TODO use self.formula instead of formula
         # TODO check the universally quantified variables used in arguments
         # TODO place an existential variable after the last such universal variable
         # TODO substitute
