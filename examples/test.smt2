@@ -10,6 +10,8 @@
       (forall ((y Int) (z Int))
         (> y (g (+ x z)))
       )
+      (> (g x) x
+      )
     )
   )
 )
