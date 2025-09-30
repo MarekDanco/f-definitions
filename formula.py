@@ -8,7 +8,6 @@ class Formula:
         self.symbol_expr = {}
         self.collect_symbs_cache = {}
         self.symbols = self.collect_symbs(formula, [])
-        print(self.symbol_args)
 
     def _translate_var_id(self, var, scope):
         var_id = z3.get_var_index(var)
@@ -53,16 +52,19 @@ class Formula:
             arg_vector.append(new_arg)
         self._add_arg(expr.decl(), scope[-1], tuple(arg_vector), expr)
 
+    def get_id(self, expr, scope):
+        """Include scope in the id to patch de Bruijn collisions."""
+        expr_id = expr.get_id()
+        return (expr_id, tuple(scope))
+
     def collect_symbs(self, expr, scope):
         """Extract all variables/constants from a Z3 formula"""
-        expr_id = expr.get_id()
+        expr_id = self.get_id(expr, scope)
         if z3.is_quantifier(expr):
             new_scope = scope + [expr]
         else:
             new_scope = scope
         if expr_id in self.collect_symbs_cache:
-            # de Bruijn variables bug
-            print(expr)
             return self.collect_symbs_cache[expr_id]
         symbs = set()
         if z3.is_app(expr) and expr.decl().kind() == z3.Z3_OP_UNINTERPRETED:
@@ -98,25 +100,21 @@ class Formula:
         var_name = f"deskolem_{symbol.name()}_{hash(args) % 10000}"
         return z3.Const(var_name, symbol.range())
 
-    # TODO check the universally quantified variables used in arguments
-    # TODO place an existential variable after the last such universal variable
-    # TODO substitute
-
     def deskolemize(self, symbol, scope):
         expr = list(self.symbol_expr[symbol][scope])[0]
-        print(scope.body())
-        print(expr)
+        print("scope body", expr)
+        print("expr", expr)
         deskolem_var = self.get_deskolem_var(symbol, scope)
         sub = [(expr, deskolem_var)]
         f_deskolem = z3.substitute(scope.body(), sub)
+        print(f_deskolem)
+        exist_f_deskolem = z3.Exists([deskolem_var], f_deskolem)
+        print(exist_f_deskolem)
         vs = [
             z3.Const(scope.var_name(i), scope.var_sort(i))
             for i in range(scope.num_vars())
         ]
-        new_scope = z3.ForAll(
-            vs,
-            z3.Exists([deskolem_var], f_deskolem),
-        )
+        new_scope = z3.ForAll(vs, exist_f_deskolem)
         return new_scope
 
     def test_deskolemize(self, formula):
