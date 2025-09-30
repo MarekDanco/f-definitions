@@ -11,9 +11,14 @@
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 
 \newtheorem{definition}{Definition}
+\newtheorem{property}{Property}
 \newtheorem{example}{Example}
 \npthousandsep{,}
 \newcommand{\gmodel}{\mathcal{M}}
+
+
+
+
 
 \newcommand{\todoSR}[1]{\todo[color=blue!40]{#1}}
 
@@ -82,33 +87,25 @@ values to the very same entity.
 
 \section*{Definitions}
 
-\begin{definition}[Entity]
-    An \emph{entity} of a formula is either a numerical variable or a pair consisting of an  uninterpreted
-    function symbol and an integer (which models an index of the uninterpreted function symbol).
-\end{definition}
-
-\begin{definition}[Satisfiability Certificate]
-    Given a formula $\phi$, a \emph{satisfiability certificate} is
-
+\begin{definition}
+    Given a formula $\phi$, a \emph{satisfiability certificate}\todoSR{I slightly polished the definition, and added the property and proof below} is
     \begin{itemize}
-        \item an order\footnote{For now, I assume this order to be total.} on all instantiations
-              \todo{Do you mean an order on the constraints these instantiations
-                  produce? -Marek}\todoSR{I used the term ``constraint'' only to
-                  express (my own) intuition. I also had the feeling that for a
-                  formal definition via ``instantiation of quantifier'' may be more
-                  straightforward. None of this is set in stone, of cource.}
-              of quantified
-              sub-formulas of $\phi$, viewing the quantifier-free part as ONE quantified formula with
-              an empty tuple of quantified variables, hence having one instantiation, and
-        \item for each instantiation of a quantified formula
+        \item a order\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. However, to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes or relax anti-symmetry.} on all instantiations of quantified sub-formulas of $\phi$, viewing the quantifier-free part as quantified with an empty tuple of quantified variables, hence having one instantiation, and
+        \item for each instantiation of a quantified sub-formula of $\phi$
               \begin{itemize}
-                  \item a subset of its entities marked as existential such that the existential entities do not occur in any
-                        formula instantiation occurring before according to the given order, and
-                  \item a certificate showing that for all values of the non-existential entities there exist values for
-                        all other entities satisfying this instantiation, which we will call \emph{satisfiability propagator}.
+                  \item a subset of its entities marked as existential such that the existential entities do not occur in any formula instantiation occurring before according to the given order, and
+                  \item a certificate showing that for all values of the non-existential entities there exist values for all other entities satisfying this instantiation, which we will call \emph{satisfiability propagator}.
               \end{itemize}
     \end{itemize}
-\end{definition}
+  \end{definition}
+
+  \begin{property}
+    Every formula that has a satisfiability certificate is satisfiable.
+  \end{property}
+
+  \begin{proof}
+    We use the principle of induction on well-orders. Let $y$ be an instantiation of a quantified sub-formula, and let $X$ be the set of all instantiations of quantified sub-formulas $x$ with $x<y$. We assume that $\bigwedge_{x\in X} x$ is satisfiable, and prove that $\bigwedge_{x\in X} x\wedge y$ is satisfiable, as well. Since the formula has a satisfiability certificate, the existential entities of $y$ do not occur in any element of $X$. Let $\alpha$ be a variable assignment satisfying $\bigwedge_{x\in X} x$. Let $\alpha'$ be the extension of $\alpha$ that assigns to the existential entities of $y$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $X$, for all entities occurring in $X$, the value of $\alpha'$ is the same as the value of $\alpha$. Hence $\alpha'$ satisfies both $\bigwedge_{x\in X} x$ and $y$, and so it satisfies $\bigwedge_{x\in X} x\wedge y$. \qed
+  \end{proof} 
 
 The satisfiability propagators typical have the form entity=term, where the left-hand sides are the existential
 variables\footnote{At some point, we might allow satisfiability propagators of a different form, for example,
@@ -132,6 +129,41 @@ Very rough idea:
         \item satisfiability propagators for the two blocks in the order: $g(x) = g(x-2)+1$, $g(x) = g(x+2)-1$
     \end{itemize}
 \end{example}
+
+\begin{example}\todoSR{new}
+  \[ g(0)=10\wedge g(2)=10\wedge\forall x \:.\: g(x+2)=g(x) \]
+  \begin{itemize}
+  \item order (same item means both $\leq$ and $\geq$):
+    \begin{enumerate}
+    \item $g(0)=10$, $g(2)=10$, $g(x+2)=g(x)$ for $x=0$
+    \item $g(x+2)=g(x)$ for $x=1, 2, \dots$
+    \item $g(x+2)=g(x)$ for $x=-1,-2,\dots$
+    \end{enumerate}
+  \item corresponding existential entities (here $g(1)$ is not existential anywhere, and hence can be chosen arbitrarily):
+    \begin{enumerate}
+    \item $g(0), g(2)$
+    \item $g(3),g(4),\dots$
+    \item $g(-1),g(-2),\dots$
+    \end{enumerate}
+  \item propagators: 
+    \begin{enumerate}
+    \item $g(0)=10$, $g(2)=10$
+    \item $g(x)=g(x-2)$
+    \item $g(x)=g(x+2)$
+    \end{enumerate}
+  \end{itemize}
+\end{example}
+
+\begin{example}\todoSR{new}
+  \[ g(0)=10\wedge g(2)=13\wedge\forall x \:.\: g(x+2)=g(x) \]
+  does not have a satisfiability certificate:
+  \begin{itemize}
+  \item  If the instantiation $x\leftarrow 0$ would come before any of $g(0)=10$ and $g(2)=13$, let us say before $g(0)=10$, $g(2)$ cannot be existential for $g(2)=13$ and hence this constraint would have to hold \emph{for all} values of $g(2)$, which is not true.
+  \item  If the instantiation $x\leftarrow 0$ would come after both $g(0)=10$ and $g(2)=13$, this would make both $g(0)$ and $g(2)$ non-existential. As a result, $g(0)=g(2)$ would need to be true \emph{for all} values of $g(0)$ and $g(2)$, which is does not.
+  \end{itemize}
+
+\end{example}
+
 
 \begin{example}
     \[f(3, a) \geq 4 + g(b) \wedge (\forall x, y \:.\: f(x, y) <x + g(y)) \wedge (\forall x \:.\: g(x) = g(x+2))\]
