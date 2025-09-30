@@ -84,10 +84,13 @@ class Formula:
         return all(len(args) == 1 for _, args in self.symbol_args[symbol].items())
 
     def get_var_chain(self, formula, scope, chain):
-        """Return chain of universally quantified variables in a formula until scope is reached."""
+        """Return chain of (name, sort) tuples for quantified variables until scope is reached."""
         vs = []
-        if z3.is_quantifier(formula) and formula.is_forall():
-            vs = [formula.var_name(i) for i in range(formula.num_vars())]
+        if z3.is_quantifier(formula):
+            vs = [
+                (formula.var_name(i), formula.var_sort(i))
+                for i in range(formula.num_vars())
+            ]
         if formula.get_id() == scope.get_id():
             return chain + vs
         for c in formula.children():
@@ -102,14 +105,18 @@ class Formula:
 
     def deskolemize(self, symbol, scope):
         expr = list(self.symbol_expr[symbol][scope])[0]
-        print("scope body", expr)
-        print("expr", expr)
         deskolem_var = self.get_deskolem_var(symbol, scope)
         sub = [(expr, deskolem_var)]
         f_deskolem = z3.substitute(scope.body(), sub)
-        print(f_deskolem)
-        exist_f_deskolem = z3.Exists([deskolem_var], f_deskolem)
-        print(exist_f_deskolem)
+        print("deskolemized scope", f_deskolem)
+        var_chain = self.get_var_chain(self.formula, scope, [])
+        assert var_chain is not None, f"Could not find {scope} in {self.formula}"
+        shift_sub = []
+        for i, (_, var_sort) in enumerate(var_chain):
+            shift_sub.append((z3.Var(i, var_sort), z3.Var(i + 1, var_sort)))
+        f_deskolem_shifted = z3.substitute(f_deskolem, shift_sub)
+        print("shifted scope", f_deskolem_shifted)
+        exist_f_deskolem = z3.Exists([deskolem_var], f_deskolem_shifted)
         vs = [
             z3.Const(scope.var_name(i), scope.var_sort(i))
             for i in range(scope.num_vars())
