@@ -54,6 +54,7 @@ def main():
     for cons in constraints:
         f = Formula(cons)
         display_formula(f.formula)
+        print()
         f.test_deskolemize(f.formula)
 
 
