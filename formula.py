@@ -3,11 +3,16 @@ import z3
 
 class Formula:
     def __init__(self, formula) -> None:
-        self.formula = formula  # TODO NNF conversion
+        self.formula = self._to_nnf(formula)
         self.symbol_args = {}
         self.symbol_expr = {}
         self.collect_symbs_cache = {}
-        self.symbols = self.collect_symbs(formula, [])
+        self.symbols = self.collect_symbs(self.formula, [])
+
+    def _to_nnf(self, formula):
+        nnf_tactic = z3.Tactic("nnf")
+        nnf_goal = nnf_tactic(formula)
+        return nnf_goal.as_expr()
 
     def _translate_var_id(self, var, scope):
         var_id = z3.get_var_index(var)
@@ -108,14 +113,12 @@ class Formula:
         deskolem_var = self.get_deskolem_var(symbol, scope)
         sub = [(expr, deskolem_var)]
         f_deskolem = z3.substitute(scope.body(), sub)
-        print("deskolemized scope", f_deskolem)
         var_chain = self.get_var_chain(self.formula, scope, [])
         assert var_chain is not None, f"Could not find {scope} in {self.formula}"
         shift_sub = []
         for i, (_, var_sort) in enumerate(var_chain):
             shift_sub.append((z3.Var(i, var_sort), z3.Var(i + 1, var_sort)))
         f_deskolem_shifted = z3.substitute(f_deskolem, shift_sub)
-        print("shifted scope", f_deskolem_shifted)
         exist_f_deskolem = z3.Exists([deskolem_var], f_deskolem_shifted)
         vs = [
             z3.Const(scope.var_name(i), scope.var_sort(i))
