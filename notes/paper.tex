@@ -94,7 +94,10 @@ values to the very same entity.
         \item for each instantiation of a quantified sub-formula of $\phi$
               \begin{itemize}
                   \item a subset of its entities marked as existential such that the existential entities do not occur in any formula instantiation occurring before according to the given order, and
-                  \item a certificate showing that for all values of the non-existential entities there exist values for all other entities satisfying this instantiation, which we will call \emph{satisfiability propagator}.
+                  \item a certificate showing that for all values of the non-existential entities there exist values for all other entities satisfying this instantiation, which we will call \emph{satisfiability propagator}\footnote{The satisfiability propagators typical have the form entity=term, where the left-hand sides are the existential
+variables. But at some point, we might allow satisfiability propagators of a different form, for example,
+    to represent real-algebraic number solutions in the case of the reals}.
+.
               \end{itemize}
     \end{itemize}
   \end{definition}
@@ -104,12 +107,10 @@ values to the very same entity.
   \end{property}
 
   \begin{proof}
-    We use the principle of induction on well-orders. Let $y$ be an instantiation of a quantified sub-formula, and let $X$ be the set of all instantiations of quantified sub-formulas $x$ with $x<y$. We assume that $\bigwedge_{x\in X} x$ is satisfiable, and prove that $\bigwedge_{x\in X} x\wedge y$ is satisfiable, as well. Since the formula has a satisfiability certificate, the existential entities of $y$ do not occur in any element of $X$. Let $\alpha$ be a variable assignment satisfying $\bigwedge_{x\in X} x$. Let $\alpha'$ be the extension of $\alpha$ that assigns to the existential entities of $y$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $X$, for all entities occurring in $X$, the value of $\alpha'$ is the same as the value of $\alpha$. Hence $\alpha'$ satisfies both $\bigwedge_{x\in X} x$ and $y$, and so it satisfies $\bigwedge_{x\in X} x\wedge y$. \qed
+    We use the principle of induction on well-orders. Let $y$ be an instantiation of a quantified sub-formula, and let $X$ be the set of all instantiations of quantified sub-formulas $x$ with $x<y$. We assume that $\bigwedge_{x\in X} x$ is satisfiable, and prove that $\bigwedge_{x\in X} x\wedge y$ is satisfiable, as well. Since the formula has a satisfiability certificate, the existential entities of $y$ do not occur in any element of $X$. Let $\alpha$ be a variable assignment satisfying $\bigwedge_{x\in X} x$. Let $\alpha'$ be the extension of $\alpha$ that assigns to the existential entities of $y$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $X$, for all entities occurring in $X$, the value of $\alpha'$ is the same as the value of $\alpha$. Hence $\alpha'$ satisfies both $\bigwedge_{x\in X} x$ and $y$, and so it satisfies $\bigwedge_{x\in X} x\wedge y$. 
   \end{proof} 
 
-The satisfiability propagators typical have the form entity=term, where the left-hand sides are the existential
-variables\footnote{At some point, we might allow satisfiability propagators of a different form, for example,
-    to represent real-algebraic number solutions in the case of the reals}.
+The goal is not a constructive converse for certain classes of formulas.\footnote{A converse shows that a satisfiability certificate exists for such a  class, and a  constructive converse, in addition, provides an algorithm that finds this certificate}
 
 \section*{Constructing Certificates}
 Very rough idea:
