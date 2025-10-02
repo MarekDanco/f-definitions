@@ -110,7 +110,7 @@ variables. But at some point, we might allow satisfiability propagators of a dif
     We use the principle of induction on well-orders. Let $y$ be an instantiation of a quantified sub-formula, and let $X$ be the set of all instantiations of quantified sub-formulas $x$ with $x<y$. We assume that $\bigwedge_{x\in X} x$ is satisfiable, and prove that $\bigwedge_{x\in X} x\wedge y$ is satisfiable, as well. Since the formula has a satisfiability certificate, the existential entities of $y$ do not occur in any element of $X$. Let $\alpha$ be a variable assignment satisfying $\bigwedge_{x\in X} x$. Let $\alpha'$ be the extension of $\alpha$ that assigns to the existential entities of $y$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $X$, for all entities occurring in $X$, the value of $\alpha'$ is the same as the value of $\alpha$. Hence $\alpha'$ satisfies both $\bigwedge_{x\in X} x$ and $y$, and so it satisfies $\bigwedge_{x\in X} x\wedge y$. 
   \end{proof} 
 
-The goal is not a constructive converse for certain classes of formulas.\footnote{A converse shows that a satisfiability certificate exists for such a  class, and a  constructive converse, in addition, provides an algorithm that finds this certificate}
+  The goal is now an algorithm that computes such satisfiability certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
 
 \section*{Constructing Certificates}
 Very rough idea:
