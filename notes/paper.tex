@@ -94,10 +94,8 @@ values to the very same entity.
         \item for each instantiation of a quantified sub-formula of $\phi$
               \begin{itemize}
                   \item a subset of its entities marked as existential such that the existential entities do not occur in any formula instantiation occurring before according to the given order, and
-                  \item a certificate showing that for all values of the non-existential entities there exist values for all other entities satisfying this instantiation, which we will call \emph{satisfiability propagator}\footnote{The satisfiability propagators typical have the form entity=term, where the left-hand sides are the existential
-variables. But at some point, we might allow satisfiability propagators of a different form, for example,
+                  \item a certificate showing that for all values of the non-existential entities there exist values of the existential ones satisfying this instantiation, which we will call \emph{satisfiability propagator}\footnote{Ideally, satisfiability propagators should be constructive. That is, they should take the form of an algorithm that computes these values. In many cases, they can even be synthesized automatically from the quantifier elimination problem~\cite{kuncak-sttt13}.  But at some point, we might allow satisfiability propagators of a different form, for example,
     to represent real-algebraic number solutions in the case of the reals}.
-.
               \end{itemize}
     \end{itemize}
   \end{definition}
@@ -282,7 +280,7 @@ Synthesis of strategies on LIA problems Murphy and Kincaid~\cite{kincaid-cav24}.
 Synthesis, single invocation Kun\v cak et
 al.~\cite{kuncak-pldi10,kuncak-sttt13}.
 
-\bibliographystyle{splncs04}
+\bibliographystyle{abbrv}
 \bibliography{refs}
 
 \end{document}
