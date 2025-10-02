@@ -90,7 +90,7 @@ values to the very same entity.
 \begin{definition}
     Given a formula $\phi$, a \emph{satisfiability certificate}\todoSR{I slightly polished the definition, and added the property and proof below} is
     \begin{itemize}
-        \item a order\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. However, to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes or relax anti-symmetry.} on all instantiations of quantified sub-formulas of $\phi$, viewing the quantifier-free part as quantified with an empty tuple of quantified variables, hence having one instantiation, and
+        \item an order\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. However, to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes or relax anti-symmetry.} on all instantiations of quantified sub-formulas of $\phi$, viewing the quantifier-free part as quantified with an empty tuple of quantified variables, hence having one instantiation, and
         \item for each instantiation of a quantified sub-formula of $\phi$
               \begin{itemize}
                   \item a subset of its entities marked as existential such that the existential entities do not occur in any formula instantiation occurring before according to the given order, and
