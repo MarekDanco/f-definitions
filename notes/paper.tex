@@ -88,7 +88,7 @@ values to the very same entity.
 \section*{Definitions}
 
 \begin{definition}
-    Given a formula $\phi$, a \emph{satisfiability certificate}\todoSR{I slightly polished the definition, and added the property and proof below} is
+    Given a formula $\phi$, a \emph{satisfiability certificate} is
     \begin{itemize}
         \item an order\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. However, to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes or relax anti-symmetry.} on all instantiations of quantified sub-formulas of $\phi$, viewing the quantifier-free part as quantified with an empty tuple of quantified variables, hence having one instantiation, and
         \item for each instantiation of a quantified sub-formula of $\phi$
@@ -129,7 +129,7 @@ Very rough idea:
     \end{itemize}
 \end{example}
 
-\begin{example}\todoSR{new}
+\begin{example}
   \[ g(0)=10\wedge g(2)=10\wedge\forall x \:.\: g(x+2)=g(x) \]
   \begin{itemize}
   \item order (same item means both $\leq$ and $\geq$):
@@ -153,7 +153,7 @@ Very rough idea:
   \end{itemize}
 \end{example}
 
-\begin{example}\todoSR{new}
+\begin{example}
   \[ g(0)=10\wedge g(2)=13\wedge\forall x \:.\: g(x+2)=g(x) \]
   does not have a satisfiability certificate:
   \begin{itemize}
