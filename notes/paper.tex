@@ -137,9 +137,14 @@ values for the existential ones such that the extension of~$I$ assigning these v
   \end{property}
 
   \begin{proof}
-    The pre-satisfiability certificate $I$ satisfies the quantifier free part. We will show that there is an extension of $I$ satisfying the quantified part. For this we use the principle of induction on well-orders to show that for every instantiation~$\psi$ of a quantified-subformula, the set of formulas $\{ \psi' \mid \psi'\prec \psi\}$ is satisfied by an extension of $I$. Due to compactness\todoSR{check details} this implies that the formula is satisfiable.
+    Assume a formula $\phi$ that has a satisfiability certificate.
+    The corresponding pre-satisfiability certificate $I$ satisfies the quantifier free part of $\phi$. We use the principle of induction on well-orders to show that for every instantiation~$\psi$ of a quantified-subformula, the set of formulas $\{ \psi' \mid \psi'\prec \psi\}$ is satisfied by an extension of $I$. 
     
-    Let $\psi$ be an instantiation of a quantified sub-formula, and let $X$ be $\{ \psi' \mid \psi'\prec \psi\}$. We assume that $X$ is satisfiable by an extension $I_X$ of $I$, and prove that $X\cup \{ \psi\}$ is satisfiable by an extension of $I$, as well. Since the formula has a satisfiability certificate, the existential entities of $\psi$ do not occur in any element of $X$. Let $I'$ be the extension of $I_X$ that assigns to the existential entities of $\psi$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $X$, for all entities occurring in $X$, the value of $I'$ is the same as the value of $I_X$. Hence $I'$ satisfies both $X$ and $\psi$, and so it satisfies $X\cup \{ \psi\}$. 
+    Let $\psi$ be an instantiation of a quantified sub-formula, and let $X$ be $\{ \psi' \mid \psi'\prec \psi\}$. We assume that $X$ is satisfiable by an extension $I_X$ of $I$, and prove that $X\cup \{ \psi\}$ is satisfiable by an extension of $I$, as well. Since the formula has a satisfiability certificate, the existential entities of $\psi$ do not occur in any element of $X$. Let $I'$ be the extension of $I_X$ that assigns to the existential entities of $\psi$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $X$, for all entities occurring in $X$, the value of $I'$ is the same as the value of $I_X$. Hence $I'$ satisfies both $X$ and $\psi$, and so it satisfies $X\cup \{ \psi\}$.
+
+    Now denote for every instantiation~$\psi$ of a quantified-subformula the entity interpretation $I$  satisfying $\psi$ as constructed in the previous paragraph by $I_{\psi}$.
+    % From the well-order $\prec$ we get a corresponding well-order on these entity interpretations.
+    Let $I_{\phi}$ be the entity interpretation that, for any entity $u$, assigns the value to $u$ that $I_{\psi}$ assigns to it for the smallest $\psi$ (wrt. $\prec$) that assigns a value to $u$. This smallest $\psi$ exists, since $\prec$ is a well-order. This entity interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
   \end{proof} 
 
 
