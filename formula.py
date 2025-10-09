@@ -22,7 +22,8 @@ class Formula:
                 var_id -= num_vars
             else:
                 var_name = quant.var_name(num_vars - 1 - var_id)
-                return z3.Const(var_name, var.sort())
+                break
+        return z3.Const(var_name, var.sort())
 
     def _find_vars(self, expr):
         if z3.is_var(expr):
@@ -102,6 +103,7 @@ class Formula:
             result = self.get_var_chain(c, scope, chain + vs)
             if result is not None:
                 return result
+        return None
 
     def get_deskolem_var(self, symbol, scope):
         args = list(self.symbol_args[symbol][scope])[0]
