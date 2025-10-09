@@ -8,10 +8,6 @@ import z3
 from formula import Formula
 
 
-def test_var_chain(formula):
-    return formula.get_var_chain(formula.formula, formula.formula.body().arg(1), [])
-
-
 def parse_command_line() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Tool for function synthesis")
     parser.add_argument(
