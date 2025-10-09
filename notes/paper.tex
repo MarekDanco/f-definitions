@@ -186,8 +186,7 @@ Very rough idea:
     \[ \forall x \:.\: g(x+2)=g(x)+1 \]
     \begin{itemize}
         \item order: $0,1,\dots, -1, -2, \dots$
-        \item corresponding existential entities: $g(2), g(3), \dots, g(-1), g(-2), \dots$   (note that g(0) and g(1) are not
-              existential anywhere, and hence can be chosen arbitrarily)
+        \item corresponding existential entities: $g(2), g(3), \dots, g(-1), g(-2), \dots$   \footnote{Formally speaking also $g(0)$ is existential for the instantiation with $0$, and $g(1)$ for the instantiation with $1$. However, assuming them to be non-existential allows for a uniform construction of satisfiability propagators. This ensures correctness, see the comment after the definition of satisfiability certificate.}
         \item satisfiability propagators for the two blocks in the order: $g(x) = g(x-2)+1$, $g(x) = g(x+2)-1$
     \end{itemize}
 \end{example}
@@ -195,59 +194,35 @@ Very rough idea:
 \begin{example}
   \[ g(0)=10\wedge g(2)=10\wedge\forall x \:.\: g(x+2)=g(x) \]
   \begin{itemize}
-  \item order (same item means both $\leq$ and $\geq$):
+  \item order
     \begin{enumerate}
-    \item $g(0)=10$, $g(2)=10$, $g(x+2)=g(x)$ for $x=0$
-    \item $g(x+2)=g(x)$ for $x=1, 2, \dots$
+    \item $g(x+2)=g(x)$ for $x=0, 1, \dots$
     \item $g(x+2)=g(x)$ for $x=-1,-2,\dots$
     \end{enumerate}
-  \item corresponding existential entities (here $g(1)$ is not existential anywhere, and hence can be chosen arbitrarily):
-    \begin{enumerate}
-    \item $g(0), g(2)$
-    \item $g(3),g(4),\dots$
-    \item $g(-1),g(-2),\dots$
-    \end{enumerate}
+  \item pre-satisfiability certificate $\{ g(0)\mapsto 10, g(2)\mapsto 10 \}$
   \item propagators: 
     \begin{enumerate}
-    \item $g(0)=10$, $g(2)=10$
-    \item $g(x)=g(x-2)$
-    \item $g(x)=g(x+2)$
+    \item $x=0$: nothing to assign
+    \item $x=1,\dots$: $g(x)=g(x-2)$
+    \item $x=-1,-2,\dots$: $g(x)=g(x+2)$
     \end{enumerate}
   \end{itemize}
 \end{example}
 
-\begin{example}
-  \[ g(0)=10\wedge g(2)=13\wedge\forall x \:.\: g(x+2)=g(x) \]
-  does not have a satisfiability certificate:
-  \begin{itemize}
-  \item  If the instantiation $x\leftarrow 0$ would come before any of $g(0)=10$ and $g(2)=13$, let us say before $g(0)=10$, $g(2)$ cannot be existential for $g(2)=13$ and hence this constraint would have to hold \emph{for all} values of $g(2)$, which is not true.
-  \item  If the instantiation $x\leftarrow 0$ would come after both $g(0)=10$ and $g(2)=13$, this would make both $g(0)$ and $g(2)$ non-existential. As a result, $g(0)=g(2)$ would need to be true \emph{for all} values of $g(0)$ and $g(2)$, which is does not.
-  \end{itemize}
-
-\end{example}
-
-
+\newpage
 \begin{example}
     \[f(3, a) \geq 4 + g(b) \wedge (\forall x, y \:.\: f(x, y) <x + g(y)) \wedge (\forall x \:.\: g(x) = g(x+2))\]
     \begin{itemize}
         \item order on constraints, block-wise:
               \begin{enumerate}
-                  \item $f(3, a) \geq 4 + g(b)$
                   \item $f(x,y) <x+g(y)$ for $(x,y)= (3,0)$
                   \item $g(x) = g(x + 2)$ for $x= 0, 1, \dots$
                   \item $g(x) = g(x + 2)$, for $x= -1, -2, \dots$,
                   \item any order on the rest of $\forall x,y. \;f(x,y) < x + g(y)$ (i.e., (x,y) $\not=$ (3,0))
               \end{enumerate}
-        \item corresponding existential entities:
-              \begin{enumerate}
-                  \item $\{a, b, f(3,0), g(1)\}$
-                  \item $\{ g(0)\}$
-                  \item $\{ g(2) \}, \{ g(3) \}, \dots$
-                  \item $\{ g(-1) \}, \{ g(-2) \}, \dots$
-              \end{enumerate}
+        \item pre-satisfiability certificate: $\{ a\mapsto 0, b\mapsto 1, f(3,0)\mapsto 4, g(1)\mapsto 0\}$
         \item satisfiability propagators:
               \begin{enumerate}
-                  \item $a=0, b=1, f(3,0)=4, g(1)=0$
                   \item $g(0)=2$
                   \item $g(x)= g(x-2)$
                   \item $g(x)=g(x+2)$
@@ -257,23 +232,21 @@ Very rough idea:
 \end{example}
 
 \begin{example}
-    \[f(x) + f(x+3) < f(x+2)\]
+    \[\forall x \;.\; f(x) + f(x+3) < f(x+2)\]
     \begin{itemize}
         \item order on constraints:
               \begin{enumerate}
                   \item $f(0) + f(3) < f(2)$
                   \item $f(1) + f(4) < f(3)$
-                  \item $f(x) + f(x + 3) < f(x + 2)$ for $x = 2, 3, \dots$ and $x = -1, -2, \dots$
-              \end{enumerate}
-        \item corresponding existential entities:
-              \begin{enumerate}
-                  \item $\{f(0), f(2)\}$
-                  \item $\{f(1)\}$
+                  \item $f(x) + f(x + 3) < f(x + 2)$ for $x = 2, 3, \dots$ 
+                  \item $f(x) + f(x + 3) < f(x + 2)$ for $x = -1, -2, \dots$
               \end{enumerate}
         \item satisfiability propagators:
               \begin{enumerate}
-                  \item $f(0) = 0, f(1) = 1, f(2) = 2$
+                  \item $f(0) = 0, f(2) = 2, f(3) = 1$
+                  \item $f(1) = 0, f(4) =0$
                   \item $f(x) = f(x-1) - f(x-3) - 1$
+                  \item $f(x) = - f(x+3) + f(x+2)  - 1$                    
               \end{enumerate}
     \end{itemize}
 \end{example}
