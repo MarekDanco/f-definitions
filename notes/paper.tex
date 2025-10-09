@@ -118,8 +118,7 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 
     \begin{itemize}
         \item an order $\preceq$\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).} on all instantiations of quantified sub-formulas of $\phi$, 
         \item an pre-satisfiability certificate $I$, which for every instantiation $\psi$ of a quantified sub-formula of $\phi$ partitions $\Gamma_I(\psi)$ into
-          \begin{itemize}
-            
+          \begin{itemize}          
           \item entities assigned a value by $I$,
           \item entities not assigned a value by $I$ where $\psi$ is the first instantiation wrt. $\prec$ where the entity occurs in $\Gamma_I(\psi)$ (\emph{existential entitites}),
           \item entities not assigned a value by $I$ for which there is an instantiation $\psi'\prec\psi$ where the entity occurs in $\Gamma_I(\psi')$
@@ -132,6 +131,8 @@ values for the existential ones such that the extension of~$I$ assigning these v
               \end{itemize}
   \end{definition}
 
+  Note that, a fortiori, a satisfiability propagator for a certain partition of entities into the three sets above, stays a satisfiability propagator when moving entities from being non-existential to being existential.
+  
   \begin{property}
     Every formula that has a satisfiability certificate is satisfiable.
   \end{property}
@@ -146,7 +147,6 @@ values for the existential ones such that the extension of~$I$ assigning these v
     % From the well-order $\prec$ we get a corresponding well-order on these entity interpretations.
     Let $I_{\phi}$ be the entity interpretation that, for any entity $u$, assigns the value to $u$ that $I_{\psi}$ assigns to it for the smallest $\psi$ (wrt. $\prec$) that assigns a value to $u$. This smallest $\psi$ exists, since $\prec$ is a well-order. This entity interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
   \end{proof} 
-
 
 A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model of the formula. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$.
 
