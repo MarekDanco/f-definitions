@@ -38,7 +38,7 @@ def display_constraints(constraints, message=None) -> None:
 
 def parse_input_file(file_path: str):
     s = z3.Solver()
-    input_path = "examples/test.smt2" if file_path == "-" else file_path
+    input_path = "examples/deskolemize.smt2" if file_path == "-" else file_path
     s.from_file(input_path)
     constraints = s.assertions()
     return constraints
