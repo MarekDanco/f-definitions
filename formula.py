@@ -25,6 +25,14 @@ class Formula:
                 break
         return z3.Const(var_name, var.sort())
 
+    def _find_consts(self, expr):
+        if z3.is_const(expr):
+            return {expr}
+        cs = set()
+        for arg in expr.children():
+            cs |= self._find_consts(arg)
+        return cs
+
     def _find_vars(self, expr):
         if z3.is_var(expr):
             return {expr}
@@ -46,6 +54,12 @@ class Formula:
             return
         self.symbol_args[symbol][scope].add(arg_vector)
         self.symbol_expr[symbol][scope].add(expr)
+
+    def _collect_arg_consts(self, arg_vector):
+        consts = set()
+        for arg in arg_vector:
+            consts |= self._find_consts(arg)
+        return consts
 
     def _collect_symbs_args(self, expr, scope):
         arg_vector = []
@@ -116,6 +130,12 @@ class Formula:
         sub = [(expr, deskolem_var)]
         f_deskolem = z3.substitute(scope.body(), sub)
         var_chain = self.get_var_chain(self.formula, scope, [])
+        symbol_consts = self._collect_arg_consts(
+            list(self.symbol_args[symbol][scope])[0]
+        )
+        print("symbol consts", symbol_consts)
+        print("var chain", var_chain)
+        # TODO deskolemize at the right point
         assert var_chain is not None, f"Could not find {scope} in {self.formula}"
         shift_sub = []
         for i, (_, var_sort) in enumerate(var_chain):
