@@ -292,11 +292,11 @@ Very rough idea:
 For multiple quantified subformulas we can try to derive constraints on $c_i$ for the first step in \ref{alg_sketch}.
 
 \begin{algorithm}
-    \caption{Algorithm Wild Sketch (Likely Wrong)}
-    \begin{algorithmic}[1]\label{alg_sketch}
+    \caption{Algorithm Wild Sketch (Likely Wrong)}\label{alg_sketch}
+    \begin{algorithmic}[1]
         \Require $\phi = \forall x. \,\psi(x, f(x + c_1), \dots, f(x + c_n))$, ground part $\textit{G}$
         \Ensure A satisfying assignment to $f$
-        \State $\textit{I} \gets \text{interpretation that grounds the arguments of } f$
+        \State $\textit{I} \gets \text{interpretation that grounds the arguments of } f \text{ in } \phi$
         \Comment{partial model}
         \State Determine the order $\psi_1 \prec \psi_2 \prec \dots$ on instantiations of $\phi$
         \Comment{based on $\textit{I}$}
@@ -304,12 +304,16 @@ For multiple quantified subformulas we can try to derive constraints on $c_i$ fo
         and add to $\textit{G}$
         \State Extend \textit{I} to a model of $\textit{G}$
         \State Let $\phi_1 = \forall x \exists \alpha_1, \dots, \alpha_n . \,\psi(x, \alpha_1, \dots, \alpha_n)$
+        \Comment replace $f$'s with new variables
         \State Eliminate $\alpha_n$ that represents
         $f(x+c_n)$ for ${c_n}^\mathit{I} = \mathit{max}\{ {c_1}^\mathit{I}, \dots, {c_n}^\mathit{I} \}$
         \State Let
         $\phi_2 = \bigvee_{t \in S}\forall x \exists \alpha_1, \dots, \alpha_{n-1} . \,\psi(x, \alpha_1, \dots, \alpha_{n-1}, t)$
-        \State From $\phi_2$ we can get the propagator for the direction to the right
+        \Comment{case splitting for 8.}
+        \State From $\phi_2$ we can get the propagator(s) for the direction to the right
         \State Propagate $\rightarrow$ if contradiction return to \textsc{1.}
+        \Comment{4. should always work}
+        \State Symmetrically for the other direction
     \end{algorithmic}
 \end{algorithm}
 
