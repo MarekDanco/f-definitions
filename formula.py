@@ -125,17 +125,12 @@ class Formula:
         return z3.Const(var_name, symbol.range())
 
     def deskolemize(self, symbol, scope):
+        """Deskolemize a single invocation symbol within the given scope."""
         expr = list(self.symbol_expr[symbol][scope])[0]
         deskolem_var = self.get_deskolem_var(symbol, scope)
         sub = [(expr, deskolem_var)]
         f_deskolem = z3.substitute(scope.body(), sub)
         var_chain = self.get_var_chain(self.formula, scope, [])
-        symbol_consts = self._collect_arg_consts(
-            list(self.symbol_args[symbol][scope])[0]
-        )
-        print("symbol consts", symbol_consts)
-        print("var chain", var_chain)
-        # TODO deskolemize at the right point
         assert var_chain is not None, f"Could not find {scope} in {self.formula}"
         shift_sub = []
         for i, (_, var_sort) in enumerate(var_chain):
