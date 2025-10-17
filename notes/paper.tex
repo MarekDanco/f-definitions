@@ -304,8 +304,8 @@ Class of formulas:
   
   We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require that for one of the $f_1,\dots,f_r$, for both its highest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ and lowest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ we can always find a values satisfying $Q$. More formally, there must be an $i^*\in \{1,\dots, r\}$ such that 
   \begin{itemize}
-  \item for all arguments to $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and 
-  \item for all arguments to $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}}))$ satisfying $Q$. 
+  \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and 
+  \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ satisfying $Q$. 
     \end{itemize}
 For increasing $x$, this will propagate values to the entity $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ which, since the offset $c^{f_{i^*}}_{l_{i^*}}$ is the biggest for $f_{i^*}$ has not been propagated a value to, before. Analogically, for decreasing $x$, it will propagate values to the entity with the smallest offset. Note that there might be weaker requirements (with less entities universally quantified) that also might do the job, but this needs more investigation.
 
