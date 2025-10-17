@@ -291,9 +291,17 @@ Very rough idea:
 \section*{Algorithm}
 
 Class of formulas:
-  \[ F\wedge \forall x\;.\; Q(f_1(x+c^{f_1}_1),\dots,f_1(x+c^{f_1}_{l_1}),\dots,f_r(x+c^{f_r}_1),\dots,f_r(x+c^{f_r}_{l_r}))\]
-  where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, the constants $c^{f_i}_{1},\dots,c^{f_i}_{l_i}$ are sorted.
+  \[ F\wedge \forall x\;.\; Q(f_1(x+c^{f_1}_1),\dots,f_1(x+c^{f_1}_{l_1}),\dots,f_r(x+c^{f_r}_1),\dots,f_r(x+c^{f_r}_{l_r})),\]
+  where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, the constants $c^{f_i}_{1},\dots,c^{f_i}_{l_i}$ are sorted and pairwise different.
 
+  This does not yet address:
+  \begin{itemize}
+  \item uninterpreted function symbols of higher arity
+  \item more interesting argument terms containing uninterpreted constants or function symbols
+  \item several quantified variables    
+  \end{itemize}
+  The first item looks like a straightforward extension of the below (choose one argument to base everything on), just introducing messy notation. So we might leave it out for now. The other two are interesting extensions we should think about.
+  
   We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require that for one of the $f_1,\dots,f_r$, for both its highest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ and lowest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ we can always find a values satisfying $Q$. More formally, there must be an $i^*\in \{1,\dots, r\}$ such that 
   \begin{itemize}
   \item for all arguments to $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and 
