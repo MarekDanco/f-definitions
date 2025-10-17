@@ -15,6 +15,8 @@
 \newtheorem{example}{Example}
 \npthousandsep{,}
 \newcommand{\gmodel}{\mathcal{M}}
+\newcommand{\smt}{\textsc{smt}}
+\newcommand{\args}{\text{args}}
 
 
 
@@ -150,7 +152,7 @@ Note that, a fortiori, a satisfiability propagator for a certain partition of en
 
 A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model of the formula. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$.
 
-For this, let $inst(u)$ either be the  instantiation $\psi$ of a quantified sub-formula with $u\in\Gamma_I(\psi)$ and where $u$ is existential, or $\bot$ if there is no such instantiation. For any instantiation $\psi$ of a quantified sub-formula with existential entities $u_1,\dots, u_s$ and non-existential entities $v_1,\dots, v_r$, the satisfiability propagator defines  functions $valprop_{u_1},\dots, valprop_{u_s}$ such that for any $\hat{v}_1,\dots,\hat{v}_r$, the entity assignment
+For this, let $inst(u)$ either be the  instantiation $\psi$ of a quantified sub-formula with $u\in\Gamma_I(\psi)$ and where $u$ is existential, or $\bot$ if there is no such instantiation. For any instantiation $\psi$ of a quantified sub-formula with existential entities $u_1,\dots, u_s$ and non-existential entities $v_1,\dots, v_r$, the satisfiability propagator defines  functions $valprop_{u_1},\dots, valprop_{u_s}$ such that for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
 \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  valprop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto valprop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.
 Then, a program to compute the value $val(u)$ of a given entity $u$ looks as follows:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
@@ -285,6 +287,88 @@ Very rough idea:
         g = \{x \mapsto x + 2\}
     \end{gather*}
 \end{example}
+
+\section*{Algorithm}
+
+Class of formulas:
+  \[ F\wedge \forall x\;.\; Q(f_1(x+c^{f_1}_1),\dots,f_1(x+c^{f_1}_{l_1}),\dots,f_r(x+c^{f_r}_1),\dots,f_r(x+c^{f_r}_{l_r}))\]
+  where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, the constants $c^{f_i}_{1},\dots,c^{f_i}_{l_i}$ are sorted.
+
+  We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require that for one of the $f_1,\dots,f_r$, for both its highest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ and lowest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ we can always find a values satisfying $Q$. More formally, there must be an $i^*\in \{1,\dots, r\}$ such that 
+  \begin{itemize}
+  \item for all arguments to $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and 
+  \item for all arguments to $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}}))$ satisfying $Q$. 
+    \end{itemize}
+For increasing $x$, this will propagate values to the entity $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ which, since the offset $c^{f_{i^*}}_{l_{i^*}}$ is the biggest for $f_{i^*}$ has not been propagated a value to, before. Analogically, for decreasing $x$, it will propagate values to the entity with the smallest offset. Note that there might be weaker requirements (with less entities universally quantified) that also might do the job, but this needs more investigation.
+
+In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
+
+  An algorithm now can construct a satisfiability certificate from an integer interval $I$ and an entity interpretation $\alpha$ s.t.
+  \begin{itemize}
+  \item $\alpha\models F\wedge \bigwedge_{x\in I} Q$
+  \item there is no $t\in args(F, f)$, $\max I<x$  s.t. $x+c^{f_{i^*}}_{l_{i^*}}=\alpha(t)$ (no entity propagated to by upward induction clashes with an argument of $f$ in $F$)
+  \item there is no $t\in args(F, f)$, $x<\min I$  s.t. $x+c^{f_{i^{*}}}_{l_{1}}=\alpha(t)$ (no entity propagated to by downward induction clashes with an argument of $f$ in $F$)
+  \end{itemize}
+
+  % The corresponding certificate is:
+  % \begin{itemize}
+  % \item order on constraints:
+  %   \begin{enumerate}
+  %   \item $F$, $Q(f(x+k),f(x+l))$ for $x\in I$
+  %   \item $Q(f(x+k),f(x+l))$ for $x=\max I+1, \max I+2, \dots$
+  %   \item $Q(f(x+k),f(x+l))$ for $x=\min I-1, \min I-2, \dots$      
+  %   \end{enumerate}
+  % \item existential entities:
+  %   \begin{enumerate}
+  %   \item $\{ x+k \mid x \in I \}\cup \{ x+l \mid x \in I \}$
+  %   \item $\max I + l+1, \max I+l+2, \dots$
+  %   \item $\min I + k -1, \min I+k-2, \dots$
+  %   \end{enumerate}
+  % \end{itemize}
+  For coming up with an algorithm, let us first simplify the two conditions: Pushing negation over quantifiers, we get:
+  \begin{itemize}
+  \item  for all $t\in args(F, f)$, for all $x$ with $\max I<x$, $\alpha(t)<x+c^{f_{i^*}}_{l_{i^*}}$ 
+  \item for all $t\in args(F, f)$, for all $x$ with $x<\min I$, $x+c^{f_{i^{*}}}_{l_{1}}<\alpha(t)$
+  \end{itemize}
+And eliminating the inner universal quantifier, we get
+    \begin{itemize}
+  \item  for all $t\in args(F, f)$, $\alpha(t)<\max I + 1 +c^{f_{i^*}}_{l_{i^*}}$ 
+  \item for all $t\in args(F, f)$, $\min I-1+c^{f_{i^{*}}}_{l_{1}}<\alpha(t)$
+  \end{itemize}
+  which simplifies to
+ \[ \text{for all } t\in args(F, f), \min I+c^{f_{i^{*}}}_{l_{1}}\leq\alpha(t)\leq\max I +c^{f_{i^*}}_{l_{i^*}}.\] 
+Using this condition, we get a first (inefficient) algorithm for constructing a certificate. Here we use the notation that for a formula $F$, $smt(F)$ is a model of $F$, if it exists (i.e., $F$ is satisfiable), and $\bot$, otherwise
+
+
+\begin{algorithm}
+\caption{Satisfiability Check}
+\label{alg:sr}
+\textbf{Input:} Formula $F \wedge \forall x \:.\: Q$ as above\\
+\textbf{Output:} SAT or UNSAT
+\begin{algorithmic}[1]
+% \Procedure{OriginalSMT}{$F, f, k, l, Q$}
+    \State $\underline{I} \leftarrow 0$, $\overline{I} \leftarrow 0$ \Comment{Start with singleton interval}
+    \State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q\right)$
+    
+    \While{$\alpha \neq \bot$}
+                        
+        \State $\text{condition} \leftarrow \bigwedge_{t \in \args(F,f)} \underline{I} + c^{f_{i^{*}}}_{l_{1}} \leq \alpha(t) \leq \overline{I} + c^{f_{i^*}}_{l_{i^*}}$
+        \If{$\smt(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q \wedge \text{condition}) \neq \bot$} \Comment{with clash condition}
+            \State \Return \textsc{Sat} \Comment{Certificate can be constructed}
+        \EndIf
+        
+%        \State \textbf{Expand interval symmetrically:}
+        \State $\underline{I} \leftarrow \underline{I} - 1$
+        \State $\overline{I} \leftarrow \overline{I} + 1$
+        
+ %       \State \textbf{Solve extended formula:}
+        \State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q\right)$ \Comment{with updated bounds}
+    \EndWhile
+    
+    \State \Return \textsc{Unsat}
+% \EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
 
 \section*{Algorithm}
