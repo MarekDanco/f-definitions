@@ -13,6 +13,13 @@
 \newtheorem{definition}{Definition}
 \newtheorem{property}{Property}
 \newtheorem{example}{Example}
+
+\newtheorem{theorem}{Theorem}
+\theoremstyle{remark}
+\newtheorem{claim}{Claim}
+\usepackage{etoolbox}
+\AtEndEnvironment{proof}{\setcounter{claim}{0}}
+
 \npthousandsep{,}
 \newcommand{\gmodel}{\mathcal{M}}
 \newcommand{\smt}{\textsc{smt}}
@@ -380,6 +387,61 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
 \end{algorithm}
 
 We are currently polishing a completeness proof for the \textsc{Sat} case. For the \textsc{Unsat} case, the essential argument seems to be the same as for Ge and de~Moura~\cite[paragraph ``compactness'']{ge-cav09}.
+
+\begin{theorem}
+    Let $\phi$ be a formula of the form
+    \begin{align*}
+        \phi:=F\land Q\big(f_1(x+c_1^{f_1}),...,f_1(x+c_{l_1}^{f_1}),...,f_r(x+c_1^{f_r}),...,f_r(x+c_{1_r}^{f_r})\big)
+    \end{align*}
+    where
+    \begin{enumerate}
+        \item $F$ is quantifier-free.
+        \item For every $i\in\{1,...,r\}$, the constants $c_1^{f_i},...,c_{l_i}^{f_i}$ are sorted and pairwise different.
+        \item $\phi$ is satisfiable.
+        \item $\phi$ satisfies ReqPivot for a specific critical function $f_{i^*}$ \todo{SN: ReqPivot is the $f_{i^*}$ requirement.}
+    \end{enumerate}
+    Then, Algorithm 1, upon input $\phi$, will terminate and return SAT.
+\end{theorem}
+
+\begin{proof}
+    Since $\phi$ is satisfiable, there exists a model $\gmodel\vDash\phi$. From $\gmodel$, we can extract a pre-satisfiability certificate $I^*$ (Definition \ref{def:pre-sat-cert}). This $I^*$ provides concrete integer values for all ground terms in $F$ and for the entities appearing in the instantiations of the quantified formula that make $\phi$ true.
+    Let $S$ be the finite set of all integer arguments for the critical function $f_{i^*}$ that appear in the ground part $F$:
+    \begin{align*}
+        S=\{I^*(t)\,|\,t\in\args(F,f_{i^*})\}
+    \end{align*}
+    Define the minimal and maximal elements of this set: $L=\min(S)$ and $U=\max(S)$. Now we define this critical interval $[K_{\text{min}},K_{\text{max}}]$ where:
+    \begin{align*}
+        K_{\text{min}}=L-c_{l_{i^*}}^{f_{i^*}} \hspace{0.5em}\text{and}\hspace{0.5em} K_{\text{max}}=U-c_{l_1}^{f_{i^*}}
+    \end{align*}
+    \begin{claim}
+       For the interval $[K_{\text{min}},K_{\text{max}}]$, $I^*$ satisfies the clash condition:
+        \begin{align*}
+            \forall t\in\args(F,f_{i^*}).K_{\text{min}}+c_{l_1}^{f_{i^*}}\leq I^*(t)\leq K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}
+        \end{align*}
+        \textit{Proof:} For any $t\in\args(F,f_{i^*})$, we have $L\leq I^*(t)\leq U$. Therefore,
+        \begin{itemize}
+            \item $K_{\text{min}}+c_{l_1}^{f_{i^*}}=\big(L-c_{l_{i^*}}^{f_{i^*}}\big)+c_{l_1}^{f_{i^*}}\leq L\leq I^*(t)$ since $c_{l_1}^{f_{i^*}}\leq c_{l_{i^*}}^{f_{i^*}}$
+            \item $I^*(t)\leq U\leq\big(U-c_{l_1}^{f_{i^*}}\big)+c_{l_{i^*}}^{f_{i^*}}=K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}$ since $c_{l_{i^*}}^{f_{i^*}}\geq c_{l_1}^{f_{i^*}}$
+        \end{itemize}
+    \end{claim}
+
+    Now let $N=\max(K_{\text{min}},K_{\text{max}})$ and consider Algorithm \ref{alg:sr}.
+    \begin{enumerate}
+        \item Line 1: initialisation.
+        \item Line 2: First SMT call. This succeeds because $\phi$ is satisfiable.
+        \item Loop progression: the algorithm enters the while-loop and expands symmetrically.
+        \item At iteration where interval becomes $[-N,N]$:
+        \begin{itemize}
+            \item Line 9. This will succeed because we can construct a mnodel as follows:
+            \begin{itemize}
+                \item For $F$ and $Q(x)$ with $x\in[K_\text{min},K_{\text{max}}]$, use values from $I^*$;
+                \item use the ReqPivot propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
+            \end{itemize}
+            \item Line 5: $\smt(F \wedge \bigwedge_{x=-N}^N Q \wedge C)$ where $C$ is the clash condition $\forall t\in\args(F,f_{i^*}).-N+c_{l_1}^{f_{i^*}}\leq \alpha(t)\leq N+c_{l_{i^*}}^{f_{i^*}}$. This will succeed because the model constructed above also satisfies $C$ (followed from Claim 1 and the fact that $[K_{\text{min}},K_{\text{max}}]\subseteq[-N,N]$).
+            \item $\therefore$ Algorithm \ref{alg:sr} returns SAT.\qedhere
+        \end{itemize}
+    \end{enumerate}
+\end{proof}
 
 \section*{Algorithm}
 
