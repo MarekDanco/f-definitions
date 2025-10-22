@@ -6,6 +6,7 @@
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 \usepackage{hyperref}
+\usepackage{commath}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
@@ -426,7 +427,7 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
         \end{itemize}
     \end{claim}
 
-    Now let $N=\max(K_{\text{min}},K_{\text{max}})$ and consider Algorithm \ref{alg:sr}.
+    Now let $N=\max(\abs{K_{\text{min}}},\abs{K_{\text{max}}})$ and consider Algorithm \ref{alg:sr}.
     \begin{enumerate}
         \item Line 1: initialisation.
         \item Line 2: First SMT call. This succeeds because $\phi$ is satisfiable.
