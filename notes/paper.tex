@@ -27,16 +27,14 @@
 \newcommand{\args}{\text{args}}
 
 
-
-
-
 \newcommand{\todoSR}[1]{\todo[color=blue!40]{#1}}
 \newcommand{\mj}[1]{\todo[color=green!20]{#1 -mik}}
+\newcommand{\marek}[1]{\todo[color=red!10]{#1 -Marek}}
 
 \title{
-    Iterative Function Definitions
+    Inductive Function Definitions
 }
-\author{Stefan Ratschan \and Marek Dančo \and Mikoláš Janota}
+\author{Stefan Ratschan \and Stefan Nugraha \and Mikoláš Janota \and Marek Dančo}
 \date{}
 
 \begin{document}
@@ -124,7 +122,7 @@ Given a term $t$ and an entity interpretation $I$, we can define the semantics $
 For example, the interpretation $I=\{ a\mapsto 5 \}$ grounds the formula $f(a)\geq 0$, and the entity $f(5)$ is an $I$-grounded entity in $f(a)\geq 0$.
 
 \begin{definition}
-  \label{def:pre-sat-cert}
+    \label{def:pre-sat-cert}
     Given a formula $\phi$, we call an entity interpretation $I$ that satisfies the quantifier-free part of $\phi$ and  that grounds  all instantiations of quantified sub-formulas of $\phi$ a \emph{pre-satisfiability certificate} of $\phi$. For any instantiation $\psi$ of a quantified sub-formula of $\phi$, we denote by $\Gamma_I(\psi)$ the resulting set of entities.
 \end{definition}
 
@@ -306,97 +304,104 @@ Very rough idea:
 \section*{Algorithm}
 
 Class of formulas:
-  \[ F\wedge \forall x\;.\; Q(f_1(x+c^{f_1}_1),\dots,f_1(x+c^{f_1}_{l_1}),\dots,f_r(x+c^{f_r}_1),\dots,f_r(x+c^{f_r}_{l_r})),\]
-  where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, the constants $c^{f_i}_{1},\dots,c^{f_i}_{l_i}$ are sorted and pairwise different.
+\[ F\wedge \forall x\;.\; Q(f_1(x+c^{f_1}_1),\dots,f_1(x+c^{f_1}_{l_1}),\dots,f_r(x+c^{f_r}_1),\dots,f_r(x+c^{f_r}_{l_r})),\]
+where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, the constants $c^{f_i}_{1},\dots,c^{f_i}_{l_i}$ are sorted and pairwise different.
 
-  This does not yet address:
-  \begin{itemize}
-  \item uninterpreted function symbols of higher arity
-  \item more interesting argument terms containing uninterpreted constants or function symbols
-  \item several quantified variables    
-  \item several quantified sub-formulas
-  \end{itemize}
-  The first item looks like a straightforward extension of the below (choose one argument to base everything on), just introducing messy notation. So we might leave it out for now. The others are interesting extensions we should think about.
-  
-  We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require that for one of the $f_1,\dots,f_r$, for both its highest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ and lowest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ we can always find values satisfying $Q$. More formally, there must be an $i^*\in \{1,\dots, r\}$ such that \mj{the lowest should be $c^{f_{i^*}}_1$?}
-  \begin{itemize}
-      \item for all values of entities\mj{the terminology does not make sense to me here} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and 
-  \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ satisfying $Q$. 
-    \end{itemize}
+This does not yet address:
+\begin{itemize}
+    \item uninterpreted function symbols of higher arity
+    \item more interesting argument terms containing uninterpreted constants or function symbols
+    \item several quantified variables
+    \item several quantified sub-formulas
+\end{itemize}
+The first item looks like a straightforward extension of the below (choose one argument to base everything on), just introducing messy notation. So we might leave it out for now. The others are interesting extensions we should think about.
+
+We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require that for one of the $f_1,\dots,f_r$, for both its highest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ and lowest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ we can always find values satisfying $Q$. More formally, there must be an $i^*\in \{1,\dots, r\}$ such that \mj{the lowest should be $c^{f_{i^*}}_1$?}
+\begin{itemize}
+    \item for all values of entities\mj{the terminology does not make sense to me here} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
+    \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ satisfying $Q$.
+\end{itemize}
 
 \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+I added some notes in \ref{todo:marek}. -Marek
+%%%%%%%%%%%%%%%%%%%%%%%%
+
 For increasing $x$, this will propagate values to the entity $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ which, since the offset $c^{f_{i^*}}_{l_{i^*}}$ is the biggest for $f_{i^*}$ has not been propagated a value to, before. Analogically, for decreasing $x$, it will propagate values to the entity with the smallest offset. Note that there might be weaker requirements (with fewer entities universally quantified) that also might do the job, but this needs more investigation.
 
 In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
 
-  An algorithm now can construct a satisfiability certificate from an integer interval $I$ and an entity interpretation $\alpha$ s.t.
-  \begin{itemize}
-  \item $\alpha\models F\wedge \bigwedge_{x\in I} Q$
-  \item there is no $t\in args(F, f)$, $\max I<x$  s.t.\ $x+c^{f_{i^*}}_{l_{i^*}}=\alpha(t)$ (no entity propagated to by upward induction clashes with an argument of $f$ in $F$)
-  \item there is no $t\in args(F, f)$, $x<\min I$  s.t.\ $x+c^{f_{i^{*}}}_{l_{1}}=\alpha(t)$ (no entity propagated to by downward induction clashes with an argument of $f$ in $F$)
-  \end{itemize}
+An algorithm now can construct a satisfiability certificate from an integer interval $I$ and an entity interpretation $\alpha$ s.t.
+\begin{itemize}
+    \item $\alpha\models F\wedge \bigwedge_{x\in I} Q$
+    \item there is no $t\in args(F, f)$, $\max I<x$  s.t.\ $x+c^{f_{i^*}}_{l_{i^*}}=\alpha(t)$ (no entity propagated to by upward induction clashes with an argument of $f$ in $F$)
+    \item there is no $t\in args(F, f)$, $x<\min I$  s.t.\ $x+c^{f_{i^{*}}}_{l_{1}}=\alpha(t)$ (no entity propagated to by downward induction clashes with an argument of $f$ in $F$)
+\end{itemize}
 
-  % The corresponding certificate is:
-  % \begin{itemize}
-  % \item order on constraints:
-  %   \begin{enumerate}
-  %   \item $F$, $Q(f(x+k),f(x+l))$ for $x\in I$
-  %   \item $Q(f(x+k),f(x+l))$ for $x=\max I+1, \max I+2, \dots$
-  %   \item $Q(f(x+k),f(x+l))$ for $x=\min I-1, \min I-2, \dots$      
-  %   \end{enumerate}
-  % \item existential entities:
-  %   \begin{enumerate}
-  %   \item $\{ x+k \mid x \in I \}\cup \{ x+l \mid x \in I \}$
-  %   \item $\max I + l+1, \max I+l+2, \dots$
-  %   \item $\min I + k -1, \min I+k-2, \dots$
-  %   \end{enumerate}
-  % \end{itemize}
-  For coming up with an algorithm, let us first simplify the two conditions: Pushing negation over quantifiers, we get:
-  \begin{itemize}
-  \item  for all $t\in args(F, f)$, for all $x$ with $\max I<x$, $\alpha(t)<x+c^{f_{i^*}}_{l_{i^*}}$ 
-  \item for all $t\in args(F, f)$, for all $x$ with $x<\min I$, $x+c^{f_{i^{*}}}_{l_{1}}<\alpha(t)$
-  \end{itemize}
+% The corresponding certificate is:
+% \begin{itemize}
+% \item order on constraints:
+%   \begin{enumerate}
+%   \item $F$, $Q(f(x+k),f(x+l))$ for $x\in I$
+%   \item $Q(f(x+k),f(x+l))$ for $x=\max I+1, \max I+2, \dots$
+%   \item $Q(f(x+k),f(x+l))$ for $x=\min I-1, \min I-2, \dots$
+%   \end{enumerate}
+% \item existential entities:
+%   \begin{enumerate}
+%   \item $\{ x+k \mid x \in I \}\cup \{ x+l \mid x \in I \}$
+%   \item $\max I + l+1, \max I+l+2, \dots$
+%   \item $\min I + k -1, \min I+k-2, \dots$
+%   \end{enumerate}
+% \end{itemize}
+For coming up with an algorithm, let us first simplify the two conditions: Pushing negation over quantifiers, we get:
+\begin{itemize}
+    \item  for all $t\in args(F, f)$, for all $x$ with $\max I<x$, $\alpha(t)<x+c^{f_{i^*}}_{l_{i^*}}$
+    \item for all $t\in args(F, f)$, for all $x$ with $x<\min I$, $x+c^{f_{i^{*}}}_{l_{1}}<\alpha(t)$
+\end{itemize}
 And eliminating the inner universal quantifier, we get
-    \begin{itemize}
-  \item  for all $t\in args(F, f)$, $\alpha(t)<\max I + 1 +c^{f_{i^*}}_{l_{i^*}}$ 
-  \item for all $t\in args(F, f)$, $\min I-1+c^{f_{i^{*}}}_{l_{1}}<\alpha(t)$
-  \end{itemize}
-  which simplifies to
- \[ \text{for all } t\in args(F, f), \min I+c^{f_{i^{*}}}_{l_{1}}\leq\alpha(t)\leq\max I +c^{f_{i^*}}_{l_{i^*}}.\] 
+\begin{itemize}
+    \item  for all $t\in args(F, f)$, $\alpha(t)<\max I + 1 +c^{f_{i^*}}_{l_{i^*}}$
+    \item for all $t\in args(F, f)$, $\min I-1+c^{f_{i^{*}}}_{l_{1}}<\alpha(t)$
+\end{itemize}
+which simplifies to
+\[ \text{for all } t\in args(F, f), \min I+c^{f_{i^{*}}}_{l_{1}}\leq\alpha(t)\leq\max I +c^{f_{i^*}}_{l_{i^*}}.\]
 Using this condition, we get a first (inefficient) algorithm for constructing a certificate. Here we use the notation that for a formula $F$, $smt(F)$ is a model of $F$, if it exists (i.e., $F$ is satisfiable), and $\bot$, otherwise
 \mj{Is this condition really correct? If $F$ is empty, there's no condition on
-$I$ (it can be empty), but how are we sure that we can glue together the two functions (the negative
-and the positive)?}
-
+    $I$ (it can be empty), but how are we sure that we can glue together the two functions (the negative
+    and the positive)?}
+\marek{When $F$ is empty, if the algorithm finds an $\alpha$, it concludes we can define all
+    the remaining entities by propagation. We can currently do that only in the case when
+    there is just one quantified assertion. This is addressed in \ref{todo:marek}.}
 
 \begin{algorithm}
-\caption{Satisfiability Check}
-\label{alg:sr}
-\textbf{Input:} Formula $F \wedge \forall x \:.\: Q$ as above\\
-\textbf{Output:} SAT or UNSAT
-\begin{algorithmic}[1]
-% \Procedure{OriginalSMT}{$F, f, k, l, Q$}
-    \State $\underline{I} \leftarrow 0$, $\overline{I} \leftarrow 0$ \Comment{Start with singleton interval}
-    \State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q\right)$
-    
-    \While{$\alpha \neq \bot$}
-                        
+    \caption{Satisfiability Check}
+    \label{alg:sr}
+    \textbf{Input:} Formula $F \wedge \forall x \:.\: Q$ as above\\
+    \textbf{Output:} SAT or UNSAT
+    \begin{algorithmic}[1]
+        % \Procedure{OriginalSMT}{$F, f, k, l, Q$}
+        \State $\underline{I} \leftarrow 0$, $\overline{I} \leftarrow 0$ \Comment{Start with singleton interval}
+        \State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q\right)$
+
+        \While{$\alpha \neq \bot$}
+
         \State $\text{condition} \leftarrow \bigwedge_{t \in \args(F,f)} \underline{I} + c^{f_{i^{*}}}_{l_{1}} \leq \alpha(t) \leq \overline{I} + c^{f_{i^*}}_{l_{i^*}}$
         \If{$\smt(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q \wedge \text{condition}) \neq \bot$} \Comment{with clash condition}
-            \State \Return \textsc{Sat} \Comment{Certificate can be constructed}
+        \State \Return \textsc{Sat} \Comment{Certificate can be constructed}
         \EndIf
-        
-%        \State \textbf{Expand interval symmetrically:}
+
+        %        \State \textbf{Expand interval symmetrically:}
         \State $\underline{I} \leftarrow \underline{I} - 1$
         \State $\overline{I} \leftarrow \overline{I} + 1$
-        
- %       \State \textbf{Solve extended formula:}
+
+        %       \State \textbf{Solve extended formula:}
         \State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q\right)$ \Comment{with updated bounds}
-    \EndWhile
-    
-    \State \Return \textsc{Unsat}
-% \EndProcedure
-\end{algorithmic}
+        \EndWhile
+
+        \State \Return \textsc{Unsat}
+        % \EndProcedure
+    \end{algorithmic}
 \end{algorithm}
 
 We are currently polishing a completeness proof for the \textsc{Sat} case. For the \textsc{Unsat} case, the essential argument seems to be the same as for Ge and de~Moura~\cite[paragraph ``compactness'']{ge-cav09}.
@@ -427,7 +432,7 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
         K_{\text{min}}=L-c_{l_{i^*}}^{f_{i^*}} \hspace{0.5em}\text{and}\hspace{0.5em} K_{\text{max}}=U-c_1^{f_{i^*}}
     \end{align*}
     \begin{claim}
-       For the interval $[K_{\text{min}},K_{\text{max}}]$, $I^*$ satisfies the clash condition:
+        For the interval $[K_{\text{min}},K_{\text{max}}]$, $I^*$ satisfies the clash condition:
         \begin{align*}
             \forall t\in\args(F,f_{i^*}).K_{\text{min}}+c_1^{f_{i^*}}\leq I^*(t)\leq K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}
         \end{align*}
@@ -444,17 +449,46 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
         \item Line 2: First SMT call. This succeeds because $\phi$ is satisfiable.
         \item Loop progression: the algorithm enters the while-loop and expands symmetrically.
         \item At iteration where interval becomes $[-N,N]$:
-        \begin{itemize}
-            \item Line 9. This will succeed because we can construct a mnodel as follows:
-            \begin{itemize}
-                \item For $F$ and $Q(x)$ with $x\in[K_\text{min},K_{\text{max}}]$, use values from $I^*$;
-                \item use the ReqPivot propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
-            \end{itemize}
-            \item Line 5: $\smt(F \wedge \bigwedge_{x=-N}^N Q \wedge C)$ where $C$ is the clash condition $\forall t\in\args(F,f_{i^*}).-N+c_1^{f_{i^*}}\leq \alpha(t)\leq N+c_{l_{i^*}}^{f_{i^*}}$. This will succeed because the model constructed above also satisfies $C$ (followed from Claim 1 and the fact that $[K_{\text{min}},K_{\text{max}}]\subseteq[-N,N]$).
-            \item $\therefore$ Algorithm \ref{alg:sr} returns SAT.\qedhere
-        \end{itemize}
+              \begin{itemize}
+                  \item Line 9. This will succeed because we can construct a mnodel as follows:
+                        \begin{itemize}
+                            \item For $F$ and $Q(x)$ with $x\in[K_\text{min},K_{\text{max}}]$, use values from $I^*$;
+                            \item use the ReqPivot propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
+                        \end{itemize}
+                  \item Line 5: $\smt(F \wedge \bigwedge_{x=-N}^N Q \wedge C)$ where $C$ is the clash condition $\forall t\in\args(F,f_{i^*}).-N+c_1^{f_{i^*}}\leq \alpha(t)\leq N+c_{l_{i^*}}^{f_{i^*}}$. This will succeed because the model constructed above also satisfies $C$ (followed from Claim 1 and the fact that $[K_{\text{min}},K_{\text{max}}]\subseteq[-N,N]$).
+                  \item $\therefore$ Algorithm \ref{alg:sr} returns SAT.\qedhere
+              \end{itemize}
     \end{enumerate}
 \end{proof}
+
+
+\section*{TODO notes}\label{todo:marek}
+
+I agree that with the current wording the requirement \emph{ReqPivot} doesn't hold for
+$Q = f(x)<f(x+1)\land f(x+1)<f(x+3)$, since not for all values of $f(x), f(x+1)$ can we find
+a value of $f(x+3)$ that satisfies $Q$. Similarly for the second point.
+However, in this case we can simply require that the values of the (non-existential)
+entities in $Q$ are such that the literals not containing $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$,
+$f_{i^*}(x+c^{f_{i^*}}_1)$ in the first, respectively the second point, are satisfied.
+
+Mikol\'a\v s found  another class of formulas where the current approach doesn't work.
+Consider the following problem
+\[
+    \forall x. \,f(x + 7) > f(x) - f(x + 3)
+    \,\land \,\forall x. \,f(x + 3) > f(x)
+\]
+Setting $f(x + 7) = f(x) - f(x + 3) + 1$ and $f(x + 3) = f(x) + 1$ leads to a contradiction,
+because after 3 ``propagation steps'', starting from $x = 0$, in the first conjunct we get
+$f(21) = 0$, while after 7 steps in the second conjunct we get $f(21) = 7$.
+
+For that reason it would be useful to impose constraints on the definitions $F_{x + 7}, F_{x + 3}$
+of $f(x + 7), f(x + 3)$, namely that $F^3_{x + 7} = F^7_{x + 3}$. These constraints are
+likely necessary in the general case to maintain compatibility across the definitions,
+since in the benchmarks the uninterpreted function symbols occur in
+various quantified assertions.
+
+I will have a closer look at this. We might require that the problem is given in CNF.
+
 
 \section*{Algorithm}
 
@@ -514,7 +548,7 @@ al.~\cite{kuncak-pldi10,kuncak-sttt13}.
 Array decision procedures~\cite{Bradley:06}: no arithmetic on universally quantified variables allowed.
 Habermehl et al.~\cite{habermehl-etaps08} allow difference bounded constraints on array offsets of the form $a[i+c]$. From the MBQI paper: ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA does not refer to linear integer arithmetic, but to the logic allowed by Habermehl et al.}  will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.''
 Alberti et al.~\cite{alberti2014decision}: only one universally quantified variable allowed.
-Elad et al.~\cite{elad2024infinite}: The fragment of FOL for which they prove decidability (OSC, Section~6) does not allow anything like integer arithmetic. 
+Elad et al.~\cite{elad2024infinite}: The fragment of FOL for which they prove decidability (OSC, Section~6) does not allow anything like integer arithmetic.
 
 
 
