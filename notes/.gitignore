@@ -1,6 +1,6 @@
 paper.aux
 paper.fdb_latexmk
-paper.fls
+*.fls
 paper.hd
 paper.log
 paper.out
