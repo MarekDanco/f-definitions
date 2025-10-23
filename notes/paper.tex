@@ -31,7 +31,7 @@
 
 
 \newcommand{\todoSR}[1]{\todo[color=blue!40]{#1}}
-\newcommand{\mj}[1]{\todo[color=green!40]{#1}}
+\newcommand{\mj}[1]{\todo[color=green!20]{#1 -mik}}
 
 \title{
     Iterative Function Definitions
@@ -318,6 +318,8 @@ Class of formulas:
       \item for all values of entities\mj{the terminology does not make sense to me here} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and 
   \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{1}})$ satisfying $Q$. 
     \end{itemize}
+
+\mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
 For increasing $x$, this will propagate values to the entity $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ which, since the offset $c^{f_{i^*}}_{l_{i^*}}$ is the biggest for $f_{i^*}$ has not been propagated a value to, before. Analogically, for decreasing $x$, it will propagate values to the entity with the smallest offset. Note that there might be weaker requirements (with fewer entities universally quantified) that also might do the job, but this needs more investigation.
 
 In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
