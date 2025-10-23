@@ -364,6 +364,9 @@ And eliminating the inner universal quantifier, we get
   which simplifies to
  \[ \text{for all } t\in args(F, f), \min I+c^{f_{i^{*}}}_{l_{1}}\leq\alpha(t)\leq\max I +c^{f_{i^*}}_{l_{i^*}}.\] 
 Using this condition, we get a first (inefficient) algorithm for constructing a certificate. Here we use the notation that for a formula $F$, $smt(F)$ is a model of $F$, if it exists (i.e., $F$ is satisfiable), and $\bot$, otherwise
+\mj{Is this condition really correct? If $F$ is empty, there's no condition on
+$I$ (it can be empty), but how are we sure that we can glue together the two functions (the negative
+and the positive)?}
 
 
 \begin{algorithm}
