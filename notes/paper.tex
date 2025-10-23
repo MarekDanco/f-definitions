@@ -509,7 +509,11 @@ Synthesis of strategies on LIA problems Murphy and Kincaid~\cite{kincaid-cav24}.
 Synthesis, single invocation Kun\v cak et
 al.~\cite{kuncak-pldi10,kuncak-sttt13}.
 Array decision procedures~\cite{Bradley:06}: no arithmetic on universally quantified variables allowed.
-Habermehl et al.~\cite{habermehl-etaps08} allow difference bounded constraints on array offsets of the form $a[i+c]$. From the MBQI paper: ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.''
+Habermehl et al.~\cite{habermehl-etaps08} allow difference bounded constraints on array offsets of the form $a[i+c]$. From the MBQI paper: ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA does not refer to linear integer arithmetic, but to the logic allowed by Habermehl et al.}  will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.''
+Alberti et al.~\cite{alberti2014decision}: only one universally quantified variable allowed.
+Elad et al.~\cite{elad2024infinite}: The fragment of FOL for which they prove decidability (OSC, Section~6) does not allow anything like integer arithmetic. 
+
+
 
 \bibliographystyle{abbrv}
 \bibliography{refs}
