@@ -324,10 +324,6 @@ We will satisfy the universal quantifier by an inductive argument going both up 
 
 \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
 
-%%%%%%%%%%%%%%%%%%%%%%%%
-I added some notes in \ref{todo:marek}. -Marek
-%%%%%%%%%%%%%%%%%%%%%%%%
-
 For increasing $x$, this will propagate values to the entity $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ which, since the offset $c^{f_{i^*}}_{l_{i^*}}$ is the biggest for $f_{i^*}$ has not been propagated a value to, before. Analogically, for decreasing $x$, it will propagate values to the entity with the smallest offset. Note that there might be weaker requirements (with fewer entities universally quantified) that also might do the job, but this needs more investigation.
 
 In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
@@ -487,7 +483,7 @@ likely necessary in the general case to maintain compatibility across the defini
 since in the benchmarks the uninterpreted function symbols occur in
 various quantified assertions.
 
-It is good to note that even with the current restrictions the problem
+Note that even with the current restrictions the problem
 when working with multiple quantified formulas might be too hard.
 Consider for example
 \[
@@ -500,29 +496,29 @@ Let us instantiate by 0 -- we obtain the following system of inequalities
 	f(0) & < f(1) - f(2) \\
 	f(0) & < f(1)
 \end{align*}
-We can find a feasible region $R_1 \cup R_2$ by splitting on the parity of $f(2)$, where
+We can find a feasible region $R_1 \cup R_2$ by splitting on the sign of $f(2)$, where
 \begin{align*}
 	R_1 & = \{ (f(0), f(1), f(2)) \,| \,f(2) < 0 \,\land \,f(0) < f(1) \}           \\
 	R_2 & = \{ (f(0), f(1), f(2)) \,| \,f(2) \geq 0 \,\land \,f(0) < f(1) - f(2) \}
 \end{align*}
 We would like to expand a model of this region into a model of the input formula.
 Trivially, we cannot do that with $R_1$ since $f(2) < 0$ forces $f$ to be negative everywhere
-and at the same time $f$ is increasing -- such function cannot be built over integers.
+and at the same time $f$ is increasing -- such function cannot be built over the integers.
 We cannot expand a model of $R_2$ either, since if we instantiate the condition
 \[
 	\forall{x}. \,f(x) < f(x + 1) - f(x + 2)
 \]
 by 0 and 1, we get $f(0) < -f(3)$, which together with $f(0) < f(3)$ and the fact that
-$f$ is forced to be positive in $R_2$, yields a contradiction. Therefore, the problem is
+$f$ is forced to be non-negative in $R_2$ yields a contradiction. Therefore, the problem is
 unsatisfiable.
 
-The problem is that showing $R_1$ cannot be used in finding the model is that it requires
+The problem in showing that $R_1$ cannot be used in finding the model is that it requires
 proving the following set of formulas is $\textsc{unsat}$ over the integers
 \[
 	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
 \]
 This is already too hard for SMT solvers, because it cannot be proven by instantiation.
-Namely, every finite set of instantiations is satisfiable.
+Indeed, every finite set of instantiations of the above formula is satisfiable.
 
 \section*{Algorithm}
 
