@@ -517,10 +517,46 @@ proving the following set of formulas is $\textsc{unsat}$ over the integers
 \[
 	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
 \]
-This is already too hard for SMT solvers, because it cannot be proven by instantiation.
+This is already too hard for SMT solvers, because it cannot be proven by instantiation
+\footnote{In general, we can look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
+	If from the other quantified subformulas we can derive that $f$ is stricly increasing, we can conclude
+	the entire formula is \textsc{unsat} over the integers.}.
 Indeed, every finite set of instantiations of the above formula is satisfiable.
+A similar result can be found in \cite{ge-cav09}, where from compactness we have that
+the above formula has as models only non-standard models of arithmetic (e.g. polynomials over $\mathbb{Z}$).
 
-\section*{Algorithm}
+\section*{Induction}
+
+Mikol\'a\v s pointed out that the above problem can be proven $\textsc{unsat}$ only by the schema of induction.
+Using $\forall{x}. \,f(x)<f(x+1)$ we can prove that
+\[
+	\forall{v}\exists{x}. \,f(x) \geq f(0) + v
+\]
+For the base case we have $\exists x. \,f(x) \geq f(0) + 0$ is valid when setting $x = 0$. For the induction step
+assume for some $v$ and $x$ we have $f(x) \geq f(0) + v$. Now,
+\[
+	f(x) \geq f(0) + v \implies f(x) + 1 \geq f(0) + v + 1 \implies f(x+1) \geq f(0) + v + 1,
+\]
+where the second implication holds by the assumption that $f$ is increasing. Instantiating the lemma by $v = -f(0)$
+now yields {unsat}, since we get
+\[
+	\forall{x}. \,f(x)<0 \land \exists{x}. \,f(x) \geq 0
+\]
+
+Another example when induction is needed is
+\[
+	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
+\]
+Note that (the extension to unsatisfiable formulas of) our algorithm cannot be applied in this case
+because in each $\alpha$ we can set $c$ to be outside $I$. The same goes for any instantiation method.
+We can easily prove the lemma
+\[
+	\forall{x}. \,f(x) = 0
+\]
+from the first and third conjunct by induction. Again, only non-standard models of arithmetic satisfy this formula.
+
+
+\section*{Wrong Algorithm}
 
 For multiple quantified subformulas we can try to derive constraints on $c_i$ for the first step in \ref{alg_sketch}.
 
@@ -575,7 +611,7 @@ Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
 Synthesis of strategies on LIA problems Murphy and Kincaid~\cite{kincaid-cav24}.
 Synthesis, single invocation Kun\v cak et
 al.~\cite{kuncak-pldi10,kuncak-sttt13}.
-Array decision procedures~\cite{Bradley:06}: no arithmetic on universally quantified variables allowed.
+Array decision procedures~\cite{bradley-vmcai06}: no arithmetic on universally quantified variables allowed.
 Habermehl et al.~\cite{habermehl-etaps08} allow difference bounded constraints on array offsets of the form $a[i+c]$. From the MBQI paper: ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA does not refer to linear integer arithmetic, but to the logic allowed by Habermehl et al.}  will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.''
 Alberti et al.~\cite{alberti2014decision}: only one universally quantified variable allowed.
 Elad et al.~\cite{elad2024infinite}: The fragment of FOL for which they prove decidability (OSC, Section~6) does not allow anything like integer arithmetic.
