@@ -7,6 +7,7 @@
 \usepackage[noend]{algpseudocode}
 \usepackage{hyperref}
 \usepackage{commath}
+\usepackage[most]{tcolorbox}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
@@ -30,6 +31,7 @@
 \newcommand{\todoSR}[1]{\todo[color=blue!40]{#1}}
 \newcommand{\mj}[1]{\todo[color=green!20]{#1 -mik}}
 \newcommand{\marek}[1]{\todo[color=red!10]{#1 -Marek}}
+\newcommand{\todoSN}[1]{\todo[color=orange!50]{#1 -SN}}
 
 \title{
     Inductive Function Definitions
@@ -413,7 +415,7 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
 		\item $F$ is quantifier-free.
 		\item For every $i\in\{1,...,r\}$, the constants $c_1^{f_i},...,c_{l_i}^{f_i}$ are sorted and pairwise different.
 		\item $\phi$ is satisfiable.
-		\item $\phi$ satisfies ReqPivot for a specific critical function $f_{i^*}$ \todo{SN: ReqPivot is the $f_{i^*}$ requirement.}
+		\item $\phi$ satisfies ReqPivot for a specific critical function $f_{i^*}$ \todoSN{ReqPivot is the $f_{i^*}$ requirement.}
 	\end{enumerate}
 	Then, Algorithm 1, upon input $\phi$, will terminate and return SAT.
 \end{theorem}
@@ -467,6 +469,17 @@ a value of $f(x+3)$ that satisfies $Q$. Similarly for the second point.
 However, in this case we can simply require that the values of the (non-existential)
 entities in $Q$ are such that the literals not containing $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$,
 $f_{i^*}(x+c^{f_{i^*}}_1)$ in the first, respectively the second point, are satisfied.
+\todoSN{Then I think below is the new ReqPivot definition for now?}
+
+\begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced] 
+\paragraph{ReqPivot Condition.}
+Let $f_1, \dots, f_r$ be the functions appearing in $Q$. 
+We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
+\begin{itemize}
+    \item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+    \item Symetrically, for the smallest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+\end{itemize}
+\end{tcolorbox}
 
 Mikol\'a\v s found  another class of formulas where the current approach doesn't work.
 Consider the following problem
