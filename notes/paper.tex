@@ -134,7 +134,7 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 
 	Given a formula $\phi$, a \emph{satisfiability certificate} is
 	\begin{itemize}
 		\item an order $\preceq$\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).} on all instantiations of quantified sub-formulas of $\phi$,
-		\item an pre-satisfiability certificate $I$, which for every instantiation $\psi$ of a quantified sub-formula of $\phi$ partitions $\Gamma_I(\psi)$ into
+		\item a pre-satisfiability certificate $I$, which for every instantiation $\psi$ of a quantified sub-formula of $\phi$ partitions $\Gamma_I(\psi)$ into
 		      \begin{itemize}
 			      \item entities assigned a value by $I$,
 			      \item entities not assigned a value by $I$ where $\psi$ is the first instantiation wrt. $\prec$ where the entity occurs in $\Gamma_I(\psi)$ (\emph{existential entitites}),
