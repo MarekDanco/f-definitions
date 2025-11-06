@@ -30,7 +30,7 @@
 
 \newcommand{\todoSR}[1]{\todo[color=blue!40]{#1}}
 \newcommand{\mj}[1]{\todo[color=green!20]{#1 -mik}}
-\newcommand{\marek}[1]{\todo[color=red!10]{#1 -Marek}}
+\newcommand{\marek}[1]{\todo[color=red!10]{#1 -MD}}
 \newcommand{\todoSN}[1]{\todo[color=orange!50]{#1 -SN}}
 
 \title{
@@ -470,15 +470,15 @@ However, in this case we can simply require that the values of the (non-existent
 entities in $Q$ are such that the literals not containing $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$,
 $f_{i^*}(x+c^{f_{i^*}}_1)$ in the first, respectively the second point, are satisfied.
 \todoSN{Then I think below is the new ReqPivot definition for now?}
-
-\begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced] 
-\paragraph{ReqPivot Condition.}
-Let $f_1, \dots, f_r$ be the functions appearing in $Q$. 
-We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
-\begin{itemize}
-    \item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-    \item Symetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-\end{itemize}
+\marek{Almost, see this problem with only nonstandard models. $\forall x. f(x)<f(x+1) \land f(x)<0$}
+\begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
+	\paragraph{ReqPivot Condition.}
+	Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
+	We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
+	\begin{itemize}
+		\item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+		\item Symetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+	\end{itemize}
 \end{tcolorbox}
 
 Mikol\'a\v s found  another class of formulas where the current approach doesn't work.
@@ -517,6 +517,8 @@ We can find a feasible region $R_1 \cup R_2$ by splitting on the sign of $f(2)$,
 \end{align*}
 We would like to expand a model of this region into a model of the input formula.
 Trivially, we cannot do that with $R_1$ since $f(2) < 0$ forces $f$ to be negative everywhere
+\marek{This is wrong I don't know how I came up with it. At least we now have the nice induction
+	example because of it. The rest of the ``proof'' is wrong too.}
 and at the same time $f$ is increasing -- such function cannot be built over the integers.
 We cannot expand a model of $R_2$ either, since if we instantiate the condition
 \[
@@ -538,6 +540,13 @@ This is already too hard for SMT solvers, because it cannot be proven by instant
 Indeed, every finite set of instantiations of the above formula is satisfiable.
 A similar result can be found in \cite{ge-cav09}, where from compactness we have that
 the above formula has as models only non-standard models of arithmetic (e.g. polynomials over $\mathbb{Z}$).
+
+TODO actually solve:
+\[
+	\forall{x}. \,f(x) < f(x + 1) \pm f(x + 2)
+	\,\land \,\forall{x}. \,f(x) < f(x + 1)
+\]
+
 
 \section*{Induction}
 
