@@ -369,9 +369,6 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
 \mj{Is this condition really correct? If $F$ is empty, there's no condition on
 	$I$ (it can be empty), but how are we sure that we can glue together the two functions (the negative
 	and the positive)?}
-\marek{When $F$ is empty, if the algorithm finds an $\alpha$, it concludes we can define all
-	the remaining entities by propagation. We can currently do that only in the case when
-	there is just one quantified assertion. This is addressed in \ref{todo:marek}.}
 
 \begin{algorithm}
 	\caption{Satisfiability Check}
@@ -461,14 +458,31 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
 \end{proof}
 
 
-\section*{TODO notes}\label{todo:marek}
+\section*{What Can't the Previous Work Solve?}
 
-I agree that with the current wording the requirement \emph{ReqPivot} doesn't hold for
-$Q = f(x)<f(x+1)\land f(x+1)<f(x+3)$, since not for all values of $f(x), f(x+1)$ can we find
-a value of $f(x+3)$ that satisfies $Q$. Similarly for the second point.
-However, in this case we can simply require that the values of the (non-existential)
-entities in $Q$ are such that the literals not containing $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$,
-$f_{i^*}(x+c^{f_{i^*}}_1)$ in the first, respectively the second point, are satisfied.
+Here, I am considering the works \cite{bradley-vmcai06, ge-cav09, habermehl-etaps08}.
+
+\subsection*{Infinitely Increasing But Bounded Integer Sequence}
+
+\[
+	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
+\]
+
+
+\subsection*{Two-Valued Constant Function}
+
+\[
+	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
+\]
+
+In the last meeting I hand-wavedly assumed this cannot be in the fragment of \cite{habermehl-etaps08}.
+However, it is. They accept the literals $f(x) - f(x+1) \leq 0$ and $f(x+1) - f(x) \leq 0$, which in conjunction simplify
+to $f(x) = f(x+1)$. They can then universally quantify this to form an array property. The other equalities can
+be formed as value expressions $A \leq B \,\land \,B \leq A$. This cannot be solved by \cite{bradley-manna07, ge-cav09} though.
+
+
+\section*{TODO notes}
+
 \todoSN{Then I think below is the new ReqPivot definition for now?}
 \marek{Almost, see this problem with only nonstandard models. $\forall x. f(x)<f(x+1) \land f(x)<0$}
 \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
@@ -481,76 +495,66 @@ $f_{i^*}(x+c^{f_{i^*}}_1)$ in the first, respectively the second point, are sati
 	\end{itemize}
 \end{tcolorbox}
 
-Mikol\'a\v s found  another class of formulas where the current approach doesn't work.
-Consider the following problem
+
+Mikol\'a\v s and I discovered the following trick. Suppose we have this formula
+\[
+	\forall x. \,f(x + 7) > f(x) - f(x + 3)
+	\,\land \,f(x + 3) > f(x)
+\]
+Since the literals are in conjunction, for all $x$ both of them have to be satisfied. This means we can
+split the formula into two universally quantified formulas like so
 \[
 	\forall x. \,f(x + 7) > f(x) - f(x + 3)
 	\,\land \,\forall x. \,f(x + 3) > f(x)
 \]
-Setting $f(x + 7) = f(x) - f(x + 3) + 1$ and $f(x + 3) = f(x) + 1$ leads to a contradiction,
-because after 3 ``propagation steps'', starting from $x = 0$, in the first conjunct we get
-$f(21) = 0$, while after 7 steps in the second conjunct we get $f(21) = 7$.
-
-For that reason it would be useful to impose constraints on the definitions $F_{x + 7}, F_{x + 3}$
-of $f(x + 7), f(x + 3)$, namely that $F^3_{x + 7} = F^7_{x + 3}$. These constraints are
-likely necessary in the general case to maintain compatibility across the definitions,
-since in the benchmarks the uninterpreted function symbols occur in
-various quantified assertions.
-
-Note that even with the current restrictions the problem
-when working with multiple quantified formulas might be too hard.
-Consider for example
+Using substitution we ``normalize'' the formulas as follows
 \[
-	\forall{x}. \,f(x) < f(x + 1) - f(x + 2)
-	\,\land \,\forall{x}. \,f(x) < f(x + 1)
+	\forall x. \,f(x) > f(x - 7) - f(x - 4)
+	\,\land \,\forall x. \,f(x) > f(x - 3)
 \]
-The idea we use is that we first find \emph{I} where we can define $f$ and then proceed by propagation.
-Let us instantiate by 0 -- we obtain the following system of inequalities
-\begin{align*}
-	f(0) & < f(1) - f(2) \\
-	f(0) & < f(1)
-\end{align*}
-We can find a feasible region $R_1 \cup R_2$ by splitting on the sign of $f(2)$, where
-\begin{align*}
-	R_1 & = \{ (f(0), f(1), f(2)) \,| \,f(2) < 0 \,\land \,f(0) < f(1) \}           \\
-	R_2 & = \{ (f(0), f(1), f(2)) \,| \,f(2) \geq 0 \,\land \,f(0) < f(1) - f(2) \}
-\end{align*}
-We would like to expand a model of this region into a model of the input formula.
-Trivially, we cannot do that with $R_1$ since $f(2) < 0$ forces $f$ to be negative everywhere
-\marek{This is wrong I don't know how I came up with it. At least we now have the nice induction
-	example because of it. The rest of the ``proof'' is wrong too.}
-and at the same time $f$ is increasing -- such function cannot be built over the integers.
-We cannot expand a model of $R_2$ either, since if we instantiate the condition
-\[
-	\forall{x}. \,f(x) < f(x + 1) - f(x + 2)
-\]
-by 0 and 1, we get $f(0) < -f(3)$, which together with $f(0) < f(3)$ and the fact that
-$f$ is forced to be non-negative in $R_2$ yields a contradiction. Therefore, the problem is
-unsatisfiable.
+We can then merge the two foralls into one and continue out algorithm normally.
+This ``normalization'' may potentially significantly reduce the amount of iterations in the while
+cycle of Algorithm \ref{alg:sr}. Note that this doesn't work for conjunction.
 
-The problem in showing that $R_1$ cannot be used in finding the model is that it requires
-proving the following set of formulas is $\textsc{unsat}$ over the integers
-\[
-	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
-\]
-This is already too hard for SMT solvers, because it cannot be proven by instantiation
-\footnote{In general, we can look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
-	If from the other quantified subformulas we can derive that $f$ is stricly increasing, we can conclude
-	the entire formula is \textsc{unsat} over the integers.}.
-Indeed, every finite set of instantiations of the above formula is satisfiable.
-A similar result can be found in \cite{ge-cav09}, where from compactness we have that
-the above formula has as models only non-standard models of arithmetic (e.g. polynomials over $\mathbb{Z}$).
+\subsection*{Conjunction}
 
-TODO actually solve:
-\[
-	\forall{x}. \,f(x) < f(x + 1) \pm f(x + 2)
-	\,\land \,\forall{x}. \,f(x) < f(x + 1)
-\]
+TODO include notes from meeting
+
+\begin{example}
+	\[
+		\forall{x}. \,f(x) < f(x + 1) + f(x + 2)
+		\,\land \,\forall{x}. \,f(x) < f(x + 1)
+	\]
+	From $-2$ to the right use identity function. For $x \leq -3$ use
+	\[
+		f(x) = f(x + 1) + f(x + 2) -1
+	\]
+\end{example}
+
+
+TODO solve:
+\begin{example}
+	\[
+		\forall{x}. \,f(x) < f(x + 1) - f(x + 2)
+		\,\land \,\forall{x}. \,f(x) < f(x + 1)
+	\]
+\end{example}
 
 
 \section*{Induction}
 
-Mikol\'a\v s pointed out that the above problem can be proven $\textsc{unsat}$ only by the schema of induction.
+In the following problem we need induction to prove $\textsc{unsat}$
+\footnote{In general, we could look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
+	If from the other quantified subformulas we can derive that $f$ is stricly increasing, we can conclude
+	the entire formula is \textsc{unsat} over the integers.}
+\[
+	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
+\]
+Indeed, every finite set of instantiations of the above formula is satisfiable, therefore the problem
+cannot be proven by instantiation.
+A similar result can be found in \cite{ge-cav09}, where from compactness we have that
+the above formula has as models only non-standard models of arithmetic (e.g. polynomials over $\mathbb{Z}$).
+
 Using $\forall{x}. \,f(x)<f(x+1)$ we can prove that
 \[
 	\forall{v}\exists{x}. \,f(x) \geq f(0) + v
@@ -579,56 +583,6 @@ We can easily prove the lemma
 from the first and third conjunct by induction. Again, only non-standard models of arithmetic satisfy this formula.
 
 
-\section*{Wrong Algorithm}
-
-For multiple quantified subformulas we can try to derive constraints on $c_i$ for the first step in \ref{alg_sketch}.
-
-\begin{algorithm}
-	\caption{Algorithm Sketch}\label{alg_sketch}
-	\begin{algorithmic}[1]
-		\Require $\phi = \forall x. \,\psi(x, f(x + c_1), \dots, f(x + c_n))$, ground part $\textit{G}$
-		\Ensure A satisfying assignment to $f$
-		\State $\textit{I} \gets \text{interpretation that grounds the arguments of } f \text{ in } \phi$
-		\Comment{partial model}
-		\State Determine the order $\psi_1 \prec \psi_2 \prec \dots$ on instantiations of $\phi$
-		\Comment{based on $\textit{I}$}
-		\State Instantiate $\phi$ up to $j$ s.t. $\bigcup_{i \leq j} \Gamma_\textit{I}(\psi_i)$ contains all $f(c_i)$
-		and add to $\textit{G}$
-		\State Extend \textit{I} to a model of $\textit{G}$
-		\State Let $\phi_1 = \forall x \exists \alpha_1, \dots, \alpha_n . \,\psi(x, \alpha_1, \dots, \alpha_n)$
-		\Comment deskolemize $f$'s
-		\State Eliminate $\alpha_n$ that represents
-		$f(x+c_n)$ for ${c_n}^\mathit{I} = \mathit{max}\{ {c_1}^\mathit{I}, \dots, {c_n}^\mathit{I} \}$
-		\State Let
-		$\phi_2 = \bigvee_{t \in S}\forall x \exists \alpha_1, \dots, \alpha_{n-1} . \,\psi(x, \alpha_1, \dots, \alpha_{n-1}, t)$
-		\Comment{case splitting for 8.}
-		\State From $\phi_2$ we can get the propagator(s) for the direction to the right
-		\State Propagate $\rightarrow$ if contradiction return to \textsc{1.}
-		\Comment{4. should always work}
-		\State Symmetrically for the other direction
-	\end{algorithmic}
-\end{algorithm}
-
-%\begin{algorithm}
-%\caption{Algorithm Prototype}
-%\begin{algorithmic}[1]
-%\Require $\psi = \forall x. \,\varphi(x, f(x))$, where $f$ is single invocation and
-%$\psi$ is satisfiable
-%\Ensure A satisfying assignment to $f$
-%\State $\psi_1 \gets \forall x \exists y . \, \varphi(x, y)$
-%\Comment{deskolemize $f$ in $\psi$}
-%\State $\psi_2 \gets \bigvee_{} \forall x. \,\varphi(x)[c]$
-%\Comment{eliminite $y$ from $\psi_1$}
-%\State $\psi_3 \gets \bigwedge_{d \in T}\bigvee_{c \in S}  \,\varphi[d, c]$
-%\Comment{eliminite $x$ from $\psi_2$}
-%\State $\mathcal{L} \gets$ true literals in \textsc{sat}($\psi_3$)
-%\State $\{(d_1, c_1), \dots, (d_n, c_n)\} \gets$ values of $d, c$ in $\mathcal{L}$
-%\State \Return $f = \{d_1 \mapsto c_1, \dots, d_n \mapsto c_n\}$
-%\end{algorithmic}
-%\end{algorithm}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \section*{Related Work}\label{}
 Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
 Synthesis of strategies on LIA problems Murphy and Kincaid~\cite{kincaid-cav24}.
@@ -638,7 +592,6 @@ Array decision procedures~\cite{bradley-vmcai06}: no arithmetic on universally q
 Habermehl et al.~\cite{habermehl-etaps08} allow difference bounded constraints on array offsets of the form $a[i+c]$. From the MBQI paper: ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA does not refer to linear integer arithmetic, but to the logic allowed by Habermehl et al.}  will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.''
 Alberti et al.~\cite{alberti2014decision}: only one universally quantified variable allowed.
 Elad et al.~\cite{elad2024infinite}: The fragment of FOL for which they prove decidability (OSC, Section~6) does not allow anything like integer arithmetic.
-
 
 
 \bibliographystyle{abbrv}
