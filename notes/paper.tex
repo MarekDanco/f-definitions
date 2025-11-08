@@ -331,12 +331,19 @@ For increasing $x$, this will propagate values to the entity $f_{i^*}(x+c^{f_{i^
 
 In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
 
-An algorithm now can construct a satisfiability certificate from an integer interval $I$ and an entity interpretation $\alpha$ s.t.
+
+
+\begin{property}
+  Assume an integer interval $I$ and an entity interpretation $\alpha$ s.t.
 \begin{itemize}
 	\item $\alpha\models F\wedge \bigwedge_{x\in I} Q$
 	\item there is no $t\in args(F, f)$, $\max I<x$  s.t.\ $x+c^{f_{i^*}}_{l_{i^*}}=\alpha(t)$ (no entity propagated to by upward induction clashes with an argument of $f$ in $F$)
 	\item there is no $t\in args(F, f)$, $x<\min I$  s.t.\ $x+c^{f_{i^{*}}}_1=\alpha(t)$ (no entity propagated to by downward induction clashes with an argument of $f$ in $F$)
-\end{itemize}
+        \end{itemize}
+        Then the order $\max I+1, \max I+2, \dots, \min I-1, \min I-2$, together with the entity interpretation $\alpha$, and propagators for ReqPivot form a satisfiability certificate for $F\wedge \bigwedge_{x\in I} Q\wedge \forall_{x\not\in I} Q$.
+\end{property}
+
+Since $F\wedge \bigwedge_{x\in I} Q\wedge \forall_{x\not\in I} Q$ is equivalent to $F\wedge \forall x \,.\, Q$, this also certifies satisfiability of this formula.
 
 % The corresponding certificate is:
 % \begin{itemize}
