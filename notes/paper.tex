@@ -521,11 +521,22 @@ Using substitution we ``normalize'' the formulas as follows
 \]
 We can then merge the two foralls into one and continue out algorithm normally.
 This ``normalization'' may potentially significantly reduce the amount of iterations in the while
-cycle of Algorithm \ref{alg:sr}. Note that this doesn't work for conjunction.
+cycle of Algorithm \ref{alg:sr}. Note that this doesn't work for disjunction.
 
-\subsection*{Conjunction}
+\section*{Disjunction}
 
-TODO include notes from meeting
+Complementary preconditions.
+
+\[\forall{x}. \,2*f(x + 5) = x \,\lor \,2*f(x + 1) = x + 1\]
+Here we pick exactly one disjunction based on the parity of $x$. We never assign to the same entity
+twice, because the difference between the offsets is even.
+
+\[
+\forall{x}. \,f(x + 3) > f(x + 7) \,\lor \,f(x + 4) < f(x + 5)
+\]
+Precondition for each disjunct is $\top$.
+
+\subsection*{Few More Examples}
 
 \begin{example}
 	\[
@@ -539,30 +550,35 @@ TODO include notes from meeting
 \end{example}
 
 
-TODO solve:
 \begin{example}
 	\[
 		\forall{x}. \,f(x) < f(x + 1) - f(x + 2)
 		\,\land \,\forall{x}. \,f(x) < f(x + 1)
 	\]
+	Since $f$ is increasing there has to exist an $a$ for which $f(a) \geq 0$.
+	At the same time $f(a) < f(a+1) - f(a+2)$ and $f(a+1) < f(a+2) - f(a+3)$. That means 
+	$f(a) < -f(a+3)$ but also $f(a) < f(a+3)$. Therefore, $f(a) < \text{min}\{-f(a+3), f(a+3)\}$.
+	In other words $f(a) < 0$, a contradiction.
 \end{example}
 
 
 \section*{Induction}
 
-In the following problem we need induction to prove $\textsc{unsat}$
-\footnote{In general, we could look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
-	If from the other quantified subformulas we can derive that $f$ is stricly increasing, we can conclude
-	the entire formula is \textsc{unsat} over the integers.}
+In the solution of the previous example we implicitly used the fact that the following
+formula is \textsc{unsat}
 \[
 	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
 \]
+Note that one cannot prove that by instantiation\footnote{
+	In general, we could look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
+	If from the other quantified subformulas we can derive that $f$ is stricly increasing, we can conclude
+	the entire formula is \textsc{unsat} over the integers.}.
 Indeed, every finite set of instantiations of the above formula is satisfiable, therefore the problem
 cannot be proven by instantiation.
 A similar result can be found in \cite{ge-cav09}, where from compactness we have that
 the above formula has as models only non-standard models of arithmetic (e.g. polynomials over $\mathbb{Z}$).
 
-Using $\forall{x}. \,f(x)<f(x+1)$ we can prove that
+Using $\forall{x}. \,f(x)<f(x+1)$ we can prove by induction that
 \[
 	\forall{v}\exists{x}. \,f(x) \geq f(0) + v
 \]
@@ -572,12 +588,12 @@ assume for some $v$ and $x$ we have $f(x) \geq f(0) + v$. Now,
 	f(x) \geq f(0) + v \implies f(x) + 1 \geq f(0) + v + 1 \implies f(x+1) \geq f(0) + v + 1,
 \]
 where the second implication holds by the assumption that $f$ is increasing. Instantiating the lemma by $v = -f(0)$
-now yields {unsat}, since we get
+now proves the formula is \textsc{unsat}, since we get
 \[
 	\forall{x}. \,f(x)<0 \land \exists{x}. \,f(x) \geq 0
 \]
 
-Another example when induction is needed is
+Another example where induction is needed is
 \[
 	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
 \]
