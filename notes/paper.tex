@@ -334,13 +334,13 @@ In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $
 
 
 \begin{property}
-  Assume an integer interval $I$ and an entity interpretation $\alpha$ s.t.
-\begin{itemize}
-	\item $\alpha\models F\wedge \bigwedge_{x\in I} Q$
-	\item there is no $t\in args(F, f)$, $\max I<x$  s.t.\ $x+c^{f_{i^*}}_{l_{i^*}}=\alpha(t)$ (no entity propagated to by upward induction clashes with an argument of $f$ in $F$)
-	\item there is no $t\in args(F, f)$, $x<\min I$  s.t.\ $x+c^{f_{i^{*}}}_1=\alpha(t)$ (no entity propagated to by downward induction clashes with an argument of $f$ in $F$)
-        \end{itemize}
-        Then the order $\max I+1, \max I+2, \dots, \min I-1, \min I-2,\dots$, together with the entity interpretation $\alpha$, and propagators for ReqPivot form a satisfiability certificate for $F\wedge \bigwedge_{x\in I} Q\wedge \forall_{x\not\in I} Q$.
+	Assume an integer interval $I$ and an entity interpretation $\alpha$ s.t.
+	\begin{itemize}
+		\item $\alpha\models F\wedge \bigwedge_{x\in I} Q$
+		\item there is no $t\in args(F, f)$, $\max I<x$  s.t.\ $x+c^{f_{i^*}}_{l_{i^*}}=\alpha(t)$ (no entity propagated to by upward induction clashes with an argument of $f$ in $F$)
+		\item there is no $t\in args(F, f)$, $x<\min I$  s.t.\ $x+c^{f_{i^{*}}}_1=\alpha(t)$ (no entity propagated to by downward induction clashes with an argument of $f$ in $F$)
+	\end{itemize}
+	Then the order $\max I+1, \max I+2, \dots, \min I-1, \min I-2,\dots$, together with the entity interpretation $\alpha$, and propagators for ReqPivot form a satisfiability certificate for $F\wedge \bigwedge_{x\in I} Q\wedge \forall_{x\not\in I} Q$.
 \end{property}
 
 Since $F\wedge \bigwedge_{x\in I} Q\wedge \forall_{x\not\in I} Q$ is equivalent to $F\wedge \forall x \,.\, Q$, this also certifies satisfiability of this formula.
@@ -525,18 +525,29 @@ cycle of Algorithm \ref{alg:sr}. Note that this doesn't work for disjunction.
 
 \section*{Disjunction}
 
-Complementary preconditions.
+
+To deal with disjunctions, Mikol\'a\v s proposed we could work with preconditions
+(possibly in \cite{kuncak-pldi10} or \cite{kuncak-sttt13}).
+For each literal in disjunction we can form a precondition on $x$ in a way that
+if the precondition holds, that literal has to be satisfied.
 
 \[\forall{x}. \,2*f(x + 5) = x \,\lor \,2*f(x + 1) = x + 1\]
-Here we pick exactly one disjunction based on the parity of $x$. We never assign to the same entity
-twice, because the difference between the offsets is even.
+
+The preconditions are $2 \mid x$ and $2 \nmid x$ for the first and second disjunct respectively.
+In this case the preconditions are complementary -- for each $x$ exactly one precondition
+is satisfied. If we can form complementary preconditions, then we can do the normalization trick.
+Notice we never assign to the same entity twice, because the difference between the offsets is even.
+The formula is thus satisfiable.
 
 \[
-\forall{x}. \,f(x + 3) > f(x + 7) \,\lor \,f(x + 4) < f(x + 5)
+	\forall{x}. \,f(x + 3) > f(x + 7) \,\lor \,f(x + 4) < f(x + 5)
 \]
-Precondition for each disjunct is $\top$.
+
+Here, both of the dijuncts satisfy \emph{ReqPivot}. That means we can form complementary preconditions
+$\top$ and $\bot$ for the first and second disjunct respectively and satisfy only the first for all $x$.
 
 \subsection*{Few More Examples}
+
 
 \begin{example}
 	\[
@@ -556,7 +567,7 @@ Precondition for each disjunct is $\top$.
 		\,\land \,\forall{x}. \,f(x) < f(x + 1)
 	\]
 	Since $f$ is increasing there has to exist an $a$ for which $f(a) \geq 0$.
-	At the same time $f(a) < f(a+1) - f(a+2)$ and $f(a+1) < f(a+2) - f(a+3)$. That means 
+	At the same time $f(a) < f(a+1) - f(a+2)$ and $f(a+1) < f(a+2) - f(a+3)$. That means
 	$f(a) < -f(a+3)$ but also $f(a) < f(a+3)$. Therefore, $f(a) < \text{min}\{-f(a+3), f(a+3)\}$.
 	In other words $f(a) < 0$, a contradiction.
 \end{example}
@@ -573,8 +584,7 @@ Note that one cannot prove that by instantiation\footnote{
 	In general, we could look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
 	If from the other quantified subformulas we can derive that $f$ is stricly increasing, we can conclude
 	the entire formula is \textsc{unsat} over the integers.}.
-Indeed, every finite set of instantiations of the above formula is satisfiable, therefore the problem
-cannot be proven by instantiation.
+Indeed, every finite set of instantiations of the above formula is satisfiable.
 A similar result can be found in \cite{ge-cav09}, where from compactness we have that
 the above formula has as models only non-standard models of arithmetic (e.g. polynomials over $\mathbb{Z}$).
 
