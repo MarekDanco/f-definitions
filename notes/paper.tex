@@ -472,32 +472,11 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
 	\end{enumerate}
 \end{proof}
 
-\section*{What Can't the Previous Work Solve?}
-
-Here, I am considering the works \cite{bradley-vmcai06, ge-cav09, habermehl-etaps08}.
-
-\subsection*{Infinitely Increasing But Bounded Integer Sequence}
-
-\[
-	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
-\]
-
-
-\subsection*{Two-Valued Constant Function}
-
-\[
-	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
-\]
-
-In the last meeting I hand-wavedly assumed this cannot be in the fragment of \cite{habermehl-etaps08}.
-However, it is. They accept the literals $f(x) - f(x+1) \leq 0$ and $f(x+1) - f(x) \leq 0$, which in conjunction simplify
-to $f(x) = f(x+1)$. They can then universally quantify this to form an array property. The other equalities can
-be formed as value expressions $A \leq B \,\land \,B \leq A$. This cannot be solved by \cite{bradley-manna07, ge-cav09} though.
 
 \section{Extensions}
 \subsection{Conjunction}\label{sec:conj}
 
-The proposed new \emph{ReqPivot} condition addressing the extension to conjunction of literals. 
+The proposed new \emph{ReqPivot} condition addressing the extension to conjunction of literals.
 It doesn't deal with formulas with only nonstandard models such as Formula~\eqref{eq:ind-needed}.
 \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
 	\paragraph{ReqPivot Condition.}
@@ -509,7 +488,6 @@ It doesn't deal with formulas with only nonstandard models such as Formula~\eqre
 	\end{itemize}
 \end{tcolorbox}
 
-% Mikol\'a\v s and I discovered the following trick.
 Suppose the following formula.
 \begin{equation}\label{eq:conj1}
 	\forall x.\,f(x + 7) > f(x) - f(x + 3)
@@ -531,7 +509,7 @@ Using substitution we ``normalize'' the formulas as follows
 	\,\land \,\forall x. \,f(x) > f(x - 3)
 \]
 We can then merge the two foralls into one and continue out algorithm normally.
-This ``normalization'' may potentially significantly reduce the amount of iterations in the while
+This normalization may potentially significantly reduce the amount of iterations in the while
 cycle of Algorithm~\ref{alg:sr}.
 
 In general, for a formula $\bigwedge_i F_i$, for forward propagation,
@@ -553,14 +531,14 @@ following section.
 \subsection{Disjunction}\label{sec:disj}
 
 
-To deal with disjunctions, Mikol\'a\v s proposed we could work with preconditions
-(possible in \cite{kuncak-pldi10} or \cite{kuncak-sttt13}).
-For each literal in disjunction we can form a precondition on $x$ in a way that
+To deal with disjunctions, Mikol\'a\v s proposed we could work
+with preconditions~\cite{kuncak-pldi10, kuncak-sttt13}.
+For each disjunct we can form a precondition on $x$ in a way that
 if the precondition holds, that literal has to be satisfied.
 More precisely, suppose we are given a formula of the form
-$\forall x. \,l_1(x) \lor \dots \lor l_n(x)$. 
+$\forall x. \,l_1(x) \lor \dots \lor l_n(x)$.
 For each $l_i$ we may attempt to form a precondition $\mathit{pre}_i$ so that
-$\forall x. \, \mathit{pre}_i(x) \implies l_i(x)$ is valid.
+$\forall x. \, \mathit{pre}_i(x) \implies l_i(x)$ is satisfiable.
 We can then construct the formula
 $\forall x. \,\mathit{pre}_1(x)\implies l_1(x) \lor \dots \lor \mathit{pre}_n(x)\implies l_n(x)$.
 
@@ -619,7 +597,7 @@ Note that one cannot prove that by instantiation\footnote{
 	If from the other quantified subformulas we can derive that $f$ is stricly increasing, we can conclude
 	the entire formula is \textsc{unsat} over the integers.}.
 Indeed, every finite set of instantiations of the above formula is satisfiable.
-A similar result can be found in \cite{ge-cav09}, where from compactness we have that
+A similar result can be found in~\cite{ge-cav09}, where from compactness we have that
 the above formula has as models only non-standard models of arithmetic (e.g. polynomials over $\mathbb{Z}$).
 
 Using $\forall{x}. \,f(x)<f(x+1)$ we can prove by induction the lemma
@@ -631,9 +609,9 @@ assume for some $v$ and $x$ we have $f(x) \geq f(0) + v$. Now,
 \[
 	f(x) \geq f(0) + v \implies f(x) + 1 \geq f(0) + v + 1 \implies f(x+1) \geq f(0) + v + 1,
 \]
-where the second implication holds by the assumption that $f$ is increasing. 
+where the second implication holds by the assumption that $f$ is increasing.
 Instantiating the Lemma~\eqref{eq:ind-needed-lemma} by $v = -f(0)$
-now proves the Formula~\eqref{eq:ind-needed} is \textsc{unsat}, since we get
+now proves Formula~\eqref{eq:ind-needed} is \textsc{unsat}, since we get
 \[
 	\forall{x}. \,f(x)<0 \land \exists{x}. \,f(x) \geq 0
 \]
@@ -661,6 +639,36 @@ Habermehl et al.~\cite{habermehl-etaps08} allow difference bounded constraints o
 Alberti et al.~\cite{alberti2014decision}: only one universally quantified variable allowed.
 Elad et al.~\cite{elad2024infinite}: The fragment of FOL for which they prove decidability (OSC, Section~6) does not allow anything like integer arithmetic.
 
+
+\section*{What Can't the Previous Work Solve?}
+
+Here, I am considering the works~\cite{bradley-vmcai06, ge-cav09, habermehl-etaps08}.
+
+\subsection*{Infinitely Increasing But Bounded Integer Sequence}
+
+\[
+	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
+\]
+
+The syntax in~\cite{habermehl-etaps08} includes $\leq$ but does not include $<$. It does include negation though, but only if it
+results in the quantified variables being existential. This cannot be solved by~\cite{bradley-vmcai06} (see Theorem 4 in their paper).
+\textsc{Z3} cannot solve this on its own but with the addition of Lemma~\ref{eq:ind-needed-lemma} it can.
+Adding the lemma also helps Vampire but not \textsc{cvc5}.
+
+\subsection*{Two-Valued Constant Function}
+
+\[
+	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
+\]
+
+In the last meeting I hand-wavedly assumed this cannot be in the fragment of~\cite{habermehl-etaps08}.
+However, it is. They accept the literals $f(x) - f(x+1) \leq 0$ and $f(x+1) - f(x) \leq 0$, which in conjunction simplify
+to $f(x) = f(x+1)$. They can then universally quantify this to form an array property. The other equalities can
+be formed as value expressions $A \leq B \,\land \,B \leq A$. I can look more thoroughly at the paper
+to see how can they solve this.
+This cannot be solved by~\cite{bradley-vmcai06}, because the
+third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
+\textsc{Z3} cannot solve this -- Compactness section in~\cite{ge-cav09}.
 
 \bibliographystyle{abbrv}
 \bibliography{refs}
