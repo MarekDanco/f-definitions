@@ -472,7 +472,6 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
 	\end{enumerate}
 \end{proof}
 
-
 \section*{What Can't the Previous Work Solve?}
 
 Here, I am considering the works \cite{bradley-vmcai06, ge-cav09, habermehl-etaps08}.
@@ -495,11 +494,11 @@ However, it is. They accept the literals $f(x) - f(x+1) \leq 0$ and $f(x+1) - f(
 to $f(x) = f(x+1)$. They can then universally quantify this to form an array property. The other equalities can
 be formed as value expressions $A \leq B \,\land \,B \leq A$. This cannot be solved by \cite{bradley-manna07, ge-cav09} though.
 
+\section{Extensions}
+\subsection{Conjunction}\label{sec:conj}
 
-\section*{TODO notes}
-
-\todoSN{Then I think below is the new ReqPivot definition for now?}
-\marek{Almost, see this problem with only nonstandard models. $\forall x. f(x)<f(x+1) \land f(x)<0$}
+The proposed new \emph{ReqPivot} condition addressing the extension to conjunction of literals. 
+It doesn't deal with formulas with only nonstandard models such as Formula~\eqref{eq:ind-needed}.
 \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
 	\paragraph{ReqPivot Condition.}
 	Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
@@ -510,8 +509,6 @@ be formed as value expressions $A \leq B \,\land \,B \leq A$. This cannot be sol
 	\end{itemize}
 \end{tcolorbox}
 
-\section{Extensions}
-\subsection{Conjunction}\label{sec:conj}
 % Mikol\'a\v s and I discovered the following trick.
 Suppose the following formula.
 \begin{equation}\label{eq:conj1}
@@ -559,8 +556,13 @@ following section.
 To deal with disjunctions, Mikol\'a\v s proposed we could work with preconditions
 (possible in \cite{kuncak-pldi10} or \cite{kuncak-sttt13}).
 For each literal in disjunction we can form a precondition on $x$ in a way that
-if the precondition holds, that literal has to be satisfied.\mj{Does it
-satisfied the precondition are not?}
+if the precondition holds, that literal has to be satisfied.
+More precisely, suppose we are given a formula of the form
+$\forall x. \,l_1(x) \lor \dots \lor l_n(x)$. 
+For each $l_i$ we may attempt to form a precondition $\mathit{pre}_i$ so that
+$\forall x. \, \mathit{pre}_i(x) \implies l_i(x)$ is valid.
+We can then construct the formula
+$\forall x. \,\mathit{pre}_1(x)\implies l_1(x) \lor \dots \lor \mathit{pre}_n(x)\implies l_n(x)$.
 
 \[\forall{x}. \,2*f(x + 5) = x \,\lor \,2*f(x + 1) = x + 1\]
 
@@ -592,25 +594,26 @@ $\top$ and $\bot$ for the first and second disjunct respectively and satisfy onl
 \end{example}
 
 
-\begin{example}
+\begin{example}\label{ex:ind-needed}
 	\[
 		\forall{x}. \,f(x) < f(x + 1) - f(x + 2)
 		\,\land \,\forall{x}. \,f(x) < f(x + 1)
 	\]
-	Since $f$ is increasing there has to exist an $a$ for which $f(a) \geq 0$\mj{do we need induction for this?}.
+	Since $f$ is increasing there has to exist an $a$ for which $f(a) \geq 0$
+	(this requires an inductive proof, see Section~\ref{sec:ind}).
 	At the same time, $f(a) < f(a+1) - f(a+2)$ and $f(a+1) < f(a+2) - f(a+3)$. That means
 	$f(a) < -f(a+3)$ but also $f(a) < f(a+3)$. Therefore, $f(a) < \text{min}\{-f(a+3), f(a+3)\}$.
 	In other words $f(a) < 0$, a contradiction.
 \end{example}
 
 
-\section*{Induction}
+\section{Induction}\label{sec:ind}
 
-In the solution of the previous example\mj{always refer to the example by ref command, I don't know which you mean here.} we implicitly used the fact that the following
+In the solution of Example~\ref{ex:ind-needed} we implicitly used the fact that the following
 formula is \textsc{unsat}
-\[
+\begin{equation}\label{eq:ind-needed}
 	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
-\]
+\end{equation}
 Note that one cannot prove that by instantiation\footnote{
 	In general, we could look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
 	If from the other quantified subformulas we can derive that $f$ is stricly increasing, we can conclude
@@ -619,17 +622,18 @@ Indeed, every finite set of instantiations of the above formula is satisfiable.
 A similar result can be found in \cite{ge-cav09}, where from compactness we have that
 the above formula has as models only non-standard models of arithmetic (e.g. polynomials over $\mathbb{Z}$).
 
-Using $\forall{x}. \,f(x)<f(x+1)$ we can prove by induction that
-\[
+Using $\forall{x}. \,f(x)<f(x+1)$ we can prove by induction the lemma
+\begin{equation}\label{eq:ind-needed-lemma}
 	\forall{v}\exists{x}. \,f(x) \geq f(0) + v
-\]
+\end{equation}
 For the base case we have $\exists x. \,f(x) \geq f(0) + 0$ is valid when setting $x = 0$. For the induction step
 assume for some $v$ and $x$ we have $f(x) \geq f(0) + v$. Now,
 \[
 	f(x) \geq f(0) + v \implies f(x) + 1 \geq f(0) + v + 1 \implies f(x+1) \geq f(0) + v + 1,
 \]
-where the second implication holds by the assumption that $f$ is increasing. Instantiating the lemma by $v = -f(0)$
-now proves the formula is \textsc{unsat}, since we get
+where the second implication holds by the assumption that $f$ is increasing. 
+Instantiating the Lemma~\eqref{eq:ind-needed-lemma} by $v = -f(0)$
+now proves the Formula~\eqref{eq:ind-needed} is \textsc{unsat}, since we get
 \[
 	\forall{x}. \,f(x)<0 \land \exists{x}. \,f(x) \geq 0
 \]
@@ -638,8 +642,8 @@ Another example where induction is needed is
 \[
 	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
 \]
-Note that (the extension to unsatisfiable formulas of) our algorithm cannot be applied in this case
-because in each $\alpha$ we can set $c$ to be outside $I$\mj{Algorithm can be applied, it just doesn't terminate.}. The same goes for any instantiation method.
+Note that applying Algorithm~\ref{alg:sr} results in an infinite loop
+because in every $\alpha$ we can set $c$ to be outside $I$. The same goes for any instantiation method.
 We can easily prove the lemma
 \[
 	\forall{x}. \,f(x) = 0
