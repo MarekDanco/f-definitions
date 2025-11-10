@@ -587,18 +587,19 @@ $\top$ and $\bot$ for the first and second disjunct respectively and satisfy onl
 
 \section{Induction}\label{sec:ind}
 
-In the solution of Example~\ref{ex:ind-needed} we implicitly used the fact that the following
+In the solution of Example~\ref{ex:ind-needed}, we implicitly used the fact that the following
 formula is \textsc{unsat}
 \begin{equation}\label{eq:ind-needed}
 	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
 \end{equation}
-Note that one cannot prove that by instantiation\footnote{
+Note that one cannot prove that by instantiation\mj{instantiating the original
+formula (we can still instantiate the induction schema)}\footnote{
 	In general, we could look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
-	If from the other quantified subformulas we can derive that $f$ is stricly increasing, we can conclude
+	If from the other quantified subformulas we can derive that $f$ is strictly increasing, we can conclude
 	the entire formula is \textsc{unsat} over the integers.}.
 Indeed, every finite set of instantiations of the above formula is satisfiable.
 A similar result can be found in~\cite{ge-cav09}, where from compactness we have that
-the above formula has as models only non-standard models of arithmetic (e.g. polynomials over $\mathbb{Z}$).
+the above formula has as models only non-standard models of arithmetic (e.g.\ polynomials over $\mathbb{Z}$).
 
 Using $\forall{x}. \,f(x)<f(x+1)$ we can prove by induction the lemma
 \begin{equation}\label{eq:ind-needed-lemma}
@@ -620,7 +621,8 @@ Another example where induction is needed is
 \[
 	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
 \]
-Note that applying Algorithm~\ref{alg:sr} results in an infinite loop
+Note that applying Algorithm~\ref{alg:sr} results in an infinite loop\mj{better
+say ``does not terminate'''}
 because in every $\alpha$ we can set $c$ to be outside $I$. The same goes for any instantiation method.
 We can easily prove the lemma
 \[
