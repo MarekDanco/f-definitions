@@ -334,6 +334,7 @@ We will satisfy the universal quantifier by an inductive argument going both up 
 
 \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
 \todoSR{Correct. It applies to both parts individually, but not to the conjunction. This is  restrictive, of course, but allowed for an easy generalization to the case of several occurrences of the same function symbol with different arguments.}
+\marek{It applies to both if we shift the second conjunct to the left by 1 in the left direction and to the left by 2 in the right direction. See Section~\ref{sec:conj}.}
 
 For increasing $x$, this will propagate values to the entity $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ which, since the offset $c^{f_{i^*}}_{l_{i^*}}$ is the biggest for $f_{i^*}$ has not been propagated a value to, before. Analogically, for decreasing $x$, it will propagate values to the entity with the smallest offset. Note that there might be weaker requirements (with fewer entities universally quantified) that also might do the job, but this needs more investigation.
 
@@ -532,13 +533,16 @@ following section.
 
 
 To deal with disjunctions, Mikol\'a\v s proposed we could work
-with preconditions~\cite{kuncak-pldi10, kuncak-sttt13}.
+with preconditions\footnote{Here I am talking about preconditions in the sense
+	of the Kuncak paper. By precondition I don't mean the \emph{ReqPivot} condition.
+	Sorry for the confusion Mikoláš.}~\cite{kuncak-pldi10, kuncak-sttt13}.
 For each disjunct we can form a precondition on $x$ in a way that
 if the precondition holds, that literal has to be satisfied.
 More precisely, suppose we are given a formula of the form
 $\forall x. \,l_1(x) \lor \dots \lor l_n(x)$.
-For each $l_i$ we may attempt to form a precondition $\mathit{pre}_i$ so that
-$\forall x. \, \mathit{pre}_i(x) \implies l_i(x)$ is satisfiable.
+We may attempt to form a precondition $\mathit{pre}_i$ for each $i$  so that
+$\forall x. \, \mathit{pre}_i(x) \implies l_i(x)$ is satisfiable and
+$\forall x. \,\bigvee_{i = 1}^n pre_i(x)$ is valid.
 We can then construct the formula
 $\forall x. \,\mathit{pre}_1(x)\implies l_1(x) \lor \dots \lor \mathit{pre}_n(x)\implies l_n(x)$.
 
