@@ -510,11 +510,11 @@ Using substitution we ``normalize'' the formulas as follows
 	\forall x. \,f(x) > f(x - 7) - f(x - 4)
 	\,\land \,\forall x. \,f(x) > f(x - 3)
 \]
-We can then merge the two foralls\mj{universal quantifiers} into one and continue out algorithm normally.
+We can then merge the two universal quantifiers into one and continue out algorithm normally.
 This normalization may potentially significantly reduce the amount of iterations in the while
 cycle of Algorithm~\ref{alg:sr}\mj{This is also true but in this example we
 cannot apply the algorithm at all. Maybe you want to have a different example
-for that.}.
+for that.} \marek{I think you can. Can we discuss this?}.
 
 In general, for a formula $\bigwedge_i F_i$, for forward propagation,
 shift the  offsets so that the highest offset is $0$, i.e.\ $f(x)$ is being
@@ -599,12 +599,11 @@ formula is \textsc{unsat}
 \begin{equation}\label{eq:ind-needed}
 	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
 \end{equation}
-Note that one cannot prove that by instantiation\mj{instantiating the original
-formula (we can still instantiate the induction schema)}\footnote{
+Note that one cannot prove that by instantiating the formula.\footnote{
 	In general, we could look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
 	If from the other quantified subformulas we can derive that $f$ is strictly increasing, we can conclude
-	the entire formula is \textsc{unsat} over the integers.}.
-Indeed, every finite set of instantiations of the above formula is satisfiable.
+	the entire formula is \textsc{unsat} over the integers.}
+Indeed, every finite set of instantiations is satisfiable.
 A similar result can be found in~\cite{ge-cav09}, where from compactness we have that
 the above formula has as models only non-standard models of arithmetic (e.g.\ polynomials over $\mathbb{Z}$).
 
@@ -628,9 +627,8 @@ Another example where induction is needed is
 \[
 	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
 \]
-Note that applying Algorithm~\ref{alg:sr} results in an infinite loop\mj{better
-say ``does not terminate'''}
-because in every $\alpha$ we can set $c$ to be outside $I$. The same goes for any instantiation method.
+Note that Algorithm~\ref{alg:sr} does not terminate on this example because in every $\alpha$ 
+we can set $c$ to be outside $I$. The same goes for any instantiation method.
 We can easily prove the lemma
 \[
 	\forall{x}. \,f(x) = 0
