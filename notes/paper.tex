@@ -444,18 +444,19 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
 		K_{\text{min}}=L-c_{l_{i^*}}^{f_{i^*}} \hspace{0.5em}\text{and}\hspace{0.5em} K_{\text{max}}=U-c_1^{f_{i^*}}
 	\end{align*}
 	\begin{claim}
+        \label{claim:inTerminationProof}	
 		For the interval $[K_{\text{min}},K_{\text{max}}]$, $I^*$ satisfies the clash condition:
 		\begin{align*}
 			\forall t\in\args(F,f_{i^*}).K_{\text{min}}+c_1^{f_{i^*}}\leq I^*(t)\leq K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}
 		\end{align*}
 		\textit{Proof:} For any $t\in\args(F,f_{i^*})$, we have $L\leq I^*(t)\leq U$. Therefore,
 		\begin{itemize}
-			\item $K_{\text{min}}+c_1^{f_{i^*}}=\big(L-c_{l_{i^*}}^{f_{i^*}}\big)+c_1^{f_{i^*}}\leq L\leq I^*(t)$ since $c_1^{f_{i^*}}\leq c_{l_{i^*}}^{f_{i^*}}$
-			\item $I^*(t)\leq U\leq\big(U-c_1^{f_{i^*}}\big)+c_{l_{i^*}}^{f_{i^*}}=K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}$ since $c_{l_{i^*}}^{f_{i^*}}\geq c_1^{f_{i^*}}$
+			\item $K_{\text{min}}+c_1^{f_{i^*}}=\big(L-c_{l_{i^*}}^{f_{i^*}}\big)+c_1^{f_{i^*}}\leq L\leq I^*(t)$ since $c_1^{f_{i^*}}\leq c_{l_{i^*}}^{f_{i^*}}$, and
+			\item $I^*(t)\leq U\leq\big(U-c_1^{f_{i^*}}\big)+c_{l_{i^*}}^{f_{i^*}}=K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}$ since $c_{l_{i^*}}^{f_{i^*}}\geq c_1^{f_{i^*}}$.
 		\end{itemize}
 	\end{claim}
 
-	Now let $N=\max(\abs{K_{\text{min}}},\abs{K_{\text{max}}})$ and consider Algorithm \ref{alg:sr}.
+	The two points above end the proof of Claim \ref{claim:inTerminationProof}. Now let $N=\max(\abs{K_{\text{min}}},\abs{K_{\text{max}}})$ and consider Algorithm \ref{alg:sr}.
 	\begin{enumerate}
 		\item Line 1: initialisation.
 		\item Line 2: First SMT call. This succeeds because $\phi$ is satisfiable.
