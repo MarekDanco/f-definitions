@@ -485,7 +485,7 @@ It doesn't deal with formulas with only nonstandard models such as Formula~\eqre
 	We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
 	\begin{itemize}
 		\item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-		\item Symetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+		\item Symmetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
 	\end{itemize}
 \end{tcolorbox}
 
@@ -494,9 +494,9 @@ Suppose the following formula.
 	\forall x.\,f(x + 7) > f(x) - f(x + 3)
 	\,\land \,f(x + 3) > f(x)
 \end{equation}
-Formula~\eqref{eq:conj1} does not satisfy the precondition of our algorithm because
+Formula~\eqref{eq:conj1} does not satisfy the ReqPivot condition because
 for values of $f(x+3)$ and $f(x)$ with $f(x+3)\leq f(x)$, it is no longer
-possible to find a value of $f(x+7)$  to satisfy the formula.
+possible to find a value of $f(x+7)$ to satisfy the formula.
 
 Since the literals are in conjunction, for all $x$ both of them have to be satisfied. This means we can
 split the formula into two universally quantified formulas like so
@@ -509,9 +509,11 @@ Using substitution we ``normalize'' the formulas as follows
 	\forall x. \,f(x) > f(x - 7) - f(x - 4)
 	\,\land \,\forall x. \,f(x) > f(x - 3)
 \]
-We can then merge the two foralls into one and continue out algorithm normally.
+We can then merge the two foralls\mj{universal quantifiers} into one and continue out algorithm normally.
 This normalization may potentially significantly reduce the amount of iterations in the while
-cycle of Algorithm~\ref{alg:sr}.
+cycle of Algorithm~\ref{alg:sr}\mj{This is also true but in this example we
+cannot apply the algorithm at all. Maybe you want to have a different example
+for that.}.
 
 In general, for a formula $\bigwedge_i F_i$, for forward propagation,
 shift the  offsets so that the highest offset is $0$, i.e.\ $f(x)$ is being
