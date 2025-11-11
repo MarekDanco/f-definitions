@@ -159,6 +159,8 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 
 
 Note that, a fortiori, a satisfiability propagator for a certain partition of entities into the three sets above, stays a satisfiability propagator when moving entities from being non-existential to being existential.
 
+Also note that for instantiations of quantified sub-formulas that only contain entities assigned a value by $I$, the satisfiability propagator only needs to certify that $I$ satisfies the respective instantiation. Hence, the entity interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator.
+
 \begin{property}
 	Every formula that has a satisfiability certificate is satisfiable.
 \end{property}
