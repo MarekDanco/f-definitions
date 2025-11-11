@@ -354,24 +354,20 @@ In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $
 		\item there is no $t\in args(F, f)$, $\max I<x$  s.t.\ $x+c^{f_{i^*}}_{l_{i^*}}=\alpha(t)$ (no entity propagated to by upward induction clashes with an argument of $f$ in $F$)
 		\item there is no $t\in args(F, f)$, $x<\min I$  s.t.\ $x+c^{f_{i^{*}}}_1=\alpha(t)$ (no entity propagated to by downward induction clashes with an argument of $f$ in $F$)
 	\end{itemize}
-	Then the order $\max I+1, \max I+2, \dots, \min I-1, \min I-2,\dots$, together with the entity interpretation $\alpha$, and propagators for ReqPivot form a satisfiability certificate for $F\wedge \forall x \:.\: Q$.
+	Then the order $0,1,-1,2,-2\dots, I, -I,\max I+1, \max I+2, \dots, \min I-1, \min I-2,\dots$, together with the entity interpretation $\alpha$, and the propagators resulting from $\alpha$ (for $x\in I$), and from ReqPivot (for $x\not\in I$) form a satisfiability certificate for $F\wedge \forall x \:.\: Q$.
 \end{property}
 
-% The corresponding certificate is:
-% \begin{itemize}
-% \item order on constraints:
-%   \begin{enumerate}
-%   \item $F$, $Q(f(x+k),f(x+l))$ for $x\in I$
-%   \item $Q(f(x+k),f(x+l))$ for $x=\max I+1, \max I+2, \dots$
-%   \item $Q(f(x+k),f(x+l))$ for $x=\min I-1, \min I-2, \dots$
-%   \end{enumerate}
-% \item existential entities:
-%   \begin{enumerate}
-%   \item $\{ x+k \mid x \in I \}\cup \{ x+l \mid x \in I \}$
-%   \item $\max I + l+1, \max I+l+2, \dots$
-%   \item $\min I + k -1, \min I+k-2, \dots$
-%   \end{enumerate}
-% \end{itemize}
+\begin{proof} (under development)
+  Since $\alpha\models F\wedge \bigwedge_{x\in I} Q$, for all $x\in I$, $\alpha$ assigns values to all elements of $\Gamma_{\alpha}(Q(x))$, and hence $\alpha$ itself plays the role of the satisfiability propagator.  For $x>\max I$,  neither $\alpha$, nor the propagators for $x'= \max I+1,\dots ,x-1$ assign a value to  $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$, and hence the propagator from the first condition from $ReqPivot$ is correct. For $x<\min I$,  neither $\alpha$, nor the propagators for $x'= \max I+1,\dots$, nor the propagators for $x'=\min I-1,\min I-2,\dots, x+1$ assign a value to  $f_{i^*}(x+c^{f_{i^{*}}}_1)$, and hence the propagator from the second condition from $ReqPivot$ is correct. 
+\end{proof}
+ % corresponding existential entities:
+ %  \begin{enumerate}
+ %  \item none (all entities are assigned a values by $\alpha$)
+ %  \item $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$, $x= \max I+1, \max I+2,\dots$
+ %  \item $f_{i^*}(x+c^{f_{i^*}}_1)$, $x=\min I -1, \min I-2, \dots$
+ %  \end{enumerate}
+
+
 For coming up with an algorithm, let us first simplify the two conditions: Pushing negation over quantifiers, we get:
 \begin{itemize}
 	\item  for all $t\in args(F, f)$, for all $x$ with $\max I<x$, $\alpha(t)<x+c^{f_{i^*}}_{l_{i^*}}$
