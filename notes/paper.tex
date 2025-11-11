@@ -487,7 +487,9 @@ It doesn't deal with formulas with only nonstandard models such as Formula~\eqre
 		\item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
 		\item Symmetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
 	\end{itemize}
-\end{tcolorbox}
+\end{tcolorbox}\mj{I'm not sure how to read this, what if I have this (trivially unsat)
+	formula $\forall x. f(x)=0\land f(x+1)=1\land f(x+3)>4$, doesn't it say
+that you could propagate upwards (but you cannot).}
 
 Suppose the following formula.
 \begin{equation}\label{eq:conj1}
