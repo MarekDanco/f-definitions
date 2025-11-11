@@ -139,6 +139,7 @@ For example, the interpretation $I=\{ a\mapsto 5 \}$ grounds the formula $f(a)\g
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and after instantiating the quantified sub-formula with $x=10$ to $\psi\equiv f(10+c+1)= f(10+c)+1$, $\Gamma_I(\psi)=\{ f(15), f(16)\}$.
 
 \begin{definition}
+  \label{def:certificate}
 	Given a formula $\phi$, a \emph{satisfiability certificate} is
 	\begin{itemize}
 		\item an order $\preceq$\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).} on all instantiations of quantified sub-formulas of $\phi$,
@@ -331,7 +332,8 @@ We will satisfy the universal quantifier by an inductive argument going both up 
 	\item for all values of entities\mj{the terminology does not make sense to me here} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
 	\item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
         \end{itemize}
-In the following, we will call this condition ReqPivot.        
+In the following, we will call this condition ReqPivot. We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate})
+available.        
 
 \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
 \todoSR{Correct. It applies to both parts individually, but not to the conjunction. This is  restrictive, of course, but allowed for an easy generalization to the case of several occurrences of the same function symbol with different arguments.}
