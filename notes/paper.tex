@@ -138,26 +138,27 @@ For example, the interpretation $I=\{ a\mapsto 5 \}$ grounds the formula $f(a)\g
 
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and after instantiating the quantified sub-formula with $x=10$ to $\psi\equiv f(10+c+1)= f(10+c)+1$, $\Gamma_I(\psi)=\{ f(15), f(16)\}$.
 
-\begin{definition}
+\begin{definition}\todoSR{Sorry, I changed this once more. The intuition stays the same.}
   \label{def:certificate}
 	Given a formula $\phi$, a \emph{satisfiability certificate} is
 	\begin{itemize}
 		\item an order $\preceq$\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).} on all instantiations of quantified sub-formulas of $\phi$,
-		\item a pre-satisfiability certificate $I$, which for every instantiation $\psi$ of a quantified sub-formula of $\phi$ partitions $\Gamma_I(\psi)$ into
-		      \begin{itemize}
-			      \item entities assigned a value by $I$,
-			      \item entities not assigned a value by $I$ where $\psi$ is the first instantiation wrt. $\prec$ where the entity occurs in $\Gamma_I(\psi)$ (\emph{existential entitites}),
-			      \item entities not assigned a value by $I$ for which there is an instantiation $\psi'\prec\psi$ where the entity occurs in $\Gamma_I(\psi')$
-			            (\emph{non-existential entities}), and
-		      \end{itemize}
+		\item a pre-satisfiability certificate $I$
+                \item for every instantiation $\psi$ of a quantified sub-formula of $\phi$, a set of entities (the \emph{existential entities}) that are neither assigned a values by $I$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$
+
+                  % partitions $\Gamma_I(\psi)$ into
+		  %     \begin{itemize}
+		  %             \item entities assigned a value by $I$,
+		  %             \item entities not assigned a value by $I$ where $\psi$ is the first instantiation wrt. $\prec$ where the entity occurs in $\Gamma_I(\psi)$ (\emph{existential entitites}),
+		  %             \item entities not assigned a value by $I$ for which there is an instantiation $\psi'\prec\psi$ where the entity occurs in $\Gamma_I(\psi')$
+		  %                   (\emph{non-existential entities}), and
+		  %     \end{itemize}
 		\item for each instantiation $\psi$ of a quantified sub-formula of $\phi$,
-		      a certificate (the \emph{satisfiability propagator}) showing that for all values of non-existential entities, there exist
-		      values for the existential ones such that the extension of~$I$ assigning these values to $\Gamma_I(\psi)$ satisfies~$\psi$.
+		      a certificate (the \emph{satisfiability propagator}) showing that for all values of entities that are neither assigned a value by $I$ nor are existential, there exist
+		      values for the existential entities such that the extension of~$I$ assigning these values to $\Gamma_I(\psi)$ satisfies~$\psi$.
 		      \footnote{For the sake of generality, at this point we do not require the satisfiability propagator to be constructive. Below, we will then work with algorithms computing the values only required to exist, here.}
 	\end{itemize}
 \end{definition}
-
-Note that, a fortiori, a satisfiability propagator for a certain partition of entities into the three sets above, stays a satisfiability propagator when moving entities from being non-existential to being existential.
 
 Also note that for instantiations of quantified sub-formulas that only contain entities assigned a value by $I$, the satisfiability propagator only needs to certify that $I$ satisfies the respective instantiation. Hence, the entity interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator.
 
@@ -348,25 +349,42 @@ In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $
 
 
 \begin{property}
-	Assume an integer interval $I$ and an entity interpretation $\alpha$ s.t.
+  \label{prop:cert}
+	Moreover, assume an integer interval $I$ and an entity interpretation $\alpha$ s.t.
 	\begin{itemize}
 		\item $\alpha\models F\wedge \bigwedge_{x\in I} Q$
 		\item there is no $t\in args(F, f)$, $\max I<x$  s.t.\ $x+c^{f_{i^*}}_{l_{i^*}}=\alpha(t)$ (no entity propagated to by upward induction clashes with an argument of $f$ in $F$)
 		\item there is no $t\in args(F, f)$, $x<\min I$  s.t.\ $x+c^{f_{i^{*}}}_1=\alpha(t)$ (no entity propagated to by downward induction clashes with an argument of $f$ in $F$)
 	\end{itemize}
-	Then the order $0,1,-1,2,-2\dots, I, -I,\max I+1, \max I+2, \dots, \min I-1, \min I-2,\dots$, together with the entity interpretation $\alpha$, and the propagators resulting from $\alpha$ (for $x\in I$), and from ReqPivot (for $x\not\in I$) form a satisfiability certificate for $F\wedge \forall x \:.\: Q$.
+	Then the following forms a satisfiability certificate for $F\wedge \forall x \:.\: Q$:
+        \begin{itemize}
+          
+        \item         order: $0,1,-1,2,-2\dots, I, -I,\max I+1, \max I+2, \dots, \min I-1, \min
+          I-2,\dots$,
+          
+        \item pre-satisfiability certificate: $\alpha$
+        \item corresponding sets of existential entities:
+          \begin{itemize}
+          \item $\emptyset$, for $x\in I$,
+            
+          \item $\{f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})\}$, for $x>\max I$, and  
+          \item $\{f_{i^*}(x+c^{f_{i^{*}}}_1)\}$, for $x<\min I$
+            
+          \end{itemize}
+        \item propagators:
+          \begin{itemize}
+          \item resulting from $\alpha$, for $x\in I$, 
+          \item from first part of ReqPivot, for $x>\max I$, and 
+          \item from second part of ReqPivot, for $x<\min I$.
+          \end{itemize}
+        \end{itemize}
 \end{property}
 
-\begin{proof} (under development)
-  Since $\alpha\models F\wedge \bigwedge_{x\in I} Q$, for all $x\in I$, $\alpha$ assigns values to all elements of $\Gamma_{\alpha}(Q(x))$, and hence $\alpha$ itself plays the role of the satisfiability propagator.  For $x>\max I$,  neither $\alpha$, nor the propagators for $x'= \max I+1,\dots ,x-1$ assign a value to  $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$, and hence the propagator from the first condition from $ReqPivot$ is correct. For $x<\min I$,  neither $\alpha$, nor the propagators for $x'= \max I+1,\dots$, nor the propagators for $x'=\min I-1,\min I-2,\dots, x+1$ assign a value to  $f_{i^*}(x+c^{f_{i^{*}}}_1)$, and hence the propagator from the second condition from $ReqPivot$ is correct. 
-\end{proof}
- % corresponding existential entities:
- %  \begin{enumerate}
- %  \item none (all entities are assigned a values by $\alpha$)
- %  \item $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$, $x= \max I+1, \max I+2,\dots$
- %  \item $f_{i^*}(x+c^{f_{i^*}}_1)$, $x=\min I -1, \min I-2, \dots$
- %  \end{enumerate}
-
+\begin{proof} \todoSR{I still need to check some details, e.g., the case $r<2$.}
+  We prove that the existential entities are neither assigned a value by $I$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$.
+  For $x\in I$, the set of existential is empty, hence there is nothing to prove. For $x>\max I$, the existential entity~$f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ is neither allowed to be assigned a value by $\alpha$, nor by any $x'$ with $\max I<x'<x$. The former is ensured by the second item of Property~\ref{prop:cert}, the latter by the fact that $x+c^{f_{i^*}}_{l_{i^*}}$ is the highest argument of $f_{i^*}$. 
+  For $x<\min I$, the existential entity~$f_{i^*}(x+c^{f_{i^{*}}}_1)$, is neither allowed to be assigned a value by $\alpha$, nor by any $x'$ with $\max I<x'$, nor by any $x'$ with $x<x'<\min I$. The first condition is ensured by the third item of Property~\ref{prop:cert}, the second condition by the fact that for all  $x^-<\min I$, and $x^+>\max I$, $x^-+c^{f_{i^{*}}}_1<x^++c^{f_{i^*}}_{l_{i^*}}$, and the third condition by the fact that $x^-+c^{f_{i^{*}}}_1$ is the lowest argument of $f_{i^*}$.
+  \end{proof}
 
 For coming up with an algorithm, let us first simplify the two conditions: Pushing negation over quantifiers, we get:
 \begin{itemize}
