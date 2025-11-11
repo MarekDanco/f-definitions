@@ -124,9 +124,9 @@ Examples of entities are $c$, and $f(7)$. The term $f(c+7)$ is not an entity.
 	An \emph{entity interpretation} is a function from a set of entities to integers.
 \end{definition}
 
-Given a term $t$ and an entity interpretation $I$, we can define the semantics $I(t)$ of the term under this interpretation as usual---with the difference that the result is $\bot$ if the entity interpretation does not assign a value to an entity needed for evaluating the term. For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but for $I=\{ f(1) \mapsto 7 \}$, $I(f(0))=\bot$.
+Given a term $t$ and an entity interpretation $I$, we can define the semantics $I(t)$ of the term under this interpretation as usual---with the difference that the result is $\bot$ if the entity interpretation does not assign a value to an entity needed for evaluating the term. For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but for $I=\{ f(1) \mapsto 7 \}$, $I(f(0))=\bot$. In a similar way, for a formula $\phi$, we can define that $I$ satisfies $\phi$, in which case we also write $I\models \phi$.
 
-\begin{definition}\todoSR{I added and changed definitions here to allow for a more general form of arguments of uninterpreted function symbols in quantified sub-formulas}
+\begin{definition}
 	We say that an entity interpretation $I$ \emph{grounds} a formula $\phi$ iff for all argument terms $t$ of uninterpreted function symbols in $\phi$, $I(t)\neq\bot$. For an entity interpretation $I$ grounding a formula $\phi$, we say that an entity $f(c_1,\dots, c_k)$ is an \emph{$I$-grounded entity in $\phi$} iff $\phi$ has a sub-term of the form $f(t_1,\dots, t_k)$, and $I(t_1)=c_1$, $\dots$, $I(t_k)=c_k$.
 \end{definition}
 For example, the interpretation $I=\{ a\mapsto 5 \}$ grounds the formula $f(a)\geq 0$, and the entity $f(5)$ is an $I$-grounded entity in $f(a)\geq 0$.
