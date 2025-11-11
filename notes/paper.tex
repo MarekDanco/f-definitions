@@ -381,7 +381,7 @@ In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $
 \end{property}
 
 \begin{proof} \todoSR{I still need to check some details, e.g., the case $r<2$.}
-  We prove that the existential entities are neither assigned a value by $I$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$.
+  We prove that the existential entities are neither assigned a value by $\alpha$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$.
   For $x\in I$, the set of existential is empty, hence there is nothing to prove. For $x>\max I$, the existential entity~$f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ is neither allowed to be assigned a value by $\alpha$, nor by any $x'$ with $\max I<x'<x$. The former is ensured by the second item of Property~\ref{prop:cert}, the latter by the fact that $x+c^{f_{i^*}}_{l_{i^*}}$ is the highest argument of $f_{i^*}$. 
   For $x<\min I$, the existential entity~$f_{i^*}(x+c^{f_{i^{*}}}_1)$, is neither allowed to be assigned a value by $\alpha$, nor by any $x'$ with $\max I<x'$, nor by any $x'$ with $x<x'<\min I$. The first condition is ensured by the third item of Property~\ref{prop:cert}, the second condition by the fact that for all  $x^-<\min I$, and $x^+>\max I$, $x^-+c^{f_{i^{*}}}_1<x^++c^{f_{i^*}}_{l_{i^*}}$, and the third condition by the fact that $x^-+c^{f_{i^{*}}}_1$ is the lowest argument of $f_{i^*}$.
   \end{proof}
