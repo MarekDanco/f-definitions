@@ -549,7 +549,27 @@ from the first and third conjunct by induction. Again, only non-standard models 
     \end{itemize}
 \end{tcolorbox}\mj{I'm not sure how to read this, what if I have this (trivially unsat)
     formula $\forall x. f(x)=0\land f(x+1)=1\land f(x+3)>4$, doesn't it say
-    that you could propagate upwards (but you cannot).}
+    that you could propagate upwards (but you cannot).}\todoSN{Well, the ReqPivot condition here kinda ensures local extensibility but does not guarantee global satisfiability, I think? So, a formula may satisfy ReqPivot yet it is unsatisfiable due to  global consistency constraints. But I think this is not a problem as our algorithm detects such cases when no interval $I$ and interpretation $\alpha$ can be found satisfying $F\land \bigwedge_{x \in I} Q$. Isn't it?}
+
+\begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
+	\paragraph{ReqPivot Condition.}
+	Let $Q$ be a quantified formula with entities $E$. For a pivot entitiy $p\in E$, let:
+    \begin{itemize}
+        \item $\bar{w}=E\setminus\{p\}$ be the tuple of all other entities in $Q$,
+        \item $Q_{\text{other}}(\bar{w})$ be the conjunction of all literals in $Q$ that \textbf{do not} contain $p$.
+        \item $Q_{\text{pivot}}(\bar{w},p)$ be the conjunction of all literals in $Q$ that \textbf{do} contain $p$.
+    \end{itemize}
+    The \textbf{ReqPivot} condition holds for pivot $p$ if and only if:
+    \[
+        \boxed{
+        \begin{aligned}
+            &(1) \ \exists \bar{w} . Q_{\text{other}}(\bar{w}) \\
+            &\land \\
+            &(2) \ \forall \bar{w} . \left[ Q_{\text{other}}(\bar{w}) \Rightarrow \exists p . Q(\bar{w}, p) \right]
+        \end{aligned}}
+    \]
+    The pivot entity $p$ can be either the smallest offset $f\big(x+c_1^{f_{i^*}}\big)$ or the biggest offset $f\big(x+c_{l_{i^*}}^{f_{i^*}}\big)$ where $f_{i^*}\in\{f_1,\dots,f_r\}$.
+\end{tcolorbox}\todoSN{I think this formulation will be clearer to read?}
 
 
 \section*{Related Work}\label{}
