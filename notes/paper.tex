@@ -14,7 +14,7 @@
 ,citecolor=citeblue%
 ,urlcolor=blue%
 ,plainpages=false]{hyperref}
-\usepackage{cleveref}  % must come after hyperref
+\usepackage[nameinlink,capitalize,noabbrev]{cleveref}  % must come after hyperref
 \usepackage{commath}
 \usepackage[most]{tcolorbox}
 \usepackage{enumitem}
@@ -227,7 +227,7 @@ We will satisfy the universal quantifier by an inductive argument going both up 
 \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
 \todoSR{Correct. It applies to both parts individually, but not to the conjunction. This is  restrictive, of course, but allowed for an easy generalization to the case of several occurrences of the same function symbol with different arguments.}
 \begin{itemize}
-    \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \Cref{def:entity}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
+    \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
     \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
 \end{itemize}
 In the following, we will call this condition \req. We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate})
@@ -465,7 +465,7 @@ We define the \emph{minimal offset term} in an analogous way.
 
 \begin{definition}[Cell]
     A \emph{cell} is a term of the form $f(n)$ where $f$ is an uninterpreted function symbol
-    and $n\in\mathbb{Z}$.\mj{difference from \Cref{def:entity}?}
+    and $n\in\mathbb{Z}$.\mj{difference from \cref{def:entity}?}
 \end{definition}
 
 % \begin{definition}[Maximal Cell]
@@ -525,7 +525,7 @@ As a negative example, consider
 \[\forall{x}. \,2*f(x + 4) = x \,\lor \,2*f(x + 1) = x + 1\]
 with the same preconditions as before, that is $2 \mid x$ and $2 \nmid x$.
 Note that this formula doesn't satisfy the requirement~\ref{pre:3} since for $x_1=2$ and $x_2=5$
-we try to write to $f(6)$ two times with different values.\mj{Further, the
+we try to write to $f(6)$ two times with different values.\mj{Further, the is
 formula unsatisfiable}
 
 
