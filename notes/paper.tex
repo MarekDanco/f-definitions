@@ -444,10 +444,8 @@ If there exists a disjunct that satisfies \req then the problem trivially reduce
 case of a single literal by running the original algorithm on this one disjunct.
 
 Otherwise, the \req condition is not useful in the case of disjunctions, since
-when going in the increasing (decreasing) direction, the same disjunct contains the
-maximal (minimal) offset\mj{Why?}.
-As a result, the algorithm effectively tries to satisfy the formula using
-only this single disjunct, which isn't sound\mj{not sure that's the right word}. Therefore, a different approach is required for handling disjunctions.
+assume we are propagating in the increasing direction and we have set arbitrary
+values to all cells except the maximal one.
 
 \begin{definition}[Offset Term]
     An \emph{offset term} is a term of the form $x + k$, where $x$ is a variable and $k\in\mathbb{Z}$.
@@ -463,20 +461,19 @@ function symbols.
 \end{definition}
 We define the \emph{minimal offset term} in an analogous way.
 
-\begin{definition}[Cell]
-    A \emph{cell} is a term of the form $f(n)$ where $f$ is an uninterpreted function symbol
-    and $n\in\mathbb{Z}$.\mj{difference from \cref{def:entity}?}
-\end{definition}
+I use the term ``cell'' for ``entity'' here.
 
-% \begin{definition}[Maximal Cell]
-% 	The \emph{maximal cell} of $f$ in a formula $\varphi$ is the cell $f(t)$ where $t$ is the maximal
-% 	offset term of $f$ in $\varphi$.
-% \end{definition}
-% We define the \emph{minimal cell} in an analogous way.
+\begin{definition}[Maximal Cell]
+	The \emph{maximal cell} of $f$ in a formula $\varphi[x \mapsto a]$ is the cell $f(t(a))$ where $t$ is the maximal
+	offset term of $f$ in $\varphi$.
+\end{definition}
+We define the \emph{minimal cell} in an analogous way.
 
 In our algorithm, we define the value for the maximal cell of $f_{i*}$ in the increasing
 direction and for the minimal cell in the decreasing direction.
 Let us for convenience define the following terminology.
+\marek{In the following I still haven't thought through what exactly
+$\underline{I}, \bar{I}$ are.}
 \begin{definition}[Write to a Cell]
     We say a formula $\varphi[x\mapsto a]$ \emph{writes to a cell} $f(n)$ if either
     \begin{enumerate}
@@ -489,22 +486,17 @@ Let us for convenience define the following terminology.
     \emph{in the increasing direction}. Analogously for the \emph{decreasing direction} in the second case.
 \end{definition}
 
-Suppose we are given a formula of the form $\forall x. \,l_1(x) \lor \dots \lor l_n(x)$.
-For each disjunct we can form a precondition formula on $x$ in a way that
-if the precondition holds, that literal has to be satisfied.
-More precisely, if we construct formulas $\mathit{pre}_1, \dots, \mathit{pre}_n$ so that
-\mj{What can the precondition comprise?, e.g., is $c|x$ allowed?}
-\marek{It is very difficult for me to argue why these conditions are sufficient. I don't think they are.
-    I also think this is a significantly more difficult problem than the original one,
-    since we assume none of the disjuncts satisfy \req. I will take a look at this later.}
+Suppose we are given the formula $\varphi = \forall x. \,\varphi_1(x) \lor \dots \lor \varphi_n(x)$.
+If we can construct formulas $\mathit{pre}_1, \dots, \mathit{pre}_n$ so that
+they contain only $x$ and interpreted function symbols, and in addition
 \begin{enumerate}
-    \item\label{pre:1} $\forall x. \,\mathit{pre}_i(x) \implies l_i(x)$ is satisfiable for all $i$,
-    \item\label{pre:2} $\forall x. \,\bigvee_{i = 1}^n \mathit{pre}_i(x)$ is valid,
-    \item\label{pre:3} there are no $i\not=j, x_1, x_2$ such that $\mathit{pre}_i(x_1) \land \mathit{pre}_j(x_2)$
-          and $l_i[x \mapsto x_1]$, $l_j[x \mapsto x_2]$ write to the same cell in the same direction,
+    \item\label{pre:1} $\forall x. \,\bigvee_{i = 1}^n \mathit{pre}_i(x)$ is valid,
+    \item\label{pre:2} given $a$, if $\mathit{pre}_{i_1}(a) \land \dots \land \mathit{pre}_{i_n}(a)$ holds,
+	    we can apply \req condition on $\varphi_{i_1}(a)\lor \dots \lor \varphi_{i_n}(a)$, and
+    \item\label{pre:3} there are no $i\not=j, x_1\not=x_2$ such that $\mathit{pre}_i(x_1) \land \mathit{pre}_j(x_2)$
+          and $\varphi_i[x \mapsto x_1]$, $\varphi_j[x \mapsto x_2]$ write to the same cell in the same direction,
 \end{enumerate}
-then we can solve instead the following formula\mj{Why do we need to still solve it isn't it clearly satisfiable?}
-\[\forall x. \,\mathit{pre}_1(x) \implies l_1(x) \,\lor \,\dots \,\lor \,\mathit{pre}_n(x) \implies l_n(x)\]
+then $\varphi$ is satisfiable. The argument is similar as before.\marek{I will elaborate on this later.}
 However, finding such precondition formulas is a difficult synthesis problem and shall be left
 as a subject of future work.
 
@@ -525,8 +517,8 @@ As a negative example, consider
 \[\forall{x}. \,2*f(x + 4) = x \,\lor \,2*f(x + 1) = x + 1\]
 with the same preconditions as before, that is $2 \mid x$ and $2 \nmid x$.
 Note that this formula doesn't satisfy the requirement~\ref{pre:3} since for $x_1=2$ and $x_2=5$
-we try to write to $f(6)$ two times with different values.\mj{Further, the is
-formula unsatisfiable}
+we try to write to $f(6)$ two times with different values. Furthermore, the
+formula is unsatisfiable.
 
 
 \subsection*{Few More Examples}
