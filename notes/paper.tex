@@ -14,6 +14,7 @@
 ,citecolor=citeblue%
 ,urlcolor=blue%
 ,plainpages=false]{hyperref}
+\usepackage{cleveref}  % must come after hyperref
 \usepackage{commath}
 \usepackage[most]{tcolorbox}
 \usepackage{enumitem}
@@ -114,29 +115,31 @@ values to the very same entity.
 
 \section{Definitions}
 
-We will view quantifier-free formulas as formulas with a universal quantifier that ranges over an empty tuple of variables. Hence quantifier-free formulas have precisely one instantiation.
+We will view quantifier-free formulas as formulas with a universal quantifier that ranges over an empty tuple of variables. Hence, quantifier-free formulas have precisely one instantiation.
 
-\begin{definition}
-    An \emph{entity} is a term of the form $f(c_1,\dots, c_k)$ where $f$ is an uninterpreted function symbols and $c_1,\dots, c_k$ are  integers.\todoSR{Mikoláš used the term ``cell'', which might more succinct and descriptive.}
+\begin{definition}[entity]\label{def:entity}
+    An \emph{entity} is a term of the form $f(c_1,\dots, c_k)$ where $f$ is an uninterpreted function symbols and $c_1,\dots, c_k$ are integers.\todoSR{Mikoláš used the term ``cell'', which might more succinct and descriptive.}
+    \mj{Potentially change notation from $c_i$ to $n_i$ to distinguish numerals
+    and constants.}
 \end{definition}
 Examples of entities are $c$, and $f(7)$. The term $f(c+7)$ is not an entity.
 
 % For now, we restrict ourselves to the case where the arguments of uninterpreted function symbols may not include further uninterpreted function symbols (e.g., $\forall x\;.\; f(x+1)=f(x)+1$ is OK, but $\forall x\;.\; f(x+c)=f(x)+1$ not). As a consequence, in each instantiation, all arguments to uninterpreted function symbols evaluate to constants, and hence the instantiation constrains a fixed finite set of entities, which we call the \emph{entities of the instantiation}.
 
-\begin{definition}
-    An \emph{entity interpretation} is a function from a set of entities to integers.
+\begin{definition}[entity interpretation]
+    An \emph{entity interpretation} is a \mj{(partial)} function from a set of entities to integers\mj{We do not really rely on~$\mathbb{Z}$ in the co-domain, possibly extend to sort $S$}.
 \end{definition}
 
-Given a term $t$ and an entity interpretation $I$, we can define the semantics $I(t)$ of the term under this interpretation as usual---with the difference that the result is $\bot$ if the entity interpretation does not assign a value to an entity needed for evaluating the term. For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but for $I=\{ f(1) \mapsto 7 \}$, $I(f(0))=\bot$. In a similar way, for a formula $\phi$, we can define that $I$ satisfies $\phi$, in which case we also write $I\models \phi$.
+Given a term $t$ and an entity interpretation $I$, we can define the semantics $I(t)$ of the term under this interpretation as usual---with the difference that the result is $\bot$ if the entity interpretation does not assign a value to an entity needed for evaluating the term. For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but for $I=\{ f(1) \mapsto 7 \}$, $I(f(0))=\bot$. Analogously, for a formula $\phi$, we define that $I$ satisfies $\phi$, in which case we also write $I\models \phi$.
 
 \begin{definition}
-    We say that an entity interpretation $I$ \emph{grounds} a formula $\phi$ iff for all argument terms $t$ of uninterpreted function symbols in $\phi$, $I(t)\neq\bot$. For an entity interpretation $I$ grounding a formula $\phi$, we say that an entity $f(c_1,\dots, c_k)$ is an \emph{$I$-grounded entity in $\phi$} iff $\phi$ has a sub-term of the form $f(t_1,\dots, t_k)$, and $I(t_1)=c_1$, $\dots$, $I(t_k)=c_k$.
+    We say that an entity interpretation $I$ \emph{grounds}\mj{I'm not sure I like the term, because $\phi$ is already grounded. Why not ``interpret''?} a formula $\phi$ iff for all argument terms $t$ of uninterpreted function symbols in $\phi$, $I(t)\neq\bot$. For an entity interpretation $I$ grounding a formula $\phi$, we say that an entity $f(c_1,\dots, c_k)$ is an \emph{$I$-grounded entity in $\phi$} iff $\phi$ has a sub-term of the form $f(t_1,\dots, t_k)$, and $I(t_1)=c_1$, $\dots$, $I(t_k)=c_k$.
 \end{definition}
 For example, the interpretation $I=\{ a\mapsto 5 \}$ grounds the formula $f(a)\geq 0$, and the entity $f(5)$ is an $I$-grounded entity in $f(a)\geq 0$.
 
 \begin{definition}
     \label{def:pre-sat-cert}
-    Given a formula $\phi$, we call an entity interpretation $I$ that satisfies the quantifier-free part of $\phi$ and  that grounds  all instantiations of quantified sub-formulas of $\phi$ a \emph{pre-satisfiability certificate} of $\phi$. For any instantiation $\psi$ of a quantified sub-formula of $\phi$, we denote by $\Gamma_I(\psi)$ the resulting set of entities.
+    Given a formula $\phi$, we call an entity interpretation $I$ that satisfies the quantifier-free part of $\phi$ and  that grounds  all instantiations\mj{It is unclear what is  meant by ``all instantiations''?} of quantified sub-formulas of $\phi$ a \emph{pre-satisfiability certificate} of $\phi$. For any instantiation $\psi$ of a quantified sub-formula of $\phi$, we denote by $\Gamma_I(\psi)$ the resulting set of entities.
 \end{definition}
 
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and after instantiating the quantified sub-formula with $x=10$ to $\psi\equiv f(10+c+1)= f(10+c)+1$, $\Gamma_I(\psi)=\{ f(15), f(16)\}$.
@@ -145,9 +148,9 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 
     \label{def:certificate}
     Given a formula $\phi$, a \emph{satisfiability certificate} is
     \begin{itemize}
-        \item an order $\preceq$\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).} on all instantiations of quantified sub-formulas of $\phi$,
+        \item an order $\preceq$\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}\mj{remove the footnote for final version, it looks like superscript} on all instantiations of quantified sub-formulas of $\phi$,
         \item a pre-satisfiability certificate $I$
-        \item for every instantiation $\psi$ of a quantified sub-formula of $\phi$, a set of entities (the \emph{existential entities})\todoSR{alternative term ``propagated entities''} that are neither assigned a values by $I$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$
+        \item for every instantiation $\psi$ of a quantified sub-formula of $\phi$, a set of entities (the \emph{existential entities})\todoSR{alternative term ``propagated entities''} that are neither assigned a values by $I$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$\mj{I'm having trouble parsing the sentence.}
 
               % partitions $\Gamma_I(\psi)$ into
               %     \begin{itemize}
@@ -208,6 +211,8 @@ The goal is now an algorithm that computes such satisfiability certificates and 
 Class of formulas:
 \[ F\wedge \forall x\;.\; Q(f_1(x+c^{f_1}_1),\dots,f_1(x+c^{f_1}_{l_1}),\dots,f_r(x+c^{f_r}_1),\dots,f_r(x+c^{f_r}_{l_r})),\]
 where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, the constants $c^{f_i}_{1},\dots,c^{f_i}_{l_i}$ are sorted and pairwise different integers.
+\mj{Careful with terminology, for SMT people $c$ is a constant, we could use
+``numeral'' for $1,2,3,\dots$.}
 
 This does not yet address:
 \begin{itemize}
@@ -222,7 +227,7 @@ We will satisfy the universal quantifier by an inductive argument going both up 
 \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
 \todoSR{Correct. It applies to both parts individually, but not to the conjunction. This is  restrictive, of course, but allowed for an easy generalization to the case of several occurrences of the same function symbol with different arguments.}
 \begin{itemize}
-    \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
+    \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \Cref{def:entity}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
     \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
 \end{itemize}
 In the following, we will call this condition \req. We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate})
@@ -440,9 +445,9 @@ case of a single literal by running the original algorithm on this one disjunct.
 
 Otherwise, the \req condition is not useful in the case of disjunctions, since
 when going in the increasing (decreasing) direction, the same disjunct contains the
-maximal (minimal) offset.
+maximal (minimal) offset\mj{Why?}.
 As a result, the algorithm effectively tries to satisfy the formula using
-only this single disjunct, which isn't sound. Therefore, a different approach is required for handling disjunctions.
+only this single disjunct, which isn't sound\mj{not sure that's the right word}. Therefore, a different approach is required for handling disjunctions.
 
 \begin{definition}[Offset Term]
     An \emph{offset term} is a term of the form $x + k$, where $x$ is a variable and $k\in\mathbb{Z}$.
@@ -460,7 +465,7 @@ We define the \emph{minimal offset term} in an analogous way.
 
 \begin{definition}[Cell]
     A \emph{cell} is a term of the form $f(n)$ where $f$ is an uninterpreted function symbol
-    and $n\in\mathbb{Z}$.
+    and $n\in\mathbb{Z}$.\mj{difference from \Cref{def:entity}?}
 \end{definition}
 
 % \begin{definition}[Maximal Cell]
@@ -488,7 +493,8 @@ Suppose we are given a formula of the form $\forall x. \,l_1(x) \lor \dots \lor 
 For each disjunct we can form a precondition formula on $x$ in a way that
 if the precondition holds, that literal has to be satisfied.
 More precisely, if we construct formulas $\mathit{pre}_1, \dots, \mathit{pre}_n$ so that
-\marek{It is is very difficult for me to argue why these conditions are sufficient. I don't think they are.
+\mj{What can the precondition comprise?, e.g., is $c|x$ allowed?}
+\marek{It is very difficult for me to argue why these conditions are sufficient. I don't think they are.
     I also think this is a significantly more difficult problem than the original one,
     since we assume none of the disjuncts satisfy \req. I will take a look at this later.}
 \begin{enumerate}
@@ -497,7 +503,7 @@ More precisely, if we construct formulas $\mathit{pre}_1, \dots, \mathit{pre}_n$
     \item\label{pre:3} there are no $i\not=j, x_1, x_2$ such that $\mathit{pre}_i(x_1) \land \mathit{pre}_j(x_2)$
           and $l_i[x \mapsto x_1]$, $l_j[x \mapsto x_2]$ write to the same cell in the same direction,
 \end{enumerate}
-then we can solve instead the following formula
+then we can solve instead the following formula\mj{Why do we need to still solve it isn't it clearly satisfiable?}
 \[\forall x. \,\mathit{pre}_1(x) \implies l_1(x) \,\lor \,\dots \,\lor \,\mathit{pre}_n(x) \implies l_n(x)\]
 However, finding such precondition formulas is a difficult synthesis problem and shall be left
 as a subject of future work.
@@ -519,7 +525,8 @@ As a negative example, consider
 \[\forall{x}. \,2*f(x + 4) = x \,\lor \,2*f(x + 1) = x + 1\]
 with the same preconditions as before, that is $2 \mid x$ and $2 \nmid x$.
 Note that this formula doesn't satisfy the requirement~\ref{pre:3} since for $x_1=2$ and $x_2=5$
-we try to write to $f(6)$ two times with different values.
+we try to write to $f(6)$ two times with different values.\mj{Further, the
+formula unsatisfiable}
 
 
 \subsection*{Few More Examples}
