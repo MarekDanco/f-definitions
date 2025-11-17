@@ -2,10 +2,24 @@
 
 """Function synthesis project"""
 
-import sys
 import argparse
+import sys
+from typing import Iterable, cast
+
 import z3
-from formula import Formula
+
+from formula import Ground, Quantified
+
+
+def divide_constraints(constraints):
+    ground = []
+    quantified = []
+    for cons in constraints:
+        if z3.is_quantifier(cons):
+            quantified.append(cons)
+        else:
+            ground.append(cons)
+    return ground, quantified
 
 
 def parse_command_line() -> argparse.Namespace:
@@ -38,20 +52,38 @@ def display_constraints(constraints, message=None) -> None:
 
 def parse_input_file(file_path: str):
     s = z3.Solver()
-    input_path = "examples/deskolemize.smt2" if file_path == "-" else file_path
+    input_path = "examples/test2.smt2" if file_path == "-" else file_path
     s.from_file(input_path)
     constraints = s.assertions()
     return constraints
 
 
+def test(ground, quantified):
+    print("===Ground===")
+    for formula in ground:
+        display_formula(formula.formula)
+
+    print("===Quantified===")
+    for formula in quantified:
+        display_formula(formula.formula)
+        conjuncts = formula.conjuncts
+        for conj in conjuncts:
+            print("Conjunct: ", conj.conjunct)
+            print("Cells", conj.cells)
+            print("     maximal offset: ", conj.max_offset)
+            print("     minimal offset: ", conj.min_offset)
+            print("Rewritten around 0 up: ", conj.normalize(0, "up"))
+            print("Rewritten around 0 down: ", conj.normalize(0, "down"))
+
+
 def main():
     args = parse_command_line()
-    constraints = parse_input_file(args.filename)
-    for cons in constraints:
-        f = Formula(cons)
-        display_formula(f.formula)
-        print()
-        f.test_deskolemize(f.formula)
+    constraints = list(cast(Iterable, parse_input_file(args.filename)))
+    display_constraints(constraints)
+    ground, quantified = divide_constraints(constraints)
+    ground = list(map(Ground, ground))
+    quantified = list(map(Quantified, quantified))
+    test(ground, quantified)
 
 
 if __name__ == "__main__":
