@@ -1,8 +1,0 @@
-(set-logic UFLIA)
-(declare-fun f_x (Int) Int)
-(declare-fun f_y (Int Int) Int)
-(declare-fun p (Int Int Int Int) Bool)
-(assert (forall ((u Int) (w Int)) 
-    (p u (f_x u) w (f_y u w))
-))
-(check-sat)
