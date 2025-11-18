@@ -276,9 +276,13 @@ In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $
         \item[Case $x > \max I$:] The existential entity~$f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ is neither allowed to be assigned a value by $\alpha$, nor allowed to occur in any instantiation $x'$ with $\max I<x'<x$. The former is ensured by hypothesis (\textit{ii}), the latter by the fact that $x+c^{f_{i^*}}_{l_{i^*}}$ is the highest argument of $f_{i^*}$.
 
         \item[Case $x < \min I$:] The existential entity~$f_{i^*}(x+c^{f_{i^{*}}}_1)$, is neither allowed to be assigned a value by $\alpha$, nor allowed to occur in any instantiation~$x'$ with $\max I<x'$, nor in any $x'$ with $x<x'<\min I$. The first condition is ensured by hypothesis (\textit{iii}), the second condition \todoSR{This is the ``glueing together'' mentioned by Mikoláš below.} is followed from the lowest argument $(\max I+1) + c^{f_{i^*}}_1 \geq (\min I+\Delta) + c^{f_{i^*}}_1 + 1=\min I+c^{f_{i^*}}_{l_{i^*}}+1>(\min I-1)+c^{f_{i^*}}_{l_{i^*}}\geq x+c^{f_{i^{*}}}_1$,
-\[x+c^{f_{i^{*}}}_1 < \min I \leq \max I < x'+c^{f_{i^{*}}}_1\]\todoSR{Stefan, should this not be enough? This just uses non-emptiness of $I$, but no minimal size.}
 
-          and the third condition by the fact that $x+c^{f_{i^{*}}}_1$ is the lowest argument of $f_{i^*}$.
+The second condition follows from the fact that           
+\[x < \min I \leq \max I < x',\]
+\todoSR{Stefan, should this not be enough? This just uses non-emptiness of $I$, but no minimal size.}
+and hence $x+c^{f_{i^*}}_1<x'+c^{f_{i^*}}_1$. 
+
+The third condition follows from the fact that $x+c^{f_{i^{*}}}_1$ is the lowest argument of $f_{i^*}$.
     \end{description}
     In all cases, the existential entity is neither assigned by $\alpha$ nor appears in any earlier instantiation. The ReqPivot condition ensures the existence of suitable propagators. Therefore, the construction forms a valid satisfiability certificate as defined in Definition \ref{def:certificate}.
 \end{proof}
