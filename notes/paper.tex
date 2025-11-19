@@ -238,7 +238,7 @@ We will satisfy the universal quantifier by an inductive argument going both up 
 
 \paragraph{ReqPivot Condition.}
 Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
-We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
+We say that $Q$ satisfies the \req condition if there exists an index $i^* \in \{1,\dots,r\}$ such that:
 \begin{itemize}
     \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.}\todoSN{Can we use 'literals' instead?} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
     \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
@@ -279,7 +279,7 @@ In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $
 \end{property}
 
 \begin{proof} \todoSR{I still need to check some details, e.g., the case $r<2$.}
-    We verify that for each instantiation $\psi$ in the order, the existential entities are neither assigned a value by $\alpha$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$. Let $\Delta = c^{f_{i^*}}_{l_{i^*}} - c^{f_{i^*}}_1 \geq 0$ be the minimum size of $I$.
+    We verify that for each instantiation $\psi$ in the order, the existential entities are neither assigned a value by $\alpha$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$. %Let $\Delta = c^{f_{i^*}}_{l_{i^*}} - c^{f_{i^*}}_1 \geq 0$ be the minimum size of $I$.
     \begin{description}
         \item[Case $x \in I$:] The set of existential entities is empty, so the condition holds vacuously.
 
