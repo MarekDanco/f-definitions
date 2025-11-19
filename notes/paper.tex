@@ -223,30 +223,27 @@ This does not yet address:
 \end{itemize}
 The first item looks like a straightforward extension of the below (choose one argument to base everything on), just introducing messy notation. So we might leave it out for now. The others are interesting extensions we should think about.
 
-We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require that for one of the $f_1,\dots,f_r$, let us say for $f_{i^*}$, for both its highest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ and lowest argument $f_{i^*}(x+c^{f_{i^*}}_1)$ we can always find values satisfying $Q$. To formalize this, for every sub-term of $Q$ of the form $f_i(t)$, where $t$ is an arbitrary term, we introduce a fresh integer variable $\nu_i^t$ and denote by $\mathcal{V}$ the set of all these variables. We denote by $Q^\nu$ the result of replacing all these sub-terms of $Q$ by the corresponding variable from $\mathcal{V}$.
-Now there must be an $i^*\in \{1,\dots, r\}$ such that\todoSR{I tried to write \req in a way that is formally sound. I am not really satisfied with the result, so any alternative idea is very welcome.}
-% \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
-% \todoSR{Correct. It applies to both parts individually, but not to the conjunction. This is  restrictive, of course, but allowed for an easy generalization to the case of several occurrences of the same function symbol with different arguments.}
-\begin{itemize}
-\item $\forall \nu_1\dots \forall_{\nu_{|\mathcal{V}|-1}}\exists \nu_{i^*}^{x+c^{f_{i^*}}_{l_{i^*}}} .\, Q^\nu$, where $\nu_1,\dots,\nu_{|\mathcal{V}|-1}$ are all variables in $\mathcal{V}$ except for $\nu_{i^*}^{x+c^{f_{i^*}}_{l_{i^*}}}$.
-
-\item
- $\forall \nu_1\dots \forall_{\nu_{|\mathcal{V}|-1}}\exists \nu_{i^*}^{x+c^{f_{i^*}}_{1}} .\, Q^\nu$, where $\nu_1,\dots,\nu_{|\mathcal{V}|-1}$ are all variables in $\mathcal{V}$ except for $\nu_{i^*}^{x+c^{f_{i^*}}_{1}}$.
-\end{itemize}
-
-
-
-% More formally, there must be an $i^*\in \{1,\dots, r\}$ such that
+% We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require that for one of the $f_1,\dots,f_r$, let us say for $f_{i^*}$, for both its highest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ and lowest argument $f_{i^*}(x+c^{f_{i^*}}_1)$ we can always find values satisfying $Q$. More formally, there must be an $i^*\in \{1,\dots, r\}$ such that
 % % \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
 % % \todoSR{Correct. It applies to both parts individually, but not to the conjunction. This is  restrictive, of course, but allowed for an easy generalization to the case of several occurrences of the same function symbol with different arguments.}
 % \begin{itemize}
 %     \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
 %     \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
 % \end{itemize}
-In the following, we will call this condition \req. We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate})
-available.
 
+% In the following, we will call this condition \req. We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate})
+% available.
 
+We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument works, we require the \req condition described as follows.
+
+\paragraph{ReqPivot Condition.}
+Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
+We say that $Q$ satisfies the \req condition if there exists an index $i^* \in \{1,\dots,r\}$ such that:
+\begin{itemize}
+    \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.}\todoSN{Can we use 'literals' instead?} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
+    \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
+\end{itemize}
+We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate}) available.
 
 For increasing $x$, this will propagate values to the entity $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ which, since the offset $c^{f_{i^*}}_{l_{i^*}}$ is the biggest for $f_{i^*}$ has not been propagated a value to, before. Analogically, for decreasing $x$, it will propagate values to the entity with the smallest offset. Note that there might be weaker requirements (with fewer entities universally quantified) that also might do the job, but this needs more investigation.
 
