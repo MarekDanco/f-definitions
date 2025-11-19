@@ -223,17 +223,27 @@ This does not yet address:
 \end{itemize}
 The first item looks like a straightforward extension of the below (choose one argument to base everything on), just introducing messy notation. So we might leave it out for now. The others are interesting extensions we should think about.
 
-We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require that for one of the $f_1,\dots,f_r$, let us say for $f_{i^*}$, for both its highest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ and lowest argument $f_{i^*}(x+c^{f_{i^*}}_1)$ we can always find values satisfying $Q$. More formally, there must be an $i^*\in \{1,\dots, r\}$ such that
-% \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
-% \todoSR{Correct. It applies to both parts individually, but not to the conjunction. This is  restrictive, of course, but allowed for an easy generalization to the case of several occurrences of the same function symbol with different arguments.}
+% We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require that for one of the $f_1,\dots,f_r$, let us say for $f_{i^*}$, for both its highest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ and lowest argument $f_{i^*}(x+c^{f_{i^*}}_1)$ we can always find values satisfying $Q$. More formally, there must be an $i^*\in \{1,\dots, r\}$ such that
+% % \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
+% % \todoSR{Correct. It applies to both parts individually, but not to the conjunction. This is  restrictive, of course, but allowed for an easy generalization to the case of several occurrences of the same function symbol with different arguments.}
+% \begin{itemize}
+%     \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
+%     \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
+% \end{itemize}
+
+% In the following, we will call this condition \req. We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate})
+% available.
+
+We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument works, we require the \req condition described as follows.
+
+\paragraph{ReqPivot Condition.}
+Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
+We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
 \begin{itemize}
-    \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
+    \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.}\todoSN{Can we use 'literals' instead?} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
     \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
 \end{itemize}
-In the following, we will call this condition \req. We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate})
-available.
-
-
+We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate}) available.
 
 For increasing $x$, this will propagate values to the entity $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ which, since the offset $c^{f_{i^*}}_{l_{i^*}}$ is the biggest for $f_{i^*}$ has not been propagated a value to, before. Analogically, for decreasing $x$, it will propagate values to the entity with the smallest offset. Note that there might be weaker requirements (with fewer entities universally quantified) that also might do the job, but this needs more investigation.
 
@@ -603,39 +613,39 @@ We can easily prove the lemma
 \]
 from the first and third conjunct by induction. Again, only non-standard models of arithmetic satisfy this formula.
 
-\section*{Alternative \emph{ReqPivot} condition}
+% \section*{Alternative \emph{ReqPivot} condition}
 
-\begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
-    \paragraph{ReqPivot Condition.}
-    Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
-    We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
-    \begin{itemize}
-        \item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-        \item Symmetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-    \end{itemize}
-\end{tcolorbox}\mj{I'm not sure how to read this, what if I have this (trivially unsat)
-    formula $\forall x. f(x)=0\land f(x+1)=1\land f(x+3)>4$, doesn't it say
-    that you could propagate upwards (but you cannot).}\todoSN{Well, the ReqPivot condition here kinda ensures local extensibility but does not guarantee global satisfiability, I think? So, a formula may satisfy ReqPivot yet it is unsatisfiable due to  global consistency constraints. But I think this is not a problem as our algorithm detects such cases when no interval $I$ and interpretation $\alpha$ can be found satisfying $F\land \bigwedge_{x \in I} Q$. Isn't it?}
+% \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
+%     \paragraph{ReqPivot Condition.}
+%     Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
+%     We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
+%     \begin{itemize}
+%         \item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+%         \item Symmetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+%     \end{itemize}
+% \end{tcolorbox}\mj{I'm not sure how to read this, what if I have this (trivially unsat)
+%     formula $\forall x. f(x)=0\land f(x+1)=1\land f(x+3)>4$, doesn't it say
+%     that you could propagate upwards (but you cannot).}\todoSN{Well, the ReqPivot condition here kinda ensures local extensibility but does not guarantee global satisfiability, I think? So, a formula may satisfy ReqPivot yet it is unsatisfiable due to  global consistency constraints. But I think this is not a problem as our algorithm detects such cases when no interval $I$ and interpretation $\alpha$ can be found satisfying $F\land \bigwedge_{x \in I} Q$. Isn't it?}
 
-\begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
-    \paragraph{ReqPivot Condition.}
-    Let $Q$ be a quantified formula with entities $E$. For a pivot entitiy $p\in E$, let:
-    \begin{itemize}
-        \item $\bar{w}=E\setminus\{p\}$ be the tuple of all other entities in $Q$,
-        \item $Q_{\text{other}}(\bar{w})$ be the conjunction of all literals in $Q$ that \textbf{do not} contain $p$.
-        \item $Q_{\text{pivot}}(\bar{w},p)$ be the conjunction of all literals in $Q$ that \textbf{do} contain $p$.
-    \end{itemize}
-    The \textbf{ReqPivot} condition holds for pivot $p$ if and only if:
-    \[
-        \boxed{
-            \begin{aligned}
-                 & (1) \ \exists \bar{w} . Q_{\text{other}}(\bar{w})                                                      \\
-                 & \land                                                                                                  \\
-                 & (2) \ \forall \bar{w} . \left[ Q_{\text{other}}(\bar{w}) \Rightarrow \exists p . Q(\bar{w}, p) \right]
-            \end{aligned}}
-    \]
-    The pivot entity $p$ can be either the smallest offset $f\big(x+c_1^{f_{i^*}}\big)$ or the biggest offset $f\big(x+c_{l_{i^*}}^{f_{i^*}}\big)$ where $f_{i^*}\in\{f_1,\dots,f_r\}$.
-\end{tcolorbox}\todoSN{I think this formulation will be clearer to read?}
+% \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
+%     \paragraph{ReqPivot Condition.}
+%     Let $Q$ be a quantified formula with entities $E$. For a pivot entitiy $p\in E$, let:
+%     \begin{itemize}
+%         \item $\bar{w}=E\setminus\{p\}$ be the tuple of all other entities in $Q$,
+%         \item $Q_{\text{other}}(\bar{w})$ be the conjunction of all literals in $Q$ that \textbf{do not} contain $p$.
+%         \item $Q_{\text{pivot}}(\bar{w},p)$ be the conjunction of all literals in $Q$ that \textbf{do} contain $p$.
+%     \end{itemize}
+%     The \textbf{ReqPivot} condition holds for pivot $p$ if and only if:
+%     \[
+%         \boxed{
+%             \begin{aligned}
+%                  & (1) \ \exists \bar{w} . Q_{\text{other}}(\bar{w})                                                      \\
+%                  & \land                                                                                                  \\
+%                  & (2) \ \forall \bar{w} . \left[ Q_{\text{other}}(\bar{w}) \Rightarrow \exists p . Q(\bar{w}, p) \right]
+%             \end{aligned}}
+%     \]
+%     The pivot entity $p$ can be either the smallest offset $f\big(x+c_1^{f_{i^*}}\big)$ or the biggest offset $f\big(x+c_{l_{i^*}}^{f_{i^*}}\big)$ where $f_{i^*}\in\{f_1,\dots,f_r\}$.
+% \end{tcolorbox}\todoSN{I think this formulation will be clearer to read?}
 
 
 \section*{Related Work}\label{}
