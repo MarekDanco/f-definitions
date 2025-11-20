@@ -205,7 +205,7 @@ Also note that for instantiations of quantified sub-formulas that only contain e
 
 A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model of the formula. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$.
 
-For this, let $inst(u)$ either be the  instantiation $\psi$ of a quantified sub-formula with $u\in\Gamma_I(\psi)$ and where $u$ is existential, or $\bot$ if there is no such instantiation. For any instantiation $\psi$ of a quantified sub-formula with existential entities $u_1,\dots, u_s$ and non-existential entities $v_1,\dots, v_r$, the satisfiability propagator defines  functions $valprop_{u_1},\dots, valprop_{u_s}$ such that for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
+For this, let $inst(u)$ either be the  instantiation $\psi$ of a quantified sub-formula with $u\in\Gamma_I(\psi)$ and where $u$ is existential, or $\bot$ if there is no such instantiation\marek{How can this happen? We require all arguments to be in the form $x + k$, so for every entity there is a minimal $\psi$ that contains it. From minimality this $u$ has to be existential in $\psi$. Implicitly $u$ isn't in the ground part.}. For any instantiation $\psi$ of a quantified sub-formula with existential entities $u_1,\dots, u_s$ and non-existential entities $v_1,\dots, v_r$, the satisfiability propagator defines  functions $valprop_{u_1},\dots, valprop_{u_s}$ such that for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
 \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  valprop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto valprop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.
 Then, a program to compute the value $val(u)$ of a given entity $u$ looks as follows:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
@@ -429,7 +429,8 @@ Suppose the following formula.
 \end{equation}
 Formula~\eqref{eq:conj1} does not satisfy the \req condition because
 for values of $f(x+3)$ and $f(x)$ with $f(x+3)\leq f(x)$, it is no longer
-possible to find a value of $f(x+7)$ to satisfy the formula.
+possible to find a value of $f(x+7)$ to satisfy the formula. On the other hand,
+\req holds for downward propagation.
 
 Since the literals are in conjunction, for all $x$ both of them have to be satisfied. This means
 the formula is equivalent to the formula where the conjunction is split into two
@@ -449,7 +450,7 @@ Using the previous argument, we can merge the two universal quantifiers into a s
     \,\land \, \,f(x) > f(x - 3)
 \end{equation}
 Note that the condition \emph{ReqPivot} now holds for
-Formula~\eqref{eq:normalized}\todoSN{I think this formula doesn't satisfy \req for downward propagation?}, so our algorithm can be applied.
+Formula~\eqref{eq:normalized} for upward propagation too, so our algorithm can be applied.
 
 In general, for a formula $\bigwedge_i F_i$, for forward propagation,
 shift the  offsets so that the highest offset is $0$, i.e.\ $f(x)$ is being
