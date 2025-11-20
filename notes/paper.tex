@@ -236,11 +236,11 @@ The first item looks like a straightforward extension of the below (choose one a
 
 We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument works, we require the \req condition described as follows.
 
-\paragraph{ReqPivot Condition.}
+\paragraph{ReqPivot Condition.}\todoSR{I added a section for our internal discussion about this condition}
 Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
 We say that $Q$ satisfies the \req condition if there exists an index $i^* \in \{1,\dots,r\}$ such that:
 \begin{itemize}
-    \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.}\todoSN{Can we use 'literals' instead?} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
+    \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
     \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
 \end{itemize}
 We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate}) available.
@@ -613,8 +613,45 @@ We can easily prove the lemma
 \]
 from the first and third conjunct by induction. Again, only non-standard models of arithmetic satisfy this formula.
 
-\section*{Alternative \emph{ReqPivot} condition}
+\section{\req}
 
+\subsection{Terminology}
+
+The current version uses the term ``entity'' in a way that is not correct. There are two potential solutions:
+\begin{enumerate}
+\item Introduce a new term.
+\item Replace these terms by fresh variables that are then quantified.
+\item Use the weakened version of \req described below.
+\end{enumerate}
+The first solution is slightly informal, but more intuitive, the second one is formally rigorous, but may be unnecessarily convoluted, and the third depends on a version of the condition we have not yet discussed. 
+
+\subsection{Weakening}
+
+
+
+We say that $Q$ satisfies the \req condition iff 
+\begin{itemize}
+\item for all values of
+  \[
+  \begin{array}{l}
+    f_{1}(x+c^{f_{1}}_{1}), \dots,  f_{1}(x+c^{f_{1}}_{l_{1}-1})\\
+    \dots \\
+    f_{r}(x+c^{f_{r}}_{1}),  \dots  f_{r}(x+c^{f_{r}}_{l_{r}-1})
+  \end{array}\]
+ there are values for $f_{1}(x+c^{f_{1}}_{l_{1}}),\dots,$  $f_{r}(x+c^{f_{r}}_{l_{1}})$ satisfying $Q$, and
+\item  for all values of
+  \[
+  \begin{array}{l}
+    f_{1}(x+c^{f_{1}}_{2}), \dots,  f_{1}(x+c^{f_{1}}_{l_{1}})\\
+    \dots \\
+    f_{r}(x+c^{f_{r}}_{2}),  \dots  f_{r}(x+c^{f_{r}}_{l_{r}})
+  \end{array}\]
+ there are values for $f_{1}(x+c^{f_{1}}_{1}),\dots,$  $f_{r}(x+c^{f_{r}}_{1})$ satisfying $Q$.
+\end{itemize}
+We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate}) available.
+
+
+\subsection{Alternative condition}
 \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
     \paragraph{ReqPivot Condition.}
     Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
