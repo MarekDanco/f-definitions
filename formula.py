@@ -81,7 +81,7 @@ class Conjunct:
             self._collect_symbs(child)
 
     def _compute_delta(self, guide, offset):
-        delta = abs(abs(offset) - abs(guide))
+        delta = abs(offset - guide)
         if offset >= guide:
             delta *= -1
         return delta
