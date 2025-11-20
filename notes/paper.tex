@@ -163,8 +163,28 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 
               a certificate (the \emph{satisfiability propagator}) showing that for all values of entities that are neither assigned a value by $I$ nor are existential, there exist
               values for the existential entities such that the extension of~$I$ assigning these values to $\Gamma_I(\psi)$ satisfies~$\psi$.
               \footnote{For the sake of generality, at this point we do not require the satisfiability propagator to be constructive. Below, we will then work with algorithms computing the values only required to exist, here.}
+	      \marek{I attempted to simplify the definition below. That definition is far less general though.
+	      Is our original $\phi$ a conjunction of quantified formulas
+	      together with a ground part? If so, how do we order instantiations of different subformulas?}
     \end{itemize}
 \end{definition}
+
+
+\addtocounter{definition}{-1}
+\begin{definition}[Simplified]
+    Given a formula $\phi$, a \emph{satisfiability certificate} is
+    \begin{itemize}
+        \item a pre-satisfiability certificate $I$
+        \item a total order $\preceq$ on instantiations of the quantified part of $\phi$,
+        \item for each instantiation $\psi$ of the quantified part of $\phi$ a set of corresponding
+              \emph{existential} entities -- entities occurring in $\psi$ but not occurring in the ground part of $\phi$
+              or in any instantiation $\psi'$ with $\psi' \prec \psi$,
+        \item for each instantiation $\psi$ of the quantified part of $\phi$ a corresponding
+              \emph{satisfiability propagator} -- a certificate showing that for all values of entities that are not existential and 
+	      do not occur in the ground part, there exist values of existential entities that satisfy $\psi$.
+    \end{itemize}
+\end{definition}
+
 
 Also note that for instantiations of quantified sub-formulas that only contain entities assigned a value by $I$, the satisfiability propagator only needs to certify that $I$ satisfies the respective instantiation. Hence, the entity interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator.
 
