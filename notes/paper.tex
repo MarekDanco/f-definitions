@@ -335,32 +335,34 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
 	\caption{Satisfiability Check}%
 	\label{alg:sr}
 	\begin{algorithmic}[1]
-		\Require Formula $F \wedge \forall x \:.\: Q$ as above
+		\Require $\phi = F \wedge \forall x \:.\: Q$, where $F$ is ground and $Q$ satisfies \req
 		\Ensure \textsc{sat} or \textsc{unsat}
 		% \Procedure{OriginalSMT}{$F, f, k, l, Q$}
-		\State $\ubar{I} \leftarrow 0$, $\bar{I} \leftarrow 0$ \Comment{Start with singleton interval}
-		\State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\ubar{I}}^{\bar{I}} Q\right)$
+		\State $\ubar{I} \gets 0$, $\bar{I} \gets 0$ \Comment{Start with singleton interval}
+		\State $\alpha \gets \smt(F)$
+		\State $d = |c^{f_{i^{*}}}_1 - c^{f_{i^*}}_{l_{i^*}}|$
 
 		\While{$\alpha \neq \bot$}
 
-		\State $\text{condition} \leftarrow \bigwedge_{t \in \args(F,f)} \ubar{I} + c^{f_{i^{*}}}_1 \leq t \leq \bar{I} + c^{f_{i^*}}_{l_{i^*}}$
+		\State $\text{condition} \gets d = |\mathit{c_{min}} - \mathit{c_{max}}| \land%
+			\bigwedge_{t \in \args(F,f)} \ubar{I} + \mathit{c_{min}} \leq t \leq \bar{I} + \mathit{c_{max}}$
 		\If{$\smt(F \wedge \bigwedge_{x=\ubar{I}}^{\bar{I}} Q \wedge \text{condition}) \neq \bot$}
 		\State \Return \textsc{sat} \Comment{Certificate can be constructed}
 		\EndIf
 
-		\State $\mathcal{C} \gets \textsc{core}(F \wedge \bigwedge_{x=\ubar{I}}^{\bar{I}} Q \wedge \text{Condition})$
+		\State $\mathcal{C} \gets \textsc{core}(F \wedge \bigwedge_{x=\ubar{I}}^{\bar{I}} Q \wedge \text{condition})$
 		\Comment{Compute an \textsc{unsat} core}
 
 		%        \State \textbf{Expand interval symmetrically:}
-		\If{for some $t$, $t \leq \bar{I} + c^{f_{i^*}}_{l_{i^*}} \in \mathcal{C}$}
-		\State $\bar{I} \leftarrow \bar{I} + 1$
+		\If{for some $t$, $t \leq \bar{I} + \mathit{c_{max}} \in \mathcal{C}$}
+		\State $\bar{I} \gets \bar{I} + 1$
 		\EndIf
-		\If{for some $t$, $\ubar{I} + c^{f_{i^{*}}}_1 \leq t \in \mathcal{C}$}
-		\State $\ubar{I} \leftarrow \ubar{I} - 1$
+		\If{for some $t$, $\ubar{I} + \mathit{c_{min}} \leq t \in \mathcal{C}$}
+		\State $\ubar{I} \gets \ubar{I} - 1$
 		\EndIf
 
 		%       \State \textbf{Solve extended formula:}
-		\State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\ubar{I}}^{\bar{I}} Q\right)$
+		\State $\alpha \gets \smt\left(F \wedge \bigwedge_{x=\ubar{I}}^{\bar{I}} Q\right)$
 		\EndWhile
 
 		\State \Return \textsc{unsat}
@@ -368,6 +370,7 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
 	\end{algorithmic}
 \end{algorithm}
 \marek{I think $c^{f_{i^{*}}}_1, c^{f_{i^*}}_{l_{i^*}}$ can be variables but we need to maintain their differences.}
+\marek{I'll write algorithm for constructing the model tomorrow.}
 We are currently polishing a completeness proof for the \textsc{Sat} case. For the \textsc{Unsat} case, the essential argument seems to be the same as for Ge and de~Moura~\cite[paragraph ``compactness'']{ge-cav09}.
 
 \begin{theorem}
@@ -546,8 +549,6 @@ construct a formula $F'$ where $f$ is applied to arguments $t_i+k$ for some
 $k\in\mathbb{Z}$. Whenever $F$ has a model, so does $F'$; we can simply transform
 any model of $F$ to a model of $F'$ by setting $f_{F'}(x) \triangleq f_{F}(x-k)$.
 
-\marek{TODO fix Algorithm~\ref{alg:sr}}
-\marek{TODO write algorithm for constructing the model if satisfiable}
 
 This approach does not generally work for disjunction, however, which
 we address in the following section.
