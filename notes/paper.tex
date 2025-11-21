@@ -445,7 +445,7 @@ which requires $f$ to be constantly $0$, yet different from $0$ at some point.
 \begin{equation}\label{eq:completeness}
     f(c)\neq 0\land\forall x.\,f(x)=f(x+1)
 \end{equation}
-The formula is unsatisfiable as long as we have access to induction.%
+The formula is unsatisfiable\todoSR{It looks satisfiable to me (e.g., $\{ f\mapsto\lambda x\,.\,1, c\mapsto 0 \}$), maybe you forgot $f(0)=0$?} as long as we have access to induction.%
 \footnote{Apply induction in both directions to obtain $\forall n.\,f(n)=0$.}
 %%%%%%%%%%%
 Formula~\ref{eq:completeness} satisfies \req but
