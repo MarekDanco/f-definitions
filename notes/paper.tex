@@ -329,8 +329,11 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
     and the positive)?}
 \todoSR{We closed the gap in the proof of Property~\ref{prop:cert}. Non-emptyness of $I$ seems to be enough.}
 
-\section{Algorithm}
+\subsection{Propagation Algorithm}
 \mj{I'd  remove $\alpha$ on line~\ref{ln:check}. The last value of an SMT call should not matter here.}
+\mj{Potentially, in the implementation, use cores to determine which way to increase the size of~$I$.
+If a certain condition does not appear in the core, it might be possible to not
+move.}
 
 \begin{algorithm}
     \caption{Satisfiability Check}%
@@ -444,12 +447,12 @@ always decided on line~\ref{ln:check} of \cref{alg:sr}.
 % }
 %%%%%%%%%%%
 \cref{alg:sr} terminates if the given formula satisfies \req and is satisfiable in integers.
-Unsatisfible formulas are more nuanced. Consider the following formula,
+Unsatisfiable formulas are more nuanced. Consider the following formula,
 which requires $f$ to be constantly $0$, yet different from $0$ at some point.
 \begin{equation}\label{eq:completeness}
-    f(c)\neq 0\land\forall x.\,f(x)=f(x+1)
+   f(0)=0\land f(c)\neq 0\land\forall x.\,f(x)=f(x+1)
 \end{equation}
-The formula is unsatisfiable\todoSR{It looks satisfiable to me (e.g., $\{ f\mapsto\lambda x\,.\,1, c\mapsto 0 \}$), maybe you forgot $f(0)=0$?} as long as we have access to induction.%
+The formula is unsatisfiable as long as we have access to induction.%
 \footnote{Apply induction in both directions to obtain $\forall n.\,f(n)=0$.}
 %%%%%%%%%%%
 Formula~\ref{eq:completeness} satisfies \req but
