@@ -470,8 +470,31 @@ arithmetic without induction.\mj{We need to make more
 specific what this means. Is it clear that it hols?}
 
 \section{Extensions}
-\subsection{Conjunction}\label{sec:conj}
 
+\subsection{K-Induction}\label{sec:kinduction}
+The condition \req can be generalized to be able to see~$k$ steps
+ahead, in the spirit of $k$-induction~\cite{kinduction,En2003}. The value of~$k$ can be
+increased gradually. This is useful for example for periodic functions, such as
+\begin{equation}\label{eq:kind}
+    2\mid x \Rightarrow (f(x)=2\land f(x+1)=3)
+\end{equation}
+The formula~\eqref{eq:kind} does not satisfy \req but satisfies the property
+that assuming that if it is satisfied for~$i$ and $i+1$, the values for~$i+2$ and
+$i+3$ can be calculated, i.e., prove the following.
+\begin{equation}\label{eq:kind:prove}
+    \forall x_0x_1
+    \exists x_2x_3.\
+    \left(2\mid x_0 \Rightarrow (x_0=2\land x_1=3)\right)
+    \Rightarrow
+    \left(2\mid x_0 \Rightarrow (x_2=2\land x_3=3)\right)
+\end{equation}
+
+In this case, $k=2$ and \cref{alg:sr} has to be
+modified so that $|I|\geq k$ to start with.
+Analogously, backward.
+
+
+\subsection{Conjunction}\label{sec:conj}
 
 Suppose the following formula.
 \begin{equation}\label{eq:conj1}
