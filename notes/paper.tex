@@ -342,7 +342,7 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
         \While{$\alpha \neq \bot$}
 
         \State $\text{condition} \leftarrow \bigwedge_{t \in \args(F,f)} \underline{I} + c^{f_{i^{*}}}_1 \leq \alpha(t) \leq \overline{I} + c^{f_{i^*}}_{l_{i^*}}$
-        \If{$\smt(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q \wedge \text{condition}) \neq \bot$} \Comment{with clash condition}
+        \If{$\smt(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q \wedge \text{condition}) \neq \bot$} \Comment{with clash condition}\label{ln:check}
         \State \Return \textsc{Sat} \Comment{Certificate can be constructed}
         \EndIf
 
@@ -417,6 +417,57 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
     \end{enumerate}
 \end{proof}
 
+\section{Discussion on Completeness}\label{sec:completeness}
+The completeness of algorithms that operate on integers in SMT is tricky because
+integers themselves are not recursively axiomatizable.
+% Hence, it is meaningful to discuss completeness with respect to some set
+% of axioms.
+Further, nonlinear integer arithmetic is undecidable already without
+quantifiers. So for the following discussion we assume that ground problems are
+always decided on line~\ref{ln:check} of \cref{alg:sr}. 
+
+% \cref{alg:sr} terminates if the given formula satisfies \req and is satisfiable in integers.
+% Unsatisfible formulas are more nuanced. Consider the following formula,
+% which requires $f$ to be bounded by 0 but to be strictly increasing.
+% \begin{equation}\label{eq:completeness}
+%     \forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
+% \end{equation}
+% The formula is unsatisfiable as long as we have access to induction.%
+% \footnote{%
+% By induction show that $\forall n\in\mathbb{N}.\,f(n)\geq n+f(0)$.
+% From~\eqref{eq:completeness}, $f(0)<0$, substituting $-f(0)$ for $n$ gives the
+% contradiction $f(-f(0))\geq 0$.
+% }
+%%%%%%%%%%%
+\cref{alg:sr} terminates if the given formula satisfies \req and is satisfiable in integers.
+Unsatisfible formulas are more nuanced. Consider the following formula,
+which requires $f$ to be constantly $0$, yet different from $0$ at some point.
+\begin{equation}\label{eq:completeness}
+    f(c)\neq 0\land\forall x.\,f(x)=f(x+1)
+\end{equation}
+The formula is unsatisfiable as long as we have access to induction.%
+\footnote{Apply induction in both directions to obtain $\forall n.\,f(n)=0$.}
+%%%%%%%%%%%
+Formula~\ref{eq:completeness} satisfies \req but
+\cref{alg:sr} does not terminate since the interval~$I$ will grow
+indefinitely. This is due to the fact that instantiating~\eqref{eq:completeness}
+finitely many times always yields a satisfiable ground formula by setting the
+value of $c$ to an arbitrary large integer.
+Further, the formula has a model, which does not admit induction.
+Consider all polynomials on $\mathbb{Z}$, which gives the ring $\mathbb{Z}[X]$,
+where two polynomials are ordered lexicographically---giving a total order.
+Then, the function $f(p)$ can be defined as $0$ for all constant polynomials and
+$1$ everywhere else and then set $c$ to  an arbitrary non-constant polynomial,
+such as $x$.
+% Further, the formula has a model, which does not admit induction.
+% Consider all polynomials on $\mathbb{Z}$, which gives the ring $\mathbb{Z}[X]$,
+% where two polynomials are ordered lexicographically---giving a total order.
+% Then, the function $f(p)$ can be defined as $-x + \text{``constant term of }p\text{''}$.
+% Such function is always below the $0$ polynomial, and it is increasing.
+
+\cref{alg:sr} terminates if the given formula is unsatisfiable in
+arithmetic without induction.\mj{We need to make more
+specific what this means. Is it clear?}
 
 \section{Extensions}
 \subsection{Conjunction}\label{sec:conj}
