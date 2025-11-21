@@ -329,6 +329,9 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
     and the positive)?}
 \todoSR{We closed the gap in the proof of Property~\ref{prop:cert}. Non-emptyness of $I$ seems to be enough.}
 
+\section{Algorithm}
+\mj{I'd  remove $\alpha$ on line~\ref{ln:check}. The last value of an SMT call should not matter here.}
+
 \begin{algorithm}
     \caption{Satisfiability Check}%
     \label{alg:sr}
@@ -358,6 +361,7 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
         % \EndProcedure
     \end{algorithmic}
 \end{algorithm}
+
 
 We are currently polishing a completeness proof for the \textsc{Sat} case. For the \textsc{Unsat} case, the essential argument seems to be the same as for Ge and de~Moura~\cite[paragraph ``compactness'']{ge-cav09}.
 
