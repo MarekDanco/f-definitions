@@ -325,12 +325,14 @@ And eliminating the inner universal quantifier, we get
 which simplifies to
 \[ \text{for all } t\in args(F, f), \min I+c^{f_{i^{*}}}_1\leq\alpha(t)\leq\max I +c^{f_{i^*}}_{l_{i^*}}.\]
 Using this condition, we get a first (inefficient) algorithm for constructing a certificate. Here we use the notation that for a formula $F$, $smt(F)$ is a model of $F$, if it exists (i.e., $F$ is satisfiable), and $\bot$, otherwise
-\mj{Is this condition really correct? If $F$ is empty, there's no condition on
-    $I$ (it can be empty), but how are we sure that we can glue together the two functions (the negative
-    and the positive)?}
-\todoSR{We closed the gap in the proof of Property~\ref{prop:cert}. Non-emptyness of $I$ seems to be enough.}
+% \mj{Is this condition really correct? If $F$ is empty, there's no condition on
+%     $I$ (it can be empty), but how are we sure that we can glue together the two functions (the negative
+%     and the positive)?}
+% \todoSR{We closed the gap in the proof of Property~\ref{prop:cert}. Non-emptyness of $I$ seems to be enough.}
 
 \subsection{Propagation Algorithm}
+
+\todoSR{The current algorithm uses a fixed $i^*$, a witness for the existential quantifier in \req (the current text does not explicitly say this). It may also be possible to search for it, if there is several such witnesses.}
 \mj{I'd  remove $\alpha$ on line~\ref{ln:check}. The last value of an SMT call should not matter here.}
 \mj{Potentially, in the implementation, use cores to determine which way to increase the size of~$I$.
 If a certain condition does not appear in the core, it might be possible to not
