@@ -19,6 +19,9 @@
 \usepackage[most]{tcolorbox}
 \usepackage{enumitem}
 
+\usepackage{accents}  % for \ubar
+\newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 
@@ -546,6 +549,7 @@ More precisely, for a formula $F$ where $f$ is applied to arguments $t_i$,
 construct a formula $F'$ where $f$ is applied to arguments $t_i+k$ for some
 $k\in\mathbb{Z}$. Whenever $F$ has a model, so does $F'$; we can simply transform
 any model of $F$ to a model of $F'$ by setting $f_{F'}(x) \triangleq f_{F}(x-k)$.
+
 
 This approach does not generally work for disjunction, however, which
 we address in the following section.
