@@ -65,20 +65,19 @@ they uncover  errors. For example, the user may wrongly assume that an input
 stream with increasing values will contain  two neighboring values that are
 equal.  Negating and skolemizing yields the following simple SMT formula.
 \begin{equation}
-    f(a)\neq f(a+1)\land\forall x:\mathbb{Z}.\,f(x)<f(x+1)
+	f(a)\neq f(a+1)\land\forall x:\mathbb{Z}.\,f(x)<f(x+1)
 \end{equation}
 
 The formula has trivial counter-models, e.g., $f$ being the
 identity function. Such solution can be found by synthesis approaches, e.g.,
 \sygus.  But it is  easy to get out of the reach of these tools because they
 are primarily based on templates end  candidate-solution enumeration. The
-following modification is no longer solved by cvc5 in its \sygus mode.
-
+following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
 \begin{align*}
-    & f(a)\neq f(a+2)\\
-    \land &   \forall x:\mathbb{Z}.\,2\mid x \Rightarrow f(x)<f(x+1)\land 2\nmid x \Rightarrow f(x)=f(x+1)
-    % \land &   \forall x:\mathbb{Z}.\,2\mid x \Rightarrow f(x)<f(x+1)\\
-    % \land &   \forall x:\mathbb{Z}.\,2\nmid x \Rightarrow f(x)=f(x+1)
+	      & f(a)\neq f(a+2)                                                                              \\
+	\land & \forall x:\mathbb{Z}.\,2\mid x \Rightarrow f(x)<f(x+1)\land 2\nmid x \Rightarrow f(x)=f(x+1)
+	% \land &   \forall x:\mathbb{Z}.\,2\mid x \Rightarrow f(x)<f(x+1)\\
+	% \land &   \forall x:\mathbb{Z}.\,2\nmid x \Rightarrow f(x)=f(x+1)
 \end{align*}
 
 This paper shows that these formulas fall into a class were the desired model is
@@ -88,52 +87,11 @@ constructed by inductively defining functions on preceding values.
 % \cite{habermehl-etaps08}
 % \cite{bradley-manna07,bradley-vmcai06}
 
-\section*{Motivating Example}
-Consider the following UFLIA formula:
-\[
-    \varphi =
-    \underbrace{(f(3, a) \geq 4 + g(b))}_{\varphi_G}\,\land \,
-    \underbrace{(\forall x, y. \,f(x, y) < x + g(y))}_{\varphi_1}\,\land \,
-    \underbrace{(\forall x. \,g(x) = g(x + 2))}_{\varphi_2}
-\]
-Note that currently, the SMT solver Z3 cannot prove $\varphi$ is satisfiable.
-However, we show there is an algorithmic way of proving the satisfiability
-of this formula and try to identify UFLIA fragments in which this algorithm is applicable.
-
-Let $\gmodel$ be the following partial model of the ground part $\varphi_G$:
-\begin{gather*}
-    a^\gmodel = 0, \\
-    b^\gmodel = 1, \\
-    f^\gmodel = \{(3, 0) \mapsto 4\}, \\
-    g^\gmodel = \{1 \mapsto 0\}.
-\end{gather*}
-The definitions of $f^\gmodel, g^\gmodel$ on the rest of the domain are not interesting at this point.
-Notice that because of the structure of $\varphi_2$ and the fact that $g^{\gmodel}(1) = 0$,
-we can now define $g^{\gmodel}$ on all odd integers.
-Specifically, we can first order the arguments of $g$ in $\varphi_2$ with $x \prec x+2$, and define
-$g^\gmodel(3), g^\gmodel(5), g^\gmodel(7), \dots$ by unifying $x$ with $1, 3, 5, \dots$ and then set $x+2 \prec x$ and define
-$g^\gmodel(-1), g^\gmodel(-3), g^\gmodel(-5), \dots$ by unifying $x+2$ with $1, -1, -3, \dots$ That is, we can define
-$g^\gmodel(A_2)$ using $g^\gmodel(A_1)$ if we have $A_1 \prec A_2$.
-This way we can expand $\gmodel$ to also be a partial model of $\varphi_2$.
-
-Since $f^{\gmodel}(3,0) = 4$ and it must hold that $f(3,0) < 3 + g(0)$, we can set $g^{\gmodel}(0) = 2$.
-Just like above, we can now define $g^{\gmodel}$ on all even integers and thus obtain a total
-interpretation of $g$.
-Now, for any pair $(x, y)$ of integers, we can define $f^{\gmodel}(x, y)$ to be
-$x + 1$ or $x - 1$ for even or odd $y$ respectively. In the end, we can expand $\gmodel$
-to a model of $\varphi$.
-
-Observe it must be that $a \not= b$, otherwise
-$f(3, a) \geq 4 \,+ \,g(b) \,\land \,f(3, a) < 3 \,+ \,g(a)$ is unsatisfiable.
-Consequently, $\gmodel$ must be such that $a^{\gmodel} \not= b^{\gmodel}$.
-We can check the compatibility of $\gmodel$ with the rest of the formula
-after each step of our procedure and when a conflict is found,
-we can learn the new ground literals from the \textsc{unsat} core and
-restart the procedure with the updated ground part.
-
-\emph{Goal}: Proving satisfiability of UFLIA formulas (or UFNIA) formulas (which may prove unsat on the way).
-In the following, a formula will always refer to a UFNIA formula whose only quantifiers are universal
-quantifiers over integer variables.
+\emph{Goal}: Deciding satisfiability of UFLIA (or UFNIA) formulas in a fragment which allows
+the arguments of non constant uninterpreted function symbols to be only of the form
+$x + k$, where $x$ is a universally quantified variable and $k$ is a numeral.
+In the following, a formula will always refer to a UFLIA (or UFNIA) formula
+whose only quantifiers are universal.
 
 \emph{Idea}: View quantifiers as something that expresses infinitely many constraints on entities. The problem is that a
 single entity may occur in several such constraints and we must avoid assigning different values to the very same entity.
@@ -146,89 +104,89 @@ values to the very same entity.
 We will view quantifier-free formulas as formulas with a universal quantifier that ranges over an empty tuple of variables. Hence, quantifier-free formulas have precisely one instantiation.
 
 \begin{definition}[entity]\label{def:entity}
-    An \emph{entity} is a term of the form $f(c_1,\dots, c_k)$ where $f$ is an uninterpreted function symbols and $c_1,\dots, c_k$ are integers.\todoSR{Mikoláš used the term ``cell'', which might more succinct and descriptive.}
-    \mj{Potentially change notation from $c_i$ to $n_i$ to distinguish numerals
-    and constants.}
+	An \emph{entity} is a term of the form $f(c_1,\dots, c_k)$ where $f$ is an uninterpreted function symbols and $c_1,\dots, c_k$ are integers.\todoSR{Mikoláš used the term ``cell'', which might more succinct and descriptive.}
+	\mj{Potentially change notation from $c_i$ to $n_i$ to distinguish numerals
+		and constants.}
 \end{definition}
 Examples of entities are $c$, and $f(7)$. The term $f(c+7)$ is not an entity.
 
 % For now, we restrict ourselves to the case where the arguments of uninterpreted function symbols may not include further uninterpreted function symbols (e.g., $\forall x\;.\; f(x+1)=f(x)+1$ is OK, but $\forall x\;.\; f(x+c)=f(x)+1$ not). As a consequence, in each instantiation, all arguments to uninterpreted function symbols evaluate to constants, and hence the instantiation constrains a fixed finite set of entities, which we call the \emph{entities of the instantiation}.
 
 \begin{definition}[entity interpretation]
-    An \emph{entity interpretation} is a \mj{(partial)} function from a set of entities to integers\mj{We do not really rely on~$\mathbb{Z}$ in the co-domain, possibly extend to sort $S$}.
+	An \emph{entity interpretation} is a \mj{(partial)} function from a set of entities to integers\mj{We do not really rely on~$\mathbb{Z}$ in the co-domain, possibly extend to sort $S$}.
 \end{definition}
 
 Given a term $t$ and an entity interpretation $I$, we can define the semantics $I(t)$ of the term under this interpretation as usual---with the difference that the result is $\bot$ if the entity interpretation does not assign a value to an entity needed for evaluating the term. For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but for $I=\{ f(1) \mapsto 7 \}$, $I(f(0))=\bot$. Analogously, for a formula $\phi$, we define that $I$ satisfies $\phi$, in which case we also write $I\models \phi$.
 
 \begin{definition}
-    We say that an entity interpretation $I$ \emph{grounds}\mj{I'm not sure I like the term, because $\phi$ is already grounded. Why not ``interpret''?} a formula $\phi$ iff for all argument terms $t$ of uninterpreted function symbols in $\phi$, $I(t)\neq\bot$. For an entity interpretation $I$ grounding a formula $\phi$, we say that an entity $f(c_1,\dots, c_k)$ is an \emph{$I$-grounded entity in $\phi$} iff $\phi$ has a sub-term of the form $f(t_1,\dots, t_k)$, and $I(t_1)=c_1$, $\dots$, $I(t_k)=c_k$.
+	We say that an entity interpretation $I$ \emph{grounds}\mj{I'm not sure I like the term, because $\phi$ is already grounded. Why not ``interpret''?} a formula $\phi$ iff for all argument terms $t$ of uninterpreted function symbols in $\phi$, $I(t)\neq\bot$. For an entity interpretation $I$ grounding a formula $\phi$, we say that an entity $f(c_1,\dots, c_k)$ is an \emph{$I$-grounded entity in $\phi$} iff $\phi$ has a sub-term of the form $f(t_1,\dots, t_k)$, and $I(t_1)=c_1$, $\dots$, $I(t_k)=c_k$.
 \end{definition}
 For example, the interpretation $I=\{ a\mapsto 5 \}$ grounds the formula $f(a)\geq 0$, and the entity $f(5)$ is an $I$-grounded entity in $f(a)\geq 0$.
 
 \begin{definition}
-    \label{def:pre-sat-cert}
-    Given a formula $\phi$, we call an entity interpretation $I$ that satisfies the quantifier-free part of $\phi$ and  that grounds  all instantiations\mj{It is unclear what is  meant by ``all instantiations''?} of quantified sub-formulas of $\phi$ a \emph{pre-satisfiability certificate} of $\phi$. For any instantiation $\psi$ of a quantified sub-formula of $\phi$, we denote by $\Gamma_I(\psi)$ the resulting set of entities.
+	\label{def:pre-sat-cert}
+	Given a formula $\phi$, we call an entity interpretation $I$ that satisfies the quantifier-free part of $\phi$ and  that grounds  all instantiations\mj{It is unclear what is  meant by ``all instantiations''?} of quantified sub-formulas of $\phi$ a \emph{pre-satisfiability certificate} of $\phi$. For any instantiation $\psi$ of a quantified sub-formula of $\phi$, we denote by $\Gamma_I(\psi)$ the resulting set of entities.
 \end{definition}
 
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and after instantiating the quantified sub-formula with $x=10$ to $\psi\equiv f(10+c+1)= f(10+c)+1$, $\Gamma_I(\psi)=\{ f(15), f(16)\}$.
 
 \begin{definition}
-    \label{def:certificate}
-    Given a formula $\phi$, a \emph{satisfiability certificate} is
-    \begin{itemize}
-        \item an order $\preceq$\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}\mj{remove the footnote for final version, it looks like superscript} on all instantiations of quantified sub-formulas of $\phi$,
-        \item a pre-satisfiability certificate $I$
-        \item for every instantiation $\psi$ of a quantified sub-formula of $\phi$, a set of entities (the \emph{existential entities})\todoSR{alternative term ``propagated entities''} that are neither assigned a values by $I$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$\mj{I'm having trouble parsing the sentence.}
+	\label{def:certificate}
+	Given a formula $\phi$, a \emph{satisfiability certificate} is
+	\begin{itemize}
+		\item an order $\preceq$\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}\mj{remove the footnote for final version, it looks like superscript} on all instantiations of quantified sub-formulas of $\phi$,
+		\item a pre-satisfiability certificate $I$
+		\item for every instantiation $\psi$ of a quantified sub-formula of $\phi$, a set of entities (the \emph{existential entities})\todoSR{alternative term ``propagated entities''} that are neither assigned a values by $I$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$\mj{I'm having trouble parsing the sentence.}
 
-              % partitions $\Gamma_I(\psi)$ into
-              %     \begin{itemize}
-              %             \item entities assigned a value by $I$,
-              %             \item entities not assigned a value by $I$ where $\psi$ is the first instantiation wrt. $\prec$ where the entity occurs in $\Gamma_I(\psi)$ (\emph{existential entitites}),
-              %             \item entities not assigned a value by $I$ for which there is an instantiation $\psi'\prec\psi$ where the entity occurs in $\Gamma_I(\psi')$
-              %                   (\emph{non-existential entities}), and
-              %     \end{itemize}
-        \item for each instantiation $\psi$ of a quantified sub-formula of $\phi$,
-              a certificate (the \emph{satisfiability propagator}) showing that for all values of entities that are neither assigned a value by $I$ nor are existential, there exist
-              values for the existential entities such that the extension of~$I$ assigning these values to $\Gamma_I(\psi)$ satisfies~$\psi$.
-              \footnote{For the sake of generality, at this point we do not require the satisfiability propagator to be constructive. Below, we will then work with algorithms computing the values only required to exist, here.}
-	      \marek{I attempted to simplify the definition below. That definition is far less general though.
-	      Is our original $\phi$ a conjunction of quantified formulas
-	      together with a ground part? If so, how do we order instantiations of different subformulas?}
-    \end{itemize}
+		      % partitions $\Gamma_I(\psi)$ into
+		      %     \begin{itemize}
+		      %             \item entities assigned a value by $I$,
+		      %             \item entities not assigned a value by $I$ where $\psi$ is the first instantiation wrt. $\prec$ where the entity occurs in $\Gamma_I(\psi)$ (\emph{existential entitites}),
+		      %             \item entities not assigned a value by $I$ for which there is an instantiation $\psi'\prec\psi$ where the entity occurs in $\Gamma_I(\psi')$
+		      %                   (\emph{non-existential entities}), and
+		      %     \end{itemize}
+		\item for each instantiation $\psi$ of a quantified sub-formula of $\phi$,
+		      a certificate (the \emph{satisfiability propagator}) showing that for all values of entities that are neither assigned a value by $I$ nor are existential, there exist
+		      values for the existential entities such that the extension of~$I$ assigning these values to $\Gamma_I(\psi)$ satisfies~$\psi$.
+		      \footnote{For the sake of generality, at this point we do not require the satisfiability propagator to be constructive. Below, we will then work with algorithms computing the values only required to exist, here.}
+		      \marek{I attempted to simplify the definition below. That definition is far less general though.
+			      Is our original $\phi$ a conjunction of quantified formulas
+			      together with a ground part? If so, how do we order instantiations of different subformulas?}
+	\end{itemize}
 \end{definition}
 
 
 \addtocounter{definition}{-1}
 \begin{definition}[Simplified]
-    Given a formula $\phi$, a \emph{satisfiability certificate} is
-    \begin{itemize}
-        \item a pre-satisfiability certificate $I$
-        \item a total order $\preceq$ on instantiations of the quantified part of $\phi$,
-        \item for each instantiation $\psi$ of the quantified part of $\phi$ a set of corresponding
-              \emph{existential} entities -- entities occurring in $\psi$ but not occurring in the ground part of $\phi$
-              or in any instantiation $\psi'$ with $\psi' \prec \psi$,
-        \item for each instantiation $\psi$ of the quantified part of $\phi$ a corresponding
-              \emph{satisfiability propagator} -- a certificate showing that for all values of entities that are not existential and 
-	      do not occur in the ground part, there exist values of existential entities that satisfy $\psi$.
-    \end{itemize}
+	Given a formula $\phi$, a \emph{satisfiability certificate} is
+	\begin{itemize}
+		\item a pre-satisfiability certificate $I$
+		\item a total order $\preceq$ on instantiations of the quantified part of $\phi$,
+		\item for each instantiation $\psi$ of the quantified part of $\phi$ a set of corresponding
+		      \emph{existential} entities -- entities occurring in $\psi$ but not occurring in the ground part of $\phi$
+		      or in any instantiation $\psi'$ with $\psi' \prec \psi$,
+		\item for each instantiation $\psi$ of the quantified part of $\phi$ a corresponding
+		      \emph{satisfiability propagator} -- a certificate showing that for all values of entities that are not existential and
+		      do not occur in the ground part, there exist values of existential entities that satisfy $\psi$.
+	\end{itemize}
 \end{definition}
 
 
 Also note that for instantiations of quantified sub-formulas that only contain entities assigned a value by $I$, the satisfiability propagator only needs to certify that $I$ satisfies the respective instantiation. Hence, the entity interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator.
 
 \begin{property}
-    Every formula that has a satisfiability certificate is satisfiable.
+	Every formula that has a satisfiability certificate is satisfiable.
 \end{property}
 
 \begin{proof}
-    Assume a formula $\phi$ that has a satisfiability certificate.
-    The corresponding pre-satisfiability certificate $I$ satisfies the quantifier free part of $\phi$. We use the principle of induction on well-orders to show that for every instantiation~$\psi$ of a quantified-subformula, the set of formulas $\{ \psi' \mid \psi'\prec \psi\}$ is satisfied by an extension of $I$.
+	Assume a formula $\phi$ that has a satisfiability certificate.
+	The corresponding pre-satisfiability certificate $I$ satisfies the quantifier free part of $\phi$. We use the principle of induction on well-orders to show that for every instantiation~$\psi$ of a quantified-subformula, the set of formulas $\{ \psi' \mid \psi'\prec \psi\}$ is satisfied by an extension of $I$.
 
-    Let $\psi$ be an instantiation of a quantified sub-formula, and let $X$ be $\{ \psi' \mid \psi'\prec \psi\}$. We assume that $X$ is satisfiable by an extension $I_X$ of $I$, and prove that $X\cup \{ \psi\}$ is satisfiable by an extension of $I$, as well. Since the formula has a satisfiability certificate, the existential entities of $\psi$ do not occur in any element of $X$. Let $I'$ be the extension of $I_X$ that assigns to the existential entities of $\psi$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $X$, for all entities occurring in $X$, the value of $I'$ is the same as the value of $I_X$. Hence $I'$ satisfies both $X$ and $\psi$, and so it satisfies $X\cup \{ \psi\}$.
+	Let $\psi$ be an instantiation of a quantified sub-formula, and let $X$ be $\{ \psi' \mid \psi'\prec \psi\}$. We assume that $X$ is satisfiable by an extension $I_X$ of $I$, and prove that $X\cup \{ \psi\}$ is satisfiable by an extension of $I$, as well. Since the formula has a satisfiability certificate, the existential entities of $\psi$ do not occur in any element of $X$. Let $I'$ be the extension of $I_X$ that assigns to the existential entities of $\psi$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $X$, for all entities occurring in $X$, the value of $I'$ is the same as the value of $I_X$. Hence $I'$ satisfies both $X$ and $\psi$, and so it satisfies $X\cup \{ \psi\}$.
 
-    Now denote for every instantiation~$\psi$ of a quantified-subformula the entity interpretation $I$  satisfying $\psi$ as constructed in the previous paragraph by $I_{\psi}$.
-    % From the well-order $\prec$ we get a corresponding well-order on these entity interpretations.
-    Let $I_{\phi}$ be the entity interpretation that, for any entity $u$, assigns the value to $u$ that $I_{\psi}$ assigns to it for the smallest $\psi$ (wrt. $\prec$) that assigns a value to $u$. This smallest $\psi$ exists, since $\prec$ is a well-order. This entity interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
+	Now denote for every instantiation~$\psi$ of a quantified-subformula the entity interpretation $I$  satisfying $\psi$ as constructed in the previous paragraph by $I_{\psi}$.
+	% From the well-order $\prec$ we get a corresponding well-order on these entity interpretations.
+	Let $I_{\phi}$ be the entity interpretation that, for any entity $u$, assigns the value to $u$ that $I_{\psi}$ assigns to it for the smallest $\psi$ (wrt. $\prec$) that assigns a value to $u$. This smallest $\psi$ exists, since $\prec$ is a well-order. This entity interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
 \end{proof}
 
 A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model of the formula. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$.
@@ -237,19 +195,19 @@ For this, let $inst(u)$ either be the  instantiation $\psi$ of a quantified sub-
 \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  valprop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto valprop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.
 Then, a program to compute the value $val(u)$ of a given entity $u$ looks as follows:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
-    \textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
-    \textbf{if} $inst(u)=\bot$ \textbf{then} \textbf{return} 0 \`// in this case, any value (including $0$) is o.k\\
-    let $v_1,\dots, v_k$ be the non-existential entities in $inst(u)$\\
-    \textbf{return} $valprop(u)(val(v_1),\dots, val(v_k))$
+	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
+	\textbf{if} $inst(u)=\bot$ \textbf{then} \textbf{return} 0 \`// in this case, any value (including $0$) is o.k\\
+	let $v_1,\dots, v_k$ be the non-existential entities in $inst(u)$\\
+	\textbf{return} $valprop(u)(val(v_1),\dots, val(v_k))$
 \end{tabbing}
 
 \begin{property}
-    Let $u$ be an entity such that $inst(u)\neq\bot$. Then for any non-existential entity $v$ of $inst(u)$ with $inst(v)\neq\bot$, $inst(v)\prec inst(u)$.
+	Let $u$ be an entity such that $inst(u)\neq\bot$. Then for any non-existential entity $v$ of $inst(u)$ with $inst(v)\neq\bot$, $inst(v)\prec inst(u)$.
 \end{property}
 
 So each recursive call of the program $val$ either results in $inst(u)$ either decreasing or being $\bot$. In the latter case, the program terminates immediately, and the former case cannot happen infinitely often, since the used order is well-founded. So we have:
 \begin{property}
-    The program $val$ terminates.
+	The program $val$ terminates.
 \end{property}
 
 The goal is now an algorithm that computes such satisfiability certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
@@ -260,14 +218,14 @@ Class of formulas:
 \[ F\wedge \forall x\;.\; Q(f_1(x+c^{f_1}_1),\dots,f_1(x+c^{f_1}_{l_1}),\dots,f_r(x+c^{f_r}_1),\dots,f_r(x+c^{f_r}_{l_r})),\]
 where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, the constants $c^{f_i}_{1},\dots,c^{f_i}_{l_i}$ are sorted and pairwise different integers.
 \mj{Careful with terminology, for SMT people $c$ is a constant, we could use
-``numeral'' for $1,2,3,\dots$.}
+	``numeral'' for $1,2,3,\dots$.}
 
 This does not yet address:
 \begin{itemize}
-    \item uninterpreted function symbols of higher arity
-    \item more interesting argument terms containing uninterpreted constants or function symbols
-    \item several quantified variables
-    \item several quantified sub-formulas
+	\item uninterpreted function symbols of higher arity
+	\item more interesting argument terms containing uninterpreted constants or function symbols
+	\item several quantified variables
+	\item several quantified sub-formulas
 \end{itemize}
 The first item looks like a straightforward extension of the below (choose one argument to base everything on), just introducing messy notation. So we might leave it out for now. The others are interesting extensions we should think about.
 
@@ -288,8 +246,8 @@ We will satisfy the universal quantifier by an inductive argument going both up 
 Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
 We say that $Q$ satisfies the \req condition if there exists an index $i^* \in \{1,\dots,r\}$ such that:
 \begin{itemize}
-    \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
-    \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
+	\item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
+	\item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
 \end{itemize}
 We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate}) available.
 
@@ -300,55 +258,55 @@ In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $
 
 
 \begin{property}
-    \label{prop:cert}
-    Let $I$ be a non-empty integer interval and $\alpha$ be an entity interpretation  s.t.
-    \begin{enumerate}[label=(\roman*)]
-        \item $\alpha\models F\wedge \bigwedge_{x\in I} Q$
-        \item there is no $t\in args(F, f)$, $\max I<x$  s.t.\ $x+c^{f_{i^*}}_{l_{i^*}}=\alpha(t)$ (no entity propagated to by upward induction clashes with an argument of $f$ in $F$)
-        \item there is no $t\in args(F, f)$, $x<\min I$  s.t.\ $x+c^{f_{i^{*}}}_1=\alpha(t)$ (no entity propagated to by downward induction clashes with an argument of $f$ in $F$)
-    \end{enumerate}
-    Then the following forms a satisfiability certificate for $F\wedge \forall x \:.\: Q$:
-    \begin{itemize}
-        \item order: $0,1,-1,2,-2\dots, I, -I,\max I+1, \max I+2, \dots, \min I-1, \min I-2,\dots$
-        \item pre-satisfiability certificate: $\alpha$
-        \item corresponding sets of existential entities:
-              \begin{itemize}
-                  \item $\emptyset$, for $x\in I$,
+	\label{prop:cert}
+	Let $I$ be a non-empty integer interval and $\alpha$ be an entity interpretation  s.t.
+	\begin{enumerate}[label=(\roman*)]
+		\item $\alpha\models F\wedge \bigwedge_{x\in I} Q$
+		\item there is no $t\in args(F, f)$, $\max I<x$  s.t.\ $x+c^{f_{i^*}}_{l_{i^*}}=\alpha(t)$ (no entity propagated to by upward induction clashes with an argument of $f$ in $F$)
+		\item there is no $t\in args(F, f)$, $x<\min I$  s.t.\ $x+c^{f_{i^{*}}}_1=\alpha(t)$ (no entity propagated to by downward induction clashes with an argument of $f$ in $F$)
+	\end{enumerate}
+	Then the following forms a satisfiability certificate for $F\wedge \forall x \:.\: Q$:
+	\begin{itemize}
+		\item order: $0,1,-1,2,-2\dots, I, -I,\max I+1, \max I+2, \dots, \min I-1, \min I-2,\dots$
+		\item pre-satisfiability certificate: $\alpha$
+		\item corresponding sets of existential entities:
+		      \begin{itemize}
+			      \item $\emptyset$, for $x\in I$,
 
-                  \item $\{f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})\}$, for $x>\max I$, and
-                  \item $\{f_{i^*}(x+c^{f_{i^{*}}}_1)\}$, for $x<\min I$
-              \end{itemize}
-        \item propagators:
-              \begin{itemize}
-                  \item resulting from $\alpha$, for $x\in I$,
-                  \item from first part of ReqPivot, for $x>\max I$, and
-                  \item from second part of ReqPivot, for $x<\min I$.
-              \end{itemize}
-    \end{itemize}
+			      \item $\{f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})\}$, for $x>\max I$, and
+			      \item $\{f_{i^*}(x+c^{f_{i^{*}}}_1)\}$, for $x<\min I$
+		      \end{itemize}
+		\item propagators:
+		      \begin{itemize}
+			      \item resulting from $\alpha$, for $x\in I$,
+			      \item from first part of ReqPivot, for $x>\max I$, and
+			      \item from second part of ReqPivot, for $x<\min I$.
+		      \end{itemize}
+	\end{itemize}
 \end{property}
 
 \begin{proof} \todoSR{I still need to check some details, e.g., the case $r<2$.}
-    We verify that for each instantiation $\psi$ in the order, the existential entities are neither assigned a value by $\alpha$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$. %Let $\Delta = c^{f_{i^*}}_{l_{i^*}} - c^{f_{i^*}}_1 \geq 0$ be the minimum size of $I$.
-    \begin{description}
-        \item[Case $x \in I$:] The set of existential entities is empty, so the condition holds vacuously.
+	We verify that for each instantiation $\psi$ in the order, the existential entities are neither assigned a value by $\alpha$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$. %Let $\Delta = c^{f_{i^*}}_{l_{i^*}} - c^{f_{i^*}}_1 \geq 0$ be the minimum size of $I$.
+	\begin{description}
+		\item[Case $x \in I$:] The set of existential entities is empty, so the condition holds vacuously.
 
-        \item[Case $x > \max I$:] The existential entity~$f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ is neither allowed to be assigned a value by $\alpha$, nor allowed to occur in any instantiation $x'$ with $\max I<x'<x$. The former is ensured by hypothesis (\textit{ii}), the latter by the fact that $x+c^{f_{i^*}}_{l_{i^*}}$ is the highest argument of $f_{i^*}$.
+		\item[Case $x > \max I$:] The existential entity~$f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ is neither allowed to be assigned a value by $\alpha$, nor allowed to occur in any instantiation $x'$ with $\max I<x'<x$. The former is ensured by hypothesis (\textit{ii}), the latter by the fact that $x+c^{f_{i^*}}_{l_{i^*}}$ is the highest argument of $f_{i^*}$.
 
-        \item[Case $x < \min I$:] The existential entity~$f_{i^*}(x+c^{f_{i^{*}}}_1)$, is neither allowed to be assigned a value by $\alpha$, nor allowed to occur in any instantiation~$x'$ with $\max I<x'$, nor in any $x'$ with $x<x'<\min I$. The first condition is ensured by hypothesis (\textit{iii}). The second condition follows from the fact that $x < \min I \leq \max I < x'$; hence, $x+c^{f_{i^*}}_1<x'+c^{f_{i^*}}_1$. The third condition follows from the fact that $x+c^{f_{i^{*}}}_1$ is the lowest argument of $f_{i^*}$.
-        % the second condition \todoSR{This is the ``glueing together'' mentioned by Mikoláš below.} is followed from the lowest argument $(\max I+1) + c^{f_{i^*}}_1 \geq (\min I+\Delta) + c^{f_{i^*}}_1 + 1=\min I+c^{f_{i^*}}_{l_{i^*}}+1>(\min I-1)+c^{f_{i^*}}_{l_{i^*}}\geq x+c^{f_{i^{*}}}_1$,
-    \end{description}
-    In all cases, the existential entity is neither assigned by $\alpha$ nor appears in any earlier instantiation. The ReqPivot condition ensures the existence of suitable propagators. Therefore, the construction forms a valid satisfiability certificate as defined in Definition \ref{def:certificate}.
+		\item[Case $x < \min I$:] The existential entity~$f_{i^*}(x+c^{f_{i^{*}}}_1)$, is neither allowed to be assigned a value by $\alpha$, nor allowed to occur in any instantiation~$x'$ with $\max I<x'$, nor in any $x'$ with $x<x'<\min I$. The first condition is ensured by hypothesis (\textit{iii}). The second condition follows from the fact that $x < \min I \leq \max I < x'$; hence, $x+c^{f_{i^*}}_1<x'+c^{f_{i^*}}_1$. The third condition follows from the fact that $x+c^{f_{i^{*}}}_1$ is the lowest argument of $f_{i^*}$.
+		      % the second condition \todoSR{This is the ``glueing together'' mentioned by Mikoláš below.} is followed from the lowest argument $(\max I+1) + c^{f_{i^*}}_1 \geq (\min I+\Delta) + c^{f_{i^*}}_1 + 1=\min I+c^{f_{i^*}}_{l_{i^*}}+1>(\min I-1)+c^{f_{i^*}}_{l_{i^*}}\geq x+c^{f_{i^{*}}}_1$,
+	\end{description}
+	In all cases, the existential entity is neither assigned by $\alpha$ nor appears in any earlier instantiation. The ReqPivot condition ensures the existence of suitable propagators. Therefore, the construction forms a valid satisfiability certificate as defined in Definition \ref{def:certificate}.
 \end{proof}
 
 For coming up with an algorithm, let us first simplify the two conditions: Pushing negation over quantifiers, we get:
 \begin{itemize}
-    \item  for all $t\in args(F, f)$, for all $x$ with $\max I<x$, $\alpha(t)<x+c^{f_{i^*}}_{l_{i^*}}$
-    \item for all $t\in args(F, f)$, for all $x$ with $x<\min I$, $x+c^{f_{i^{*}}}_1<\alpha(t)$
+	\item  for all $t\in args(F, f)$, for all $x$ with $\max I<x$, $\alpha(t)<x+c^{f_{i^*}}_{l_{i^*}}$
+	\item for all $t\in args(F, f)$, for all $x$ with $x<\min I$, $x+c^{f_{i^{*}}}_1<\alpha(t)$
 \end{itemize}
 And eliminating the inner universal quantifier, we get
 \begin{itemize}
-    \item  for all $t\in args(F, f)$, $\alpha(t)<\max I + 1 +c^{f_{i^*}}_{l_{i^*}}$
-    \item for all $t\in args(F, f)$, $\min I-1+c^{f_{i^{*}}}_1<\alpha(t)$
+	\item  for all $t\in args(F, f)$, $\alpha(t)<\max I + 1 +c^{f_{i^*}}_{l_{i^*}}$
+	\item for all $t\in args(F, f)$, $\min I-1+c^{f_{i^{*}}}_1<\alpha(t)$
 \end{itemize}
 which simplifies to
 \[ \text{for all } t\in args(F, f), \min I+c^{f_{i^{*}}}_1\leq\alpha(t)\leq\max I +c^{f_{i^*}}_{l_{i^*}}.\]
@@ -363,96 +321,96 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
 \todoSR{The current algorithm uses a fixed $i^*$, a witness for the existential quantifier in \req (the current text does not explicitly say this). It may also be possible to search for it, if there is several such witnesses.}
 \mj{I'd  remove $\alpha$ on line~\ref{ln:check}. The last value of an SMT call should not matter here.}
 \mj{Potentially, in the implementation, use cores to determine which way to increase the size of~$I$.
-If a certain condition does not appear in the core, it might be possible to not
-move in one of the directions.}
+	If a certain condition does not appear in the core, it might be possible to not
+	move in one of the directions.}
 
 \begin{algorithm}
-    \caption{Satisfiability Check}%
-    \label{alg:sr}
-    \textbf{Input:} Formula $F \wedge \forall x \:.\: Q$ as above\\
-    \textbf{Output:} SAT or UNSAT
-    \begin{algorithmic}[1]
-        % \Procedure{OriginalSMT}{$F, f, k, l, Q$}
-        \State $\underline{I} \leftarrow 0$, $\overline{I} \leftarrow 0$ \Comment{Start with singleton interval}
-        \State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q\right)$
+	\caption{Satisfiability Check}%
+	\label{alg:sr}
+	\textbf{Input:} Formula $F \wedge \forall x \:.\: Q$ as above\\
+	\textbf{Output:} SAT or UNSAT
+	\begin{algorithmic}[1]
+		% \Procedure{OriginalSMT}{$F, f, k, l, Q$}
+		\State $\underline{I} \leftarrow 0$, $\overline{I} \leftarrow 0$ \Comment{Start with singleton interval}
+		\State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q\right)$
 
-        \While{$\alpha \neq \bot$}
+		\While{$\alpha \neq \bot$}
 
-        \State $\text{condition} \leftarrow \bigwedge_{t \in \args(F,f)} \underline{I} + c^{f_{i^{*}}}_1 \leq \alpha(t) \leq \overline{I} + c^{f_{i^*}}_{l_{i^*}}$
-        \If{$\smt(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q \wedge \text{condition}) \neq \bot$} \Comment{with clash condition}\label{ln:check}
-        \State \Return \textsc{Sat} \Comment{Certificate can be constructed}
-        \EndIf
+		\State $\text{condition} \leftarrow \bigwedge_{t \in \args(F,f)} \underline{I} + c^{f_{i^{*}}}_1 \leq \alpha(t) \leq \overline{I} + c^{f_{i^*}}_{l_{i^*}}$
+		\If{$\smt(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q \wedge \text{condition}) \neq \bot$} \Comment{with clash condition}\label{ln:check}
+		\State \Return \textsc{Sat} \Comment{Certificate can be constructed}
+		\EndIf
 
-        %        \State \textbf{Expand interval symmetrically:}
-        \State $\underline{I} \leftarrow \underline{I} - 1$
-        \State $\overline{I} \leftarrow \overline{I} + 1$
+		%        \State \textbf{Expand interval symmetrically:}
+		\State $\underline{I} \leftarrow \underline{I} - 1$
+		\State $\overline{I} \leftarrow \overline{I} + 1$
 
-        %       \State \textbf{Solve extended formula:}
-        \State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q\right)$ \Comment{with updated bounds}
-        \EndWhile
+		%       \State \textbf{Solve extended formula:}
+		\State $\alpha \leftarrow \smt\left(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q\right)$ \Comment{with updated bounds}
+		\EndWhile
 
-        \State \Return \textsc{Unsat}
-        % \EndProcedure
-    \end{algorithmic}
+		\State \Return \textsc{Unsat}
+		% \EndProcedure
+	\end{algorithmic}
 \end{algorithm}
 
 
 We are currently polishing a completeness proof for the \textsc{Sat} case. For the \textsc{Unsat} case, the essential argument seems to be the same as for Ge and de~Moura~\cite[paragraph ``compactness'']{ge-cav09}.
 
 \begin{theorem}
-    Let $\phi$ be a formula of the form
-    \begin{align*}
-        \phi:=F\land Q\big(f_1(x+c_1^{f_1}),...,f_1(x+c_{l_1}^{f_1}),...,f_r(x+c_1^{f_r}),...,f_r(x+c_{1_r}^{f_r})\big)
-    \end{align*}
-    where
-    \begin{enumerate}
-        \item $F$ is quantifier-free.
-        \item For every $i\in\{1,...,r\}$, the constants $c_1^{f_i},...,c_{l_i}^{f_i}$ are sorted and pairwise different.
-        \item $\phi$ is satisfiable.
-        \item $\phi$ satisfies ReqPivot for a specific critical function $f_{i^*}$
-    \end{enumerate}
-    Then, Algorithm~\ref{alg:sr}, upon input $\phi$, will terminate and return SAT.
+	Let $\phi$ be a formula of the form
+	\begin{align*}
+		\phi:=F\land Q\big(f_1(x+c_1^{f_1}),...,f_1(x+c_{l_1}^{f_1}),...,f_r(x+c_1^{f_r}),...,f_r(x+c_{1_r}^{f_r})\big)
+	\end{align*}
+	where
+	\begin{enumerate}
+		\item $F$ is quantifier-free.
+		\item For every $i\in\{1,...,r\}$, the constants $c_1^{f_i},...,c_{l_i}^{f_i}$ are sorted and pairwise different.
+		\item $\phi$ is satisfiable.
+		\item $\phi$ satisfies ReqPivot for a specific critical function $f_{i^*}$
+	\end{enumerate}
+	Then, Algorithm~\ref{alg:sr}, upon input $\phi$, will terminate and return SAT.
 \end{theorem}
 
 \begin{proof}
-    Since $\phi$ is satisfiable, there exists a model $\gmodel\vDash\phi$. From $\gmodel$, we can extract a pre-satisfiability certificate $I^*$ (Definition \ref{def:pre-sat-cert}). This $I^*$ provides concrete integer values for all ground terms in $F$ and for the entities appearing in the instantiations of the quantified formula that make $\phi$ true.
-    Let $S$ be the finite set of all integer arguments for the critical function $f_{i^*}$ that appear in the ground part $F$:
-    \begin{align*}
-        S=\{I^*(t)\,|\,t\in\args(F,f_{i^*})\}
-    \end{align*}
-    Define the minimal and maximal elements of this set: $L=\min(S)$ and $U=\max(S)$. Now we define this critical interval $[K_{\text{min}},K_{\text{max}}]$ where:
-    \begin{align*}
-        K_{\text{min}}=L-c_{l_{i^*}}^{f_{i^*}} \hspace{0.5em}\text{and}\hspace{0.5em} K_{\text{max}}=U-c_1^{f_{i^*}}
-    \end{align*}
-    \begin{claim}
-        \label{claim:inTerminationProof}
-        For the interval $[K_{\text{min}},K_{\text{max}}]$, $I^*$ satisfies the clash condition:
-        \begin{align*}
-            \forall t\in\args(F,f_{i^*}).K_{\text{min}}+c_1^{f_{i^*}}\leq I^*(t)\leq K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}
-        \end{align*}
-        \textit{Proof:} For any $t\in\args(F,f_{i^*})$, we have $L\leq I^*(t)\leq U$. Therefore,
-        \begin{itemize}
-            \item $K_{\text{min}}+c_1^{f_{i^*}}=\big(L-c_{l_{i^*}}^{f_{i^*}}\big)+c_1^{f_{i^*}}\leq L\leq I^*(t)$ since $c_1^{f_{i^*}}\leq c_{l_{i^*}}^{f_{i^*}}$, and
-            \item $I^*(t)\leq U\leq\big(U-c_1^{f_{i^*}}\big)+c_{l_{i^*}}^{f_{i^*}}=K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}$ since $c_{l_{i^*}}^{f_{i^*}}\geq c_1^{f_{i^*}}$.
-        \end{itemize}
-    \end{claim}
+	Since $\phi$ is satisfiable, there exists a model $\gmodel\vDash\phi$. From $\gmodel$, we can extract a pre-satisfiability certificate $I^*$ (Definition \ref{def:pre-sat-cert}). This $I^*$ provides concrete integer values for all ground terms in $F$ and for the entities appearing in the instantiations of the quantified formula that make $\phi$ true.
+	Let $S$ be the finite set of all integer arguments for the critical function $f_{i^*}$ that appear in the ground part $F$:
+	\begin{align*}
+		S=\{I^*(t)\,|\,t\in\args(F,f_{i^*})\}
+	\end{align*}
+	Define the minimal and maximal elements of this set: $L=\min(S)$ and $U=\max(S)$. Now we define this critical interval $[K_{\text{min}},K_{\text{max}}]$ where:
+	\begin{align*}
+		K_{\text{min}}=L-c_{l_{i^*}}^{f_{i^*}} \hspace{0.5em}\text{and}\hspace{0.5em} K_{\text{max}}=U-c_1^{f_{i^*}}
+	\end{align*}
+	\begin{claim}
+		\label{claim:inTerminationProof}
+		For the interval $[K_{\text{min}},K_{\text{max}}]$, $I^*$ satisfies the clash condition:
+		\begin{align*}
+			\forall t\in\args(F,f_{i^*}).K_{\text{min}}+c_1^{f_{i^*}}\leq I^*(t)\leq K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}
+		\end{align*}
+		\textit{Proof:} For any $t\in\args(F,f_{i^*})$, we have $L\leq I^*(t)\leq U$. Therefore,
+		\begin{itemize}
+			\item $K_{\text{min}}+c_1^{f_{i^*}}=\big(L-c_{l_{i^*}}^{f_{i^*}}\big)+c_1^{f_{i^*}}\leq L\leq I^*(t)$ since $c_1^{f_{i^*}}\leq c_{l_{i^*}}^{f_{i^*}}$, and
+			\item $I^*(t)\leq U\leq\big(U-c_1^{f_{i^*}}\big)+c_{l_{i^*}}^{f_{i^*}}=K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}$ since $c_{l_{i^*}}^{f_{i^*}}\geq c_1^{f_{i^*}}$.
+		\end{itemize}
+	\end{claim}
 
-    The two points above end the proof of Claim \ref{claim:inTerminationProof}. Now let $N=\max(\abs{K_{\text{min}}},\abs{K_{\text{max}}})$ and consider Algorithm \ref{alg:sr}.
-    \begin{enumerate}
-        \item Line 1: initialisation.
-        \item Line 2: First SMT call. This succeeds because $\phi$ is satisfiable.
-        \item Loop progression: the algorithm enters the while-loop and expands symmetrically.
-        \item At iteration where interval becomes $[-N,N]$:
-              \begin{itemize}
-                  \item Line 9. This will succeed because we can construct a mnodel as follows:
-                        \begin{itemize}
-                            \item For $F$ and $Q(x)$ with $x\in[K_\text{min},K_{\text{max}}]$, use values from $I^*$;
-                            \item use the ReqPivot propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
-                        \end{itemize}
-                  \item Line 5: $\smt(F \wedge \bigwedge_{x=-N}^N Q \wedge C)$ where $C$ is the clash condition $\forall t\in\args(F,f_{i^*}).-N+c_1^{f_{i^*}}\leq \alpha(t)\leq N+c_{l_{i^*}}^{f_{i^*}}$. This will succeed because the model constructed above also satisfies $C$ (followed from Claim 1 and the fact that $[K_{\text{min}},K_{\text{max}}]\subseteq[-N,N]$).
-                  \item $\therefore$ Algorithm \ref{alg:sr} returns SAT.\qedhere
-              \end{itemize}
-    \end{enumerate}
+	The two points above end the proof of Claim \ref{claim:inTerminationProof}. Now let $N=\max(\abs{K_{\text{min}}},\abs{K_{\text{max}}})$ and consider Algorithm \ref{alg:sr}.
+	\begin{enumerate}
+		\item Line 1: initialisation.
+		\item Line 2: First SMT call. This succeeds because $\phi$ is satisfiable.
+		\item Loop progression: the algorithm enters the while-loop and expands symmetrically.
+		\item At iteration where interval becomes $[-N,N]$:
+		      \begin{itemize}
+			      \item Line 9. This will succeed because we can construct a mnodel as follows:
+			            \begin{itemize}
+				            \item For $F$ and $Q(x)$ with $x\in[K_\text{min},K_{\text{max}}]$, use values from $I^*$;
+				            \item use the ReqPivot propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
+			            \end{itemize}
+			      \item Line 5: $\smt(F \wedge \bigwedge_{x=-N}^N Q \wedge C)$ where $C$ is the clash condition $\forall t\in\args(F,f_{i^*}).-N+c_1^{f_{i^*}}\leq \alpha(t)\leq N+c_{l_{i^*}}^{f_{i^*}}$. This will succeed because the model constructed above also satisfies $C$ (followed from Claim 1 and the fact that $[K_{\text{min}},K_{\text{max}}]\subseteq[-N,N]$).
+			      \item $\therefore$ Algorithm \ref{alg:sr} returns SAT.\qedhere
+		      \end{itemize}
+	\end{enumerate}
 \end{proof}
 
 \section{Discussion on Completeness}\label{sec:completeness}
@@ -462,7 +420,7 @@ integers themselves are not recursively axiomatizable.
 % of axioms.
 Further, nonlinear integer arithmetic is undecidable already without
 quantifiers. So for the following discussion we assume that ground problems are
-always decided on line~\ref{ln:check} of \cref{alg:sr}. 
+always decided on line~\ref{ln:check} of \cref{alg:sr}.
 
 % \cref{alg:sr} terminates if the given formula satisfies \req and is satisfiable in integers.
 % Unsatisfible formulas are more nuanced. Consider the following formula,
@@ -481,7 +439,7 @@ always decided on line~\ref{ln:check} of \cref{alg:sr}.
 Unsatisfiable formulas are more nuanced. Consider the following formula,
 which requires $f$ to be constantly $0$, yet different from $0$ at some point.
 \begin{equation}\label{eq:completeness}
-   f(0)=0\land f(c)\neq 0\land\forall x.\,f(x)=f(x+1)
+	f(0)=0\land f(c)\neq 0\land\forall x.\,f(x)=f(x+1)
 \end{equation}
 The formula is unsatisfiable as long as we have access to induction.%
 \footnote{Apply induction in both directions to obtain $\forall n.\,f(n)=0$.}
@@ -505,7 +463,7 @@ such as $x$.
 
 \cref{alg:sr} terminates if the given formula is unsatisfiable in
 arithmetic without induction.\mj{We need to make more
-specific what this means. Is it clear that it hols?}
+	specific what this means. Is it clear that it hols?}
 
 \section{Extensions}
 
@@ -514,17 +472,17 @@ The condition \req can be generalized to be able to see~$k$ steps
 ahead, in the spirit of $k$-induction~\cite{kinduction,En2003}. The value of~$k$ can be
 increased gradually. This is useful for example for periodic functions, such as
 \begin{equation}\label{eq:kind}
-    2\mid x \Rightarrow (f(x)=2\land f(x+1)=3)
+	2\mid x \Rightarrow (f(x)=2\land f(x+1)=3)
 \end{equation}
 The formula~\eqref{eq:kind} does not satisfy \req but satisfies the property
 that assuming that if it is satisfied for~$i$ and $i+1$, the values for~$i+2$ and
 $i+3$ can be calculated, i.e., prove the following.
 \begin{equation}\label{eq:kind:prove}
-    \forall x_0x_1
-    \exists x_2x_3.\
-    \left(2\mid x_0 \Rightarrow (x_0=2\land x_1=3)\right)
-    \Rightarrow
-    \left(2\mid x_2 \Rightarrow (x_2=2\land x_3=3)\right)
+	\forall x_0x_1
+	\exists x_2x_3.\
+	\left(2\mid x_0 \Rightarrow (x_0=2\land x_1=3)\right)
+	\Rightarrow
+	\left(2\mid x_2 \Rightarrow (x_2=2\land x_3=3)\right)
 \end{equation}
 
 In this case, $k=2$ and \cref{alg:sr} has to be
@@ -536,8 +494,8 @@ Analogously, backward.
 
 Suppose the following formula.
 \begin{equation}\label{eq:conj1}
-    \forall x.\,f(x + 7) > f(x) - f(x + 3)
-    \,\land \,f(x + 3) > f(x)
+	\forall x.\,f(x + 7) > f(x) - f(x + 3)
+	\,\land \,f(x + 3) > f(x)
 \end{equation}
 Formula~\eqref{eq:conj1} does not satisfy the \req condition because
 for values of $f(x+3)$ and $f(x)$ with $f(x+3)\leq f(x)$, it is no longer
@@ -548,18 +506,18 @@ Since the literals are in conjunction, for all $x$ both of them have to be satis
 the formula is equivalent to the formula where the conjunction is split into two
 universally quantified formulas
 \[
-    \forall x. \,f(x + 7) > f(x) - f(x + 3)
-    \,\land \,\forall x. \,f(x + 3) > f(x)
+	\forall x. \,f(x + 7) > f(x) - f(x + 3)
+	\,\land \,\forall x. \,f(x + 3) > f(x)
 \]
 Using substitution $y = x + 3$ we ``normalize'' the formulas as follows
 \[
-    \forall x. \,f(x) > f(x - 7) - f(x - 4)
-    \,\land \,\forall y. \,f(y) > f(y - 3)
+	\forall x. \,f(x) > f(x - 7) - f(x - 4)
+	\,\land \,\forall y. \,f(y) > f(y - 3)
 \]
 Using the previous argument, we can merge the two universal quantifiers into a single formula
 \begin{equation}\label{eq:normalized}
-    \forall x. \,f(x) > f(x - 7) - f(x - 4)
-    \,\land \, \,f(x) > f(x - 3)
+	\forall x. \,f(x) > f(x - 7) - f(x - 4)
+	\,\land \, \,f(x) > f(x - 3)
 \end{equation}
 Note that the condition \emph{ReqPivot} now holds for
 Formula~\eqref{eq:normalized} for upward propagation too, so our algorithm can be applied.
@@ -593,16 +551,16 @@ assume we are propagating in the increasing direction and we have set arbitrary
 values to all cells except the maximal one.
 
 \begin{definition}[Offset Term]
-    An \emph{offset term} is a term of the form $x + k$, where $x$ is a variable and $k\in\mathbb{Z}$.
+	An \emph{offset term} is a term of the form $x + k$, where $x$ is a variable and $k\in\mathbb{Z}$.
 \end{definition}
 
 We are interested in formulas where only offset terms are allowed as arguments of uninterpreted
 function symbols.
 
 \begin{definition}[Maximal Offset Term]
-    The \emph{maximal offset term} of an uninterpreted function symbol $f$ in a formula $\varphi$
-    is the offset term $x + k$ such that $f(x + k)$ occurs in $\varphi$ and for any other offset term
-    $x + k'$ occurring as an argument of $f$ in $\varphi$ we have $k' < k$.
+	The \emph{maximal offset term} of an uninterpreted function symbol $f$ in a formula $\varphi$
+	is the offset term $x + k$ such that $f(x + k)$ occurs in $\varphi$ and for any other offset term
+	$x + k'$ occurring as an argument of $f$ in $\varphi$ we have $k' < k$.
 \end{definition}
 We define the \emph{minimal offset term} in an analogous way.
 
@@ -618,28 +576,28 @@ In our algorithm, we define the value for the maximal cell of $f_{i*}$ in the in
 direction and for the minimal cell in the decreasing direction.
 Let us for convenience define the following terminology.
 \marek{In the following I still haven't thought through what exactly
-$\underline{I}, \bar{I}$ are.}
+	$\underline{I}, \bar{I}$ are.}
 \begin{definition}[Write to a Cell]
-    We say a formula $\varphi[x\mapsto a]$ \emph{writes to a cell} $f(n)$ if either
-    \begin{enumerate}
-        \item $a > \bar{I}$ and for the maximal offset term $t_{\mathit{max}}$ of $f$ in $\varphi$
-              we have $t_{\mathit{max}}(a) = n$, or
-        \item $a < \underline{I}$ and for the minimal offset term $t_{\mathit{min}}$ of $f$ in $\varphi$
-              we have $t_{\mathit{min}}(a) = n$.
-    \end{enumerate}
-    In the first case we also say $\varphi[x\mapsto a]$ \emph{writes to a cell} $f(n)$
-    \emph{in the increasing direction}. Analogously for the \emph{decreasing direction} in the second case.
+	We say a formula $\varphi[x\mapsto a]$ \emph{writes to a cell} $f(n)$ if either
+	\begin{enumerate}
+		\item $a > \bar{I}$ and for the maximal offset term $t_{\mathit{max}}$ of $f$ in $\varphi$
+		      we have $t_{\mathit{max}}(a) = n$, or
+		\item $a < \underline{I}$ and for the minimal offset term $t_{\mathit{min}}$ of $f$ in $\varphi$
+		      we have $t_{\mathit{min}}(a) = n$.
+	\end{enumerate}
+	In the first case we also say $\varphi[x\mapsto a]$ \emph{writes to a cell} $f(n)$
+	\emph{in the increasing direction}. Analogously for the \emph{decreasing direction} in the second case.
 \end{definition}
 
 Suppose we are given the formula $\varphi = \forall x. \,\varphi_1(x) \lor \dots \lor \varphi_n(x)$.
 If we can construct formulas $\mathit{pre}_1, \dots, \mathit{pre}_n$ so that
 they contain only $x$ and interpreted function symbols, and in addition
 \begin{enumerate}
-    \item\label{pre:1} $\forall x. \,\bigvee_{i = 1}^n \mathit{pre}_i(x)$ is valid,
-    \item\label{pre:2} given $a$, if $\mathit{pre}_{i_1}(a) \land \dots \land \mathit{pre}_{i_n}(a)$ holds,
-	    we can apply \req condition on $\varphi_{i_1}(a)\lor \dots \lor \varphi_{i_n}(a)$, and
-    \item\label{pre:3} there are no $i\not=j, x_1\not=x_2$ such that $\mathit{pre}_i(x_1) \land \mathit{pre}_j(x_2)$
-          and $\varphi_i[x \mapsto x_1]$, $\varphi_j[x \mapsto x_2]$ write to the same cell in the same direction,
+	\item\label{pre:1} $\forall x. \,\bigvee_{i = 1}^n \mathit{pre}_i(x)$ is valid,
+	\item\label{pre:2} given $a$, if $\mathit{pre}_{i_1}(a) \land \dots \land \mathit{pre}_{i_n}(a)$ holds,
+	      we can apply \req condition on $\varphi_{i_1}(a)\lor \dots \lor \varphi_{i_n}(a)$, and
+	\item\label{pre:3} there are no $i\not=j, x_1\not=x_2$ such that $\mathit{pre}_i(x_1) \land \mathit{pre}_j(x_2)$
+	      and $\varphi_i[x \mapsto x_1]$, $\varphi_j[x \mapsto x_2]$ write to the same cell in the same direction,
 \end{enumerate}
 then $\varphi$ is satisfiable. The argument is similar as before.\marek{I will elaborate on this later.}
 However, finding such precondition formulas is a difficult synthesis problem and shall be left
@@ -669,38 +627,38 @@ formula is unsatisfiable.
 \subsection*{Few More Examples}
 
 \begin{example}
-    \[
-        \forall{x}. \,f(x) < f(x + 1) + f(x + 2)
-        \,\land \,f(x) < f(x + 1)
-    \]
-    ReqPivot is satisfied here. In the decreasing direction simply set $f(x+1), f(x+2)$ arbitrarily
-    and set $f(x)$ as $\mathit{min}\{f(x + 1) + f(x + 2), f(x + 1)\} - 1$. In the increasing direction,
-    first normalize the problem
-    \[
-        \forall{x}. \,f(x - 2) - f(x - 1) < f(x)
-        \,\land \,f(x - 1) < f(x)
-    \]
-    Here we set $f(x)$ as $\mathit{max}\{f(x - 2) - f(x - 1), f(x - 1)\} + 1$.
+	\[
+		\forall{x}. \,f(x) < f(x + 1) + f(x + 2)
+		\,\land \,f(x) < f(x + 1)
+	\]
+	ReqPivot is satisfied here. In the decreasing direction simply set $f(x+1), f(x+2)$ arbitrarily
+	and set $f(x)$ as $\mathit{min}\{f(x + 1) + f(x + 2), f(x + 1)\} - 1$. In the increasing direction,
+	first normalize the problem
+	\[
+		\forall{x}. \,f(x - 2) - f(x - 1) < f(x)
+		\,\land \,f(x - 1) < f(x)
+	\]
+	Here we set $f(x)$ as $\mathit{max}\{f(x - 2) - f(x - 1), f(x - 1)\} + 1$.
 \end{example}
 
 
 \begin{example}\label{ex:ind-needed}
-    \[
-        \forall{x}. \,f(x) < f(x + 1) - f(x + 2)
-        \,\land \,\forall{x}. \,f(x) < f(x + 1)
-    \]
-    Since $f$ is increasing there has to exist an $a$ for which $f(a) \geq 0$
-    (this requires an inductive proof, see Section~\ref{sec:ind}).
-    At the same time, $f(a) < f(a+1) - f(a+2)$ and $f(a+1) < f(a+2) - f(a+3)$. That means
-    $f(a) < -f(a+3)$ but also $f(a) < f(a+3)$. Therefore, $f(a) < \text{min}\{-f(a+3), f(a+3)\}$.
-    In other words $f(a) < 0$, a contradiction.
+	\[
+		\forall{x}. \,f(x) < f(x + 1) - f(x + 2)
+		\,\land \,\forall{x}. \,f(x) < f(x + 1)
+	\]
+	Since $f$ is increasing there has to exist an $a$ for which $f(a) \geq 0$
+	(this requires an inductive proof, see Section~\ref{sec:ind}).
+	At the same time, $f(a) < f(a+1) - f(a+2)$ and $f(a+1) < f(a+2) - f(a+3)$. That means
+	$f(a) < -f(a+3)$ but also $f(a) < f(a+3)$. Therefore, $f(a) < \text{min}\{-f(a+3), f(a+3)\}$.
+	In other words $f(a) < 0$, a contradiction.
 
-    ReqPivot is also not satisfied here. If we normalize the formulas like so
-    \[
-        \forall{x}. \,f(x)  < f(x - 1) - f(x - 2)
-        \,\land \,f(x - 1) < f(x)
-    \]
-    and set $f(x - 2) > f(x - 1) > 0$, we can never find a value for $f(x)$ to satisfy the formula.
+	ReqPivot is also not satisfied here. If we normalize the formulas like so
+	\[
+		\forall{x}. \,f(x)  < f(x - 1) - f(x - 2)
+		\,\land \,f(x - 1) < f(x)
+	\]
+	and set $f(x - 2) > f(x - 1) > 0$, we can never find a value for $f(x)$ to satisfy the formula.
 \end{example}
 
 
@@ -709,41 +667,41 @@ formula is unsatisfiable.
 In the solution of Example~\ref{ex:ind-needed}, we implicitly used the fact that the following
 formula is \textsc{unsat}
 \begin{equation}\label{eq:ind-needed}
-    \forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
+	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
 \end{equation}
 Note that one cannot prove that by instantiating the formula.\footnote{
-    In general, we could look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
-    If from the other quantified subformulas we can derive that $f$ is strictly increasing, we can conclude
-    the entire formula is \textsc{unsat} over the integers.}
+	In general, we could look for bounds of the form $\forall x. \,f(x) < G$ for $G$ ground.
+	If from the other quantified subformulas we can derive that $f$ is strictly increasing, we can conclude
+	the entire formula is \textsc{unsat} over the integers.}
 Indeed, every finite set of instantiations is satisfiable.
 A similar result can be found in~\cite{ge-cav09}, where from compactness we have that
 the above formula has as models only non-standard models of arithmetic (e.g.\ polynomials over $\mathbb{Z}$).
 
 Using $\forall{x}. \,f(x)<f(x+1)$ we can prove by induction the lemma
 \begin{equation}\label{eq:ind-needed-lemma}
-    \forall{v}\exists{x}. \,f(x) \geq f(0) + v
+	\forall{v}\exists{x}. \,f(x) \geq f(0) + v
 \end{equation}
 For the base case we have $\exists x. \,f(x) \geq f(0) + 0$ is valid when setting $x = 0$. For the induction step
 assume for some $v$ and $x$ we have $f(x) \geq f(0) + v$. Now,
 \[
-    f(x) \geq f(0) + v \implies f(x) + 1 \geq f(0) + v + 1 \implies f(x+1) \geq f(0) + v + 1,
+	f(x) \geq f(0) + v \implies f(x) + 1 \geq f(0) + v + 1 \implies f(x+1) \geq f(0) + v + 1,
 \]
 where the second implication holds by the assumption that $f$ is increasing.
 Instantiating the Lemma~\eqref{eq:ind-needed-lemma} by $v = -f(0)$
 now proves Formula~\eqref{eq:ind-needed} is \textsc{unsat}, since we get
 \[
-    \forall{x}. \,f(x)<0 \land \exists{x}. \,f(x) \geq 0
+	\forall{x}. \,f(x)<0 \land \exists{x}. \,f(x) \geq 0
 \]
 
 Another example where induction is needed is
 \[
-    f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
+	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
 \]
 Note that Algorithm~\ref{alg:sr} does not terminate on this example because in every $\alpha$
 we can set $c$ to be outside $I$. The same goes for any instantiation method.
 We can easily prove the lemma
 \[
-    \forall{x}. \,f(x) = 0
+	\forall{x}. \,f(x) = 0
 \]
 from the first and third conjunct by induction. Again, only non-standard models of arithmetic satisfy this formula.
 
@@ -754,34 +712,34 @@ from the first and third conjunct by induction. Again, only non-standard models 
 
 The current version uses the term ``entity'' in a way that is not correct. There are three potential solutions:
 \begin{enumerate}
-\item Introduce a new term.
-\item Replace these terms by fresh variables that are then quantified.
-\item Use the weakened version of \req described below.
+	\item Introduce a new term.
+	\item Replace these terms by fresh variables that are then quantified.
+	\item Use the weakened version of \req described below.
 \end{enumerate}
-The first solution is slightly informal, but more intuitive, the second one is formally rigorous, but may be unnecessarily convoluted, and the third depends on a version of the condition we have not yet discussed. 
+The first solution is slightly informal, but more intuitive, the second one is formally rigorous, but may be unnecessarily convoluted, and the third depends on a version of the condition we have not yet discussed.
 
 \subsection{Weakening}
 
 I think that the following, weakened version of \req might be sufficient. The basic idea is that we can use propagation for the minimal and maximal term of \emph{every} function symbol $f_1,\dots,f_r$ instead of just one choice $i^*$:
 
-We say that $Q$ satisfies the \req condition iff 
+We say that $Q$ satisfies the \req condition iff
 \begin{itemize}
-\item for all values of
-  \[
-  \begin{array}{l}
-    f_{1}(x+c^{f_{1}}_{1}), \dots,  f_{1}(x+c^{f_{1}}_{l_{1}-1})\\
-    \dots \\
-    f_{r}(x+c^{f_{r}}_{1}),  \dots  f_{r}(x+c^{f_{r}}_{l_{r}-1})
-  \end{array}\]
- there are values for $f_{1}(x+c^{f_{1}}_{l_{1}}),\dots,$  $f_{r}(x+c^{f_{r}}_{l_{1}})$ satisfying $Q$, and
-\item  for all values of
-  \[
-  \begin{array}{l}
-    f_{1}(x+c^{f_{1}}_{2}), \dots,  f_{1}(x+c^{f_{1}}_{l_{1}})\\
-    \dots \\
-    f_{r}(x+c^{f_{r}}_{2}),  \dots  f_{r}(x+c^{f_{r}}_{l_{r}})
-  \end{array}\]
- there are values for $f_{1}(x+c^{f_{1}}_{1}),\dots,$  $f_{r}(x+c^{f_{r}}_{1})$ satisfying $Q$.
+	\item for all values of
+	      \[
+		      \begin{array}{l}
+			      f_{1}(x+c^{f_{1}}_{1}), \dots,  f_{1}(x+c^{f_{1}}_{l_{1}-1}) \\
+			      \dots                                                        \\
+			      f_{r}(x+c^{f_{r}}_{1}),  \dots  f_{r}(x+c^{f_{r}}_{l_{r}-1})
+		      \end{array}\]
+	      there are values for $f_{1}(x+c^{f_{1}}_{l_{1}}),\dots,$  $f_{r}(x+c^{f_{r}}_{l_{1}})$ satisfying $Q$, and
+	\item  for all values of
+	      \[
+		      \begin{array}{l}
+			      f_{1}(x+c^{f_{1}}_{2}), \dots,  f_{1}(x+c^{f_{1}}_{l_{1}}) \\
+			      \dots                                                      \\
+			      f_{r}(x+c^{f_{r}}_{2}),  \dots  f_{r}(x+c^{f_{r}}_{l_{r}})
+		      \end{array}\]
+	      there are values for $f_{1}(x+c^{f_{1}}_{1}),\dots,$  $f_{r}(x+c^{f_{r}}_{1})$ satisfying $Q$.
 \end{itemize}
 We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate}) available.
 
@@ -790,35 +748,35 @@ The downside is that such a weakened condition needs a stronger check against cl
 
 \subsection{Alternative condition}
 \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
-    \paragraph{ReqPivot Condition.}
-    Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
-    We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
-    \begin{itemize}
-        \item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-        \item Symmetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-    \end{itemize}
+	\paragraph{ReqPivot Condition.}
+	Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
+	We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
+	\begin{itemize}
+		\item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+		\item Symmetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+	\end{itemize}
 \end{tcolorbox}\mj{I'm not sure how to read this, what if I have this (trivially unsat)
-    formula $\forall x. f(x)=0\land f(x+1)=1\land f(x+3)>4$, doesn't it say
-    that you could propagate upwards (but you cannot).}\todoSN{Well, the ReqPivot condition here kinda ensures local extensibility but does not guarantee global satisfiability, I think? So, a formula may satisfy ReqPivot yet it is unsatisfiable due to  global consistency constraints. But I think this is not a problem as our algorithm detects such cases when no interval $I$ and interpretation $\alpha$ can be found satisfying $F\land \bigwedge_{x \in I} Q$. Isn't it?}
+	formula $\forall x. f(x)=0\land f(x+1)=1\land f(x+3)>4$, doesn't it say
+	that you could propagate upwards (but you cannot).}\todoSN{Well, the ReqPivot condition here kinda ensures local extensibility but does not guarantee global satisfiability, I think? So, a formula may satisfy ReqPivot yet it is unsatisfiable due to  global consistency constraints. But I think this is not a problem as our algorithm detects such cases when no interval $I$ and interpretation $\alpha$ can be found satisfying $F\land \bigwedge_{x \in I} Q$. Isn't it?}
 
 \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
-    \paragraph{ReqPivot Condition.}
-    Let $Q$ be a quantified formula with entities $E$. For a pivot entitiy $p\in E$, let:
-    \begin{itemize}
-        \item $\bar{w}=E\setminus\{p\}$ be the tuple of all other entities in $Q$,
-        \item $Q_{\text{other}}(\bar{w})$ be the conjunction of all literals in $Q$ that \textbf{do not} contain $p$.
-        \item $Q_{\text{pivot}}(\bar{w},p)$ be the conjunction of all literals in $Q$ that \textbf{do} contain $p$.
-    \end{itemize}
-    The \textbf{ReqPivot} condition holds for pivot $p$ if and only if:
-    \[
-        \boxed{
-            \begin{aligned}
-                 & (1) \ \exists \bar{w} . Q_{\text{other}}(\bar{w})                                                      \\
-                 & \land                                                                                                  \\
-                 & (2) \ \forall \bar{w} . \left[ Q_{\text{other}}(\bar{w}) \Rightarrow \exists p . Q(\bar{w}, p) \right]
-            \end{aligned}}
-    \]
-    The pivot entity $p$ can be either the smallest offset $f\big(x+c_1^{f_{i^*}}\big)$ or the biggest offset $f\big(x+c_{l_{i^*}}^{f_{i^*}}\big)$ where $f_{i^*}\in\{f_1,\dots,f_r\}$.
+	\paragraph{ReqPivot Condition.}
+	Let $Q$ be a quantified formula with entities $E$. For a pivot entitiy $p\in E$, let:
+	\begin{itemize}
+		\item $\bar{w}=E\setminus\{p\}$ be the tuple of all other entities in $Q$,
+		\item $Q_{\text{other}}(\bar{w})$ be the conjunction of all literals in $Q$ that \textbf{do not} contain $p$.
+		\item $Q_{\text{pivot}}(\bar{w},p)$ be the conjunction of all literals in $Q$ that \textbf{do} contain $p$.
+	\end{itemize}
+	The \textbf{ReqPivot} condition holds for pivot $p$ if and only if:
+	\[
+		\boxed{
+			\begin{aligned}
+				 & (1) \ \exists \bar{w} . Q_{\text{other}}(\bar{w})                                                      \\
+				 & \land                                                                                                  \\
+				 & (2) \ \forall \bar{w} . \left[ Q_{\text{other}}(\bar{w}) \Rightarrow \exists p . Q(\bar{w}, p) \right]
+			\end{aligned}}
+	\]
+	The pivot entity $p$ can be either the smallest offset $f\big(x+c_1^{f_{i^*}}\big)$ or the biggest offset $f\big(x+c_{l_{i^*}}^{f_{i^*}}\big)$ where $f_{i^*}\in\{f_1,\dots,f_r\}$.
 \end{tcolorbox}\todoSN{I think this formulation will be clearer to read?}
 
 
@@ -840,7 +798,7 @@ Here, I am considering the works~\cite{bradley-vmcai06, ge-cav09, habermehl-etap
 \subsection*{Infinitely Increasing But Bounded Integer Sequence}
 
 \[
-    \forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
+	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
 \]
 
 The syntax in~\cite{habermehl-etaps08} includes $\leq$ but does not include $<$. It does include negation though, but only if it
@@ -851,7 +809,7 @@ Adding the lemma also helps Vampire but not \textsc{cvc5}.
 \subsection*{Two-Valued Constant Function}
 
 \[
-    f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
+	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
 \]
 
 In the last meeting I hand-wavedly assumed this cannot be in the fragment of~\cite{habermehl-etaps08}.
@@ -867,113 +825,113 @@ third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
 
 Very rough idea:
 \begin{enumerate}
-    \item solve quantifier-free part
-    \item check solution against instantiations of quantified part with all entities already assigned,
-          if not satisfied, learn a clause and backtrack to solving
-    \item order all other instantiations and construct the necessary certificates
+	\item solve quantifier-free part
+	\item check solution against instantiations of quantified part with all entities already assigned,
+	      if not satisfied, learn a clause and backtrack to solving
+	\item order all other instantiations and construct the necessary certificates
 \end{enumerate}
 
 \begin{example}
-    \[ \forall x \:.\: g(x+2)=g(x)+1 \]
-    \begin{itemize}
-        \item order: $0,1,\dots, -1, -2, \dots$
-        \item corresponding existential entities: $g(2), g(3), \dots, g(-1), g(-2), \dots$   \footnote{Formally speaking also $g(0)$ is existential for the instantiation with $0$, and $g(1)$ for the instantiation with $1$. However, assuming them to be non-existential allows for a uniform construction of satisfiability propagators. This ensures correctness, see the comment after the definition of satisfiability certificate.}
-        \item satisfiability propagators for the two blocks in the order: $g(x) = g(x-2)+1$, $g(x) = g(x+2)-1$
-    \end{itemize}
+	\[ \forall x \:.\: g(x+2)=g(x)+1 \]
+	\begin{itemize}
+		\item order: $0,1,\dots, -1, -2, \dots$
+		\item corresponding existential entities: $g(2), g(3), \dots, g(-1), g(-2), \dots$   \footnote{Formally speaking also $g(0)$ is existential for the instantiation with $0$, and $g(1)$ for the instantiation with $1$. However, assuming them to be non-existential allows for a uniform construction of satisfiability propagators. This ensures correctness, see the comment after the definition of satisfiability certificate.}
+		\item satisfiability propagators for the two blocks in the order: $g(x) = g(x-2)+1$, $g(x) = g(x+2)-1$
+	\end{itemize}
 \end{example}
 
 \begin{example}
-    \[ g(0)=10\wedge g(2)=10\wedge\forall x \:.\: g(x+2)=g(x) \]
-    \begin{itemize}
-        \item order
-              \begin{enumerate}
-                  \item $g(x+2)=g(x)$ for $x=0, 1, \dots$
-                  \item $g(x+2)=g(x)$ for $x=-1,-2,\dots$
-              \end{enumerate}
-        \item pre-satisfiability certificate $\{ g(0)\mapsto 10, g(2)\mapsto 10 \}$
-        \item propagators:
-              \begin{enumerate}
-                  \item $x=0$: nothing to assign
-                  \item $x=1,\dots$: $g(x)=g(x-2)$
-                  \item $x=-1,-2,\dots$: $g(x)=g(x+2)$
-              \end{enumerate}
-    \end{itemize}
+	\[ g(0)=10\wedge g(2)=10\wedge\forall x \:.\: g(x+2)=g(x) \]
+	\begin{itemize}
+		\item order
+		      \begin{enumerate}
+			      \item $g(x+2)=g(x)$ for $x=0, 1, \dots$
+			      \item $g(x+2)=g(x)$ for $x=-1,-2,\dots$
+		      \end{enumerate}
+		\item pre-satisfiability certificate $\{ g(0)\mapsto 10, g(2)\mapsto 10 \}$
+		\item propagators:
+		      \begin{enumerate}
+			      \item $x=0$: nothing to assign
+			      \item $x=1,\dots$: $g(x)=g(x-2)$
+			      \item $x=-1,-2,\dots$: $g(x)=g(x+2)$
+		      \end{enumerate}
+	\end{itemize}
 \end{example}
 
 \begin{example}
-    \[f(3, a) \geq 4 + g(b) \wedge (\forall x, y \:.\: f(x, y) <x + g(y)) \wedge (\forall x \:.\: g(x) = g(x+2))\]
-    \begin{itemize}
-        \item order on constraints, block-wise:
-              \begin{enumerate}
-                  \item $f(x,y) <x+g(y)$ for $(x,y)= (3,0)$
-                  \item $g(x) = g(x + 2)$ for $x= 0, 1, \dots$
-                  \item $g(x) = g(x + 2)$, for $x= -1, -2, \dots$,
-                  \item any order on the rest of $\forall x,y. \;f(x,y) < x + g(y)$ (i.e., (x,y) $\not=$ (3,0))
-              \end{enumerate}
-        \item pre-satisfiability certificate: $\{ a\mapsto 0, b\mapsto 1, f(3,0)\mapsto 4, g(1)\mapsto 0\}$
-        \item satisfiability propagators:
-              \begin{enumerate}
-                  \item $g(0)=2$
-                  \item $g(x)= g(x-2)$
-                  \item $g(x)=g(x+2)$
-                  \item $f(x,y)=x+g(y)-1$
-              \end{enumerate}
-    \end{itemize}
+	\[f(3, a) \geq 4 + g(b) \wedge (\forall x, y \:.\: f(x, y) <x + g(y)) \wedge (\forall x \:.\: g(x) = g(x+2))\]
+	\begin{itemize}
+		\item order on constraints, block-wise:
+		      \begin{enumerate}
+			      \item $f(x,y) <x+g(y)$ for $(x,y)= (3,0)$
+			      \item $g(x) = g(x + 2)$ for $x= 0, 1, \dots$
+			      \item $g(x) = g(x + 2)$, for $x= -1, -2, \dots$,
+			      \item any order on the rest of $\forall x,y. \;f(x,y) < x + g(y)$ (i.e., (x,y) $\not=$ (3,0))
+		      \end{enumerate}
+		\item pre-satisfiability certificate: $\{ a\mapsto 0, b\mapsto 1, f(3,0)\mapsto 4, g(1)\mapsto 0\}$
+		\item satisfiability propagators:
+		      \begin{enumerate}
+			      \item $g(0)=2$
+			      \item $g(x)= g(x-2)$
+			      \item $g(x)=g(x+2)$
+			      \item $f(x,y)=x+g(y)-1$
+		      \end{enumerate}
+	\end{itemize}
 \end{example}
 
 \begin{example}
-    \[\forall x \;.\; f(x) + f(x+3) < f(x+2)\]
-    \begin{itemize}
-        \item order on constraints:
-              \begin{enumerate}
-                  \item $f(0) + f(3) < f(2)$
-                  \item $f(1) + f(4) < f(3)$
-                  \item $f(x) + f(x + 3) < f(x + 2)$ for $x = 2, 3, \dots$
-                  \item $f(x) + f(x + 3) < f(x + 2)$ for $x = -1, -2, \dots$
-              \end{enumerate}
-        \item satisfiability propagators:
-              \begin{enumerate}
-                  \item $f(0) = 0, f(2) = 2, f(3) = 1$
-                  \item $f(1) = 0, f(4) =0$
-                  \item $f(x) = f(x-1) - f(x-3) - 1$
-                  \item $f(x) = - f(x+3) + f(x+2)  - 1$
-              \end{enumerate}
-    \end{itemize}
+	\[\forall x \;.\; f(x) + f(x+3) < f(x+2)\]
+	\begin{itemize}
+		\item order on constraints:
+		      \begin{enumerate}
+			      \item $f(0) + f(3) < f(2)$
+			      \item $f(1) + f(4) < f(3)$
+			      \item $f(x) + f(x + 3) < f(x + 2)$ for $x = 2, 3, \dots$
+			      \item $f(x) + f(x + 3) < f(x + 2)$ for $x = -1, -2, \dots$
+		      \end{enumerate}
+		\item satisfiability propagators:
+		      \begin{enumerate}
+			      \item $f(0) = 0, f(2) = 2, f(3) = 1$
+			      \item $f(1) = 0, f(4) =0$
+			      \item $f(x) = f(x-1) - f(x-3) - 1$
+			      \item $f(x) = - f(x+3) + f(x+2)  - 1$
+		      \end{enumerate}
+	\end{itemize}
 \end{example}
 
 \addtocounter{example}{-1}
 \begin{example}[Continued]
-    Another approach in solving the problem in the previous example is the following.
-    Let us assume that $f$ is a linear map. Then,
-    \[f(x) + f(x+3) - f(x+2) = f(x+1)\]
-    We can then rewrite the problem as
-    \[f(y) < 0\]
-    Here, $f$ is a so called \emph{single invocation} symbol. That means we can deskolemize $f$
-    and get
-    \[\exists z. \, z<0\]
-    Next, we can eliminate $z$ and get the formula $-1<0$, which simplifies to $\top$.
+	Another approach in solving the problem in the previous example is the following.
+	Let us assume that $f$ is a linear map. Then,
+	\[f(x) + f(x+3) - f(x+2) = f(x+1)\]
+	We can then rewrite the problem as
+	\[f(y) < 0\]
+	Here, $f$ is a so called \emph{single invocation} symbol. That means we can deskolemize $f$
+	and get
+	\[\exists z. \, z<0\]
+	Next, we can eliminate $z$ and get the formula $-1<0$, which simplifies to $\top$.
 
-    The original problem is thus satisfiable. What's more, the value for $z$ after
-    elimination gives us a satisfying assignment to $f$:
-    \[f = \{\mapsto -1\}\]
+	The original problem is thus satisfiable. What's more, the value for $z$ after
+	elimination gives us a satisfying assignment to $f$:
+	\[f = \{\mapsto -1\}\]
 \end{example}
 
 \begin{example}
-    \[f(x) + g(x-1) > x\]
+	\[f(x) + g(x-1) > x\]
 
-    \begin{itemize}
-        \item deskolemize $f \longrightarrow \exists y. \;y + g(x - 1) > x$
-        \item deskolemize $g \longrightarrow \exists y, z. \;y + z > x$
-        \item we have the formula $\psi = \forall x \exists y, z. \; y + z > x$
-        \item eliminate $z$ from $\psi \longrightarrow \forall x \exists y. \; x - y + 1 > x - y$
-        \item we get the formula $\forall x \exists y. \; 1 > 0$, which simplifies to $\top$
-        \item $f$ is unconstrained and $g(x-1) = x - f(x) + 1$
-        \item a possible model is then
-    \end{itemize}
-    \begin{gather*}
-        f = \{\mapsto 0\} \\
-        g = \{x \mapsto x + 2\}
-    \end{gather*}
+	\begin{itemize}
+		\item deskolemize $f \longrightarrow \exists y. \;y + g(x - 1) > x$
+		\item deskolemize $g \longrightarrow \exists y, z. \;y + z > x$
+		\item we have the formula $\psi = \forall x \exists y, z. \; y + z > x$
+		\item eliminate $z$ from $\psi \longrightarrow \forall x \exists y. \; x - y + 1 > x - y$
+		\item we get the formula $\forall x \exists y. \; 1 > 0$, which simplifies to $\top$
+		\item $f$ is unconstrained and $g(x-1) = x - f(x) + 1$
+		\item a possible model is then
+	\end{itemize}
+	\begin{gather*}
+		f = \{\mapsto 0\} \\
+		g = \{x \mapsto x + 2\}
+	\end{gather*}
 \end{example}
 
 
