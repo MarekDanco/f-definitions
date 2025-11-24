@@ -73,14 +73,12 @@ identity function. Such solution can be found by synthesis approaches, e.g.,
 \sygus.  But it is  easy to get out of the reach of these tools because they
 are primarily based on templates end  candidate-solution enumeration. The
 following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
-The function is required to increase in even steps and otherwise stay the same,
-and the user wrongly assumes that there may be two values one apart that are
-the same.
 \begin{equation}
-	f(a)\neq f(a+1)\land\forall x:\mathbb{Z}.\,f(x)<f(a)
+	f(a)\neq f(a+1)\land\forall x:\mathbb{Z}.\,f(x)= f(x+2)
 \end{equation}
+These constraints allow only periodic functions whose neighboring values alternate.
 
-This paper shows that these formulas fall into a class were the desired model is
+This paper shows that these formulas fall into a class where the desired model is
 constructed by inductively defining functions on preceding values.
 
 % \cite{ge-cav09}
@@ -622,6 +620,43 @@ with the same preconditions as before, that is $2 \mid x$ and $2 \nmid x$.
 Note that this formula doesn't satisfy the requirement~\ref{pre:3} since for $x_1=2$ and $x_2=5$
 we try to write to $f(6)$ two times with different values. Furthermore, the
 formula is unsatisfiable.
+
+\section{Algorithm Improvement}
+
+\begin{algorithm}
+	\caption{Satisfiability Check}%
+	\label{alg:sr2}
+	\begin{algorithmic}[1]
+		\Require $\phi = F \wedge \forall x \:.\: Q$, where $F$ is ground and $Q$ satisfies \req
+		\Ensure \textsc{sat} or \textsc{unsat}
+		\State $\ubar{I} \gets 0$, $\bar{I} \gets 0$ \Comment{Start with singleton interval}
+		\State $\alpha \gets \smt(F)$
+		\State $d = |c^{f_{i^{*}}}_1 - c^{f_{i^*}}_{l_{i^*}}|$
+
+		\While{$\alpha \neq \bot$}
+
+		\State $\text{condition} \gets d = |\mathit{c_{min}} - \mathit{c_{max}}| \land%
+			\bigwedge_{t \in \args(F,f)} \ubar{I} + \mathit{c_{min}} \leq t \leq \bar{I} + \mathit{c_{max}}$
+		\If{$\smt(F \wedge \bigwedge_{x=\ubar{I}}^{\bar{I}} Q \wedge \text{condition}) \neq \bot$}
+		\State \Return \textsc{sat} \Comment{Certificate can be constructed}
+		\EndIf
+
+		\State $\mathcal{C} \gets \textsc{core}(F \wedge \bigwedge_{x=\ubar{I}}^{\bar{I}} Q \wedge \text{condition})$
+		\Comment{Compute an \textsc{unsat} core}
+
+		\If{for some $t$, $t \leq \bar{I} + \mathit{c_{max}} \in \mathcal{C}$}
+		\State $\bar{I} \gets \bar{I} + 1$
+		\EndIf
+		\If{for some $t$, $\ubar{I} + \mathit{c_{min}} \leq t \in \mathcal{C}$}
+		\State $\ubar{I} \gets \ubar{I} - 1$
+		\EndIf
+
+		\State $\alpha \gets \smt\left(F \wedge \bigwedge_{x=\ubar{I}}^{\bar{I}} Q\right)$
+		\EndWhile
+
+		\State \Return \textsc{unsat}
+	\end{algorithmic}
+\end{algorithm}
 
 
 \subsection*{Few More Examples}
