@@ -75,13 +75,10 @@ are primarily based on templates end  candidate-solution enumeration. The
 following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
 The function is required to increase in even steps and otherwise stay the same,
 and the user wrongly assumes that there may be two values one apart that are
-the same.\mj{Maybe even a simpler example?}
-\begin{align*}
-	      & f(a)\neq f(a+2)                                                                              \\
-	\land & \forall x:\mathbb{Z}.\,2\mid x \Rightarrow f(x)<f(x+1)\land 2\nmid x \Rightarrow f(x)=f(x+1)
-	% \land &   \forall x:\mathbb{Z}.\,2\mid x \Rightarrow f(x)<f(x+1)\\
-	% \land &   \forall x:\mathbb{Z}.\,2\nmid x \Rightarrow f(x)=f(x+1)
-\end{align*}
+the same.
+\begin{equation}
+	f(a)\neq f(a+1)\land\forall x:\mathbb{Z}.\,f(x)<f(a)
+\end{equation}
 
 This paper shows that these formulas fall into a class were the desired model is
 constructed by inductively defining functions on preceding values.
