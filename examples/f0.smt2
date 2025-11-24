@@ -1,0 +1,8 @@
+(set-logic UFLIA)
+(declare-fun f (Int) Int)
+(declare-const a Int)
+(declare-const b Int)
+(assert (forall ((x Int)) (< (f x) (f (+ 1 x)))))
+(assert (not (= a b)))
+(assert (not (= (f a) (f b))))
+(check-sat)
