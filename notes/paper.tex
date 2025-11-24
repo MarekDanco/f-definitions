@@ -14,13 +14,14 @@
 ,citecolor=citeblue%
 ,urlcolor=blue%
 ,plainpages=false]{hyperref}
-\usepackage[nameinlink,capitalize,noabbrev]{cleveref}  % must come after hyperref
+\usepackage[nameinlink,capitalize,noabbrev]{cleveref} % must come after hyperref
 \usepackage{commath}
 \usepackage[most]{tcolorbox}
 \usepackage{enumitem}
 
-\usepackage{accents}  % for \ubar
+\usepackage{accents} % for \ubar
 \newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+\newcommand{\sygus}{SyGuS\xspace}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
@@ -55,13 +56,37 @@
 \date{}
 
 \begin{document}
-
 \maketitle
-
 \section{Introduction}
-\cite{ge-cav09}
-\cite{habermehl-etaps08}
-\cite{bradley-manna07,bradley-vmcai06}
+
+Current as SMT solvers have limited capabilities to produce counterexamples
+for complex systems. Yet, counterexamples are important during modelling as
+they uncover  errors. For example, the user may wrongly assume that an input
+stream with increasing values will contain  two neighboring values that are
+equal.  Negating and skolemizing yields the following simple SMT formula.
+\begin{equation}
+    f(a)\neq f(a+1)\land\forall x:\mathbb{Z}.\,f(x)<f(x+1)
+\end{equation}
+
+The formula has trivial counter-models, e.g., $f$ being the
+identity function. Such solution can be found by synthesis approaches, e.g.,
+\sygus.  But it is  easy to get out of the reach of these tools because they
+are primarily based on templates end  candidate-solution enumeration. The
+following modification is no longer solved by cvc5 in its \sygus mode.
+
+\begin{align*}
+    & f(a)\neq f(a+2)\\
+    \land &   \forall x:\mathbb{Z}.\,2\mid x \Rightarrow f(x)<f(x+1)\land 2\nmid x \Rightarrow f(x)=f(x+1)
+    % \land &   \forall x:\mathbb{Z}.\,2\mid x \Rightarrow f(x)<f(x+1)\\
+    % \land &   \forall x:\mathbb{Z}.\,2\nmid x \Rightarrow f(x)=f(x+1)
+\end{align*}
+
+This paper shows that these formulas fall into a class were the desired model is
+constructed by inductively defining functions on preceding values.
+
+% \cite{ge-cav09}
+% \cite{habermehl-etaps08}
+% \cite{bradley-manna07,bradley-vmcai06}
 
 \section*{Motivating Example}
 Consider the following UFLIA formula:
