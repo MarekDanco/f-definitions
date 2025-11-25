@@ -59,12 +59,10 @@
 \maketitle
 \section{Introduction}
 
-% \cite{ge-cav09}
-% \cite{habermehl-etaps08}
-% \cite{bradley-manna07,bradley-vmcai06}
+\marek{Mention these \cite{bradley-manna07, bradley-vmcai06, ge-cav09, habermehl-etaps08}}
 
 Current as SMT solvers have limited capabilities to produce counterexamples
-for complex systems. Yet, counterexamples are important during modelling as
+for complex systems. Yet, counterexamples are important during modeling as
 they uncover  errors. For example, the user may wrongly assume that an input
 stream with increasing values will contain  two neighboring values that are
 equal.  Negating and skolemizing yields the following simple SMT formula.
@@ -72,8 +70,8 @@ equal.  Negating and skolemizing yields the following simple SMT formula.
 	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)<f(x+1)
 \end{equation}
 
-The formula has trivial counter-models, e.g., $f$ being the
-identity function. Such solution can be found by synthesis approaches, e.g.,
+The formula has trivial counter-models, e.g. $f$ being the
+identity function. Such solution can be found by synthesis approaches, such as
 \sygus.  But it is  easy to get out of the reach of these tools because they
 are primarily based on templates and candidate-solution enumeration. The
 following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
@@ -92,11 +90,11 @@ uninterpreted function symbols are restricted to terms of the form $x + k$, wher
 universally quantified and $k$ is a numeral, then the formula’s satisfiability
 becomes decidable via an inductive argument.
 
-\emph{Idea}: View quantifiers as something that expresses infinitely many constraints on entities. The problem is that a
-single entity may occur in several such constraints and we must avoid assigning different values to the very same entity.
-To prove satisfiability of a formula, order these constraints and use a symbolic representation of the satisfying assignment
-that assigns values to entities in such a way that following the order of constraint avoids assigning different
-values to the very same entity.
+We treat each quantifier as introducing infinitely many constraints on function calls,
+which we refer to as entities. A single entity may appear in multiple constraints, so we must
+ensure that it is assigned a consistent value throughout. To show satisfiability within
+our fragment, we impose an order on these constraints and construct a symbolic assignment
+to the entities such that, when processed in this order, no conflicting assignments arise.
 
 \section{Definitions}
 
