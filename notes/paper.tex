@@ -161,7 +161,7 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 
 		\item a total order $\preceq$ on instantiations of the quantified part of $\phi$,
 		\item for each instantiation $\psi$ of the quantified part of $\phi$ a set of corresponding
 		      \emph{existential} entities -- entities occurring in $\psi$ but not occurring in the ground part of $\phi$
-		      or in any instantiation $\psi'$ with $\psi' \prec \psi$,
+		      or in any instantiation $\psi'$, where $\psi' \prec \psi$,
 		\item for each instantiation $\psi$ of the quantified part of $\phi$ a corresponding
 		      \emph{satisfiability propagator} -- a certificate showing that for all values of entities that are not existential and
 		      do not occur in the ground part, there exist values of existential entities that satisfy $\psi$.
@@ -188,14 +188,14 @@ Also note that for instantiations of quantified sub-formulas that only contain e
 
 A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model of the formula. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$.
 
-For this, let $inst(u)$ either be the  instantiation $\psi$ of a quantified sub-formula with $u\in\Gamma_I(\psi)$ and where $u$ is existential, or $\bot$ if there is no such instantiation\marek{How can this happen? We require all arguments to be in the form $x + k$, so for every entity there is a minimal $\psi$ that contains it. From minimality this $u$ has to be existential in $\psi$. Implicitly $u$ isn't in the ground part.}. For any instantiation $\psi$ of a quantified sub-formula with existential entities $u_1,\dots, u_s$ and non-existential entities $v_1,\dots, v_r$, the satisfiability propagator defines  functions $valprop_{u_1},\dots, valprop_{u_s}$ such that for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
-\[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  valprop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto valprop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.
+For this, let $inst(u)$ either be the  instantiation $\psi$ of a quantified sub-formula with $u\in\Gamma_I(\psi)$ and where $u$ is existential, or $\bot$ if there is no such instantiation\marek{How can this happen? We require all arguments to be of the form $x + k$, so for every entity there is a minimal $\psi$ that contains it. From minimality this $u$ has to be existential in $\psi$. Implicitly $u$ isn't in the ground part.}. For any instantiation $\psi$ of a quantified sub-formula with existential entities $u_1,\dots, u_s$ and non-existential entities $v_1,\dots, v_r$, the satisfiability propagator defines  functions $prop_{u_1},\dots, prop_{u_s}$ such that for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
+\[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.\marek{Is \cite{kuncak-sttt13} applicable in our case too?}
 Then, a program to compute the value $val(u)$ of a given entity $u$ looks as follows:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
 	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
 	\textbf{if} $inst(u)=\bot$ \textbf{then} \textbf{return} 0 \`// in this case, any value (including $0$) is o.k\\
 	let $v_1,\dots, v_k$ be the non-existential entities in $inst(u)$\\
-	\textbf{return} $valprop(u)(val(v_1),\dots, val(v_k))$
+	\textbf{return} $prop(u)(val(v_1),\dots, val(v_k))$
 \end{tabbing}
 
 \begin{property}
