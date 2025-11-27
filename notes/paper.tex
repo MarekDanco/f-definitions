@@ -779,6 +779,54 @@ We will assume that we have corresponding satisfiability propagators (see Defini
 
 The downside is that such a weakened condition needs a stronger check against clashes within the algorithm. An ideal approach would probably first check what is the strongest version (or versions, if this is not unique) of \req it can satisfy, and then use it (them) during the algorithm. Note that also the current version of the algorithm depends on $i^*$, and \req may be satisfied for several choices of $i^*$.
 
+\begin{property}
+	\label{prop:cert-weakRP}
+	Let $I = [\underline{I}, \overline{I}]$ be a non-empty integer interval and $\alpha$ be an entity interpretation s.t.
+	\begin{enumerate}[label=(\roman*)]
+		\item $\alpha \models F \wedge \bigwedge_{x \in I} Q(x)$
+		\item For every function $f_j$ (where $1 \leq j \leq r$) and for every ground argument term $t \in \args(F, f_j)$, we have $\alpha(t) \leq \overline{I} + c^{f_j}_{l_j}$
+		\item For every function $f_j$ (where $1 \leq j \leq r$) and for every ground argument term $t \in \args(F, f_j)$, we have $\underline{I} + c^{f_j}_1 \leq \alpha(t)$
+	\end{enumerate}
+	Then the following forms a satisfiability certificate for $\phi = F \wedge \forall x . Q(x)$:
+	\begin{itemize}
+		\item \textbf{Order $\preceq$:} $0,1,-1,2,-2\dots, \underline{I},\overline{I},\overline{I}+1, \overline{I}+2,\dots,\underline{I}-1, \underline{I}-2,\dots$.
+		\item \textbf{Pre-satisfiability certificate:} $\alpha$
+		\item \textbf{Existential entities} for each instantiation $\psi_x$:
+		      \begin{itemize}
+			      \item $\emptyset$, for $x \in I$,
+			      \item $E^+_x = \{f_1(x+c^{f_1}_{l_1}), \dots, f_r(x+c^{f_r}_{l_r})\}$, for $x > \overline{I}$,
+			      \item $E^-_x = \{f_1(x+c^{f_1}_1), \dots, f_r(x+c^{f_r}_1)\}$, for $x < \underline{I}$
+		      \end{itemize}
+		\item \textbf{Satisfiability propagators:}
+		      \begin{itemize}
+			      \item For $x\in I$: resulting from $\alpha$.
+			      \item For $x>\overline{I}$: Use the first part of the weakened \req condition.
+			      \item For $x < \underline{I}$: Use the second part of the weakened \req condition.
+		      \end{itemize}
+	\end{itemize}
+\end{property}
+
+\begin{proof}
+    We verify that for each instantiation $\psi$ in the order, the existential entities are neither assigned a value by $\alpha$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$.
+     \begin{description}
+        \item[Case $x \in I$:] The set of existential entities is empty, so the condition holds vacuously.
+        \item[Case $x > \overline{I}$:]  Let $E^+_x = \{f_1(x+c^{f_1}_{l_1}), \dots, f_r(x+c^{f_r}_{l_r})\}$ be the existential entities.
+        \begin{itemize}
+            \item \textit{Non-assignment by $\alpha$:} Consider any entity $f_j(x+c^{f_j}_{l_j}) \in E^+_x$. For this entity to be assigned by $\alpha$, there must exist some ground argument term $t \in \args(F, f_j)$ such that $\alpha(t) = x + c^{f_j}_{l_j}$. This is impossible by hypothesis (ii).
+            \item \textit{Non-occurrence in earlier instantiations:} Consider any earlier instantiation $\psi_{x'}$ where $\overline{I} < x' < x$ and an existential entity $f_j(x+c^{f_j}_{l_j}) \in E^+_x$. For $f_j(x+c^{f_j}_{l_j})$ to appear in any instantiation $x'$, there must exist some $k$ such that $x'+c^{f_j}_k=x+c^{f_j}_{l_j}$. This is impossible because $x'+c^{f_j}_k\leq x'+c^{f_j}_{l_j}<x+c^{f_j}_{l_j}$ (since $x'<x$ and $c^{f_j}_k \leq c^{f_j}_{l_j}$). 
+        \end{itemize}
+        \item[Case $x < \underline{I}$:] Let $E^-_x=\{f_1(x+c^{f_1}_1),\dots,f_r(x+c^{f_r}_1)\}$ be the existential entities.
+        \begin{itemize}
+            \item \textit{Non-assignment by $\alpha$:} Consider any entity $f_j(x+c^{f_j}_1) \in E^-_x$. For this entity to be assigned by $\alpha$, there must exist some ground argument term $t \in \args(F, f_j)$ such that $\alpha(t)=x+c^{f_j}_1$. This is impossible by hypothesis (iii).
+            \item \textit{Non-occurrence in earlier instantiations:} Consider any earlier instantiation $\psi_{x'}$ where $x'< x$ and an existential entity $f_j(x+c^{f_j}_{l_j})\in E^+_x$. For $f_j(x+c^{f_j}_1)\in E^-_x$ to appear in any instantiation $x'$, there must exist some $k$ such that $x'+c^{f_j}_k=x+c^{f_j}_1$.
+            \begin{itemize}
+                \item If $x'>\overline{I}$: Then $x'+c^{f_j}_k\geq x'+c^{f_j}_1>\overline{I}+c^{f_j}_1 \geq \underline{I}+c^{f_j}_1>x+c^{f_j}_1$ (since $x'>\overline{I}\geq\underline{I}>x$). Thus the equality cannot hold.
+                \item If $x'<\underline{I}$ and $x'>x$: Then $x'+c^{f_j}_k\geq x'+c^{f_j}_1>x+c^{f_j}_1$ (since $x'>x$ and $c^{f_j}_k\geq c^{f_j}_1$). Thus, also, the equality cannot hold.
+            \end{itemize}
+        \end{itemize}
+    \end{description}
+    In all cases, the existential entities are neither assigned values by $\alpha$ nor appear in any earlier instantiation $x'\prec x$. Therefore, the construction forms a valid satisfiability certificate as defined in Definition \ref{def:certificate}.
+\end{proof}
 
 \subsection{Alternative condition}
 \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
