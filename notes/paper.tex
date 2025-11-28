@@ -403,8 +403,7 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
 			      \item Line 9. This will succeed because we can construct a mnodel as follows:
 			            \begin{itemize}
 				            \item For $F$ and $Q(x)$ with $x\in[K_\text{min},K_{\text{max}}]$, use values from $I^*$;
-				            \item use the 
-eq propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
+				            \item use the \req propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
 			            \end{itemize}
 			      \item Line 5: $\smt(F \wedge \bigwedge_{x=-N}^N Q \wedge C)$ where $C$ is the clash condition $\forall t\in\args(F,f_{i^*}).-N+c_1^{f_{i^*}}\leq \alpha(t)\leq N+c_{l_{i^*}}^{f_{i^*}}$. This will succeed because the model constructed above also satisfies $C$ (followed from Claim 1 and the fact that $[K_{\text{min}},K_{\text{max}}]\subseteq[-N,N]$).
 			      \item $\therefore$ Algorithm \ref{alg:sr} returns \textsc{Sat}.\qedhere
@@ -688,9 +687,7 @@ formula is unsatisfiable.
 	At the same time, $f(a) < f(a+1) - f(a+2)$ and $f(a+1) < f(a+2) - f(a+3)$. That means
 	$f(a) < -f(a+3)$ but also $f(a) < f(a+3)$. Therefore, $f(a) < \text{min}\{-f(a+3), f(a+3)\}$.
 	In other words $f(a) < 0$, a contradiction.
-
-	
-eq is also not satisfied here. If we normalize the formulas like so
+	\req is also not satisfied here. If we normalize the formulas like so
 	\[
 		\forall{x}. \,f(x)  < f(x - 1) - f(x - 2)
 		\,\land \,f(x - 1) < f(x)
