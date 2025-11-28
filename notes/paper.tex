@@ -276,8 +276,8 @@ In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $
 		\item propagators:
 		      \begin{itemize}
 			      \item resulting from $\alpha$, for $x\in I$,
-			      \item from first part of ReqPivot, for $x>\max I$, and
-			      \item from second part of ReqPivot, for $x<\min I$.
+			      \item from first part of \req, for $x>\max I$, and
+			      \item from second part of \req, for $x<\min I$.
 		      \end{itemize}
 	\end{itemize}
 \end{property}
@@ -292,7 +292,8 @@ In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $
 		\item[Case $x < \min I$:] The existential entity~$f_{i^*}(x+c^{f_{i^{*}}}_1)$, is neither allowed to be assigned a value by $\alpha$, nor allowed to occur in any instantiation~$x'$ with $\max I<x'$, nor in any $x'$ with $x<x'<\min I$. The first condition is ensured by hypothesis (\textit{iii}). The second condition follows from the fact that $x < \min I \leq \max I < x'$; hence, $x+c^{f_{i^*}}_1<x'+c^{f_{i^*}}_1$. The third condition follows from the fact that $x+c^{f_{i^{*}}}_1$ is the lowest argument of $f_{i^*}$.
 		      % the second condition \todoSR{This is the ``glueing together'' mentioned by Mikoláš below.} is followed from the lowest argument $(\max I+1) + c^{f_{i^*}}_1 \geq (\min I+\Delta) + c^{f_{i^*}}_1 + 1=\min I+c^{f_{i^*}}_{l_{i^*}}+1>(\min I-1)+c^{f_{i^*}}_{l_{i^*}}\geq x+c^{f_{i^{*}}}_1$,
 	\end{description}
-	In all cases, the existential entity is neither assigned by $\alpha$ nor appears in any earlier instantiation. The ReqPivot condition ensures the existence of suitable propagators. Therefore, the construction forms a valid satisfiability certificate as defined in Definition \ref{def:certificate}.
+	In all cases, the existential entity is neither assigned by $\alpha$ nor appears in any earlier instantiation. The 
+eq condition ensures the existence of suitable propagators. Therefore, the construction forms a valid satisfiability certificate as defined in Definition \ref{def:certificate}.
 \end{proof}
 
 For coming up with an algorithm, let us first simplify the two conditions: Pushing negation over quantifiers, we get:
@@ -364,9 +365,9 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
 		\item $F$ is quantifier-free.
 		\item For every $i\in\{1,...,r\}$, the constants $c_1^{f_i},...,c_{l_i}^{f_i}$ are sorted and pairwise different.
 		\item $\phi$ is satisfiable.
-		\item $\phi$ satisfies ReqPivot for a specific critical function $f_{i^*}$
+		\item $\phi$ satisfies \req for a specific critical function $f_{i^*}$
 	\end{enumerate}
-	Then, Algorithm~\ref{alg:sr}, upon input $\phi$, will terminate and return SAT.
+	Then, Algorithm~\ref{alg:sr}, upon input $\phi$, will terminate and return \textsc{Sat}.
 \end{theorem}
 
 \begin{proof}
@@ -395,17 +396,18 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
 	The two points above end the proof of Claim \ref{claim:inTerminationProof}. Now let $N=\max(\abs{K_{\text{min}}},\abs{K_{\text{max}}})$ and consider Algorithm \ref{alg:sr}.
 	\begin{enumerate}
 		\item Line 1: initialisation.
-		\item Line 2: First SMT call. This succeeds because $\phi$ is satisfiable.
+		\item Line 2: First $\smt$ call. This succeeds because $\phi$ is satisfiable.
 		\item Loop progression: the algorithm enters the while-loop and expands symmetrically.
 		\item At iteration where interval becomes $[-N,N]$:
 		      \begin{itemize}
 			      \item Line 9. This will succeed because we can construct a mnodel as follows:
 			            \begin{itemize}
 				            \item For $F$ and $Q(x)$ with $x\in[K_\text{min},K_{\text{max}}]$, use values from $I^*$;
-				            \item use the ReqPivot propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
+				            \item use the 
+eq propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
 			            \end{itemize}
 			      \item Line 5: $\smt(F \wedge \bigwedge_{x=-N}^N Q \wedge C)$ where $C$ is the clash condition $\forall t\in\args(F,f_{i^*}).-N+c_1^{f_{i^*}}\leq \alpha(t)\leq N+c_{l_{i^*}}^{f_{i^*}}$. This will succeed because the model constructed above also satisfies $C$ (followed from Claim 1 and the fact that $[K_{\text{min}},K_{\text{max}}]\subseteq[-N,N]$).
-			      \item $\therefore$ Algorithm \ref{alg:sr} returns SAT.\qedhere
+			      \item $\therefore$ Algorithm \ref{alg:sr} returns \textsc{Sat}.\qedhere
 		      \end{itemize}
 	\end{enumerate}
 \end{proof}
@@ -687,7 +689,8 @@ formula is unsatisfiable.
 	$f(a) < -f(a+3)$ but also $f(a) < f(a+3)$. Therefore, $f(a) < \text{min}\{-f(a+3), f(a+3)\}$.
 	In other words $f(a) < 0$, a contradiction.
 
-	ReqPivot is also not satisfied here. If we normalize the formulas like so
+	
+eq is also not satisfied here. If we normalize the formulas like so
 	\[
 		\forall{x}. \,f(x)  < f(x - 1) - f(x - 2)
 		\,\land \,f(x - 1) < f(x)
@@ -780,12 +783,12 @@ We will assume that we have corresponding satisfiability propagators (see Defini
 The downside is that such a weakened condition needs a stronger check against clashes within the algorithm. An ideal approach would probably first check what is the strongest version (or versions, if this is not unique) of \req it can satisfy, and then use it (them) during the algorithm. Note that also the current version of the algorithm depends on $i^*$, and \req may be satisfied for several choices of $i^*$.
 
 \begin{property}
-	\label{prop:cert-weakRP}
+	\label{prop:cert-weakenedRP}
 	Let $I = [\underline{I}, \overline{I}]$ be a non-empty integer interval and $\alpha$ be an entity interpretation s.t.
 	\begin{enumerate}[label=(\roman*)]
 		\item $\alpha \models F \wedge \bigwedge_{x \in I} Q(x)$
-		\item For every function $f_j$ (where $1 \leq j \leq r$) and for every ground argument term $t \in \args(F, f_j)$, we have $\alpha(t) \leq \overline{I} + c^{f_j}_{l_j}$
-		\item For every function $f_j$ (where $1 \leq j \leq r$) and for every ground argument term $t \in \args(F, f_j)$, we have $\underline{I} + c^{f_j}_1 \leq \alpha(t)$
+		\item For every function $f_j$ ($1 \leq j \leq r$), there is no $t\in \args(F, f_j)$ and $x > \overline{I}$ such that $x+c^{f_j}_{l_j}=\alpha(t)$
+		\item For every function $f_j$ ($1\leq j\leq r$), there is no $t\in\args(F,f_j)$ and $x<\underline{I}$ such that $x+c^{f_j}_1=\alpha(t)$
 	\end{enumerate}
 	Then the following forms a satisfiability certificate for $\phi = F \wedge \forall x . Q(x)$:
 	\begin{itemize}
