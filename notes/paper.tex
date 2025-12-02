@@ -110,7 +110,7 @@ Examples of entities are $c$, and $f(7)$. The term $f(c+7)$ is not an entity.
 % For now, we restrict ourselves to the case where the arguments of uninterpreted function symbols may not include further uninterpreted function symbols (e.g., $\forall x\;.\; f(x+1)=f(x)+1$ is OK, but $\forall x\;.\; f(x+c)=f(x)+1$ not). As a consequence, in each instantiation, all arguments to uninterpreted function symbols evaluate to constants, and hence the instantiation constrains a fixed finite set of entities, which we call the \emph{entities of the instantiation}.
 
 \begin{definition}[entity interpretation]
-	An \emph{entity interpretation} is a \mj{(partial)} function from a set of entities to integers\mj{We do not really rely on~$\mathbb{Z}$ in the co-domain, possibly extend to sort $S$}.
+	An \emph{entity interpretation} is a partial function whose domain is the set of entities.\todoSR{changed to take Mikláš's comments into account}
 \end{definition}
 
 Given a term $t$ and an entity interpretation $I$, we can define the semantics $I(t)$ of the term under this interpretation as usual---with the difference that the result is $\bot$ if the entity interpretation does not assign a value to an entity needed for evaluating the term. For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but for $I=\{ f(1) \mapsto 7 \}$, $I(f(0))=\bot$. Analogously, for a formula $\phi$, we define that $I$ satisfies $\phi$, in which case we also write $I\models \phi$.
