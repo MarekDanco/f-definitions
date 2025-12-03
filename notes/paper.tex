@@ -292,8 +292,7 @@ In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $
 		\item[Case $x < \min I$:] The existential entity~$f_{i^*}(x+c^{f_{i^{*}}}_1)$, is neither allowed to be assigned a value by $\alpha$, nor allowed to occur in any instantiation~$x'$ with $\max I<x'$, nor in any $x'$ with $x<x'<\min I$. The first condition is ensured by hypothesis (\textit{iii}). The second condition follows from the fact that $x < \min I \leq \max I < x'$; hence, $x+c^{f_{i^*}}_1<x'+c^{f_{i^*}}_1$. The third condition follows from the fact that $x+c^{f_{i^{*}}}_1$ is the lowest argument of $f_{i^*}$.
 		      % the second condition \todoSR{This is the ``glueing together'' mentioned by Mikoláš below.} is followed from the lowest argument $(\max I+1) + c^{f_{i^*}}_1 \geq (\min I+\Delta) + c^{f_{i^*}}_1 + 1=\min I+c^{f_{i^*}}_{l_{i^*}}+1>(\min I-1)+c^{f_{i^*}}_{l_{i^*}}\geq x+c^{f_{i^{*}}}_1$,
 	\end{description}
-	In all cases, the existential entity is neither assigned by $\alpha$ nor appears in any earlier instantiation. The 
-eq condition ensures the existence of suitable propagators. Therefore, the construction forms a valid satisfiability certificate as defined in Definition \ref{def:certificate}.
+	In all cases, the existential entity is neither assigned by $\alpha$ nor appears in any earlier instantiation. The \req condition ensures the existence of suitable propagators. Therefore, the construction forms a valid satisfiability certificate as defined in Definition \ref{def:certificate}.
 \end{proof}
 
 For coming up with an algorithm, let us first simplify the two conditions: Pushing negation over quantifiers, we get:
@@ -317,9 +316,8 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
 \subsection{Propagation Algorithm}
 
 \todoSR{The current algorithm uses a fixed $i^*$, a witness for the existential quantifier in \req (the current text does not explicitly say this). It may also be possible to search for it, if there is several such witnesses.}
-\mj{Potentially, in the implementation, use cores to determine which way to increase the size of~$I$.
-	If a certain condition does not appear in the core, it might be possible to not
-	move in one of the directions.}
+\mj{Potentially, in the implementation, use cores to determine which way to increase the size of~$I$. If a certain condition does not appear in the core, it might be possible to not move in one of the directions.}
+\todoSN{In Line~4, shouldn't it be $t \in \args(F,f_{i^*})$ instead of $f$? I am a bit confused with the notation now.}
 
 \begin{algorithm}
 	\caption{Satisfiability Check}%
@@ -355,60 +353,74 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
 We are currently polishing a completeness proof for the \textsc{Sat} case. For the \textsc{Unsat} case, the essential argument seems to be the same as for Ge and de~Moura~\cite[paragraph ``compactness'']{ge-cav09}.
 
 \begin{theorem}
-	\label{thm:satisfiableThenSAT}
-	Let $\phi$ be a formula of the form
-	\begin{align*}
-		\phi:=F\land Q\big(f_1(x+c_1^{f_1}),...,f_1(x+c_{l_1}^{f_1}),...,f_r(x+c_1^{f_r}),...,f_r(x+c_{1_r}^{f_r})\big)
-	\end{align*}
-	where
-	\begin{enumerate}
-		\item $F$ is quantifier-free.
-		\item For every $i\in\{1,...,r\}$, the constants $c_1^{f_i},...,c_{l_i}^{f_i}$ are sorted and pairwise different.
-		\item $\phi$ is satisfiable.
-		\item $\phi$ satisfies \req for a specific critical function $f_{i^*}$
-	\end{enumerate}
-	Then, Algorithm~\ref{alg:sr}, upon input $\phi$, will terminate and return \textsc{Sat}.
+    \label{thm:satisfiableThenSAT}
+    Let $\phi$ be a formula of the form
+    \begin{align*}
+        \phi:=F\land \forall x.\ Q\big(f_1(x+c_1^{f_1}),...,f_1(x+c_{l_1}^{f_1}),...,f_r(x+c_1^{f_r}),...,f_r(x+c_{l_r}^{f_r})\big)
+    \end{align*}
+    where
+    \begin{enumerate}
+        \item $F$ is quantifier-free.
+        \item For every $i\in\{1,...,r\}$, the constants $c_1^{f_i},...,c_{l_i}^{f_i}$ are sorted and pairwise different.
+        \item $\phi$ is satisfiable.
+        \item $\phi$ satisfies \req for a specific critical function $f_{i^*}$
+    \end{enumerate}
+    Then, Algorithm~\ref{alg:sr}, upon input $\phi$, will terminate and return \textsc{Sat}.
 \end{theorem}
 
 \begin{proof}
-	Since $\phi$ is satisfiable, there exists a model $\gmodel\vDash\phi$. From $\gmodel$, we can extract a pre-satisfiability certificate $I^*$ (Definition \ref{def:pre-sat-cert}). This $I^*$ provides concrete integer values for all ground terms in $F$ and for the entities appearing in the instantiations of the quantified formula that make $\phi$ true.
-	Let $S$ be the finite set of all integer arguments for the critical function $f_{i^*}$ that appear in the ground part $F$:
-	\begin{align*}
-		S=\{I^*(t)\,|\,t\in\args(F,f_{i^*})\}
-	\end{align*}
-	Define the minimal and maximal elements of this set: $L=\min(S)$ and $U=\max(S)$. Now we define this critical interval $[K_{\text{min}},K_{\text{max}}]$ where:
-	\begin{align*}
-		K_{\text{min}}=L-c_{l_{i^*}}^{f_{i^*}} \hspace{0.5em}\text{and}\hspace{0.5em} K_{\text{max}}=U-c_1^{f_{i^*}}
-	\end{align*}
-	\begin{claim}
-		\label{claim:inTerminationProof}
-		For the interval $[K_{\text{min}},K_{\text{max}}]$, $I^*$ satisfies the clash condition:
-		\begin{align*}
-			\forall t\in\args(F,f_{i^*}).K_{\text{min}}+c_1^{f_{i^*}}\leq I^*(t)\leq K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}
-		\end{align*}
-		\textit{Proof:} For any $t\in\args(F,f_{i^*})$, we have $L\leq I^*(t)\leq U$. Therefore,
-		\begin{itemize}
-			\item $K_{\text{min}}+c_1^{f_{i^*}}=\big(L-c_{l_{i^*}}^{f_{i^*}}\big)+c_1^{f_{i^*}}\leq L\leq I^*(t)$ since $c_1^{f_{i^*}}\leq c_{l_{i^*}}^{f_{i^*}}$, and
-			\item $I^*(t)\leq U\leq\big(U-c_1^{f_{i^*}}\big)+c_{l_{i^*}}^{f_{i^*}}=K_{\text{max}}+c_{l_{i^*}}^{f_{i^*}}$ since $c_{l_{i^*}}^{f_{i^*}}\geq c_1^{f_{i^*}}$.
-		\end{itemize}
-	\end{claim}
-
-	The two points above end the proof of Claim \ref{claim:inTerminationProof}. Now let $N=\max(\abs{K_{\text{min}}},\abs{K_{\text{max}}})$ and consider Algorithm \ref{alg:sr}.
-	\begin{enumerate}
-		\item Line 1: initialisation.
-		\item Line 2: First $\smt$ call. This succeeds because $\phi$ is satisfiable.
-		\item Loop progression: the algorithm enters the while-loop and expands symmetrically.
-		\item At iteration where interval becomes $[-N,N]$:
-		      \begin{itemize}
-			      \item Line 9. This will succeed because we can construct a mnodel as follows:
-			            \begin{itemize}
-				            \item For $F$ and $Q(x)$ with $x\in[K_\text{min},K_{\text{max}}]$, use values from $I^*$;
-				            \item use the \req propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
-			            \end{itemize}
-			      \item Line 5: $\smt(F \wedge \bigwedge_{x=-N}^N Q \wedge C)$ where $C$ is the clash condition $\forall t\in\args(F,f_{i^*}).-N+c_1^{f_{i^*}}\leq t\leq N+c_{l_{i^*}}^{f_{i^*}}$. This will succeed because the model constructed above also satisfies $C$ (followed from Claim \ref{claim:inTerminationProof} and the fact that $[K_{\text{min}},K_{\text{max}}]\subseteq[-N,N]$).
-			      \item $\therefore$ Algorithm \ref{alg:sr} returns \textsc{Sat}.\qedhere
-		      \end{itemize}
-	\end{enumerate}
+    Since $\phi$ is satisfiable, there exists a model $\mathcal{M} \models \phi$. From $\mathcal{M}$, we can extract an entity interpretation $I^*$ that serves as a pre-satisfiability certificate (Definition~\ref{def:pre-sat-cert}). This $I^*$ assigns integer values to all ground entities in $F$ and provides values for the entities appearing in instantiations of the quantified formula.
+    
+    Let $S$ be the set of all integer arguments for the critical function $f_{i^*}$ that appear in the ground part $F$:
+    \begin{align*}
+        S = \{I^*(t) \mid t \in \args(F, f_{i^*})\}
+    \end{align*}
+    Since $\args(F, f_{i^*})$ is finite, $S$ is finite. Define $L = \min(S)$ and $U = \max(S)$. Now define the critical interval $[K_{\min}, K_{\max}]$ where:
+    \begin{align*}
+        K_{\min} = L - c_{l_{i^*}}^{f_{i^*}} \quad\text{and}\quad K_{\max} = U - c_1^{f_{i^*}}
+    \end{align*}
+    \begin{claim}
+        \label{claim:bounds-satisfied}
+        For the interval $[K_{\min}, K_{\max}]$, $I^*$ satisfies the bound condition:
+        \begin{align*}
+            \forall t \in \args(F, f_{i^*}).\ K_{\min} + c_1^{f_{i^*}} \leq I^*(t) \leq K_{\max} + c_{l_{i^*}}^{f_{i^*}}
+        \end{align*}
+    \end{claim}
+    \begin{proof}[Proof of Claim~\ref{claim:bounds-satisfied}]
+        For any $t \in \args(F, f_{i^*})$, we have $L \leq I^*(t) \leq U$ by definition of $L$ and $U$. Therefore:
+        \begin{itemize}
+            \item $I^*(t) \geq L = (L - c_{l_{i^*}}^{f_{i^*}}) + c_{l_{i^*}}^{f_{i^*}} \geq (L - c_{l_{i^*}}^{f_{i^*}}) + c_1^{f_{i^*}} = K_{\min} + c_1^{f_{i^*}}$, since $c_{l_{i^*}}^{f_{i^*}} \geq c_1^{f_{i^*}}$.
+            \item $I^*(t) \leq U = (U - c_1^{f_{i^*}}) + c_1^{f_{i^*}} \leq (U - c_1^{f_{i^*}}) + c_{l_{i^*}}^{f_{i^*}} = K_{\max} + c_{l_{i^*}}^{f_{i^*}}$, since $c_{l_{i^*}}^{f_{i^*}} \geq c_1^{f_{i^*}}$.\qedhere
+        \end{itemize}
+    \end{proof}
+    Now, let $N = \max(|K_{\min}|, |K_{\max}|)$ and consider Algorithm~\ref{alg:sr}. We trace its execution:
+    \begin{enumerate}
+        \item \textbf{Initialisation (lines 1--2):} The algorithm sets $\underline{I} = \overline{I} = 0$ and calls $\smt(F \wedge Q(0))$. This succeeds because $\mathcal{M}$ is a model of $\phi$.
+        \item \textbf{Loop progression:} The algorithm enters the while-loop. At each iteration, it expands the interval symmetrically: $\underline{I} \leftarrow \underline{I} - 1$, $\overline{I} \leftarrow \overline{I} + 1$.
+        \item \textbf{At iteration where interval becomes $[-N, N]$:} We show that the algorithm returns \textsc{Sat} at this iteration.
+        \begin{itemize}
+            \item By construction, $[K_{\min}, K_{\max}] \subseteq [-N, N]$.
+            \item Consider the following entity interpretation $\alpha$:
+            \begin{itemize}
+                \item For all entities in $F$ and for all instantiations with $x \in [K_{\min}, K_{\max}]$, use the values from $I^*$.
+                \item For $x > K_{\max}$ (up to $N$), use the upward \req propagator to assign values to the existential entity $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$.
+                \item For $x < K_{\min}$ (down to $-N$), use the downward \req propagator to assign values to the existential entity $f_{i^*}(x+c_1^{f_{i^*}})$.
+            \end{itemize}
+            \item We claim $\alpha$ satisfies:
+            \begin{enumerate}
+                \item $F \wedge \bigwedge_{x \in [-N, N]} Q(x)$ by construction.
+                \item The clash condition $C \equiv \bigwedge_{t \in \args(F, f_{i^*})} -N + c_1^{f_{i^*}} \leq t \leq N + c_{l_{i^*}}^{f_{i^*}}$.
+            \end{enumerate}
+            \item To see why $\alpha$ satisfies $C$:
+            \begin{itemize}
+                \item For any $t \in \args(F, f_{i^*})$, $\alpha(t) = I^*(t)$ (since we use $I^*$ for ground part).
+                \item From Claim~\ref{claim:bounds-satisfied}, $K_{\min} + c_1^{f_{i^*}} \leq I^*(t) \leq K_{\max} + c_{l_{i^*}}^{f_{i^*}}$.
+                \item Since $K_{\min} \geq -N$ and $K_{\max} \leq N$, we have: $-N + c_1^{f_{i^*}} \leq I^*(t) \leq N + c_{l_{i^*}}^{f_{i^*}}$.
+                \item Therefore, under interpretation $\alpha$, each term $t$ evaluates to a value within the bounds.
+            \end{itemize}
+            \item Since such an $\alpha$ exists, the $\smt$ call on line~5 will find a model that satisfies all constraints, and the algorithm returns \textsc{Sat}.\qedhere
+        \end{itemize}
+    \end{enumerate}
 \end{proof}
 
 \section{Discussion on Completeness}\label{sec:completeness}
