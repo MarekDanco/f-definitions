@@ -308,7 +308,7 @@ And eliminating the inner universal quantifier, we get
 \end{itemize}
 which simplifies to
 \[ \text{for all } t\in args(F, f), \min I+c^{f_{i^{*}}}_1\leq\alpha(t)\leq\max I +c^{f_{i^*}}_{l_{i^*}}.\]
-Using this condition, we get a first (inefficient) algorithm for constructing a certificate. Here we use the notation that for a formula $F$, $smt(F)$ is a model of $F$, if it exists (i.e., $F$ is satisfiable), and $\bot$, otherwise
+Using this condition, we get a first (inefficient) algorithm for constructing a certificate. Here we use the notation that for a formula $F$, $\smt(F)$ is a model of $F$, if it exists (i.e., $F$ is satisfiable), and $\bot$, otherwise
 % \mj{Is this condition really correct? If $F$ is empty, there's no condition on
 %     $I$ (it can be empty), but how are we sure that we can glue together the two functions (the negative
 %     and the positive)?}
@@ -405,7 +405,7 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
 				            \item For $F$ and $Q(x)$ with $x\in[K_\text{min},K_{\text{max}}]$, use values from $I^*$;
 				            \item use the \req propagators to extend the instantiations in $[-N,N]\setminus[K_\text{min},K_\text{max}]$)
 			            \end{itemize}
-			      \item Line 5: $\smt(F \wedge \bigwedge_{x=-N}^N Q \wedge C)$ where $C$ is the clash condition $\forall t\in\args(F,f_{i^*}).-N+c_1^{f_{i^*}}\leq \alpha(t)\leq N+c_{l_{i^*}}^{f_{i^*}}$. This will succeed because the model constructed above also satisfies $C$ (followed from Claim 1 and the fact that $[K_{\text{min}},K_{\text{max}}]\subseteq[-N,N]$).
+			      \item Line 5: $\smt(F \wedge \bigwedge_{x=-N}^N Q \wedge C)$ where $C$ is the clash condition $\forall t\in\args(F,f_{i^*}).-N+c_1^{f_{i^*}}\leq t\leq N+c_{l_{i^*}}^{f_{i^*}}$. This will succeed because the model constructed above also satisfies $C$ (followed from Claim \ref{claim:inTerminationProof} and the fact that $[K_{\text{min}},K_{\text{max}}]\subseteq[-N,N]$).
 			      \item $\therefore$ Algorithm \ref{alg:sr} returns \textsc{Sat}.\qedhere
 		      \end{itemize}
 	\end{enumerate}
@@ -845,37 +845,37 @@ The downside is that such a weakened condition needs a stronger check against cl
 \end{proof}
 
 \subsection{Alternative condition}
-\begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
-	\paragraph{ReqPivot Condition.}
-	Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
-	We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
-	\begin{itemize}
-		\item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-		\item Symmetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-	\end{itemize}
-\end{tcolorbox}\mj{I'm not sure how to read this, what if I have this (trivially unsat)
-	formula $\forall x. f(x)=0\land f(x+1)=1\land f(x+3)>4$, doesn't it say
-	that you could propagate upwards (but you cannot).}\todoSN{Well, the ReqPivot condition here kinda ensures local extensibility but does not guarantee global satisfiability, I think? So, a formula may satisfy ReqPivot yet it is unsatisfiable due to  global consistency constraints. But I think this is not a problem as our algorithm detects such cases when no interval $I$ and interpretation $\alpha$ can be found satisfying $F\land \bigwedge_{x \in I} Q$. Isn't it?}
+% \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
+% 	\paragraph{ReqPivot Condition.}
+% 	Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
+% 	We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
+% 	\begin{itemize}
+% 		\item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+% 		\item Symmetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
+% 	\end{itemize}
+% \end{tcolorbox}\mj{I'm not sure how to read this, what if I have this (trivially unsat)
+% 	formula $\forall x. f(x)=0\land f(x+1)=1\land f(x+3)>4$, doesn't it say
+% 	that you could propagate upwards (but you cannot).}\todoSN{Well, the ReqPivot condition here kinda ensures local extensibility but does not guarantee global satisfiability, I think? So, a formula may satisfy ReqPivot yet it is unsatisfiable due to  global consistency constraints. But I think this is not a problem as our algorithm detects such cases when no interval $I$ and interpretation $\alpha$ can be found satisfying $F\land \bigwedge_{x \in I} Q$. Isn't it?}
 
-\begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
-	\paragraph{ReqPivot Condition.}
-	Let $Q$ be a quantified formula with entities $E$. For a pivot entitiy $p\in E$, let:
-	\begin{itemize}
-		\item $\bar{w}=E\setminus\{p\}$ be the tuple of all other entities in $Q$,
-		\item $Q_{\text{other}}(\bar{w})$ be the conjunction of all literals in $Q$ that \textbf{do not} contain $p$.
-		\item $Q_{\text{pivot}}(\bar{w},p)$ be the conjunction of all literals in $Q$ that \textbf{do} contain $p$.
-	\end{itemize}
-	The \textbf{ReqPivot} condition holds for pivot $p$ if and only if:
-	\[
-		\boxed{
-			\begin{aligned}
-				 & (1) \ \exists \bar{w} . Q_{\text{other}}(\bar{w})                                                      \\
-				 & \land                                                                                                  \\
-				 & (2) \ \forall \bar{w} . \left[ Q_{\text{other}}(\bar{w}) \Rightarrow \exists p . Q(\bar{w}, p) \right]
-			\end{aligned}}
-	\]
-	The pivot entity $p$ can be either the smallest offset $f\big(x+c_1^{f_{i^*}}\big)$ or the biggest offset $f\big(x+c_{l_{i^*}}^{f_{i^*}}\big)$ where $f_{i^*}\in\{f_1,\dots,f_r\}$.
-\end{tcolorbox}\todoSN{I think this formulation will be clearer to read?}
+% \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
+% 	\paragraph{ReqPivot Condition.}
+% 	Let $Q$ be a quantified formula with entities $E$. For a pivot entitiy $p\in E$, let:
+% 	\begin{itemize}
+% 		\item $\bar{w}=E\setminus\{p\}$ be the tuple of all other entities in $Q$,
+% 		\item $Q_{\text{other}}(\bar{w})$ be the conjunction of all literals in $Q$ that \textbf{do not} contain $p$.
+% 		\item $Q_{\text{pivot}}(\bar{w},p)$ be the conjunction of all literals in $Q$ that \textbf{do} contain $p$.
+% 	\end{itemize}
+% 	The \textbf{ReqPivot} condition holds for pivot $p$ if and only if:
+% 	\[
+% 		\boxed{
+% 			\begin{aligned}
+% 				 & (1) \ \exists \bar{w} . Q_{\text{other}}(\bar{w})                                                      \\
+% 				 & \land                                                                                                  \\
+% 				 & (2) \ \forall \bar{w} . \left[ Q_{\text{other}}(\bar{w}) \Rightarrow \exists p . Q(\bar{w}, p) \right]
+% 			\end{aligned}}
+% 	\]
+% 	The pivot entity $p$ can be either the smallest offset $f\big(x+c_1^{f_{i^*}}\big)$ or the biggest offset $f\big(x+c_{l_{i^*}}^{f_{i^*}}\big)$ where $f_{i^*}\in\{f_1,\dots,f_r\}$.
+% \end{tcolorbox}\todoSN{I think this formulation will be clearer to read?}
 
 
 \section*{Related Work}\label{}
