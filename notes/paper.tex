@@ -317,7 +317,6 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
 \subsection{Propagation Algorithm}
 
 \todoSR{The current algorithm uses a fixed $i^*$, a witness for the existential quantifier in \req (the current text does not explicitly say this). It may also be possible to search for it, if there is several such witnesses.}
-\mj{I'd  remove $\alpha$ on line~\ref{ln:check}. The last value of an SMT call should not matter here.}
 \mj{Potentially, in the implementation, use cores to determine which way to increase the size of~$I$.
 	If a certain condition does not appear in the core, it might be possible to not
 	move in one of the directions.}
@@ -334,7 +333,7 @@ Using this condition, we get a first (inefficient) algorithm for constructing a 
 
 		\While{$\alpha \neq \bot$}
 
-		\State $\text{condition} \leftarrow \bigwedge_{t \in \args(F,f)} \underline{I} + c^{f_{i^{*}}}_1 \leq \alpha(t) \leq \overline{I} + c^{f_{i^*}}_{l_{i^*}}$
+		\State $\text{condition} \leftarrow \bigwedge_{t \in \args(F,f)} \underline{I} + c^{f_{i^{*}}}_1 \leq t \leq \overline{I} + c^{f_{i^*}}_{l_{i^*}}$
 		\If{$\smt(F \wedge \bigwedge_{x=\underline{I}}^{\overline{I}} Q \wedge \text{condition}) \neq \bot$} \Comment{with clash condition}\label{ln:check}
 		\State \Return \textsc{Sat} \Comment{Certificate can be constructed}
 		\EndIf
