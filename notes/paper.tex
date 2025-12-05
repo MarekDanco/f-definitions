@@ -474,7 +474,8 @@ such as $x$.
 arithmetic without induction.\mj{We need to make more
 	specific what this means. Is it clear that it hols?}
 
-\todoSN{Should we write something like this for the unsat formulas?} ~\cref{alg:sr} terminates with \textsc{Unsat} for formulas whose unsatisfiability can be detected through finite instantiation alone. Formally:
+\todoSN{So I think we need to remove the above sentence because of the counter example $f(c)=f(c+1)\land\forall x.f(x)<f(x+1)$? If we need to say something about \textsc{Unsat} formulas, perhaps like this one below?}
+~\cref{alg:sr} terminates with \textsc{Unsat} for formulas whose unsatisfiability can be detected through finite instantiation alone. Formally:
 \begin{theorem}
     \label{thm:finiteunsatThenUNSAT}
     Let $\phi$ be a formula of the form described in \cref{thm:satisfiableThenSAT} that is unsatisfiable in the standard model of integer arithmetic. If there exists a finite set of instantiations $\{x = k_1, \dots, x = k_n\}$ such that $F\land\bigwedge_{i=1}^n Q[x\mapsto k_i]$ is unsatisfiable, then Algorithm~\ref{alg:sr} will terminate and return \textsc{Unsat}.
@@ -487,7 +488,7 @@ In general, \cref{alg:sr} is complete in the following senses:
 \begin{itemize}
     \item For \textsc{Sat}: It terminates on all satisfiable formulas within the fragment that satisfy \req (\cref{thm:satisfiableThenSAT}).
     \item For \textsc{Unsat}: It terminates on formulas whose unsatisfiability is detectable through finite instantiation (\cref{thm:finiteunsatThenUNSAT}).
-    \item For formulas requiring inductive proofs of unsatisfiability (e.g. Formula \eqref{eq:completeness}), the algorithm may not terminate. These formulas are unsatisfiable, yet every finite set of their instantiations remains satisfiable. Such formulas have no finite unsatisfiable core, causing the algorithm to expand $I$ indefinitely.
+    \item For formulas whose unsatisfiability relies on instantiations at offsets not captured by the expanding interval $I$, the algorithm may not terminate. This includes both inductive cases like Formula \eqref{eq:completeness} and non‑inductive cases like $f(c)=f(c+1)\land\forall x.f(x)<f(x+1)$ whose unsatisfiability does not require induction over all integers.
 \end{itemize}
 
 \section{Extensions}
