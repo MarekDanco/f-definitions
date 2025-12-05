@@ -212,10 +212,9 @@ The goal is now an algorithm that computes such satisfiability certificates and 
 \section{Algorithm}\label{sec:alg}
 
 Class of formulas:
-\[ F\wedge \forall x\;.\; Q(f_1(x+c^{f_1}_1),\dots,f_1(x+c^{f_1}_{l_1}),\dots,f_r(x+c^{f_r}_1),\dots,f_r(x+c^{f_r}_{l_r})),\]
-where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, the constants $c^{f_i}_{1},\dots,c^{f_i}_{l_i}$ are sorted and pairwise different integers.
-\mj{Careful with terminology, for SMT people $c$ is a constant, we could use
-	``numeral'' for $1,2,3,\dots$.}
+\[ F\wedge \forall x\;.\; Q(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\dots,f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})),\]
+where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, and the  $t^{f_i}_{1},\dots,t^{f_i}_{l_i}$ are LIA ground terms~\todoSR{We are about to extend the algorithm to this case. Is ``LIA ground term'' correct terminology?}
+
 
 This does not yet address:
 \begin{itemize}
