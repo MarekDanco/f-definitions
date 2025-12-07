@@ -6,6 +6,7 @@ from pathlib import Path
 
 import z3
 
+from converter import NNFConverter
 from printer import BoolStructPrinter
 
 CONSTANTS = list("abcdefghijklm")
@@ -26,7 +27,7 @@ def find_smtlib_files(root_path: str):
 
 
 class Renamer:
-    def __init__(self, filepath, base_path):
+    def __init__(self, filepath, base_path, nnf):
         self.filepath = filepath
         self.base_path = base_path
         self.constant_subs = []
@@ -34,6 +35,7 @@ class Renamer:
         self.var_counter = 0
         self.const_counter = 0
         self.cache = {}
+        self.nnf = nnf
 
     def is_const(self, expr):
         return (
@@ -108,6 +110,9 @@ class Renamer:
         """Process a single formula and return renamed version."""
         self.var_counter = 0
         self.cache = {}
+        if self.nnf:
+            converter = NNFConverter(formula)
+            formula = converter.convert()
         pre_simplify = self.rename_expr(formula)
         return z3.simplify(pre_simplify, no_let=True)
 
@@ -116,24 +121,35 @@ class Renamer:
         s = z3.Solver()
         s.from_file(self.filepath)
 
-        renamed_solver = z3.Solver()
         renamed_assertions = []
         for assertion in s.assertions():
             renamed_assertion = self.process_formula(assertion)
             renamed_assertions.append(renamed_assertion)
-            renamed_solver.add(renamed_assertion)
+        return renamed_assertions
+
+    def write(self, output_dir, assertions):
+        renamed_solver = z3.Solver()
+        renamed_solver.add(assertions)
 
         input_path = Path(self.filepath)
         relative_path = input_path.relative_to(self.base_path)
         output_path = output_dir / relative_path
-        output_path_skeleton = Path(str(output_path) + "_skeleton")
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        printer = BoolStructPrinter(renamed_assertions)
         with open(output_path, "w") as f:
             f.write(renamed_solver.to_smt2())
-        with open(output_path_skeleton, "w") as f:
-            f.write(printer.to_dotformat())
         print(f"  -> Written to: {output_path}")
+
+    def to_dotformat(self, output_dir, assertions):
+        input_path = Path(self.filepath)
+        relative_path = input_path.relative_to(self.base_path)
+        output_path = output_dir / relative_path
+        output_path = output_path.with_suffix(".dot")
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        printer = BoolStructPrinter(assertions)
+        with open(output_path, "w") as f:
+            f.write(printer.to_dotformat())
+        print(f"  -> DOT written to: {output_path}")
 
 
 def main():
@@ -141,6 +157,8 @@ def main():
         description="Rename variable names in SMT files using Z3"
     )
     parser.add_argument("input_path", help="Input directory or file path to rename")
+    parser.add_argument("--nnf", help="Convert to nnf", action="store_true")
+    parser.add_argument("--dot", help="Generate dotformat", action="store_true")
     args = parser.parse_args()
 
     smtlib_files = []
@@ -165,8 +183,11 @@ def main():
     for i, filepath in enumerate(smtlib_files):
         print(f"Processing file {i+1}/{len(smtlib_files)}: {filepath}")
         try:
-            renamer = Renamer(filepath, base_path)
-            renamer.process_file(output_dir)
+            renamer = Renamer(filepath, base_path, args.nnf)
+            assertions = renamer.process_file(output_dir)
+            renamer.write(output_dir, assertions)
+            if args.dot:
+                renamer.to_dotformat(output_dir, assertions)
         except Exception as e:
             print(f"  -> Error processing file: {e}")
 
