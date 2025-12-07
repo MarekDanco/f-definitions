@@ -1,5 +1,5 @@
 #!/usr/bin/env -S python3 -u
-"""Extract admissible subformulas for synthesis."""
+"""Extract admissible UFLIA subformulas for synthesis."""
 import argparse
 import os
 from pathlib import Path
@@ -52,12 +52,6 @@ class Formula:
         self._is_ground_cache[expr_id] = result
         return result
 
-
-class SubformulaFilter(Formula):
-    def __init__(self, formula):
-        super().__init__()
-        self.formula = formula
-
     def _offset_vars_ground(self, children):
         vars = []
         ground = []
@@ -76,22 +70,28 @@ class SubformulaFilter(Formula):
         if not (z3.is_add(expr) or z3.is_sub(expr)):
             return False
         children = list(expr.children())
-        vars, ground = self._offset_vars_ground(children)
-        if len(vars) == 0 and len(ground) == 0:
-            return False
+        vars, _ = self._offset_vars_ground(children)
         if len(vars) == 1:
             return True
         return False
 
+
+class SubformulaFilter(Formula):
+    """Filter a quantified subformula"""
+
+    def __init__(self, formula):
+        super().__init__()
+        self.formula = formula
+
     def _check_func_args(self, args):
         """All function arguments must be offset terms."""
+        if len(args) > 1:
+            return False  # Mikolas fix
         return all(self._is_offset_term(arg) for arg in args)
 
     def _filter_helper(self, expr):
-        """Filter a quantified assertion."""
         if z3.is_quantifier(expr):
-            # Disallow nested quantifiers
-            return None
+            return None  # disallow nested quantifiers
         if self._is_ground(expr):
             return expr
         if z3.is_var(expr):
@@ -102,29 +102,27 @@ class SubformulaFilter(Formula):
                 return expr
             else:
                 return None
-        if self._is_select(expr) or self._is_store(expr):
-            index = expr.arg(1)
-            if self._is_offset_term(index):
-                return expr
-            else:
-                return None
         if z3.is_and(expr):
             filtered_children = []
             for child in expr.children():
                 filtered = self._filter_helper(child)
-                if filtered is None:
-                    filtered_children.append(z3.BoolVal(True, ctx=expr.ctx))
-                else:
+                if filtered is not None:
                     filtered_children.append(filtered)
+            if not filtered_children:
+                return None
+            if len(filtered_children) == 1:
+                return filtered_children[0]
             return z3.And(*filtered_children)
         if z3.is_or(expr):
             filtered_children = []
             for child in expr.children():
                 filtered = self._filter_helper(child)
-                if filtered is None:
-                    filtered_children.append(z3.BoolVal(False, ctx=expr.ctx))
-                else:
+                if filtered is not None:
                     filtered_children.append(filtered)
+            if not filtered_children:
+                return None
+            if len(filtered_children) == 1:
+                return filtered_children[0]
             return z3.Or(*filtered_children)
         if z3.is_not(expr):
             filtered = self._filter_helper(expr.arg(0))
@@ -138,7 +136,6 @@ class SubformulaFilter(Formula):
             if any(c is None for c in filtered_children):
                 return None
             return expr
-
         return None
 
     def filter(self):
@@ -153,6 +150,15 @@ class Filter(Formula):
         self.filepath = filepath
         self.base_path = base_path
         self._filter_cache = {}
+
+    def _contains_entity(self, expr):
+        """Check if filtered quantifier body contains any entities"""
+        if self._is_func(expr):
+            if self._is_ground(expr):
+                return False
+            if self._is_offset_term(expr.arg(0)):
+                return True
+        return any(self._contains_entity(child) for child in expr.children())
 
     def filter(self, expr):
         expr_id = expr.get_id()
@@ -171,12 +177,17 @@ class Filter(Formula):
             new_body = sub_filter.filter()
             if new_body is None:
                 return None
+            print(new_body)
+            if not self._contains_entity(new_body):
+                return None
 
             var_names = [expr.var_name(i) for i in range(num_vars)]
             var_sorts = [expr.var_sort(i) for i in range(num_vars)]
 
             bound_vars = [z3.Const(var_names[i], var_sorts[i]) for i in range(num_vars)]
-            new_body_with_consts = z3.substitute_vars(new_body, *reversed(bound_vars))
+            new_body_with_consts = z3.substitute_vars(
+                new_body, *reversed(bound_vars)
+            )  # de bruijn
             if expr.is_forall():
                 result = z3.ForAll(
                     bound_vars,
@@ -275,11 +286,11 @@ def main():
     print(f"Found {len(smtlib_files)} SMT-LIB files to analyze.")
     for i, filepath in enumerate(smtlib_files):
         print(f"Processing file {i+1}/{len(smtlib_files)}: {filepath}")
-        try:
-            filter = Filter(filepath, base_path)
-            filter.process_file(output_dir)
-        except Exception as e:
-            print(f"  -> Error processing file: {e}")
+        # try:
+        filter = Filter(filepath, base_path)
+        filter.process_file(output_dir)
+        # except Exception as e:
+        #     print(f"  -> Error processing file: {e}")
 
 
 if __name__ == "__main__":
