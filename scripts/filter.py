@@ -97,6 +97,8 @@ class SubformulaFilter(Formula):
         if z3.is_var(expr):
             return expr
         if self._is_func(expr):
+            if expr.decl().range() != z3.IntSort():
+                return None
             args = [expr.arg(i) for i in range(expr.num_args())]
             if self._check_func_args(args):
                 return expr
@@ -177,7 +179,6 @@ class Filter(Formula):
             new_body = sub_filter.filter()
             if new_body is None:
                 return None
-            print(new_body)
             if not self._contains_entity(new_body):
                 return None
 

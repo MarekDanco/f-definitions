@@ -9,9 +9,6 @@ import z3
 from converter import NNFConverter
 from printer import BoolStructPrinter
 
-CONSTANTS = list("abcdefghijklm")
-VARIABLES = list("xyzvwnopqrstu")
-
 
 def find_smtlib_files(root_path: str):
     """Find all SMT files anywhere in the root_path tree."""
@@ -26,16 +23,30 @@ def find_smtlib_files(root_path: str):
     return smtlib_files
 
 
+def name_generator(prefix_chars, fallback_prefix):
+    """Generator that yields names from a list of characters, then numbered names."""
+    for char in prefix_chars:
+        yield char
+    counter = 0
+    while True:
+        yield f"{fallback_prefix}{counter}"
+        counter += 1
+
+
 class Renamer:
     def __init__(self, filepath, base_path, nnf):
         self.filepath = filepath
         self.base_path = base_path
-        self.constant_subs = []
         self.constant_map = {}
-        self.var_counter = 0
-        self.const_counter = 0
-        self.cache = {}
+        self.function_map = {}
         self.nnf = nnf
+
+        self.const_gen = name_generator("abcde", "c_")
+        self.func_gen = name_generator("fgh", "f_")
+        self.var_gen = None
+
+        self.collect_cache = set()
+        self.rename_cache = {}
 
     def is_const(self, expr):
         return (
@@ -44,80 +55,95 @@ class Renamer:
             and expr.decl().arity() == 0
         )
 
-    def rename_const(self, const):
-        const_decl = const.decl()
-        if const_decl in self.constant_map:
-            return self.constant_map[const_decl]
-        if len(self.constant_subs) < len(CONSTANTS):
-            new_name = CONSTANTS[len(self.constant_subs)]
-        else:
-            new_name = f"const_{self.const_counter}"
-            self.const_counter += 1
-        new_const = z3.Const(new_name, const.sort())
-        self.constant_map[const_decl] = new_const
-        self.constant_subs.append((const, new_const))
-        return new_const
-
-    def rename_quantifier(self, quantifier):
-        num_vars = quantifier.num_vars()
-        new_var_counter = self.var_counter + num_vars
-        if new_var_counter <= len(VARIABLES):
-            new_var_names = VARIABLES[self.var_counter : new_var_counter]
-        else:
-            new_var_names = [f"var_{self.var_counter + i}" for i in range(num_vars)]
-        self.var_counter = new_var_counter
-
-        new_body = self.rename_expr(quantifier.body())
-
-        var_sorts = [quantifier.var_sort(i) for i in range(num_vars)]
-        new_bound_vars = [
-            z3.Const(new_var_names[i], var_sorts[i]) for i in range(num_vars)
-        ]
-        if quantifier.is_forall():
-            return z3.ForAll(
-                new_bound_vars,
-                new_body,
-            )
-        return z3.Exists(
-            new_bound_vars,
-            new_body,
+    def is_func(self, expr):
+        return (
+            z3.is_app(expr)
+            and expr.decl().kind() == z3.Z3_OP_UNINTERPRETED
+            and expr.decl().arity() > 0
         )
 
-    def rename_expr(self, expr):
-        """Recursively rename an expression, rebuilding quantifiers with new names."""
+    def collect_symbols(self, expr):
+        """Walk the expression and collect all constants and functions to rename."""
         expr_id = expr.get_id()
-        if expr_id in self.cache:
-            return self.cache[expr_id]
-        result = None
+        if expr_id in self.collect_cache:
+            return
+
+        self.collect_cache.add(expr_id)
         if self.is_const(expr):
-            result = self.rename_const(expr)
-        elif z3.is_var(expr):
-            result = expr
-        elif z3.is_quantifier(expr):
-            result = self.rename_quantifier(expr)
+            const_decl = expr.decl()
+            new_name = next(self.const_gen)
+            new_const = z3.Const(new_name, expr.sort())
+            self.constant_map[const_decl] = (expr, new_const)
+        elif self.is_func(expr):
+            func_decl = expr.decl()
+            new_name = next(self.func_gen)
+            arity = func_decl.arity()
+            domain = [func_decl.domain(i) for i in range(arity)]
+            range_sort = func_decl.range()
+            new_func = z3.Function(new_name, *domain, range_sort)
+            var_list = [z3.Var(i, func_decl.domain(i)) for i in range(arity)]
+            new_expr = new_func(*var_list)
+            self.function_map[func_decl] = new_expr
+        for child in expr.children():
+            self.collect_symbols(child)
+
+    def rename_quantifiers(self, expr):
+        """Recursively rename quantifier variables."""
+        expr_id = expr.get_id()
+        if expr_id in self.rename_cache:
+            return self.rename_cache[expr_id]
+
+        result = None
+        if z3.is_quantifier(expr):
+            num_vars = expr.num_vars()
+            assert self.var_gen is not None
+            new_var_names = [next(self.var_gen) for _ in range(num_vars)]
+            new_body = self.rename_quantifiers(expr.body())
+            var_sorts = [expr.var_sort(i) for i in range(num_vars)]
+            new_bound_vars = [
+                z3.Const(new_var_names[i], var_sorts[i]) for i in range(num_vars)
+            ]
+            new_body = z3.substitute_vars(new_body, *reversed(new_bound_vars))
+            if expr.is_forall():
+                result = z3.ForAll(new_bound_vars, new_body)
+            else:
+                result = z3.Exists(new_bound_vars, new_body)
         elif z3.is_app(expr):
-            new_children = [self.rename_expr(child) for child in expr.children()]
+            new_children = [self.rename_quantifiers(child) for child in expr.children()]
             if new_children:
                 result = expr.decl()(*new_children)
             else:
                 result = expr
         else:
             result = expr
-        self.cache[expr_id] = result
+        self.rename_cache[expr_id] = result
         return result
 
     def process_formula(self, formula):
         """Process a single formula and return renamed version."""
-        self.var_counter = 0
-        self.cache = {}
         if self.nnf:
             converter = NNFConverter(formula)
             formula = converter.convert()
-        pre_simplify = self.rename_expr(formula)
-        return z3.simplify(pre_simplify, no_let=True)
 
-    def process_file(self, output_dir):
-        """Process the SMT file and write renamed version."""
+        self.collect_symbols(formula)
+
+        if self.constant_map:
+            const_subs = [(old, new) for old, new in self.constant_map.values()]
+            formula = z3.substitute(formula, *const_subs)
+
+        if self.function_map:
+            func_subs = [
+                (old_func, new_expr) for old_func, new_expr in self.function_map.items()
+            ]
+            formula = z3.substitute_funs(formula, *func_subs)
+
+        self.rename_cache = {}
+        self.var_gen = name_generator("xyzv", "x_")
+        formula = self.rename_quantifiers(formula)
+
+        return z3.simplify(formula, no_let=True)
+
+    def process_file(self):
         s = z3.Solver()
         s.from_file(self.filepath)
 
@@ -182,14 +208,14 @@ def main():
     print(f"Found {len(smtlib_files)} SMT-LIB files to analyze.")
     for i, filepath in enumerate(smtlib_files):
         print(f"Processing file {i+1}/{len(smtlib_files)}: {filepath}")
-        try:
-            renamer = Renamer(filepath, base_path, args.nnf)
-            assertions = renamer.process_file(output_dir)
-            renamer.write(output_dir, assertions)
-            if args.dot:
-                renamer.to_dotformat(output_dir, assertions)
-        except Exception as e:
-            print(f"  -> Error processing file: {e}")
+        # try:
+        renamer = Renamer(filepath, base_path, args.nnf)
+        assertions = renamer.process_file()
+        renamer.write(output_dir, assertions)
+        if args.dot:
+            renamer.to_dotformat(output_dir, assertions)
+        # except Exception as e:
+        #     print(f"  -> Error processing file: {e}")
 
 
 if __name__ == "__main__":
