@@ -9,13 +9,21 @@ import z3
 from converter import NNFConverter
 from printer import BoolStructPrinter
 
+VERBOSE = 0
+
+
+def log(severity, message):
+    if severity > VERBOSE:
+        return
+    print(message, flush=True)
+
 
 def find_smtlib_files(root_path: str):
     """Find all SMT files anywhere in the root_path tree."""
     smtlib_files = []
     root = Path(root_path)
     if not root.exists():
-        print(f"Error: Path '{root_path}' does not exist")
+        log(1, f"Error: Path '{root_path}' does not exist")
         return []
     for file_path in root.rglob("*"):
         if file_path.is_file() and file_path.suffix.lower() == ".smt2":
@@ -163,7 +171,7 @@ class Renamer:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
             f.write(renamed_solver.to_smt2())
-        print(f"  -> Written to: {output_path}")
+        log(3, f"  -> Written to: {output_path}")
 
     def to_dotformat(self, output_dir, assertions):
         input_path = Path(self.filepath)
@@ -175,7 +183,7 @@ class Renamer:
         printer = BoolStructPrinter(assertions)
         with open(output_path, "w") as f:
             f.write(printer.to_dotformat())
-        print(f"  -> DOT written to: {output_path}")
+        log(3, f"  -> DOT written to: {output_path}")
 
 
 def main():
@@ -198,16 +206,16 @@ def main():
         base_path = Path(args.input_path)
 
     if not smtlib_files:
-        print("No SMT-LIB files found in the specified path.")
+        log(1, "No SMT-LIB files found in the specified path.")
         return
 
     output_dir = Path(str(base_path) + "_renamed")
     output_dir.mkdir(exist_ok=True)
-    print(f"Output directory: {output_dir}")
+    log(1, f"Output directory: {output_dir}")
 
-    print(f"Found {len(smtlib_files)} SMT-LIB files to analyze.")
+    log(2, f"Found {len(smtlib_files)} SMT-LIB files to analyze.")
     for i, filepath in enumerate(smtlib_files):
-        print(f"Processing file {i+1}/{len(smtlib_files)}: {filepath}")
+        log(3, f"Processing file {i+1}/{len(smtlib_files)}: {filepath}")
         # try:
         renamer = Renamer(filepath, base_path, args.nnf)
         assertions = renamer.process_file()
@@ -215,7 +223,7 @@ def main():
         if args.dot:
             renamer.to_dotformat(output_dir, assertions)
         # except Exception as e:
-        #     print(f"  -> Error processing file: {e}")
+        #     log(1, f"  -> Error processing file: {e}")
 
 
 if __name__ == "__main__":
