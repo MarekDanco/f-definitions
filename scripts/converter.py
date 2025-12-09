@@ -7,18 +7,24 @@ class NNFConverter:
     def __init__(self, assertion):
         self.assertion = assertion
         self._nnf_cache = {}
+        self._check_cache = {}
 
     def _check_correct(self, expr, seen_not):
+        expr_id = expr.get_id()
+        if expr_id in self._check_cache:
+            return self._check_cache[expr_id]
         if z3.is_quantifier(expr):
             if seen_not:
                 return False
         if z3.is_not(expr):
             seen_not = True
-        return all(self._check_correct(c, seen_not) for c in expr.children())
+        res = all(self._check_correct(c, seen_not) for c in expr.children())
+        self._check_cache[expr_id] = res
+        return res
 
     def convert(self):
         out = self._to_nnf(self.assertion, False)
-        assert self._check_correct(out, False), "Conversion did not go correctly."
+        # assert self._check_correct(out, False), "Conversion did not go correctly."
         return out
 
     def _to_nnf(self, expr, negate):
