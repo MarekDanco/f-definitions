@@ -2,11 +2,20 @@
 """Extract admissible UFLIA subformulas for synthesis."""
 import argparse
 import os
+from functools import lru_cache
 from pathlib import Path
 
 import z3
 
 from converter import NNFConverter
+
+VERBOSE = 0
+
+
+def log(severity, message):
+    if severity > VERBOSE:
+        return
+    print(message, flush=True)
 
 
 def find_smtlib_files(root_path: str):
@@ -14,7 +23,7 @@ def find_smtlib_files(root_path: str):
     smtlib_files = []
     root = Path(root_path)
     if not root.exists():
-        print(f"Error: Path '{root_path}' does not exist")
+        log(1, f"Error: Path '{root_path}' does not exist")
         return []
     for file_path in root.rglob("*"):
         if file_path.is_file() and file_path.suffix.lower() == ".smt2":
@@ -97,8 +106,8 @@ class SubformulaFilter(Formula):
         if z3.is_var(expr):
             return expr
         if self._is_func(expr):
-            if expr.decl().range() != z3.IntSort():
-                return None
+            if expr.sort() != z3.IntSort(ctx=expr.ctx):
+                return None  # only integer functions
             args = [expr.arg(i) for i in range(expr.num_args())]
             if self._check_func_args(args):
                 return expr
@@ -112,8 +121,6 @@ class SubformulaFilter(Formula):
                     filtered_children.append(filtered)
             if not filtered_children:
                 return None
-            if len(filtered_children) == 1:
-                return filtered_children[0]
             return z3.And(*filtered_children)
         if z3.is_or(expr):
             filtered_children = []
@@ -123,8 +130,6 @@ class SubformulaFilter(Formula):
                     filtered_children.append(filtered)
             if not filtered_children:
                 return None
-            if len(filtered_children) == 1:
-                return filtered_children[0]
             return z3.Or(*filtered_children)
         if z3.is_not(expr):
             filtered = self._filter_helper(expr.arg(0))
@@ -153,6 +158,7 @@ class Filter(Formula):
         self.base_path = base_path
         self._filter_cache = {}
 
+    @lru_cache(maxsize=None)
     def _contains_entity(self, expr):
         """Check if filtered quantifier body contains any entities"""
         if self._is_func(expr):
@@ -161,6 +167,15 @@ class Filter(Formula):
             if self._is_offset_term(expr.arg(0)):
                 return True
         return any(self._contains_entity(child) for child in expr.children())
+
+    @lru_cache(maxsize=None)
+    def _contains_entity_addition(self, expr):
+        if z3.is_add(expr) or z3.is_sub(expr):
+            return self._contains_entity(expr)
+        else:
+            return any(
+                self._contains_entity_addition(child) for child in expr.children()
+            )
 
     def filter(self, expr):
         expr_id = expr.get_id()
@@ -178,8 +193,11 @@ class Filter(Formula):
             sub_filter = SubformulaFilter(expr.body())
             new_body = sub_filter.filter()
             if new_body is None:
+                self._filter_cache[expr_id] = None
                 return None
-            if not self._contains_entity(new_body):
+            assert isinstance(new_body, z3.ExprRef)
+            if not self._contains_entity_addition(new_body):
+                self._filter_cache[expr_id] = None
                 return None
 
             var_names = [expr.var_name(i) for i in range(num_vars)]
@@ -241,7 +259,7 @@ class Filter(Formula):
         ]
 
         if all(is_ground for _, is_ground in processed):
-            print("  -> Skipped: No quantified assertions remain after filtering")
+            log(3, "  -> Skipped: No quantified assertions remain after filtering")
             return
         for filtered_assertion, _ in processed:
             if filtered_assertion is not None:
@@ -253,7 +271,7 @@ class Filter(Formula):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
             f.write(filtered_solver.to_smt2())
-        print(f"  -> Written to: {output_path}")
+        log(3, f"  -> Written to: {output_path}")
 
 
 def main():
@@ -277,21 +295,21 @@ def main():
         base_path = Path(args.input_path[0])
 
     if not smtlib_files:
-        print("No SMT-LIB files found in the specified path.")
+        log(1, "No SMT-LIB files found in the specified path.")
         return
 
     output_dir = Path(str(base_path) + "_filtered")
     output_dir.mkdir(exist_ok=True)
-    print(f"Output directory: {output_dir}")
+    log(1, f"Output directory: {output_dir}")
 
-    print(f"Found {len(smtlib_files)} SMT-LIB files to analyze.")
+    log(2, f"Found {len(smtlib_files)} SMT-LIB files to analyze.")
     for i, filepath in enumerate(smtlib_files):
-        print(f"Processing file {i+1}/{len(smtlib_files)}: {filepath}")
-        # try:
-        filter = Filter(filepath, base_path)
-        filter.process_file(output_dir)
-        # except Exception as e:
-        #     print(f"  -> Error processing file: {e}")
+        log(3, f"Processing file {i+1}/{len(smtlib_files)}: {filepath}")
+        try:
+            filter = Filter(filepath, base_path)
+            filter.process_file(output_dir)
+        except Exception as e:
+            log(1, f"  -> Error processing file: {e}")
 
 
 if __name__ == "__main__":
