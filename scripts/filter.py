@@ -9,7 +9,7 @@ import z3
 
 from converter import NNFConverter
 
-VERBOSE = 0
+VERBOSE = 2
 
 
 def log(severity, message):
@@ -44,15 +44,15 @@ class Formula:
 
     def _offset_vars_ground(self, children):
         vs = []
-        ground = []
+        # ground = []
         for c in children:
-            if self._is_ground(c):
-                ground.append(c)
-            elif z3.is_var(c):
+            # if self._is_ground(c):
+            #     ground.append(c)
+            if z3.is_var(c):
                 vs.append(c)
-            else:
-                return [], []
-        return vs, ground
+            # else:
+            #     return [], []
+        return vs  # , ground
 
     def _is_offset_term(self, expr):
         if z3.is_var(expr):
@@ -60,7 +60,7 @@ class Formula:
         if not (z3.is_add(expr) or z3.is_sub(expr)):
             return False
         children = list(expr.children())
-        vs, _ = self._offset_vars_ground(children)
+        vs = self._offset_vars_ground(children)
         if len(vs) == 1:
             return True
         return False
@@ -175,7 +175,7 @@ class Filter(Formula):
                 self._filter_cache[expr_id] = None
                 return None
             assert isinstance(new_body, z3.ExprRef)
-            if not self._contains_entity_addition(new_body):
+            if not self._contains_entity(new_body):
                 self._filter_cache[expr_id] = None
                 return None
 
@@ -234,7 +234,7 @@ def main() -> int:
     )
     parser.add_argument("input_file", help="Input SMT file to filter")
     parser.add_argument(
-        "--base-dir",
+        "--output-dir",
         help="Base directory to preserve relative structure (default: parent of input file)",
     )
     args = parser.parse_args()
@@ -250,13 +250,13 @@ def main() -> int:
         return 1
 
     log(2, f"Processing file '{args.input_file}'")
-    if args.base_dir:
-        base_dir = Path(args.base_dir).resolve()
-    else:
-        base_dir = input_path.parent
 
+    base_dir = input_path.parent
+    if args.output_dir:
+        output_dir = Path(args.output_dir).resolve()
+    else:
+        output_dir = Path(str(base_dir) + "_filtered")
     relative_path = input_path.relative_to(base_dir)
-    output_dir = Path(str(base_dir) + "_filtered")
     output_path = output_dir / relative_path
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
