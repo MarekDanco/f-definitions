@@ -1,7 +1,7 @@
 #!/usr/bin/env -S python3 -u
 """Extract admissible UFLIA subformulas for synthesis."""
 import argparse
-import os
+import sys
 from functools import lru_cache
 from pathlib import Path
 
@@ -18,19 +18,6 @@ def log(severity, message):
     print(message, flush=True)
 
 
-def find_smtlib_files(root_path: str):
-    """Find all SMT files anywhere in the root_path tree."""
-    smtlib_files = []
-    root = Path(root_path)
-    if not root.exists():
-        log(1, f"Error: Path '{root_path}' does not exist")
-        return []
-    for file_path in root.rglob("*"):
-        if file_path.is_file() and file_path.suffix.lower() == ".smt2":
-            smtlib_files.append(str(file_path))
-    return smtlib_files
-
-
 class Formula:
     def __init__(self):
         self._is_ground_cache = {}
@@ -45,12 +32,6 @@ class Formula:
     def _is_arith_op(self, expr):
         return z3.is_add(expr) or z3.is_sub(expr)
 
-    def _is_select(self, expr):
-        return z3.is_app(expr) and expr.decl().kind() == z3.Z3_OP_SELECT
-
-    def _is_store(self, expr):
-        return z3.is_app(expr) and expr.decl().kind() == z3.Z3_OP_STORE
-
     def _is_ground(self, expr):
         expr_id = expr.get_id()
         if expr_id in self._is_ground_cache:
@@ -62,16 +43,16 @@ class Formula:
         return result
 
     def _offset_vars_ground(self, children):
-        vars = []
+        vs = []
         ground = []
         for c in children:
             if self._is_ground(c):
                 ground.append(c)
             elif z3.is_var(c):
-                vars.append(c)
+                vs.append(c)
             else:
                 return [], []
-        return vars, ground
+        return vs, ground
 
     def _is_offset_term(self, expr):
         if z3.is_var(expr):
@@ -79,8 +60,8 @@ class Formula:
         if not (z3.is_add(expr) or z3.is_sub(expr)):
             return False
         children = list(expr.children())
-        vars, _ = self._offset_vars_ground(children)
-        if len(vars) == 1:
+        vs, _ = self._offset_vars_ground(children)
+        if len(vs) == 1:
             return True
         return False
 
@@ -106,7 +87,7 @@ class SubformulaFilter(Formula):
         if z3.is_var(expr):
             return expr
         if self._is_func(expr):
-            if expr.sort() != z3.IntSort(ctx=expr.ctx):
+            if expr.sort() != z3.IntSort():
                 return None  # only integer functions
             args = [expr.arg(i) for i in range(expr.num_args())]
             if self._check_func_args(args):
@@ -152,10 +133,8 @@ class SubformulaFilter(Formula):
 
 
 class Filter(Formula):
-    def __init__(self, filepath, base_path):
+    def __init__(self):
         super().__init__()
-        self.filepath = filepath
-        self.base_path = base_path
         self._filter_cache = {}
 
     @lru_cache(maxsize=None)
@@ -170,7 +149,7 @@ class Filter(Formula):
 
     @lru_cache(maxsize=None)
     def _contains_entity_addition(self, expr):
-        if z3.is_add(expr) or z3.is_sub(expr):
+        if self._is_arith_op(expr):
             return self._contains_entity(expr)
         else:
             return any(
@@ -248,69 +227,69 @@ class Filter(Formula):
         filtered_assertion = z3.simplify(filtered_assertion, no_let=True)
         return filtered_assertion, is_ground
 
-    def process_file(self, output_dir):
-        ctx = z3.Context()
-        solver = z3.Solver(ctx=ctx)
-        solver.from_file(self.filepath)
 
-        filtered_solver = z3.Solver(ctx=ctx)
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Filter assertions in a single SMT file for synthesis"
+    )
+    parser.add_argument("input_file", help="Input SMT file to filter")
+    parser.add_argument(
+        "--base-dir",
+        help="Base directory to preserve relative structure (default: parent of input file)",
+    )
+    args = parser.parse_args()
+
+    input_path = Path(args.input_file).resolve()
+
+    if not input_path.exists():
+        log(1, f"Error: File '{args.input_file}' does not exist")
+        return 1
+
+    if not input_path.suffix.lower() == ".smt2":
+        log(1, "Error: File must have .smt2 extension")
+        return 1
+
+    log(2, f"Processing file '{args.input_file}'")
+    if args.base_dir:
+        base_dir = Path(args.base_dir).resolve()
+    else:
+        base_dir = input_path.parent
+
+    relative_path = input_path.relative_to(base_dir)
+    output_dir = Path(str(base_dir) + "_filtered")
+    output_path = output_dir / relative_path
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        solver = z3.Solver()
+        solver.from_file(str(input_path))
+
+        filter_obj = Filter()
+        filtered_solver = z3.Solver()
         processed = [
-            self.process_assertion(assertion) for assertion in solver.assertions()
+            filter_obj.process_assertion(assertion) for assertion in solver.assertions()
         ]
 
         if all(is_ground for _, is_ground in processed):
-            log(3, "  -> Skipped: No quantified assertions remain after filtering")
-            return
+            log(2, "  -> Skipped: No quantified assertions remain after filtering")
+            return 0
+
         for filtered_assertion, _ in processed:
             if filtered_assertion is not None:
                 filtered_solver.add(filtered_assertion)
 
-        input_path = Path(self.filepath)
-        relative_path = input_path.relative_to(self.base_path)
-        output_path = output_dir / relative_path
-        output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
             f.write(filtered_solver.to_smt2())
-        log(3, f"  -> Written to: {output_path}")
+        log(2, f"  -> Written to: {output_path}")
+        return 0
+    except Exception as e:
+        log(0, f"  -> Error processing file: {e}")
+        import traceback
 
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Filter assertions in SMT files for synthesis."
-    )
-    parser.add_argument(
-        "input_path", nargs="+", help="Input directory or file path to analyze"
-    )
-    args = parser.parse_args()
-
-    smtlib_files = []
-    base_path = None
-
-    if os.path.isfile(args.input_path[0]):
-        smtlib_files = [args.input_path[0]]
-        base_path = Path(args.input_path[0]).parent
-    else:
-        for path in args.input_path:
-            smtlib_files += find_smtlib_files(path)
-        base_path = Path(args.input_path[0])
-
-    if not smtlib_files:
-        log(1, "No SMT-LIB files found in the specified path.")
-        return
-
-    output_dir = Path(str(base_path) + "_filtered")
-    output_dir.mkdir(exist_ok=True)
-    log(1, f"Output directory: {output_dir}")
-
-    log(2, f"Found {len(smtlib_files)} SMT-LIB files to analyze.")
-    for i, filepath in enumerate(smtlib_files):
-        log(3, f"Processing file {i+1}/{len(smtlib_files)}: {filepath}")
-        try:
-            filter = Filter(filepath, base_path)
-            filter.process_file(output_dir)
-        except Exception as e:
-            log(1, f"  -> Error processing file: {e}")
+        traceback.print_exc()
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
