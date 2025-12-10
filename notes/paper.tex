@@ -42,7 +42,8 @@
 \newcommand{\args}{\text{args}}
 \usepackage{xspace}
 \newcommand{\req}{\emph{ReqPivot}\xspace}
-
+\newcommand{\subst}[3]{#1[#2\leftarrow #3]}
+\newcommand{\repr}[1]{\hat{#1}}
 
 \newcommand{\todoSR}[1]{\todo[color=blue!40]{#1}}
 \newcommand{\mj}[1]{\todo[color=green!30]{#1 -mik}}
@@ -96,12 +97,21 @@ ensure that it is assigned a consistent value throughout. To show satisfiability
 our fragment, we impose an order on these constraints and construct a symbolic assignment
 to the entities such that, when processed in this order, no conflicting assignments arise.
 
-\section{Definitions}
+\section{Notation}\todoSR{We will see where to put this, in the end}
 
+We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the term~$s$. For an integer $z\in\mathbb{Z}$, we will denote the constant representing $z$ in a logical formula by $\repr{z}$\todoSR{Does there exist some standard notation for this?}.
+
+For a formula $F$ and uninterpreted function symbol $f$, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
+
+
+
+
+\section{Definitions}
+\todoSR{I intend to add a running example and a figure}
 We will view quantifier-free formulas as formulas with a universal quantifier that ranges over an empty tuple of variables. Hence, quantifier-free formulas have precisely one instantiation.
 
 \begin{definition}[entity]\label{def:entity}
-	An \emph{entity} is a term of the form $f(c_1,\dots, c_k)$ where $f$ is an uninterpreted function symbols and $c_1,\dots, c_k$ are integers.\todoSR{Mikoláš used the term ``cell'', which might more succinct and descriptive.}
+	An \emph{entity} is a term of the form $f(c_1,\dots, c_k)$ where $f$ is an uninterpreted function symbol and $c_1,\dots, c_k$ are integers.\todoSR{Mikoláš used the term ``cell'', which might more succinct and descriptive.}
 	\mj{Potentially change notation from $c_i$ to $n_i$ to distinguish numerals
 		and constants.}
 \end{definition}
@@ -113,86 +123,93 @@ Examples of entities are $c$, and $f(7)$. The term $f(c+7)$ is not an entity.
 	An \emph{entity interpretation} is a partial function whose domain is the set of entities. An entity interpretation $I$ is \emph{compatible} with an interpretation $\mathcal{I}$ iff $I$ and $\mathcal{I}$ agree on all entities where $I$ is defined.
 \end{definition}
 
-Given a term $t$ and an entity interpretation $I$ such that  $\mathcal{I}(t)$ is unique for every $\mathcal{I}$ compatible with $I$, we define $I(t):=\mathcal{I}(t)$, and otherwise $I(t):=\bot$.\todoSR{This is not completely formal, we could also use a more formal, but less readable version.}
+Given an entity interpretation $I$, we set $\mathit{def}(I)$ the set of entities for which $I$ is defined. Given a term $t$ and an entity interpretation $I$ such that  $\mathcal{I}(t)$ is unique for every $\mathcal{I}$ compatible with $I$, we define $I(t):=\mathcal{I}(t)$, and otherwise $I(t):=\bot$.\todoSR{This is not completely formal, we could also use a more formal, but less readable version.}
 For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but $I(f(1))=\bot$. Also note that $I(f(1)-f(1))=0\neq\bot$\todoSR{I went for a semantic definition here, since it works very generally without taking much space to define.}. In a similar way, for a formula $\phi$, we define that an entity interpretation~$I$ satisfies $\phi$ iff for every interpretation $\mathcal{I}$ compatible with $I$, $\mathcal{I}$ satisfies $\phi$, in which case we also write $I\models \phi$.
 
-\begin{definition}
-	We say that an entity interpretation $I$ \emph{interprets the arguments} of a quantifier-free formula $\phi$ iff for all argument terms $t$ of uninterpreted function symbols in $\phi$, $I(t)\neq\bot$. For an entity interpretation $I$ that interprets the arguments of a formula~$\phi$, we say that an entity $f(c_1,\dots, c_k)$ is an \emph{$I$-interpreted entity in $\phi$} iff $\phi$ has a sub-term of the form $f(t_1,\dots, t_k)$, and $I(t_1)=c_1$, $\dots$, $I(t_k)=c_k$.
-\end{definition}
-For example, the interpretation $I=\{ a\mapsto 5 \}$ interprets the arguments of the formula $f(a)\geq 0$, and the entity $f(5)$ is an $I$-interpreted entity in $f(a)\geq 0$.
+% \begin{definition}
+% 	We say that an entity interpretation $I$ \emph{interprets the arguments} of a quantifier-free formula $\phi$ iff for all argument terms $t$ of uninterpreted function symbols in $\phi$, $I(t)\neq\bot$. For an entity interpretation $I$ that interprets the arguments of a formula~$\phi$, we say that an entity $f(c_1,\dots, c_k)$ is an \emph{$I$-interpreted entity in $\phi$} iff $\phi$ has a sub-term of the form $f(t_1,\dots, t_k)$, and $I(t_1)=c_1$, $\dots$, $I(t_k)=c_k$.
+% \end{definition}
+% For example, the interpretation $I=\{ a\mapsto 5 \}$ interprets the arguments of the formula $f(a)\geq 0$, and the entity $f(5)$ is an $I$-interpreted entity in $f(a)\geq 0$.
 
 \begin{definition}
 	\label{def:pre-sat-cert}
-	Given a formula $\phi$, we call an entity interpretation $I$ that satisfies the quantifier-free part of $\phi$ and  that interprets the arguments of all instantiations\mj{It is unclear what is  meant by ``all instantiations''?} of quantified sub-formulas of $\phi$ a \emph{pre-satisfiability certificate} of $\phi$. For any instantiation $\psi$ of a quantified sub-formula of $\phi$, we denote by $\Gamma_I(\psi)$ the resulting set of entities.
+	Given a formula $\phi$ of the form $F\wedge \forall x\;.\; Q$, we call an entity interpretation $I$ such that
+        \begin{itemize}
+        \item $I\models F$, and
+        \item for all $z\in\mathbb{Z}$, for every uninterpreted function symbol~$f$ and its argument terms $t\in args(Q, f)$, $I(\subst{t}{x}{\repr{z}})\neq\bot$
+        \end{itemize}
+ a \emph{pre-satisfiability certificate} of $\phi$. For any $z\in\mathbb{Z}$, we denote by $\Gamma_{I,z}(\phi)$ the resulting set of entities \[\{ I(\subst{t}{x}{\repr{z}}) \mid t\in args(Q, f), f \text{an uninterpreted function symbol}\}.\]
 \end{definition}
 
-For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and after instantiating the quantified sub-formula with $x=10$ to $\psi\equiv f(10+c+1)= f(10+c)+1$, $\Gamma_I(\psi)=\{ f(15), f(16)\}$.
+For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
 \begin{definition}
 	\label{def:certificate}
-	Given a formula $\phi$, a \emph{satisfiability certificate} is
+	Given a formula $\phi$  of the form $F\wedge \forall x\;.\; Q$, a \emph{satisfiability certificate} is
 	\begin{itemize}
-		\item an order $\preceq$\footnote{We will assume this to be a well-order (i.e., a total order for which every non-empty subset has a least element), which enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}\mj{remove the footnote for final version, it looks like superscript} on all instantiations of quantified sub-formulas of $\phi$,
-		\item a pre-satisfiability certificate $I$
-		\item for every instantiation $\psi$ of a quantified sub-formula of $\phi$, a set of entities (the \emph{existential entities})\todoSR{alternative term ``propagated entities''} that are neither assigned a value by $I$, nor occur in any $\Gamma_I(\psi')$ for an instantiation $\psi'\prec\psi$\mj{I'm having trouble parsing the sentence.}
+		\item a well-order $\preceq$ on $\mathbb{Z}$,%\footnote{A well-order total order for which every non-empty subset has a least element. This enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}
+		\item a pre-satisfiability certificate $I$ of $\phi$,
+		\item for every $z\in\mathbb{Z}$
+                  \begin{itemize}
+                  \item a set $X_z\subseteq \Gamma_{I,z}(\phi)$  (the \emph{existential entities})\todoSR{alternative term ``propagated entities''} such that \[X_z\cap (\mathit{def}(I)\cup\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi))=\emptyset,\] and
+                    %that are neither assigned a value by $I$, nor occur in any $\Gamma_{I,z'}(\phi)$ for any $z'\prec z$
+                  \item a certificate (the \emph{satisfiability propagator}) showing that for all values of entities in $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ there exist values for the entities in $X_z$ such that for the entity assignment $I_{X_z}$ assigning these values to $X_z$, $I\cup I_{X_z}\models \subst{Q}{x}{\repr{z}}$.
+                  \end{itemize}
 
-		      % partitions $\Gamma_I(\psi)$ into
-		      %     \begin{itemize}
-		      %             \item entities assigned a value by $I$,
-		      %             \item entities not assigned a value by $I$ where $\psi$ is the first instantiation wrt. $\prec$ where the entity occurs in $\Gamma_I(\psi)$ (\emph{existential entitites}),
-		      %             \item entities not assigned a value by $I$ for which there is an instantiation $\psi'\prec\psi$ where the entity occurs in $\Gamma_I(\psi')$
-		      %                   (\emph{non-existential entities}), and
-		      %     \end{itemize}
-		\item for each instantiation $\psi$ of a quantified sub-formula of $\phi$,
-		      a certificate (the \emph{satisfiability propagator}) showing that for all values of entities that are neither assigned a value by $I$ nor are existential, there exist
-		      values for the existential entities such that the extension of~$I$ assigning these values to $\Gamma_I(\psi)$ satisfies~$\psi$.
-		      \footnote{For the sake of generality, at this point we do not require the satisfiability propagator to be constructive. Below, we will then work with algorithms computing the values only required to exist, here.}
-		      \marek{I attempted to simplify the definition below. That definition is far less general though.
-			      Is our original $\phi$ a conjunction of quantified formulas
-			      together with a ground part? If so, how do we order instantiations of different subformulas?}
 	\end{itemize}
 \end{definition}
 
+For the sake of generality, at this point we do not require the satisfiability propagator to be constructive. Below, we will then work with algorithms computing the values only required to exist, here.
 
-\addtocounter{definition}{-1}
-\begin{definition}[Simplified]
-	Given a formula $\phi$, a \emph{satisfiability certificate} is
-	\begin{itemize}
-		\item a pre-satisfiability certificate $I$
-		\item a total order $\preceq$ on instantiations of the quantified part of $\phi$,
-		\item for each instantiation $\psi$ of the quantified part of $\phi$ a set of corresponding
-		      \emph{existential} entities -- entities occurring in $\psi$ but not occurring in the ground part of $\phi$
-		      or in any instantiation $\psi'$, where $\psi' \prec \psi$,
-		\item for each instantiation $\psi$ of the quantified part of $\phi$ a corresponding
-		      \emph{satisfiability propagator} -- a certificate showing that for all values of entities that are not existential and
-		      do not occur in the ground part, there exist values of existential entities that satisfy $\psi$.
-	\end{itemize}
-\end{definition}
+% \addtocounter{definition}{-1}
+% \begin{definition}[Simplified]
+% 	Given a formula $\phi$, a \emph{satisfiability certificate} is
+% 	\begin{itemize}
+% 		\item a pre-satisfiability certificate $I$
+% 		\item a total order $\preceq$ on instantiations of the quantified part of $\phi$,
+% 		\item for each instantiation $\psi$ of the quantified part of $\phi$ a set of corresponding
+% 		      \emph{existential} entities -- entities occurring in $\psi$ but not occurring in the ground part of $\phi$
+% 		      or in any instantiation $\psi'$, where $\psi' \prec \psi$,
+% 		\item for each instantiation $\psi$ of the quantified part of $\phi$ a corresponding
+% 		      \emph{satisfiability propagator} -- a certificate showing that for all values of entities that are not existential and
+% 		      do not occur in the ground part, there exist values of existential entities that satisfy $\psi$.
+% 	\end{itemize}
+% \end{definition}
 
 
-Also note that for instantiations of quantified sub-formulas that only contain entities assigned a value by $I$, the satisfiability propagator only needs to certify that $I$ satisfies the respective instantiation. Hence, the entity interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator.
+Also note that for $z\in\mathbb{Z}$ such that $\Gamma_{I,z}\subseteq \mathit{def}(I)$, the set of existential variables $X_z$ must be empty, and the satisfiability propagator only needs to certify that $I\models \subst{Q}{x}{\repr{z}}$. In other words, the entity interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator.
 
 \begin{property}\label{prop:certThenSat}
-	Every formula that has a satisfiability certificate is satisfiable.
+	Every formula formula $\phi$  of the form $F\wedge \forall x\;.\; Q$ that has a satisfiability certificate is satisfiable.
 \end{property}
 
 \begin{proof}
-	Assume a formula $\phi$ that has a satisfiability certificate.
-	The corresponding pre-satisfiability certificate $I$ satisfies the quantifier free part of $\phi$. We use the principle of induction on well-orders to show that for every instantiation~$\psi$ of a quantified-subformula, the set of formulas $\{ \psi' \mid \psi'\prec \psi\}$ is satisfied by an extension of $I$.
+	Assume a formula of the given form and assume that it  has a satisfiability certificate.
+	The corresponding pre-satisfiability certificate $I$ satisfies the quantifier free part of $\phi$. We use the principle of induction on well-orders to show that for every $z\in\mathbb{Z}$ the set of formulas $\{ \subst{Q}{x}{\repr{z}'} \mid z'\preceq z\}$ is satisfied by an extension of $I$.
 
-	Let $\psi$ be an instantiation of a quantified sub-formula, and let $X$ be $\{ \psi' \mid \psi'\prec \psi\}$. We assume that $X$ is satisfiable by an extension $I_X$ of $I$, and prove that $X\cup \{ \psi\}$ is satisfiable by an extension of $I$, as well. Since the formula has a satisfiability certificate, the existential entities of $\psi$ do not occur in any element of $X$. Let $I'$ be the extension of $I_X$ that assigns to the existential entities of $\psi$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $X$, for all entities occurring in $X$, the value of $I'$ is the same as the value of $I_X$. Hence $I'$ satisfies both $X$ and $\psi$, and so it satisfies $X\cup \{ \psi\}$.
+	Let $z\in\mathbb{Z}$, and let $\Phi$ be $\{ \subst{Q}{x}{\repr{z}'} \mid z'\prec z\}$. We assume that $\Phi$ is satisfied by an extension $I_{\Phi}$ of $I$, and prove that $\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$ is satisfied by an extension of $I$, as well. Since the formula has a satisfiability certificate, the existential entities of $\psi$ do not occur in any element of $\Phi$. Let $I'$ be the extension of $I_{\Phi}$ that assigns to the existential entities $X_z$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $\Phi$, for all entities occurring in $\Phi$, the value of $I'$ is the same as the value of $I_{\Phi}$. Hence $I'$ satisfies both $\Phi$ and $\subst{Q}{x}{\repr{z}}$, and so it satisfies $\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$.
 
-	Now denote for every instantiation~$\psi$ of a quantified-subformula the entity interpretation $I$  satisfying $\psi$ as constructed in the previous paragraph by $I_{\psi}$.
+	Now denote for every $z\in\mathbb{Z}$ the entity interpretation  satisfying $\subst{Q}{x}{\repr{z}}$ as constructed in the previous paragraph by $I_z$.
 	% From the well-order $\prec$ we get a corresponding well-order on these entity interpretations.
-	Let $I_{\phi}$ be the entity interpretation that, for any entity $u$, assigns the value to $u$ that $I_{\psi}$ assigns to it for the smallest $\psi$ (wrt. $\prec$) that assigns a value to $u$. This smallest $\psi$ exists, since $\prec$ is a well-order. This entity interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
+	Let $I_{\phi}$ be the entity interpretation that, for any entity $u$, assigns the value to $u$ that $I_{z}$ assigns to it for the smallest $z$ (wrt. $\prec$) that assigns a value to $u$. This smallest $z$ exists, since $\prec$ is a well-order. The entity interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
 \end{proof}
 
-A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model of the formula. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$.
+A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model of the formula. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\mathbb{Z}$ and for each $u\in X_z$ we assume a function $prop_{u}$ such that for
+an entity interpretation $I'$ with $def(I')=\Gamma_{I,z}(\phi)\setminus def(I)\setminus X_z$, $I\cup I'\cup\{ x\mapsto z\}\cup \{ u \mapsto prop_{u}(I\cup \{ x\mapsto z\}) \mid u\in{X_z}\}\models Q$.\todoSR{I am currently working on this. In the meanwhile, do not expect it to make sense.}
 
-For this, for any entity $u$, let $inst(u)$ either be the  instantiation $\psi$ of a quantified sub-formula with $u\in\Gamma_I(\psi)$ and where $u$ is existential, or $\bot$ if there is no such instantiation\marek{How can this happen?}\todoSR{It can happen with function symbols of arity $\geq 2$.}
+% for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
+% \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$
+
+% For any instantiation $\psi$ of a quantified sub-formula with existential entities $u_1,\dots, u_s$ and non-existential entities $v_1,\dots, v_r$, the satisfiability propagator defines  functions $prop_{u_1},\dots, prop_{u_s}$ such that for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
+% \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.\marek{Is \cite{kuncak-sttt13} applicable in our case too?}
+
+
+Now, for any entity $u$, let $inst(u)$ either be the $z\in\mathbb{Z}$ with $u\in X_z$ or $\bot$ if there is no such instantiation (this means that either $I(u)\neq \bot$ or ...).
 % We require all arguments to be of the form $x + k$, so for every entity there is a minimal $\psi$ that contains it. From minimality this $u$ has to be existential in $\psi$. Implicitly $u$ isn't in the ground part.}.
-For any instantiation $\psi$ of a quantified sub-formula with existential entities $u_1,\dots, u_s$ and non-existential entities $v_1,\dots, v_r$, the satisfiability propagator defines  functions $prop_{u_1},\dots, prop_{u_s}$ such that for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
-\[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.\marek{Is \cite{kuncak-sttt13} applicable in our case too?}
+
+
+
+
 Then, a program to compute the value $val(u)$ of a given entity $u$ looks as follows:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
 	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
@@ -252,8 +269,6 @@ We will assume that we have corresponding satisfiability propagators (see Defini
 
 For increasing $x$, this will propagate values to the entity $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ which, since the offset $c^{f_{i^*}}_{l_{i^*}}$ is the biggest for $f_{i^*}$ has not been propagated a value to, before. Analogically, for decreasing $x$, it will propagate values to the entity with the smallest offset. Note that there might be weaker requirements (with fewer entities universally quantified) that also might do the job, but this needs more investigation.
 
-In the following, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
-\mj{WLOG $c_1=0$ by setting $x$ to $x-c_1$, this might simplify the presentation.}
 
 
 \begin{property}
