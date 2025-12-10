@@ -284,7 +284,7 @@ def main() -> int:
         log(2, f"  -> Written to: {output_path}")
         return 0
     except Exception as e:
-        log(0, f"  -> Error processing file: {e}")
+        log(0, f"  -> Error processing file '{args.input_file}'\n{e}")
         import traceback
 
         traceback.print_exc()
