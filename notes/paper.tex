@@ -123,7 +123,7 @@ Examples of entities are $c$, and $f(7)$. The term $f(c+7)$ is not an entity.
 	An \emph{entity interpretation} is a partial function whose domain is the set of entities. An entity interpretation $I$ is \emph{compatible} with an interpretation $\mathcal{I}$ iff $I$ and $\mathcal{I}$ agree on all entities where $I$ is defined.
 \end{definition}
 
-Given an entity interpretation $I$, we set $\mathit{def}(I)$ the set of entities for which $I$ is defined. Given a term $t$ and an entity interpretation $I$ such that  $\mathcal{I}(t)$ is unique for every $\mathcal{I}$ compatible with $I$, we define $I(t):=\mathcal{I}(t)$, and otherwise $I(t):=\bot$.\todoSR{This is not completely formal, we could also use a more formal, but less readable version.}
+Given an entity interpretation $I$, we denote by $\mathit{def}(I)$ the set of entities for which $I$ is defined. Given a term $t$ and an entity interpretation $I$  we define $I(t):=\mathcal{I}(t)$, if  $\mathcal{I}(t)$ is unique for every interpretation $\mathcal{I}$ compatible with $I$, and otherwise $I(t):=\bot$.\todoSR{This is not completely formal, we could also use a more formal, but less readable version.}
 For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but $I(f(1))=\bot$. Also note that $I(f(1)-f(1))=0\neq\bot$\todoSR{I went for a semantic definition here, since it works very generally without taking much space to define.}. In a similar way, for a formula $\phi$, we define that an entity interpretation~$I$ satisfies $\phi$ iff for every interpretation $\mathcal{I}$ compatible with $I$, $\mathcal{I}$ satisfies $\phi$, in which case we also write $I\models \phi$.
 
 % \begin{definition}
