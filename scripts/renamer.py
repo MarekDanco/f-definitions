@@ -9,7 +9,7 @@ import z3
 from converter import NNFConverter
 from printer import BoolStructPrinter
 
-VERBOSE = 0
+VERBOSE = 2
 
 
 def log(severity, message):
@@ -171,7 +171,7 @@ class Renamer:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
             f.write(renamed_solver.to_smt2())
-        log(3, f"  -> Written to: {output_path}")
+        log(2, f"  -> Written to: {output_path}")
 
     def to_dotformat(self, output_dir, assertions):
         input_path = Path(self.filepath)
@@ -183,7 +183,7 @@ class Renamer:
         printer = BoolStructPrinter(assertions)
         with open(output_path, "w") as f:
             f.write(printer.to_dotformat())
-        log(3, f"  -> DOT written to: {output_path}")
+        log(2, f"  -> DOT written to: {output_path}")
 
 
 def main():
@@ -213,7 +213,7 @@ def main():
     output_dir.mkdir(exist_ok=True)
     log(1, f"Output directory: {output_dir}")
 
-    log(2, f"Found {len(smtlib_files)} SMT-LIB files to analyze.")
+    log(3, f"Found {len(smtlib_files)} SMT-LIB files to analyze.")
     for i, filepath in enumerate(smtlib_files):
         log(3, f"Processing file {i+1}/{len(smtlib_files)}: {filepath}")
         # try:
