@@ -6,7 +6,6 @@ from functools import cache
 from pathlib import Path
 
 import z3
-
 from converter import NNFConverter
 
 VERBOSE = 2
@@ -56,7 +55,7 @@ class Formula:
     def _is_offset_term(self, expr):
         if z3.is_var(expr):
             return True
-        if not (z3.is_add(expr) or z3.is_sub(expr)):
+        if not self._is_arith_op(expr):
             return False
         children = list(expr.children())
         vs = self._offset_vars_ground(children)
