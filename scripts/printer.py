@@ -1,7 +1,37 @@
 #!/usr/bin/env -S python3 -u
 """Various SMT pretty printers."""
 
+import argparse
+from functools import cache
+from pathlib import Path
+
 import z3
+
+
+def write_dot(filepath, assertions, lits):
+    input_path = Path(filepath)
+    output_path = input_path.with_suffix(".dot")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    printer = BoolStructPrinter(assertions)
+    with open(output_path, "w") as f:
+        f.write(printer.to_dotformat(literals=lits))
+    print(f"DOT written to: {output_path}")
+
+
+@cache
+def has_quantifiers(expr):
+    if z3.is_quantifier(expr):
+        return True
+    return any(has_quantifiers(c) for c in expr.children())
+
+
+def quantified(assertions):
+    res = []
+    for a in assertions:
+        if has_quantifiers(a):
+            res.append(a)
+    return res
 
 
 class BoolStructPrinter:
@@ -16,7 +46,7 @@ class BoolStructPrinter:
         self.edges = []
         self.nodes = []
 
-    def to_dotformat(self):
+    def to_dotformat(self, literals=False):
         """Generate dot format"""
         self.node_counter = 0
         self.edges = []
@@ -27,7 +57,7 @@ class BoolStructPrinter:
         self.nodes.append((root_id, "assertions"))
 
         for assertion in self.assertions:
-            assertion_id = self._traverse_dot(assertion)
+            assertion_id = self._traverse_dot(assertion, literals)
             self.edges.append((root_id, assertion_id))
 
         dot = "digraph combined_assertions {\n"
@@ -42,30 +72,33 @@ class BoolStructPrinter:
         dot += "}"
         return dot
 
-    def _traverse_dot(self, expr):
+    def _traverse_dot(self, expr, literals):
         current_id = self.node_counter
         self.node_counter += 1
         if z3.is_quantifier(expr):
             label = "exists" if expr.is_exists() else "forall"
             self.nodes.append((current_id, label))
-            child_id = self._traverse_dot(expr.body())
+            child_id = self._traverse_dot(expr.body(), literals)
             self.edges.append((current_id, child_id))
         elif z3.is_and(expr):
             self.nodes.append((current_id, "and"))
             for child in expr.children():
-                child_id = self._traverse_dot(child)
+                child_id = self._traverse_dot(child, literals)
                 self.edges.append((current_id, child_id))
         elif z3.is_or(expr):
             self.nodes.append((current_id, "or"))
             for child in expr.children():
-                child_id = self._traverse_dot(child)
+                child_id = self._traverse_dot(child, literals)
                 self.edges.append((current_id, child_id))
         elif z3.is_not(expr):
             self.nodes.append((current_id, "not"))
-            child_id = self._traverse_dot(expr.arg(0))
+            child_id = self._traverse_dot(expr.arg(0), literals)
             self.edges.append((current_id, child_id))
         else:
-            self.nodes.append((current_id, ""))
+            if literals:
+                self.nodes.append((current_id, f"{expr}"))
+            else:
+                self.nodes.append((current_id, ""))
         return current_id
 
     def to_sexpr(self):
@@ -89,17 +122,32 @@ class BoolStructPrinter:
 
 
 def main():
-    s = z3.Solver()
-    s.from_file(
-        "non-incremental/NIA/20230321-UltimateAutomizerSvcomp2023_renamed/gcd_2.c_0.smt2"
+    parser = argparse.ArgumentParser(
+        description="Create a dotformat of the boolean structure of a formula"
     )
-    p = BoolStructPrinter(s.assertions())
-    for a in s.assertions():
-        print(a)
-    print()
-    print(p.to_sexpr())
-    print()
-    print(p.to_dotformat())
+    parser.add_argument("input_file", help="Input SMT file visualize")
+    parser.add_argument(
+        "--quantified_only", help="Input SMT file visualize", action="store_true"
+    )
+    parser.add_argument(
+        "--literals", help="Include literals in leaves", action="store_true"
+    )
+    args = parser.parse_args()
+
+    input_path = Path(args.input_file).resolve()
+
+    if not input_path.exists():
+        print(f"Error: File '{args.input_file}' does not exist")
+        return 1
+
+    if not input_path.suffix.lower() == ".smt2":
+        print("Error: File must have .smt2 extension")
+        return 1
+
+    s = z3.Solver()
+    s.from_file(str(input_path))
+    assertions = quantified(s.assertions()) if args.quantified_only else s.assertions()
+    write_dot(input_path, assertions, args.literals)
 
 
 if __name__ == "__main__":

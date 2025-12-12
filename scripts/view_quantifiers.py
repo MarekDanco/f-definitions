@@ -1,11 +1,11 @@
 #!/usr/bin/env -S python3 -u
 import argparse
-from functools import lru_cache
+from functools import cache
 
 import z3
 
 
-@lru_cache(maxsize=None)
+@cache
 def has_quantifiers(expr):
     if z3.is_quantifier(expr):
         return True
