@@ -177,7 +177,7 @@ For the sake of generality, at this point we do not require the satisfiability p
 % \end{definition}
 
 
-Also note that for $z\in\mathbb{Z}$ such that $\Gamma_{I,z}\subseteq \mathit{def}(I)$, the set of existential variables $X_z$ must be empty, and the satisfiability propagator only needs to certify that $I\models \subst{Q}{x}{\repr{z}}$. In other words, the entity interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator.
+Also note that for $z\in\mathbb{Z}$ such that $\Gamma_{I,z}\subseteq \mathit{def}(I)$, the set of existential variables $X_z$ must be empty, and the satisfiability propagator only needs to certify that $I\models \subst{Q}{x}{\repr{z}}$. In other words, the entity interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator. 
 
 \begin{property}\label{prop:certThenSat}
 	Every formula formula $\phi$  of the form $F\wedge \forall x\;.\; Q$ that has a satisfiability certificate is satisfiable.
@@ -194,9 +194,9 @@ Also note that for $z\in\mathbb{Z}$ such that $\Gamma_{I,z}\subseteq \mathit{def
 	Let $I_{\phi}$ be the entity interpretation that, for any entity $u$, assigns the value to $u$ that $I_{z}$ assigns to it for the smallest $z$ (wrt. $\prec$) that assigns a value to $u$. This smallest $z$ exists, since $\prec$ is a well-order. The entity interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
 \end{proof}
 
-A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\mathbb{Z}$ and for each $u\in X_z$ we assume a function $prop_{u}$ such that for
-an entity interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$, $I\cup I'\cup \{ u \mapsto prop_{u}(I\cup \{ x\mapsto z\}) \mid u\in{X_z}\}\models\subst{Q}{x}{\repr{z}}$.\todoSR{I am currently working on this. In the meanwhile, do not expect it to make sense.}
-
+A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\mathbb{Z}$ and for each $u\in X_z$ we assume a function $prop_{u,z}$ such that for
+an entity interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$, $I\cup I'\cup \{ u \mapsto prop_{u,z}(I\cup I') \mid u\in{X_z}\}\models\subst{Q}{x}{\repr{z}}$.
+ 
 % for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
 % \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$
 
@@ -204,22 +204,18 @@ an entity interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus
 % \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.\marek{Is \cite{kuncak-sttt13} applicable in our case too?}
 
 
-Now, for any entity $u$, let $inst(u)$ either be the $z\in\mathbb{Z}$ with $u\in X_z$ or $\bot$ if there is no such instantiation (this means that either $I(u)\neq \bot$ or ...).
-% We require all arguments to be of the form $x + k$, so for every entity there is a minimal $\psi$ that contains it. From minimality this $u$ has to be existential in $\psi$. Implicitly $u$ isn't in the ground part.}.
-
-
-
+Now, observe that for any entity $u$ there is at most one $z\in\mathbb{Z}$ with $u\in X_z$ (if there would be more than one then, due to $\preceq$ being a well-order, there is a minimal one, let us say $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any entity $u$, let $inst(u)$ either be the $z\in\mathbb{Z}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
 
 Then, a program to compute the value $val(u)$ of a given entity $u$ looks as follows:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
 	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
 	\textbf{if} $inst(u)=\bot$ \textbf{then} \textbf{return} 0 \`// in this case, any value (including $0$) is o.k\\
-	let $v_1,\dots, v_k$ be the non-existential entities in $inst(u)$\\
-	\textbf{return} $prop(u)(val(v_1),\dots, val(v_k))$
+	\textbf{return} $prop_{u,inst(u)}(I\cup \{ v\mapsto val(v) \mid v\in \Gamma_{I,inst(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z\})$
 \end{tabbing}
 
+Here, the recursive calls go down the order $\prec$ in the following sense:
 \begin{property}
-	Let $u$ be an entity such that $inst(u)\neq\bot$. Then for any non-existential entity $v$ of $inst(u)$ with $inst(v)\neq\bot$, $inst(v)\prec inst(u)$.
+	Let $u$ be an entity such that $inst(u)\neq\bot$. Then for any $v\in\Gamma_{I,inst(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $inst(v)\neq\bot$, $inst(v)\prec inst(u)$.
 \end{property}
 
 So each recursive call of the program $val$ either results in $inst(u)$ either decreasing or being $\bot$. In the latter case, the program terminates immediately, and the former case cannot happen infinitely often, since the used order is well-founded. So we have:
