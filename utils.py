@@ -10,6 +10,7 @@ def has_quantifiers(expr):
     return any(has_quantifiers(c) for c in expr.children())
 
 
+@cache
 def is_func(expr):
     """Check if expr is uninterpreted function symbol with arity > 0"""
     return (
@@ -19,6 +20,7 @@ def is_func(expr):
     )
 
 
+@cache
 def is_const(expr):
     """Check if expr is uninterpreted function symbol with arity 0"""
     return (
@@ -28,6 +30,14 @@ def is_const(expr):
     )
 
 
+@cache
+def contains_const_func(expr):
+    if is_const(expr) or is_func(expr):
+        return True
+    return any(contains_const_func(c) for c in expr.children())
+
+
+@cache
 def is_arithmetic_op(expr):
     return z3.is_add(expr) or z3.is_sub(expr)
 
@@ -39,7 +49,7 @@ def is_ground(expr):
     return all(is_ground(child) for child in expr.children())
 
 
-def _offset_vars_ground(children):
+def offset_vars_ground(children):
     vs, ground = [], []
     for c in children:
         if is_ground(c):
@@ -60,7 +70,7 @@ def is_offset_term(expr):
     if not is_arithmetic_op(expr):
         return False
     children = list(expr.children())
-    vs, _ = _offset_vars_ground(children)
+    vs, _ = offset_vars_ground(children)
     if len(vs) == 1:
         return True
     return False
