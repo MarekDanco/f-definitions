@@ -28,9 +28,9 @@ class ReqPivot:
         return conj_manager.manage()
 
     def test(self, assertion, direction: Literal["up", "down"]):
-        formula, self.entities = self._process(assertion, direction)
-        assert self.entities, "Found no entities"
-        existential, target = split_entities(self.entities, direction)
+        formula, entities = self._process(assertion, direction)
+        assert entities, "Found no entities"
+        existential, target = split_entities(entities, direction)
 
         existential_consts, existential_subs = self._get_subs(existential)
         target_const, target_sub = self._get_subs(target)
