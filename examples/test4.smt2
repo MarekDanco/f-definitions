@@ -5,7 +5,7 @@
 (assert
   (forall ((x Int))
     (and
-      (> (f (+ x 7))
+      (> (f (+ x 7 (- 3 2)))
         (- (f x) (f (+ x 3))))
       (> (f (+ x 3))
         (f (- x 1)))
