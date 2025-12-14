@@ -8,7 +8,7 @@ from utils import get_entities, get_offset, simplify, split_entities
 class Conjunct:
     def __init__(self, conjunction, direction):
         entities = list(get_entities(conjunction))
-        self.existential, self.target = split_entities(entities, direction)
+        _, self.target = split_entities(entities, direction)
 
 
 class ConjunctionsManager:
