@@ -7,7 +7,7 @@ from typing import Literal
 import z3
 
 from conjunct import ConjunctionsManager
-from utils import get_entities, has_quantifiers, simplify, split_entities
+from utils import has_quantifiers, res_matrix_entities, split_entities
 
 
 class ReqPivot:
@@ -23,9 +23,9 @@ class ReqPivot:
         assert z3.is_quantifier(assertion), f"{assertion} is not quantified"
         matrix = assertion.body()
         if not z3.is_and(matrix):
-            return simplify(matrix), list(get_entities(matrix))
+            return res_matrix_entities(matrix)
         conj_manager = ConjunctionsManager(matrix, direction)
-        return conj_manager.manage()
+        return res_matrix_entities(conj_manager.manage())
 
     def test(self, assertion, direction: Literal["up", "down"]):
         formula, entities = self._process(assertion, direction)
