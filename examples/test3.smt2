@@ -1,5 +1,6 @@
 (set-logic UFLIA)
 (declare-fun g (Int) Int)
+(declare-fun c () Int)
 (assert
   (forall ((x Int))
     (= (g (+ x 2))
