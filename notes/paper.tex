@@ -205,21 +205,21 @@ an entity interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus
 % \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.\marek{Is \cite{kuncak-sttt13} applicable in our case too?}
 
 
-Now, observe that for any entity $u$ there is at most one $z\in\mathbb{Z}$ with $u\in X_z$ (if there would be more than one then, due to $\preceq$ being a well-order, there is a minimal one, let us say $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any entity $u$, let $inst(u)$ either be the $z\in\mathbb{Z}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
+Now, observe that for any entity $u$ there is at most one $z\in\mathbb{Z}$ with $u\in X_z$ (if there would be more than one then, due to $\preceq$ being a well-order, there is a minimal one, let us say $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any entity $u$, let $\mathit{inst}(u)$ either be the $z\in\mathbb{Z}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
 
 Then, a program to compute the value $val(u)$ of a given entity $u$ looks as follows:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
 	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
-	\textbf{if} $inst(u)=\bot$ \textbf{then} \textbf{return} 0 \`// in this case, any value (including $0$) is o.k\\
-	\textbf{return} $prop_{u,inst(u)}(I\cup \{ v\mapsto val(v) \mid v\in \Gamma_{I,inst(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z\})$
+	\textbf{if} $\mathit{inst}(u)=\bot$ \textbf{then} \textbf{return} 0 \`// in this case, any value (including $0$) is o.k\\
+	\textbf{return} $prop_{u,\mathit{inst}(u)}(I\cup \{ v\mapsto val(v) \mid v\in \Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z\})$
 \end{tabbing}
 
 Here, the recursive calls go down the order $\prec$ in the following sense:
 \begin{property}
-	Let $u$ be an entity such that $inst(u)\neq\bot$. Then for any $v\in\Gamma_{I,inst(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $inst(v)\neq\bot$, $inst(v)\prec inst(u)$.
+	Let $u$ be an entity such that $\mathit{inst}(u)\neq\bot$. Then for any $v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, $\mathit{inst}(v)\prec \mathit{inst}(u)$.
 \end{property}
 
-So each recursive call of the program $val$ either results in $inst(u)$ either decreasing or being $\bot$. In the latter case, the program terminates immediately, and the former case cannot happen infinitely often, since the used order is well-founded. So we have:
+So each recursive call of the program $val$ either results in $\mathit{inst}(u)$ either decreasing or being $\bot$. In the latter case, the program terminates immediately, and the former case cannot happen infinitely often, since the used order is well-founded. So we have:
 \begin{property}
 	The program $val$ terminates.
 \end{property}
