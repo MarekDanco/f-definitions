@@ -4,11 +4,8 @@
 
 import argparse
 import sys
-from typing import Iterable, cast
 
 import z3
-
-from formula import Ground, Quantified
 
 
 def divide_constraints(constraints):
@@ -32,7 +29,12 @@ def parse_command_line() -> argparse.Namespace:
         type=str,
     )
     parser.add_argument(
-        "-v", "--verbose", help="Show all messages", action="store_true"
+        "-v",
+        "--verbosity",
+        default=0,
+        type=int,
+        choices=range(0, 4),
+        help="Verbosity level for main module (0–3)",
     )
     args = parser.parse_args()
     return args
@@ -58,32 +60,14 @@ def parse_input_file(file_path: str):
     return constraints
 
 
-def test(ground, quantified):
-    print("===Ground===")
-    for formula in ground:
-        display_formula(formula.formula)
-
-    print("===Quantified===")
-    for formula in quantified:
-        display_formula(formula.formula)
-        conjuncts = formula.conjuncts
-        for conj in conjuncts:
-            print("Conjunct: ", conj.conjunct)
-            print("Cells", conj.cells)
-            print("     maximal offset: ", conj.max_offset)
-            print("     minimal offset: ", conj.min_offset)
-            print("Rewritten around 0 up: ", conj.normalize(0, "up"))
-            print("Rewritten around 0 down: ", conj.normalize(0, "down"))
+def _set_verbosity(lvl):
+    global VERBOSITY
+    VERBOSITY = lvl
 
 
 def main():
     args = parse_command_line()
-    constraints = list(cast(Iterable, parse_input_file(args.filename)))
-    display_constraints(constraints)
-    ground, quantified = divide_constraints(constraints)
-    ground = list(map(Ground, ground))
-    quantified = list(map(Quantified, quantified))
-    test(ground, quantified)
+    _set_verbosity(args.verbosity)
 
 
 if __name__ == "__main__":

@@ -2,11 +2,10 @@
 """Extract admissible UFLIA subformulas for synthesis."""
 import argparse
 import sys
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 
 import z3
-
 from converter import NNFConverter
 
 VERBOSE = 2
@@ -21,7 +20,6 @@ def log(severity, message):
 class Formula:
     def __init__(self):
         self._is_ground_cache = {}
-        self._has_quantifier_cache = {}
 
     def _is_func(self, expr):
         return z3.is_app(expr) and expr.decl().kind() == z3.Z3_OP_UNINTERPRETED
@@ -57,7 +55,7 @@ class Formula:
     def _is_offset_term(self, expr):
         if z3.is_var(expr):
             return True
-        if not (z3.is_add(expr) or z3.is_sub(expr)):
+        if not self._is_arith_op(expr):
             return False
         children = list(expr.children())
         vs = self._offset_vars_ground(children)
@@ -137,7 +135,7 @@ class Filter(Formula):
         super().__init__()
         self._filter_cache = {}
 
-    @lru_cache(maxsize=None)
+    @cache
     def _contains_entity(self, expr):
         """Check if filtered quantifier body contains any entities"""
         if self._is_func(expr):
@@ -147,7 +145,7 @@ class Filter(Formula):
                 return True
         return any(self._contains_entity(child) for child in expr.children())
 
-    @lru_cache(maxsize=None)
+    @cache
     def _contains_entity_addition(self, expr):
         if self._is_arith_op(expr):
             return self._contains_entity(expr)
