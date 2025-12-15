@@ -221,8 +221,11 @@ Here, the recursive calls go down the order $\prec$ in the following sense:
 
 So each recursive call of the program $val$ either results in $\mathit{inst}(u)$ either decreasing or being $\bot$. In the latter case, the program terminates immediately, and the former case cannot happen infinitely often, since the used order is well-founded. So we have:
 \begin{property}
-	The program $val$ terminates.
+The program $val$ terminates.
 \end{property}
+
+Note that, in general, it is not possible to compute $val(u)$ by computing the values of $X_z, z \in \mathbb{Z}$, with $z$ being initialized with the minimal $z$ wrt. $\prec$, and then using a loop that increases $z$ from one successor wrt. $\prec$ to the next. For example, if  $\prec$  orders all even numbers before all odd ones, then this loop would have to iterate over infinitely many even numbers before computing the value of an odd one.
+     
 
 The goal is now an algorithm that computes such satisfiability certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
 
