@@ -10,6 +10,10 @@ def simplify(expr):
     return z3.simplify(expr, som=True)
 
 
+def res_matrix_entities(matrix):
+    return simplify(matrix), list(get_entities(matrix))
+
+
 @cache
 def get_entities(expr):
     """Recursively extract entities from a Z3 expression."""
@@ -37,7 +41,7 @@ def get_offset(entity, model: None | z3.ModelRef = None) -> int:
         result = model.eval(sum(ground), model_completion=True)
     else:
         if any(contains_const_func(g) for g in ground):
-            assert False, "Not implemented"
+            assert False, f"Cannot determine value of offset {sum(ground)}"
         result = sum(g.as_long() for g in ground)
 
     if isinstance(result, int):
