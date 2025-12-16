@@ -208,10 +208,10 @@ an entity interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus
 
 Now, observe that for any entity $u$ there is at most one $z\in\mathbb{Z}$ with $u\in X_z$ (if there would be more than one then, due to $\preceq$ being a well-order, there is a minimal one, let us say $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any entity $u$, let $\mathit{inst}(u)$ either be the $z\in\mathbb{Z}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
 
-Then, a program to compute the value $val(u)$ of a given entity $u$ looks as follows:
+Then, for the interpretation $I_\phi$ from the proof of Property~\ref{prop:certThenSat}, which satisfies a given formula~$\phi$, and a given entity~$u$, the value of $I_\phi(u)$ can be computed by the following recursive function $val(u)$:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
 	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
-	\textbf{if} $\mathit{inst}(u)=\bot$ \textbf{then} \textbf{return} 0 \`// in this case, any value (including $0$) is o.k\\
+	\textbf{if} $\mathit{inst}(u)=\bot$ \textbf{then} \textbf{return} 0\\
 	\textbf{return} $prop_{u,\mathit{inst}(u)}(I\cup \{ v\mapsto val(v) \mid v\in \Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z\})$
 \end{tabbing}
 
