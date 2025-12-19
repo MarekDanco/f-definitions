@@ -524,14 +524,14 @@ In general, \cref{alg:sr} is complete in the following senses:
       \item verification conditions on programs with arrays: Universal quantifiers occur on the left-hand side of implications and might refer to infinitely many elements (for real-world programs, due to a programmer mistake). A tiny (and stupid) example\todoSR{I will think of something more interesting}:
         \begin{tabbing}\quad\=\kill
           \textbf{assert} $\forall i \,.\, i\geq 0 \Rightarrow a[i+1]> a[i]$\\
-          $x\leftarrow -7$\\
+          $x\leftarrow a[0]$\\
           \textbf{assert} $x\geq 0$
         \end{tabbing}
 For proving the verification condition
-\[ [\forall i \,.\, a[i+1]> a[i]\wedge x=-7] \Rightarrow x\geq 0 \]
+\[ [\forall i \,.\, a[i+1]> a[i]\wedge x=a[0]] \Rightarrow x\geq 0 \]
 one has to show its negation
-\[ \forall i \,.\, a[i+1]> a[i]\wedge x=-7 \wedge x<0 \]
-to be satisfiable. This formula is trivial, but does not have a finite model.
+\[ \forall i \,.\, a[i+1]> a[i]\wedge x=a[0] \wedge x<0 \]
+to be satisfiable. The formula  is indeed satisfiable, but not by a finite model. And our method is able to prove its satisfiability.
 
         
       \item non-termination: Most techniques seem to look for program traces ending in a cycle where the program state keeps returning into a state it already reached before. But programs over integers (as opposed machine integers) may also diverge without a cycle: For example, for the program
