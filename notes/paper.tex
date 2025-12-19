@@ -507,7 +507,39 @@ In general, \cref{alg:sr} is complete in the following senses:
     \item For \textsc{Sat}: It terminates on all satisfiable formulas within the fragment that satisfy \req (\cref{thm:satisfiableThenSAT}).
     \item For \textsc{Unsat}: It terminates on formulas whose unsatisfiability is detectable through finite instantiation (\cref{thm:finiteunsatThenUNSAT}).
     \item For formulas whose unsatisfiability relies on instantiations at offsets not captured by the expanding interval $I$, the algorithm may not terminate. This includes both inductive cases like Formula \eqref{eq:completeness} and non‑inductive cases like $f(c)=f(c+1)\land\forall x.f(x)<f(x+1)$ whose unsatisfiability does not require induction over all integers.
-\end{itemize}
+    \end{itemize}
+
+    \section{Experiments}
+
+    \subsection{Potential Benchmark Problems}
+    \begin{itemize}
+    \item smtlib
+      \begin{itemize}
+      \item UFLIA: difficult to find problems with addition in function argument, yet with nested functions, but there are problems where the nesting can be stratified
+      \item array theories: examples without writes? eliminating writes?        
+      \end{itemize}
+    \item Reynolds et al.~\cite{reynolds2016model}
+    \item program analysis
+      \begin{itemize}
+      \item verification conditions on programs with arrays (to check: is reasoning about infinitely many elements useful in this context)
+      \item non-termination: most techniques seem to look for loops, but programs over integers (as opposed machine integers) may also diverge without a loop: For example, for the program
+\begin{tabbing}\quad\=\kill
+$i\leftarrow 0$\\
+\texttt{while} $i\geq 0$\\
+\> $i\leftarrow i+1$
+\end{tabbing}
+satisfiability of
+\[ f(0)=0 \wedge \forall x \;.\; f(x+1)=f(x)+1 \wedge f(x)\geq 0\]
+implies non-termination.
+
+This formula does not satisfy ReqPivot since it does not include reasoning about invariants:
+\[ \forall u\exists u' \;.\; u'=u+1 \wedge u\geq 0\]
+  However, its extension with $k$-induction might do the job:
+\[ \forall u, u'\exists u'' \;.\; [u'=u+1 \wedge u\geq 0]\Rightarrow [u''=u'+1 \wedge u'\geq 0]\]
+
+      \item ranking function synthesis        
+      \end{itemize}
+    \end{itemize}
 
 \section{Extensions}
 
