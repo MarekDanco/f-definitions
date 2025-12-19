@@ -522,7 +522,7 @@ In general, \cref{alg:sr} is complete in the following senses:
     \item program analysis
       \begin{itemize}
       \item verification conditions on programs with arrays (to check: is reasoning about infinitely many elements useful in this context)
-      \item non-termination: most techniques seem to look for loops, but programs over integers (as opposed machine integers) may also diverge without a loop: For example, for the program
+      \item non-termination: Most techniques seem to look for program traces ending in a cycle where the program state keeps returning into a state it already reached before. But programs over integers (as opposed machine integers) may also diverge without a cycle: For example, for the program
 \begin{tabbing}\quad\=\kill
 $i\leftarrow 0$\\
 \texttt{while} $i\geq 0$\\
