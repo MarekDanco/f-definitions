@@ -138,7 +138,7 @@ For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but $I(f(1))=\bot$. Also
         \item $I\models F$, and
         \item for all $z\in\mathbb{Z}$, for every uninterpreted function symbol~$f$ and its argument terms $t\in args(Q, f)$, $I(\subst{t}{x}{\repr{z}})\neq\bot$
         \end{itemize}
- a \emph{pre-satisfiability certificate} of $\phi$. For any $z\in\mathbb{Z}$, we denote by $\Gamma_{I,z}(\phi)$ the resulting set of entities \[\{ I(\subst{t}{x}{\repr{z}}) \mid t\in args(Q, f), f \text{an uninterpreted function symbol}\}.\]
+ a \emph{pre-satisfiability certificate} of $\phi$. For any $z\in\mathbb{Z}$, we denote by $\Gamma_{I,z}(\phi)$ the resulting set of entities \[\{ I(\subst{t}{x}{\repr{z}}) \mid t\in args(Q, f), f \emph{ is an uninterpreted function symbol}\}.\]
 \end{definition}
 
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
