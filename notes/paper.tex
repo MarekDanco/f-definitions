@@ -549,7 +549,9 @@ This formula does not satisfy ReqPivot since it does not include reasoning about
   However, its extension with $k$-induction might do the job:
 \[ \forall u, u'\exists u'' \;.\; [u'=u+1 \wedge u\geq 0]\Rightarrow [u''=u'+1 \wedge u'\geq 0]\]
 
-      \item ranking function synthesis        
+\item ranking function synthesis: for a formula $\Phi(x,x')$ modeling a loop iteration from program state $x$ to $x'$, find a function $f$ such that
+  \[ \forall x, x' \;.\; \Phi(x,x') \Rightarrow f(x')<f(x)\]
+Problem: the program state usually consists of several variables, resulting in many universally quantified variables in the formula.
       \end{itemize}
     \end{itemize}
 
