@@ -531,7 +531,7 @@ For proving the verification condition
 \[ [\forall i \,.\, a[i+1]> a[i]\wedge x=a[0]] \Rightarrow x\geq 0 \]
 one has to show its negation
 \[ \forall i \,.\, a[i+1]> a[i]\wedge x=a[0] \wedge x<0 \]
-to be satisfiable. The formula  is indeed satisfiable, but not by a finite model. And our method is able to prove its satisfiability.
+to be unsatisfiable. However, the program has a bug (any array where $a[0]<0$), and hence the formula  is satisfiable. Moreover, the initial assertion speaks about infinitely many array elements, and hence the formula does not have  a finite model. Our method is able to prove that the formula is satisfiable.
 
         
       \item non-termination: Most techniques seem to look for program traces ending in a cycle where the program state keeps returning into a state it already reached before. But programs over integers (as opposed machine integers) may also diverge without a cycle: For example, for the program
