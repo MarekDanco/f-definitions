@@ -523,7 +523,7 @@ In general, \cref{alg:sr} is complete in the following senses:
       \begin{itemize}
       \item verification conditions on programs with arrays: Universal quantifiers occur on the left-hand side of implications and might refer to infinitely many elements (for real-world programs, due to a programmer mistake). A tiny (and stupid) example\todoSR{I will think of something more interesting}:
         \begin{tabbing}\quad\=\kill
-          \textbf{assert} $\forall i \,.\, i\geq 0 \Rightarrow a[i+1]> a[i]$\\
+          \textbf{assert} $a[i+1]> a[i]$\\
           $x\leftarrow a[0]$\\
           \textbf{assert} $x\geq 0$
         \end{tabbing}
