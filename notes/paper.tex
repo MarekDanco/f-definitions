@@ -14,6 +14,8 @@
 ,citecolor=citeblue%
 ,urlcolor=blue%
 ,plainpages=false]{hyperref}
+\hypersetup{colorlinks,citecolor=blue,linkcolor=blue,urlcolor=blue}
+\AtBeginDocument{\hypersetup{pdfborder={0 0 1}}}
 \usepackage[nameinlink,capitalize,noabbrev]{cleveref} % must come after hyperref
 \usepackage{commath}
 \usepackage[most]{tcolorbox}
@@ -31,6 +33,7 @@
 \newtheorem{example}{Example}
 
 \newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
 \theoremstyle{remark}
 \newtheorem{claim}{Claim}
 \usepackage{etoolbox}
@@ -922,38 +925,218 @@ The downside is that such a weakened condition needs a stronger check against cl
     In all cases, the existential entities are neither assigned values by $\alpha$ nor appear in any earlier instantiation $x'\prec x$. Therefore, the construction forms a valid satisfiability certificate as defined in Definition \ref{def:certificate}.
 \end{proof}
 
-\subsection{Alternative condition}
-% \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
-% 	\paragraph{ReqPivot Condition.}
-% 	Let $f_1, \dots, f_r$ be the functions appearing in $Q$.
-% 	We say that $Q$ satisfies the \emph{ReqPivot condition} if there exists an index $i^* \in \{1,\dots,r\}$ such that:
-% 	\begin{itemize}
-% 		\item For the smallest offset $c_1^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ are such that all literals not containing $f_{i^*}(x+c_1^{f_{i^*}})$ are satisfied. Then $f_{i^*}(x+c_1^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-% 		\item Symmetrically, for the biggest offset $c_{l_{i^*}}^{f_{i^*}}$, require that the values of the non-existential variables in $Q$ satisfy all literals not containing $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$. Then $f_{i^*}(x+c_{l_{i^*}}^{f_{i^*}})$ can be chosen to satisfy the remaining literal(s) containing it.
-% 	\end{itemize}
-% \end{tcolorbox}\mj{I'm not sure how to read this, what if I have this (trivially unsat)
-% 	formula $\forall x. f(x)=0\land f(x+1)=1\land f(x+3)>4$, doesn't it say
-% 	that you could propagate upwards (but you cannot).}\todoSN{Well, the ReqPivot condition here kinda ensures local extensibility but does not guarantee global satisfiability, I think? So, a formula may satisfy ReqPivot yet it is unsatisfiable due to  global consistency constraints. But I think this is not a problem as our algorithm detects such cases when no interval $I$ and interpretation $\alpha$ can be found satisfying $F\land \bigwedge_{x \in I} Q$. Isn't it?}
+\subsection{Generalised ReqPivot: From Single to Multiple Pivot Functions}
 
-% \begin{tcolorbox}[enhanced,breakable,skin first=enhanced,skin middle=enhanced,skin last=enhanced]
-% 	\paragraph{ReqPivot Condition.}
-% 	Let $Q$ be a quantified formula with entities $E$. For a pivot entitiy $p\in E$, let:
-% 	\begin{itemize}
-% 		\item $\bar{w}=E\setminus\{p\}$ be the tuple of all other entities in $Q$,
-% 		\item $Q_{\text{other}}(\bar{w})$ be the conjunction of all literals in $Q$ that \textbf{do not} contain $p$.
-% 		\item $Q_{\text{pivot}}(\bar{w},p)$ be the conjunction of all literals in $Q$ that \textbf{do} contain $p$.
-% 	\end{itemize}
-% 	The \textbf{ReqPivot} condition holds for pivot $p$ if and only if:
-% 	\[
-% 		\boxed{
-% 			\begin{aligned}
-% 				 & (1) \ \exists \bar{w} . Q_{\text{other}}(\bar{w})                                                      \\
-% 				 & \land                                                                                                  \\
-% 				 & (2) \ \forall \bar{w} . \left[ Q_{\text{other}}(\bar{w}) \Rightarrow \exists p . Q(\bar{w}, p) \right]
-% 			\end{aligned}}
-% 	\]
-% 	The pivot entity $p$ can be either the smallest offset $f\big(x+c_1^{f_{i^*}}\big)$ or the biggest offset $f\big(x+c_{l_{i^*}}^{f_{i^*}}\big)$ where $f_{i^*}\in\{f_1,\dots,f_r\}$.
-% \end{tcolorbox}\todoSN{I think this formulation will be clearer to read?}
+The \req condition introduced in \cref{sec:alg} requires the existence of a \emph{single} pivot function $f_{i^*}$ whose maximal and minimal offset terms can be propagated, and it assumes that arguments to uninterpreted functions in the quantified part are of the form $x + k$ where $k$ is a numeral. We now generalise this notion in two ways:
+
+\begin{enumerate}
+    \item We allow \emph{multiple} functions to serve as pivots.
+    \item We permit offset terms that are ground LIA terms $t$, not just numerals. Thus function arguments in the quantified part have the form $x + t$ where $t$ is a ground term.
+\end{enumerate}
+
+The core construction remains similar, i.e. we seek an interval $B = [b_{\min}, b_{\max}]$ —the ``base interval''—and an interpretation that satisfies the ground constraints together with all quantified instantiations inside $B$. Additionally, we require that the interpretation admits \emph{extension formulas} that guarantee the solution can be propagated outward from $B$ in both directions without clashing with the ground part. When such a $B$ and interpretation exist, a complete satisfiability certificate can be built, certifying that the formula is satisfiable.
+
+\paragraph{Multi-\req Condition} First, we formalise the condition that enables propagation in both directions, generalising the single-pivot \req condition to allow multiple functions to serve as pivots.
+
+\begin{definition}[Multi-\req Condition]
+\label{def:multi-reqpivot}
+Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$, with $T_i = \{t^{f_i}_1, \dots, t^{f_i}_{l_i}\}$ being the offset terms for $f_i$. We say that $Q$ satisfies the \emph{multi-\req} condition if:
+
+\begin{enumerate}
+    \item \textbf{Upward propagation:} There exist subsets $S_1 \subseteq T_1, \dots, S_r \subseteq T_r$ (some possibly empty) such that these 2 conditions are hold:
+    \begin{enumerate}
+        \item \emph{Maximality condition $\Phi_{\text{max}}$:}
+        % $\Phi_{\text{max}}(S_1,\dots,S_r)$:}
+        \[
+        \bigwedge_{i: S_i \neq \emptyset} \left(
+        \bigwedge_{t,t' \in S_i} t = t' \;\land\;
+        \bigwedge_{t \in S_i, t' \in T_i \setminus S_i} t > t'
+        \right)
+        \]
+        
+        \item \emph{Propagability condition $\Phi_{\text{prop-up}}$:}\newline 
+        Let $u_1, \dots, u_m$ enumerate all function applications in $Q$ that are NOT of the form $f_i(x+t)$ with $t \in S_i$. Then $\forall x \forall a_1 \dots \forall a_m \exists v.\ Q'$ where 
+        \begin{equation*}
+            Q'=Q\big[f_i(x+t) \mapsto v \text{ for all } i \text{ and all } t \in S_i,\ u_1 \mapsto a_1,\ \dots,\ u_m \mapsto a_m\big]    
+        \end{equation*}    
+    \end{enumerate}
+    
+    \item \textbf{Downward propagation:} There exist subsets $S'_1 \subseteq T_1, \dots, S'_r \subseteq T_r$ (some possibly empty) such that these 2 conditions are hold::
+    \begin{enumerate}
+        \item \emph{Minimality condition $\Phi_{\text{min}}$:}
+        \[
+        \bigwedge_{i: S'_i \neq \emptyset} \left(
+        \bigwedge_{t,t' \in S'_i} t = t' \;\land\;
+        \bigwedge_{t \in S'_i, t' \in T_i \setminus S'_i} t < t'
+        \right)
+        \]
+                
+        \item \emph{Propagability condition $\Phi_{\text{prop-down}}$:} Let $v_1, \dots, v_n$ enumerate all function applications in $Q$ that are NOT of the form $f_i(x+t)$ with $t \in S'_i$. Then $\forall x \forall c_1 \dots \forall c_n \exists w.\ Q'$ where 
+        \begin{equation*}
+        Q' = Q\big[f_i(x+t) \mapsto w \text{ for all } i \text{ and all } t \in S_i',\ 
+                v_1 \mapsto c_1,\ \dots,\ v_n \mapsto c_n\big].    
+    \end{equation*}
+    \end{enumerate}
+\end{enumerate}
+In both cases, the notation $Q[\text{term} \mapsto \text{variable}]$ denotes simultaneous substitution of each occurrence of the term by the variable.
+\end{definition}
+
+Intuitively, the multi-\req condition ensures that for upward propagation, we can choose a collection of maximal offset terms and assign them \emph{a common value} that satisfies $Q$, given arbitrary values for the remaining function applications. The downward condition is symmetric.
+
+Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the entities generated during propagation from clashing with the ground part $F$.
+
+\begin{definition}[Interval Extension Formulas]
+\label{def:interval-extension-formulas}
+For an interval $B = [b_{\min}, b_{\max}]$, define:
+
+\begin{enumerate}
+    \item \textbf{Upward extension formula $\Psi_{\text{up}}(B)$}:
+    \[
+    \bigvee_{S_1 \subseteq T_1, \dots, S_r \subseteq T_r} 
+    \Bigg[
+    \Phi_{\text{max}}\;\land\; 
+    \Phi_{\text{prop-up}} \;\land
+    \bigwedge_{i=1}^{r} \bigwedge_{\substack{t_g \in \args(F,f_i) \\ t \in S_i}} t_g \leq b_{\max}+t
+    \Bigg]
+    \]
+    where $\Phi_{\text{max}}$ and $\Phi_{\text{prop-up}}$ are as defined in \cref{def:multi-reqpivot}.
+    
+    \item \textbf{Downward extension formula $\Psi_{\text{down}}(B)$}:
+    \[
+    \bigvee_{S_1 \subseteq T_1, \dots, S_r \subseteq T_r} 
+    \Bigg[
+    \Phi_{\text{min}} \;\land\; 
+    \Phi_{\text{prop-down}} \;\land
+    \bigwedge_{i=1}^{r} \bigwedge_{\substack{t_g \in \args(F,f_i) \\ t \in S_i}} t_g \geq b_{\min}+t \Bigg]
+    \]
+    where $\Phi_{\text{min}}$ and $\Phi_{\text{prop-down}}$ are as defined in \cref{def:multi-reqpivot}.
+\end{enumerate}
+\end{definition}
+
+Thus, $\Psi_{\text{up}}(B)$ (resp. $\Psi_{\text{down}}(B)$) asserts that there exist subsets $S_1,\dots,S_r$ satisfying the upward (resp. downward) conditions of multi‑\req and \emph{additionally} satisfying the clash condition for interval $B$. The clash condition ensures that no entity $f_i(z+t)$ with $z > b_{\max}$ (resp. $z < b_{\min}$) and $t \in S_i$ already appears in the ground part $F$.
+
+\begin{theorem}[Interval Certificate]
+\label{thm:interval-certificate}
+Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval. If there exists an interpretation $I$ such that
+\begin{enumerate}
+    \item $I \models F \land \bigwedge_{x \in B} Q[x]$,
+    \item $I \models \Psi_{\text{up}}(B)$,
+    \item $I \models \Psi_{\text{down}}(B)$,
+\end{enumerate}
+then $\phi = F \land \forall x.\, Q$ has a satisfiability certificate and is therefore satisfiable.
+\end{theorem}
+
+\begin{proof}
+Assume $I$ satisfies the three conditions. From $I \models \Psi_{\text{up}}(B)$, pick subsets $S_1^{\uparrow}, \dots, S_r^{\uparrow}$ that witness the satisfied disjunct. From $I \models \Psi_{\text{down}}(B)$, pick subsets $S_1^{\downarrow}, \dots, S_r^{\downarrow}$ that witness its disjunct. We construct a certificate as in \cref{def:certificate}:
+
+\begin{enumerate}
+    \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
+    \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
+        
+    \item \textbf{Pre‑satisfiability certificate:} $I$ 
+    
+    \item \textbf{Existential entities $X_z$ for $z \in \mathbb{Z}$:}
+    \[
+    X_z = 
+    \begin{cases}
+    \emptyset & \text{if } z \in B, \\[4pt]
+    \bigl\{ f_i(z+t) \mid i=1,\dots,r,\; t \in S_i^{\uparrow} \bigr\} & \text{if } z > b_{\max}, \\[4pt]
+    \bigl\{ f_i(z+t) \mid i=1,\dots,r,\; t \in S_i^{\downarrow} \bigr\} & \text{if } z < b_{\min}.
+    \end{cases}
+    \]
+    
+    \item \textbf{Satisfiability propagators:}
+    \begin{itemize}
+        \item For $z \in B$: $I$ itself satisfies $Q[z]$.
+        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(S_1^{\uparrow},\dots,S_r^{\uparrow})$ provides a function that, given values for all non‑existential entities in $\Gamma_{I,z}(\phi)$, returns a common value $v$ to assign to every $f_i(z+t)$ with $t \in S_i^{\uparrow}$, thereby satisfying $Q[z]$.
+        \item For $z < b_{\min}$: the condition $\Phi_{\text{prop-down}}(S_1^{\downarrow},\dots,S_r^{\downarrow})$ yields a propagator for the entities $f_i(z+t)$ with $t \in S_i^{\downarrow}$.
+    \end{itemize}
+\end{enumerate}
+
+It remains to verify the disjointness of \cref{def:certificate}:
+\[
+X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \emptyset.
+\]
+
+\begin{itemize}
+    \item For $z \in B$, $X_z = \emptyset$ holds trivially.
+    \item For $z > b_{\max}$, consider any $f_i(z+t)$ with $t \in S_i^{\uparrow}$.
+    \begin{itemize}
+        \item It cannot belong to $\mathit{def}(I)$ because the clash condition $t_g \leq b_{\max} + t$ guarantees $I(t_g) \leq b_{\max} + I(t) < z + I(t)$ for every $t_g \in \args(F,f_i)$.
+        \item It cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$ because either $z' \leq b_{\max}$ (then $z'+I(t') \leq b_{\max} + I(t') < z + I(t)$ for all $t' \in T_i$), or $b_{\max} < z' < z$ (then $z'+I(t') \leq z'+ \max_{t'' \in T_i} I(t'') < z + I(t)$ since $I(t)$ is maximal among $\{I(t'') \mid t'' \in T_i\}$ by $\Phi_{\text{max}}$).
+    \end{itemize}
+    \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}$ and the downward clash condition.
+\end{itemize}
+
+Thus all certificate requirements are satisfied. By \cref{prop:certThenSat}, $\phi$ is satisfiable.
+\end{proof}
+
+\cref{thm:interval-certificate} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions.
+
+\begin{algorithm}
+\caption{Interval‑Based Satisfiability Check (multi-\req)}
+\label{alg:interval-check}
+\begin{algorithmic}[1]
+\Require $\phi = F \land \forall x.\, Q$ in the fragment
+\Ensure \textsc{Sat} or \textsc{Unsat}
+\State $b_{\min} \gets 0$, $b_{\max} \gets 0$ \Comment{Start with singleton interval $[0,0]$}
+\State $I \gets \smt\!\left(F \land Q[0]\right)$
+\While{$I \neq \bot$}
+    \State Construct $\Psi_{\text{up}}([b_{\min},b_{\max}])$ and $\Psi_{\text{down}}([b_{\min},b_{\max}])$ \Comment{\cref{def:interval-extension-formulas}}
+    \If{$\smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x] \land \Psi_{\text{up}} \land \Psi_{\text{down}}\right) \neq \bot$}
+        \State \Return \textsc{Sat} \Comment{Certificate exists by \cref{thm:interval-certificate}}
+    \EndIf
+    \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
+    \State $I \gets \smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right)$
+\EndWhile
+\State \Return \textsc{Unsat}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{corollary}[Soundness]
+\cref{alg:interval-check} is sound: if it returns \textsc{Sat}, then $\phi$ is satisfiable.
+\end{corollary}
+\begin{proof}
+When the algorithm returns \textsc{Sat}, it has found an interval $B$ and an interpretation satisfying the three conditions of \cref{thm:interval-certificate}. Hence $\phi$ is satisfiable.
+\end{proof}
+
+\begin{theorem}[Relative Completeness]
+\label{thm:relative-completeness}
+Let $\phi = F \land \forall x.\, Q$ be a formula in our fragment. If
+\begin{enumerate}
+    \item $\phi$ is satisfiable, and
+    \item $\phi$ satisfies the multi‑\req condition (\cref{def:multi-reqpivot}),
+\end{enumerate}
+then \cref{alg:interval-check} terminates and returns \textsc{Sat}.
+\end{theorem}
+
+\begin{proof}
+Assume $\phi$ is satisfiable and satisfies multi‑\req. Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding entity interpretation $I^*$. By multi‑\req, there exist subsets $S_1^{\uparrow}, \dots, S_r^{\uparrow}$ satisfying $\Phi_{\text{max}}$ and $\Phi_{\text{prop-up}}$, and subsets $S_1^{\downarrow}, \dots, S_r^{\downarrow}$ satisfying $\Phi_{\text{min}}$ and $\Phi_{\text{prop-down}}$.
+
+For each $i$, define:
+\[
+v_{\max}^i = \max\{\, I^*(t) \mid t \in T_i \,\}, \qquad
+v_{\min}^i = \min\{\, I^*(t) \mid t \in T_i \,\}.
+\]
+The conditions $\Phi_{\text{max}}$ and $\Phi_{\text{min}}$ ensure that for $t \in S_i^{\uparrow}$ we have $I^*(t) = v_{\max}^i$, and for $t \in S_i^{\downarrow}$ we have $I^*(t) = v_{\min}^i$.
+
+Now choose
+\[
+b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\},
+\]
+\[
+b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\}.
+\]
+
+Set $B = [b_{\min}, b_{\max}]$. By construction:
+\begin{enumerate}
+    \item $I^* \models F \land \bigwedge_{x \in B} Q[x]$ (since $\mathcal{M} \models \phi$),
+    \item $I^*$ satisfies the disjunct of $\Psi_{\text{up}}(B)$ corresponding to $\{S_i^{\uparrow}\}$,
+    \item $I^*$ satisfies the disjunct of $\Psi_{\text{down}}(B)$ corresponding to $\{S_i^{\downarrow}\}$.
+\end{enumerate}
+
+Let $N = \max(|b_{\min}|, |b_{\max}|)$. Algorithm~\ref{alg:interval-check} expands $B$ symmetrically from $[0,0]$. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$. At that point the $\smt$ call on line~5 will be satisfiable (witnessed by $I^*$), and the algorithm returns \textsc{Sat}.
+\end{proof}
 
 
 \section*{Related Work}\label{}
