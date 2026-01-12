@@ -1015,19 +1015,22 @@ For an interval $B = [b_{\min}, b_{\max}]$, define:
 
 Thus, $\Psi_{\text{up}}(B)$ (resp. $\Psi_{\text{down}}(B)$) asserts that there exist subsets $S_1,\dots,S_r$ satisfying the upward (resp. downward) conditions of multi‑\req and \emph{additionally} satisfying the clash condition for interval $B$. The clash condition ensures that no entity $f_i(z+t)$ with $z > b_{\max}$ (resp. $z < b_{\min}$) and $t \in S_i$ already appears in the ground part $F$.
 
-\begin{theorem}[Interval Certificate]
+\begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate}
-Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval. If there exists an interpretation $I$ such that
-\begin{enumerate}
-    \item $I \models F \land \bigwedge_{x \in B} Q[x]$,
-    \item $I \models \Psi_{\text{up}}(B)$,
-    \item $I \models \Psi_{\text{down}}(B)$,
-\end{enumerate}
-then $\phi = F \land \forall x.\, Q$ has a satisfiability certificate and is therefore satisfiable.
+Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval.  
+Then $\phi = F \land \forall x.\, Q$ has a satisfiability certificate — and hence is satisfiable — provided that
+\[
+\Bigl(F \land \bigwedge_{x \in B} Q[x]\Bigr) \;\land\; \Psi_{\text{up}}(B) \;\land\; \Psi_{\text{down}}(B)
+\]
+holds.
 \end{theorem}
 
 \begin{proof}
-Assume $I$ satisfies the three conditions. From $I \models \Psi_{\text{up}}(B)$, pick subsets $S_1^{\uparrow}, \dots, S_r^{\uparrow}$ that witness the satisfied disjunct. From $I \models \Psi_{\text{down}}(B)$, pick subsets $S_1^{\downarrow}, \dots, S_r^{\downarrow}$ that witness its disjunct. We construct a certificate as in \cref{def:certificate}:
+Suppose the conditions of the theorem hold, and let $I$ be an interpretation satisfying
+\[
+F \land \bigwedge_{x \in B} Q[x]\;\land\; \Psi_{\text{up}}(B) \;\land\; \Psi_{\text{down}}(B).
+\]
+From $I \models \Psi_{\text{down}}(B)$, pick subsets $S_1^{\downarrow}, \dots, S_r^{\downarrow}$ that witness its disjunct. We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
