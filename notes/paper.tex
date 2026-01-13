@@ -1161,6 +1161,15 @@ Set $B = [b_{\min}, b_{\max}]$. By construction:
 Let $N = \max(|b_{\min}|, |b_{\max}|)$. Algorithm~\ref{alg:interval-check} expands $B$ symmetrically from $[0,0]$. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$. At that point the $\smt$ call on line~5 will be satisfiable (witnessed by $I^*$), and the algorithm returns \textsc{Sat}.
 \end{proof}
 
+We kept Algorithm~\ref{alg:interval-check} as simple as possible, not taking into account efficiency considerations. We will now turn to efficiency.
+
+Observations:
+\begin{itemize}
+\item $\Phi_{\text{max}}$ and $\Phi_{\text{prop-up}}$ (and their dual counter-parts) do not depend on the interval $B$.
+\item Some special cases (e.g., all offsets are fixed integers) might enable some more efficient treatment.
+\item We may exploit the capability of SMT solvers to do incremental solving.
+\end{itemize}
+
 
 \section*{Related Work}\label{}
 Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
