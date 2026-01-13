@@ -1099,7 +1099,7 @@ Observations:
 \item Some special cases (e.g., all offsets are fixed integers) might enable some more efficient treatment.
 \item We may exploit the capability of SMT solvers to do incremental solving.
 \item The formula used in Algorithm~\ref{alg:interval-check} is not in CNF, which is required by SMT solvers. We can either call the solver separately on the individual disjuncts of $\Psi_{\text{up}}([b_{\min},b_{\max}])$ and $\Psi_{\text{down}}([b_{\min},b_{\max}])$, or transform it into CNF using auxiliary variables.
-\item The idea of using unsat cores to decide how to expand the interval (Algorithm~\ref{alg:sr2}) is also applicable)
+\item The idea of using unsat cores to decide how to expand the interval (Algorithm~\ref{alg:sr2}) is also applicable.
 \item The more elements $S_i$ contains, the weaker the pivot condition becomes. On the other hand, if $S_i$ is empty, then no clash condition is needed.
 \end{itemize}
 
