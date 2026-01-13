@@ -443,6 +443,17 @@ We are currently polishing a completeness proof for the \textsc{Sat} case. For t
     \end{enumerate}
 \end{proof}
 
+\section{Experiments}
+
+\section{Conclusion}
+
+\bibliographystyle{abbrv}
+\bibliography{refs}
+
+
+
+\appendix
+
 \section{Discussion on Completeness}\label{sec:completeness}
 The completeness of algorithms that operate on integers in SMT is tricky because
 integers themselves are not recursively axiomatizable.
@@ -512,9 +523,7 @@ In general, \cref{alg:sr} is complete in the following senses:
     \item For formulas whose unsatisfiability relies on instantiations at offsets not captured by the expanding interval $I$, the algorithm may not terminate. This includes both inductive cases like Formula \eqref{eq:completeness} and non‑inductive cases like $f(c)=f(c+1)\land\forall x.f(x)<f(x+1)$ whose unsatisfiability does not require induction over all integers.
     \end{itemize}
 
-    \section{Experiments}
-
-    \subsection{Potential Benchmark Problems}
+    \section{Potential Benchmark Problems}
     \begin{itemize}
     \item smtlib
       \begin{itemize}
@@ -524,19 +533,30 @@ In general, \cref{alg:sr} is complete in the following senses:
     \item Reynolds et al.~\cite{reynolds2016model}
     \item program analysis
       \begin{itemize}
-      \item verification conditions on programs with arrays: Universal quantifiers occur on the left-hand side of implications and might refer to infinitely many elements (for real-world programs, due to a programmer mistake). A tiny (and stupid) example\todoSR{I will think of something more interesting}:
-        \begin{tabbing}\quad\=\kill
-          \textbf{assert} $a[i+1]> a[i]$\\
-          $x\leftarrow a[0]$\\
-          \textbf{assert} $x\geq 0$
-        \end{tabbing}
-For proving the verification condition
-\[ [\forall i \,.\, a[i+1]> a[i]\wedge x=a[0]] \Rightarrow x\geq 0 \]
-one has to show its negation
-\[ \forall i \,.\, a[i+1]> a[i]\wedge x=a[0] \wedge x<0 \]
-to be unsatisfiable. However, the program has a bug (any array where $a[0]<0$), and hence the formula  is satisfiable. Moreover, the initial assertion speaks about infinitely many array elements, and hence the formula does not have  a finite model. Our method is able to prove that the formula is satisfiable.
-\item reactive programming, where uninterpreted function symbols model data streams 
+      \item verification conditions on programs with arrays: There are two basic reasons why verification conditions may fail to hold: (1) a bug, (2) underlying assertions not being inductive. In the first case, the counter-model will typically be finite, since program executions only modify finite memory. In the second case, the counter-model may be infinite. However, even in the first case our method may improve upon methods such as MBQI, due to two reasons:
+        \begin{itemize}
+        \item the models produced by MBQI are very difficult to read
+        \item run-time of MBQI increases with the size of the model
+        \end{itemize}
+        For example, on my brand-new notebook, CVC5 with MBQI needs roughly 15sec to show the formula
+        \[ f(0)=0 \wedge \forall x \;.\; x<0\vee x>1000\vee f(x+1)=f(x)+1 \]
+        to be satisfiable, and then produces an unreadable model of size 25K. After changing the upper bound to 10000, CVC5 does not terminate in 10 minutes, so apparently, the growth is super-linear.
         
+       
+
+%         Universal quantifiers occur on the left-hand side of implications and might refer to infinitely many elements (for real-world programs, due to a programmer mistake). A tiny (and stupid) example\todoSR{I will think of something more interesting}:
+%         \begin{tabbing}\quad\=\kill
+%           \textbf{assert} $a[i+1]> a[i]$\\
+%           $x\leftarrow a[0]$\\
+%           \textbf{assert} $x\geq 0$
+%         \end{tabbing}
+% For proving the verification condition
+% \[ [\forall i \,.\, a[i+1]> a[i]\wedge x=a[0]] \Rightarrow x\geq 0 \]
+% one has to show its negation
+% \[ \forall i \,.\, a[i+1]> a[i]\wedge x=a[0] \wedge x<0 \]
+% to be unsatisfiable. However, the program has a bug (any array where $a[0]<0$), and hence the formula  is satisfiable. Moreover, the initial assertion speaks about infinitely many array elements, and hence the formula does not have  a finite model. Our method is able to prove that the formula is satisfiable.
+\item reactive programming, where uninterpreted function symbols model data streams 
+\item finding counter-examples in protocol verification        
 \item non-termination: Most techniques seem to look for program traces ending in a cycle where the program state keeps returning into a state it already reached before. But programs over integers (as opposed machine integers) may also diverge without a cycle. There are some techniques~\cite{chen2014proving} that can take this info account, and even use conditions similar to ReqPivot on transitions systems. 
 
 Usage of our techniques:  For example, for the program
@@ -1299,9 +1319,6 @@ Very rough idea:
 	\end{gather*}
 \end{example}
 
-
-\bibliographystyle{abbrv}
-\bibliography{refs}
 
 \end{document}
 
