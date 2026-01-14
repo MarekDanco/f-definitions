@@ -899,10 +899,10 @@ Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$, wi
         \]
         
       \item \emph{Propagability condition $\Phi_{\text{prop-up}}$:}\todoSR{Stefan N. will add an example, the old ReqPivot is the special case where all $S_i$ are empty except for one, and this one contains exactly one element}
-        \[\forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1\dots \exists v_r.\ Q'\] where for all $i\in\{1,\dots,r\}$, $Q'$ be the formula obtained from $Q$ by simultaneously replacing:
+        \[\forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1\dots \exists v_r.\ Q'\] where  $Q'$ is the formula obtained from $Q$ by simultaneously replacing for all $i\in\{1,\dots,r\}$,
         \begin{itemize}
-            \item every $f_i(x+t)$ with $t \in S_i$ by $v_i$,
-            \item every $f_i(x+t)$ with $t \in T_i \setminus S_i$ by the corresponding $u_i^t \in \bar{u}_i$, where $\bar{u}_i = \{u_i^t \mid t \in T_i \setminus S_i\}$.
+            \item every $f_i(x+t)$ such that $t \in S_i$ by $v_i$,
+            \item every $f_i(x+t)$ such that $t \in T_i \setminus S_i$ by the corresponding $u_i^t \in \bar{u}_i$, where $\bar{u}_i = \{u_i^t \mid t \in T_i \setminus S_i\}$.
             % $\bar{u}_i$ stands for all $u_i^t$ with $t\in T_i\setminus S_i$.            
         \end{itemize}
 
