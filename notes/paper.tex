@@ -1102,6 +1102,7 @@ Observations:
 \item The idea of using unsat cores to decide how to expand the interval (Algorithm~\ref{alg:sr2}) is also applicable.
 \item The more elements $S_i$ contains, the weaker the pivot condition becomes (i.e., the easier it is to satisfy). On the other hand, if $S_i$ is empty, then the clash condition is trivially satisfied, which may avoid many algorithm iterations (e.g., in cases where $f_i$ as a big integer argument in the ground part~$F$).
 \item In the case where big integers arguments occur in the ground part~$F$, we may use these integers to appropriately initialize the interval $[b_{\min},b_{\max}]$.
+\item Perhaps pre‑compute candidate subsets $S_i$ that satisfy $\Phi_{\text{max}}$ or $\Phi_{\text{min}}$, then check only those disjuncts.
 \end{itemize}
 
 
