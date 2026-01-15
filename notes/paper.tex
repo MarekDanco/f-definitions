@@ -1119,114 +1119,113 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
 Thus all certificate requirements are satisfied. By \cref{prop:certThenSat}, $\phi$ is satisfiable.
 \end{proof}
 
-\cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. To use the parameterised version, the algorithm can iterate over candidate pairs $(\mathcal{S},\mathcal{S}')$.
+\cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. 
+% To use the parameterised version, the algorithm can iterate over candidate pairs $(\mathcal{S},\mathcal{S}')$.
 
 \begin{algorithm}
-\caption{Interval‑Based Satisfiability Check (parameterised multi-\req)}
-\label{alg:interval-check-param}
+\caption{Interval‑Based Sat Check (par. multi-\req) with $\bigvee$}
+\label{alg:interval-check-param-withBigvee}
 \begin{algorithmic}[1]
 \Require $\phi = F \land \forall x.\, Q$ in the fragment
 \Ensure \textsc{Sat} or \textsc{Unsat}
-\State $\mathcal{C} \gets \{(\mathcal{S},\mathcal{S}') \mid Q \text{ satisfies multi-\req for } (\mathcal{S},\mathcal{S}')\}$
-\For{each $(\mathcal{S},\mathcal{S}') \in \mathcal{C}$}
-    \State $b_{\min} \gets 0$, $b_{\max} \gets 0$ 
-    \State $I \gets \smt\!\left(F \land Q[0]\right)$
-    \While{$I \neq \bot$}
-        \State Construct $\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$ and $\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S}')$ \Comment{\cref{def:interval-extension-formulas-param}}
-        \If{$\smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x] \land \Psi_{\text{up}} \land \Psi_{\text{down}}\right) \neq \bot$}
-            \State \Return \textsc{Sat} 
-        \EndIf
-        \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
-        \State $I \gets \smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right)$
-    \EndWhile
-\EndFor
+\State $b_{\min} \gets 0$, $b_{\max} \gets 0$ 
+\State $I \gets \smt\!\left(F \land Q[0]\right)$
+\While{$I \neq \bot$}
+    \State $\text{max}_\text{up}\gets\bigvee_{S_1\subseteq T_1,\dots,S_r\subseteq T_r}\Psi_{\text{up}}([b_{\min},b_{\max}],(S_1,\dots,S_r))$
+    \State $\text{min}_\text{down}\gets\bigvee_{S_1'\subseteq T_1,\dots,S_r'\subseteq T_r}\Psi_{\text{up}}([b_{\min},b_{\max}],(S_1',\dots,S_r'))$ 
+    \If{$\smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}\right) \neq \bot$}
+        \State \Return \textsc{Sat} 
+    \EndIf
+    \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
+    \State $I \gets \smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right)$
+\EndWhile
 \State \Return \textsc{Unsat}
 \end{algorithmic}
 \end{algorithm}
 
-\begin{corollary}[Soundness (parameterised version)]
-\cref{alg:interval-check-param} is sound: if it returns \textsc{Sat}, then $\phi$ is satisfiable.
-\end{corollary}
-\begin{proof}
-When the algorithm returns \textsc{Sat}, it has found an interval $B$ and an interpretation satisfying the conditions of \cref{thm:interval-certificate-param} for some $(\mathcal{S},\mathcal{S}')$. Hence $\phi$ is satisfiable.
-\end{proof}
+% \begin{corollary}[Soundness (parameterised version)]
+% \cref{alg:interval-check-param} is sound: if it returns \textsc{Sat}, then $\phi$ is satisfiable.
+% \end{corollary}
+% \begin{proof}
+% When the algorithm returns \textsc{Sat}, it has found an interval $B$ and an interpretation satisfying the conditions of \cref{thm:interval-certificate-param} for some $(\mathcal{S},\mathcal{S}')$. Hence $\phi$ is satisfiable.
+% \end{proof}
 
-\begin{theorem}[Relative Completeness (parameterised version)]
-\label{thm:relative-completeness-param}
-Let $\phi = F \land \forall x.\, Q$ be a formula in our fragment. If
-\begin{enumerate}
-    \item $\phi$ is satisfiable, and
-    \item $\phi$ satisfies the multi‑\req condition for some $(\mathcal{S},\mathcal{S}')$ as defined in \cref{def:multi-reqpivot-param},
-\end{enumerate}
-then \cref{alg:interval-check-param} terminates and returns \textsc{Sat}.
-\end{theorem}
+% \begin{theorem}[Relative Completeness (parameterised version)]
+% \label{thm:relative-completeness-param}
+% Let $\phi = F \land \forall x.\, Q$ be a formula in our fragment. If
+% \begin{enumerate}
+%     \item $\phi$ is satisfiable, and
+%     \item $\phi$ satisfies the multi‑\req condition for some $(\mathcal{S},\mathcal{S}')$ as defined in \cref{def:multi-reqpivot-param},
+% \end{enumerate}
+% then \cref{alg:interval-check-param} terminates and returns \textsc{Sat}.
+% \end{theorem}
 
-\begin{proof}
-Assume $\phi$ is satisfiable and satisfies multi‑\req for some pair $(\mathcal{S},\mathcal{S}') = (S_1,\dots,S_r, S'_1,\dots,S'_r)$. Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding entity interpretation $I^*$.
+% \begin{proof}
+% Assume $\phi$ is satisfiable and satisfies multi‑\req for some pair $(\mathcal{S},\mathcal{S}') = (S_1,\dots,S_r, S'_1,\dots,S'_r)$. Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding entity interpretation $I^*$.
 
-For each $i$, define:
-\[
-v_{\max}^i = \max\{\, I^*(t) \mid t \in T_i \,\}, \qquad
-v_{\min}^i = \min\{\, I^*(t) \mid t \in T_i \,\}.
-\]
+% For each $i$, define:
+% \[
+% v_{\max}^i = \max\{\, I^*(t) \mid t \in T_i \,\}, \qquad
+% v_{\min}^i = \min\{\, I^*(t) \mid t \in T_i \,\}.
+% \]
 
-The conditions $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{min}}(\mathcal{S}')$ ensure that:
-\begin{itemize}
-    \item For all $t \in S_i$: $I^*(t) = v_{\max}^i$,
-    \item For all $t \in S_i'$: $I^*(t) = v_{\min}^i$.
-\end{itemize}
+% The conditions $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{min}}(\mathcal{S}')$ ensure that:
+% \begin{itemize}
+%     \item For all $t \in S_i$: $I^*(t) = v_{\max}^i$,
+%     \item For all $t \in S_i'$: $I^*(t) = v_{\min}^i$.
+% \end{itemize}
 
-Now choose
-\[
-b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\},
-\]
-\[
-b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\}.
-\]
+% Now choose
+% \[
+% b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\},
+% \]
+% \[
+% b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\}.
+% \]
 
-Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies the three conditions:
+% Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies the three conditions:
 
-\begin{enumerate}
-    \item \textbf{Base interval satisfiability:} 
-    $I^* \models F \land \bigwedge_{x \in B} Q[x]$ since $\mathcal{M} \models \phi$.
+% \begin{enumerate}
+%     \item \textbf{Base interval satisfiability:} 
+%     $I^* \models F \land \bigwedge_{x \in B} Q[x]$ since $\mathcal{M} \models \phi$.
     
-    \item \textbf{Upward extension:} 
-    For $\Psi_{\text{up}}(B,\mathcal{S})$, we have:
-    \begin{itemize}
-        \item $\Phi_{\text{max}}(\mathcal{S})$ holds by definition of $\mathcal{S}$.
-        \item $\Phi_{\text{prop-up}}(\mathcal{S})$ holds by the multi-\req condition for $(\mathcal{S},\mathcal{S}')$.
-        \item For each $i$ and each $t_g \in \args(F,f_i)$ with $t \in S_i$:
-        \[
-        I^*(t_g) \leq b_{\max} + v_{\max}^i = b_{\max} + I^*(t)
-        \]
-        by construction of $b_{\max}$.
-    \end{itemize}
+%     \item \textbf{Upward extension:} 
+%     For $\Psi_{\text{up}}(B,\mathcal{S})$, we have:
+%     \begin{itemize}
+%         \item $\Phi_{\text{max}}(\mathcal{S})$ holds by definition of $\mathcal{S}$.
+%         \item $\Phi_{\text{prop-up}}(\mathcal{S})$ holds by the multi-\req condition for $(\mathcal{S},\mathcal{S}')$.
+%         \item For each $i$ and each $t_g \in \args(F,f_i)$ with $t \in S_i$:
+%         \[
+%         I^*(t_g) \leq b_{\max} + v_{\max}^i = b_{\max} + I^*(t)
+%         \]
+%         by construction of $b_{\max}$.
+%     \end{itemize}
     
-    \item \textbf{Downward extension:} 
-    For $\Psi_{\text{down}}(B,\mathcal{S}')$, we have:
-    \begin{itemize}
-        \item $\Phi_{\text{min}}(\mathcal{S}')$ holds by definition of $\mathcal{S}'$.
-        \item $\Phi_{\text{prop-down}}(\mathcal{S}')$ holds by the multi-\req condition for $(\mathcal{S},\mathcal{S}')$.
-        \item For each $i$ and each $t_g \in \args(F,f_i)$ with $t \in S_i'$:
-        \[
-        I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
-        \]
-        by construction of $b_{\min}$.
-    \end{itemize}
-\end{enumerate}
+%     \item \textbf{Downward extension:} 
+%     For $\Psi_{\text{down}}(B,\mathcal{S}')$, we have:
+%     \begin{itemize}
+%         \item $\Phi_{\text{min}}(\mathcal{S}')$ holds by definition of $\mathcal{S}'$.
+%         \item $\Phi_{\text{prop-down}}(\mathcal{S}')$ holds by the multi-\req condition for $(\mathcal{S},\mathcal{S}')$.
+%         \item For each $i$ and each $t_g \in \args(F,f_i)$ with $t \in S_i'$:
+%         \[
+%         I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
+%         \]
+%         by construction of $b_{\min}$.
+%     \end{itemize}
+% \end{enumerate}
 
-Thus $I^*$ satisfies all conditions. Let $N = \max(|b_{\min}|, |b_{\max}|)$. 
+% Thus $I^*$ satisfies all conditions. Let $N = \max(|b_{\min}|, |b_{\max}|)$. 
 
-Now consider \cref{alg:interval-check-param}. For the pair $(\mathcal{S},\mathcal{S}')$, the algorithm starts with $[b_{\min}, b_{\max}] = [0, 0]$ and expands symmetrically. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$. 
+% Now consider \cref{alg:interval-check-param}. For the pair $(\mathcal{S},\mathcal{S}')$, the algorithm starts with $[b_{\min}, b_{\max}] = [0, 0]$ and expands symmetrically. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$. 
 
-At that iteration, the $\smt$ call on line~8 of \cref{alg:interval-check-param} will check:
-\[
-F \land \bigwedge_{x=-N}^{N} Q[x] \land \Psi_{\text{up}}([-N,N],\mathcal{S}) \land \Psi_{\text{down}}([-N,N],\mathcal{S}')
-\]
-Since $[-N, N]$ contains $B$, and $I^*$ satisfies all the conditions, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm will return \textsc{Sat} for this pair $(\mathcal{S},\mathcal{S}')$.
-\end{proof}
+% At that iteration, the $\smt$ call on line~8 of \cref{alg:interval-check-param} will check:
+% \[
+% F \land \bigwedge_{x=-N}^{N} Q[x] \land \Psi_{\text{up}}([-N,N],\mathcal{S}) \land \Psi_{\text{down}}([-N,N],\mathcal{S}')
+% \]
+% Since $[-N, N]$ contains $B$, and $I^*$ satisfies all the conditions, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm will return \textsc{Sat} for this pair $(\mathcal{S},\mathcal{S}')$.
+% \end{proof}
 
-We keep \cref{alg:interval-check-param} as simple as possible, not taking into account efficiency considerations. We will now turn to efficiency.
+We keep \cref{alg:interval-check-param-withBigvee} as simple as possible, not taking into account efficiency considerations. We will now turn to efficiency.
 
 Observations:
 \begin{itemize}
@@ -1252,6 +1251,29 @@ Idea for CNF representation:
         \]
 
 \end{enumerate}
+
+\begin{algorithm}
+\caption{Interval‑Based Satisfiability Check (parameterised multi-\req)}
+\label{alg:interval-check-param}
+\begin{algorithmic}[1]
+\Require $\phi = F \land \forall x.\, Q$ in the fragment
+\Ensure \textsc{Sat} or \textsc{Unsat}
+\State $\mathcal{C} \gets \{(\mathcal{S},\mathcal{S}') \mid Q \text{ satisfies multi-\req for } (\mathcal{S},\mathcal{S}')\}$
+\For{each $(\mathcal{S},\mathcal{S}') \in \mathcal{C}$}
+    \State $b_{\min} \gets 0$, $b_{\max} \gets 0$ 
+    \State $I \gets \smt\!\left(F \land Q[0]\right)$
+    \While{$I \neq \bot$}
+        \State Construct $\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$ and $\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S}')$ \Comment{\cref{def:interval-extension-formulas-param}}
+        \If{$\smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x] \land \Psi_{\text{up}} \land \Psi_{\text{down}}\right) \neq \bot$}
+            \State \Return \textsc{Sat} 
+        \EndIf
+        \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
+        \State $I \gets \smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right)$
+    \EndWhile
+\EndFor
+\State \Return \textsc{Unsat}
+\end{algorithmic}
+\end{algorithm}
 
 
 
