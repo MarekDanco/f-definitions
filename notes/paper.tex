@@ -884,7 +884,7 @@ The core construction remains similar, i.e. we seek an interval $B = [b_{\min}, 
 
 \begin{definition}[Multi-\req Condition]
 \label{def:multi-reqpivot}
-Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$, with $T_i = \{t^{f_i}_1, \dots, t^{f_i}_{l_i}\}$ being the offset terms for $f_i$. We say that $Q$ satisfies the \emph{multi-\req} condition\todoSR{I (SR) am considering to make the definition parametric in $S_1,\dots,S_r$, $S_1',\dots,S_r'$ to allow for different variants of the algorithm.} if:
+Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$, with $T_i = \{t^{f_i}_1, \dots, t^{f_i}_{l_i}\}$ being the offset terms for $f_i$. We say that $Q$ satisfies the \emph{multi-\req} condition\todoSR{We are considering to make the definition parametric in $S_1,\dots,S_r$, $S_1',\dots,S_r'$ to allow for different variants of the algorithm.} if:
 
 \begin{enumerate}
     \item \textbf{Upward propagation:} There exist subsets $S_1 \subseteq T_1, \dots, S_r \subseteq T_r$ (some possibly empty) such that the following two conditions hold:
@@ -898,7 +898,7 @@ Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$, wi
         \right)
         \]
         
-      \item \emph{Propagability condition $\Phi_{\text{prop-up}}$:}\todoSR{Stefan N. will add an example, the old ReqPivot is the special case where all $S_i$ are empty except for one, and this one contains exactly one element}
+      \item \emph{Propagability condition $\Phi_{\text{prop-up}}$:}\todoSR{The old ReqPivot is the special case where all $S_i$ are empty except for one, and this one contains exactly one element}
         \[\forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1\dots \exists v_r.\ Q'\] where  $Q'$ is the formula obtained from $Q$ by simultaneously replacing for all $i\in\{1,\dots,r\}$,
         \begin{itemize}
             \item every $f_i(x+t)$ such that $t \in S_i$ by $v_i$,
