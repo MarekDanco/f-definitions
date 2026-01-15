@@ -931,7 +931,8 @@ Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$, wi
 %In both cases, the notation $Q[\text{term} \mapsto \text{variable}]$ denotes simultaneous substitution of each occurrence of the term by the variable.
 \end{definition}
 
-Intuitively, the multi-\req condition ensures that for upward propagation, we can choose a collection of maximal offset terms and assign them \emph{a common value} that satisfies $Q$, given arbitrary values for the remaining function applications. The downward condition is symmetric.
+Intuitively, the multi‑\req condition generalises the single‑pivot \req condition by allowing \emph{multiple functions} to serve as pivots simultaneously. For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The old single‑pivot \req is the special case where exactly one $S_i$ is non‑empty and contains a single offset. The downward condition is symmetric.
+
 
 \begin{example}[Multi-\req Illustration]
 Consider the formula:
