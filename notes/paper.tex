@@ -882,53 +882,38 @@ The core construction remains similar, i.e. we seek an interval $B = [b_{\min}, 
 
 \paragraph{Multi-\req Condition} First, we formalise the condition that enables propagation in both directions, generalising the single-pivot \req condition to allow multiple functions to serve as pivots.
 
-\begin{definition}[Multi-\req Condition]
-\label{def:multi-reqpivot}
-Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$, with $T_i = \{t^{f_i}_1, \dots, t^{f_i}_{l_i}\}$ being the offset terms for $f_i$. We say that $Q$ satisfies the \emph{multi-\req} condition\todoSR{We are considering to make the definition parametric in $S_1,\dots,S_r$, $S_1',\dots,S_r'$ to allow for different variants of the algorithm.} if:
+\begin{definition}[Multi-\req Condition (parametric version)]
+\label{def:multi-reqpivot-param}
+Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$, with $T_i = \{t^{f_i}_1, \dots, t^{f_i}_{l_i}\}$ being the offset terms for $f_i$.
 
-\begin{enumerate}
-    \item \textbf{Upward propagation:} There exist subsets $S_1 \subseteq T_1, \dots, S_r \subseteq T_r$ (some possibly empty) such that the following two conditions hold:
-    \begin{enumerate}
-        \item \emph{Maximality condition $\Phi_{\text{max}}$:}
-        % $\Phi_{\text{max}}(S_1,\dots,S_r)$:}
+For any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$ with $S_i \subseteq T_i$, define:
+
+\begin{itemize}
+    \item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}
         \[
-        \bigwedge_{i} \left(
+        \bigwedge_{i=1}^{r} \left(
         \bigwedge_{t,t' \in S_i} t = t' \;\land\;
         \bigwedge_{t \in S_i, t' \in T_i \setminus S_i} t > t'
-        \right)
+        \right).
         \]
-        
-      \item \emph{Propagability condition $\Phi_{\text{prop-up}}$:}\todoSR{The old ReqPivot is the special case where all $S_i$ are empty except for one, and this one contains exactly one element}
-        \[\forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1\dots \exists v_r.\ Q'\] where  $Q'$ is the formula obtained from $Q$ by simultaneously replacing for all $i\in\{1,\dots,r\}$,
+    \item \textbf{Upward propagability condition $\Phi_{\text{prop-up}}(\mathcal{S})$:}\\
+        \[\forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1\dots \exists v_r.\ Q'(\mathcal{S})\] where  $Q'(\mathcal{S})$ is the formula obtained from $Q$ by simultaneously replacing for all $i\in\{1,\dots,r\}$,
         \begin{itemize}
             \item every $f_i(x+t)$ such that $t \in S_i$ by $v_i$,
             \item every $f_i(x+t)$ such that $t \in T_i \setminus S_i$ by the corresponding $u_i^t \in \bar{u}_i$, where $\bar{u}_i = \{u_i^t \mid t \in T_i \setminus S_i\}$.
-            % $\bar{u}_i$ stands for all $u_i^t$ with $t\in T_i\setminus S_i$.            
         \end{itemize}
+\end{itemize}
 
-    \end{enumerate}
-    
-    \item \textbf{Downward propagation:} There exist subsets $S'_1 \subseteq T_1, \dots, S'_r \subseteq T_r$ (some possibly empty) such that the following two conditions hold:
-    \begin{enumerate}
-        \item \emph{Minimality condition $\Phi_{\text{min}}$:}
-        \[
-        \bigwedge_{i} \left(
-        \bigwedge_{t,t' \in S'_i} t = t' \;\land\;
-        \bigwedge_{t \in S'_i, t' \in T_i \setminus S'_i} t < t'
-        \right)
-        \]
-                
-      \item  \emph{Propagability condition $\Phi_{\text{prop-down}}$:}\\
-      Defined analogously to $\Phi_{\text{prop-up}}$, with $S'_i$ in place of $S_i$.
+Symmetrically, for downward propagation with subsets $\mathcal{S}' = (S'_1,\dots,S'_r)$, define 
+$\Phi_{\text{min}}(\mathcal{S}')$ (with $<$ instead of $>$) and $\Phi_{\text{prop-down}}(\mathcal{S}')$.
 
-        % Let $v_1, \dots, v_n$ enumerate all function applications in $Q$ that are NOT of the form $f_i(x+t)$ with $t \in S'_i$. Then $\forall x \forall c_1 \dots \forall c_n \exists w.\ Q'$ where 
-    %     \begin{equation*}
-    %     Q' = Q\big[f_i(x+t) \mapsto w \text{ for all } i \text{ and all } t \in S_i',\ 
-    %             v_1 \mapsto c_1,\ \dots,\ v_n \mapsto c_n\big].    
-    % \end{equation*}
-    \end{enumerate}
-\end{enumerate}
-%In both cases, the notation $Q[\text{term} \mapsto \text{variable}]$ denotes simultaneous substitution of each occurrence of the term by the variable.
+We say\todoSN{I am not sure whether we need this or just directly saying the sentence after the two bullet points?} that $Q$ satisfies the \emph{multi-\req condition for $(\mathcal{S}, \mathcal{S}')$} if:
+\begin{itemize}
+    \item $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ hold,
+    \item $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ hold.
+\end{itemize}
+
+We say $Q$ satisfies the \emph{multi-\req condition} (without parameters) if there exists \emph{some} pair $(\mathcal{S}, \mathcal{S}')$ for which the above holds.
 \end{definition}
 
 Intuitively, the multi‑\req condition generalises the single‑pivot \req condition by allowing \emph{multiple functions} to serve as pivots simultaneously. For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The old single‑pivot \req is the special case where exactly one $S_i$ is non‑empty and contains a single offset. The downward condition is symmetric.
@@ -1035,42 +1020,37 @@ Thus any $c \in (-2, 1)$ works. %If $c \geq 1$, we could use Choice 2 for upward
 
 Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the entities generated during propagation from clashing with the ground part $F$.
 
-\begin{definition}[Interval Extension Formulas]
-\label{def:interval-extension-formulas}
-For an interval $B = [b_{\min}, b_{\max}]$, define:
+\begin{definition}[Interval Extension Formulas (parameterised)]
+\label{def:interval-extension-formulas-param}
+For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$, define:
 
 \begin{enumerate}
-    \item \textbf{Upward extension formula $\Psi_{\text{up}}(B)$}:
+    \item \textbf{Upward extension formula $\Psi_{\text{up}}(B,\mathcal{S})$}:
     \[
-    \bigvee_{S_1 \subseteq T_1, \dots, S_r \subseteq T_r} 
-    \Bigg[
-    \Phi_{\text{max}}\;\land\; 
-    \Phi_{\text{prop-up}} \;\land
+    \Phi_{\text{max}}(\mathcal{S})\;\land\; 
+    \Phi_{\text{prop-up}}(\mathcal{S}) \;\land
     \bigwedge_{i=1}^{r} \bigwedge_{\substack{t_g \in \args(F,f_i) \\ t \in S_i}} t_g \leq b_{\max}+t
-    \Bigg]
     \]
-    where $\Phi_{\text{max}}$ and $\Phi_{\text{prop-up}}$ are as defined in \cref{def:multi-reqpivot}.
+    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:multi-reqpivot-param}.
     
-    \item \textbf{Downward extension formula $\Psi_{\text{down}}(B)$}:
+    \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
     \[
-    \bigvee_{S_1 \subseteq T_1, \dots, S_r \subseteq T_r} 
-    \Bigg[
-    \Phi_{\text{min}} \;\land\; 
-    \Phi_{\text{prop-down}} \;\land
-    \bigwedge_{i=1}^{r} \bigwedge_{\substack{t_g \in \args(F,f_i) \\ t \in S_i}} t_g \geq b_{\min}+t \Bigg]
+    \Phi_{\text{min}}(\mathcal{S}') \;\land\; 
+    \Phi_{\text{prop-down}}(\mathcal{S}') \;\land
+    \bigwedge_{i=1}^{r} \bigwedge_{\substack{t_g \in \args(F,f_i) \\ t \in S_i'}} t_g \geq b_{\min}+t
     \]
-    where $\Phi_{\text{min}}$ and $\Phi_{\text{prop-down}}$ are as defined in \cref{def:multi-reqpivot}.
+    where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ are as defined in \cref{def:multi-reqpivot-param}.
 \end{enumerate}
 \end{definition}
 
 Thus, $\Psi_{\text{up}}(B)$ (resp. $\Psi_{\text{down}}(B)$) asserts that there exist subsets $S_1,\dots,S_r$ satisfying the upward (resp. downward) conditions of multi‑\req and \emph{additionally} satisfying the clash condition for interval $B$. The clash condition ensures that no entity $f_i(z+t)$ with $z > b_{\max}$ (resp. $z < b_{\min}$) and $t \in S_i$ already appears in the ground part $F$.
 
-\begin{theorem}[Interval Satisfiability]
-\label{thm:interval-certificate}
-Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval.  
+\begin{theorem}[Interval Satisfiability (parameterised version)]
+\label{thm:interval-certificate-param}
+Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and let $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$ be subsets satisfying the multi-\req condition for $(\mathcal{S}, \mathcal{S}')$ as defined in \cref{def:multi-reqpivot-param}.  
 Then $\phi = F \land \forall x.\, Q$ has a satisfiability certificate — and hence is satisfiable — provided that
 \[
-\Bigl(F \land \bigwedge_{x \in B} Q[x]\Bigr) \;\land\; \Psi_{\text{up}}(B) \;\land\; \Psi_{\text{down}}(B)
+\Bigl(F \land \bigwedge_{x \in B} Q[x]\Bigr) \;\land\; \Psi_{\text{up}}(B,\mathcal{S}) \;\land\; \Psi_{\text{down}}(B,\mathcal{S}')
 \]
 holds.
 \end{theorem}
@@ -1078,9 +1058,10 @@ holds.
 \begin{proof}
 Suppose the conditions of the theorem hold, and let $I$ be an interpretation satisfying
 \[
-F \land \bigwedge_{x \in B} Q[x]\;\land\; \Psi_{\text{up}}(B) \;\land\; \Psi_{\text{down}}(B).
+F \land \bigwedge_{x \in B} Q[x]\;\land\; \Psi_{\text{up}}(B,\mathcal{S}) \;\land\; \Psi_{\text{down}}(B,\mathcal{S}').
 \]
-From $I \models \Psi_{\text{down}}(B)$, pick subsets $S_1^{\downarrow}, \dots, S_r^{\downarrow}$ that witness its disjunct. We construct a certificate as in \cref{def:certificate}:
+
+We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
@@ -1093,85 +1074,107 @@ From $I \models \Psi_{\text{down}}(B)$, pick subsets $S_1^{\downarrow}, \dots, S
     X_z = 
     \begin{cases}
     \emptyset & \text{if } z \in B, \\[4pt]
-    \bigl\{ f_i(z+t) \mid i=1,\dots,r,\; t \in S_i^{\uparrow} \bigr\} & \text{if } z > b_{\max}, \\[4pt]
-    \bigl\{ f_i(z+t) \mid i=1,\dots,r,\; t \in S_i^{\downarrow} \bigr\} & \text{if } z < b_{\min}.
+    \bigl\{ f_i(z+t) \mid i=1,\dots,r,\; t \in S_i \bigr\} & \text{if } z > b_{\max}, \\[4pt]
+    \bigl\{ f_i(z+t) \mid i=1,\dots,r,\; t \in S_i' \bigr\} & \text{if } z < b_{\min}.
     \end{cases}
     \]
     
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
         \item For $z \in B$: $I$ itself satisfies $Q[z]$.
-        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(S_1^{\uparrow},\dots,S_r^{\uparrow})$ provides a function that, given values for all non‑existential entities in $\Gamma_{I,z}(\phi)$, returns a common value $v$ to assign to every $f_i(z+t)$ with $t \in S_i^{\uparrow}$, thereby satisfying $Q[z]$.
-        \item For $z < b_{\min}$: the condition $\Phi_{\text{prop-down}}(S_1^{\downarrow},\dots,S_r^{\downarrow})$ yields a propagator for the entities $f_i(z+t)$ with $t \in S_i^{\downarrow}$.
+        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(\mathcal{S})$ provides a function that, given values for all non‑existential entities in $\Gamma_{I,z}(\phi)$, returns values $v_1,\dots,v_r$ to assign to every $f_i(z+t)$ with $t \in S_i$, thereby satisfying $Q[z]$.
+        \item For $z < b_{\min}$: the condition $\Phi_{\text{prop-down}}(\mathcal{S}')$ yields a propagator for the entities $f_i(z+t)$ with $t \in S_i'$.
     \end{itemize}
 \end{enumerate}
 
-It remains to verify the disjointness of \cref{def:certificate}:
+It remains to verify the disjointness condition of \cref{def:certificate}:
 \[
 X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \emptyset.
 \]
 
 \begin{itemize}
     \item For $z \in B$, $X_z = \emptyset$ holds trivially.
-    \item For $z > b_{\max}$, consider any $f_i(z+t)$ with $t \in S_i^{\uparrow}$.
+    \item For $z > b_{\max}$, consider any $f_i(z+t)$ with $t \in S_i$.
     \begin{itemize}
-        \item It cannot belong to $\mathit{def}(I)$ because the clash condition $t_g \leq b_{\max} + t$ guarantees $I(t_g) \leq b_{\max} + I(t) < z + I(t)$ for every $t_g \in \args(F,f_i)$.
-        \item It cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$ because either $z' \leq b_{\max}$ (then $z'+I(t') \leq b_{\max} + I(t') < z + I(t)$ for all $t' \in T_i$), or $b_{\max} < z' < z$ (then $z'+I(t') \leq z'+ \max_{t'' \in T_i} I(t'') < z + I(t)$ since $I(t)$ is maximal among $\{I(t'') \mid t'' \in T_i\}$ by $\Phi_{\text{max}}$).
+        \item It cannot belong to $\mathit{def}(I)$ because the clash condition $t_g \leq b_{\max} + t$ in $\Psi_{\text{up}}(B,\mathcal{S})$ guarantees $I(t_g) \leq b_{\max} + I(t) < z + I(t)$ for every $t_g \in \args(F,f_i)$.
+        \item It cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$ because either:
+        \begin{enumerate}
+            \item $z' \leq b_{\max}$: then $z'+I(t') \leq b_{\max} + I(t') < z + I(t)$ for all $t' \in T_i$,
+            \item $b_{\max} < z' < z$: then $z'+I(t') \leq z'+ \max_{t'' \in T_i} I(t'') < z + I(t)$ since $I(t)$ is maximal among $\{I(t'') \mid t'' \in T_i\}$ by $\Phi_{\text{max}}(\mathcal{S})$.
+        \end{enumerate}
     \end{itemize}
-    \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}$ and the downward clash condition.
+
+    \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition.
+    % \item For $z < b_{\min}$, consider any $f_i(z+t)$ with $t \in S_i'$.
+    % \begin{itemize}
+    %     \item It cannot belong to $\mathit{def}(I)$ because the clash condition $t_g \geq b_{\min} + t$ in $\Psi_{\text{down}}(B,\mathcal{S}')$ guarantees $I(t_g) \geq b_{\min} + I(t) > z + I(t)$ for every $t_g \in \args(F,f_i)$.
+    %     \item It cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$ because either:
+    %     \begin{enumerate}
+    %         \item $z' \geq b_{\min}$: then $z'+I(t') \geq b_{\min} + I(t') > z + I(t)$ for all $t' \in T_i$,
+    %         \item $z < z' < b_{\min}$: then $z'+I(t') \geq z'+ \min_{t'' \in T_i} I(t'') > z + I(t)$ since $I(t)$ is minimal among $\{I(t'') \mid t'' \in T_i\}$ by $\Phi_{\text{min}}(\mathcal{S}')$.
+    %     \end{enumerate}
+    % \end{itemize}
 \end{itemize}
 
 Thus all certificate requirements are satisfied. By \cref{prop:certThenSat}, $\phi$ is satisfiable.
 \end{proof}
 
-\cref{thm:interval-certificate} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions.
+\cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. To use the parameterised version, the algorithm can iterate over candidate pairs $(\mathcal{S},\mathcal{S}')$.
 
 \begin{algorithm}
-\caption{Interval‑Based Satisfiability Check (multi-\req)}
-\label{alg:interval-check}
+\caption{Interval‑Based Satisfiability Check (parameterised multi-\req)}
+\label{alg:interval-check-param}
 \begin{algorithmic}[1]
 \Require $\phi = F \land \forall x.\, Q$ in the fragment
 \Ensure \textsc{Sat} or \textsc{Unsat}
-\State $b_{\min} \gets 0$, $b_{\max} \gets 0$ \Comment{Start with singleton interval $[0,0]$}
-\State $I \gets \smt\!\left(F \land Q[0]\right)$
-\While{$I \neq \bot$}
-    \State Construct $\Psi_{\text{up}}([b_{\min},b_{\max}])$ and $\Psi_{\text{down}}([b_{\min},b_{\max}])$ \Comment{\cref{def:interval-extension-formulas}}
-    \If{$\smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x] \land \Psi_{\text{up}} \land \Psi_{\text{down}}\right) \neq \bot$}
-        \State \Return \textsc{Sat} \Comment{Certificate exists by \cref{thm:interval-certificate}}
-    \EndIf
-    \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
-    \State $I \gets \smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right)$
-\EndWhile
+\State $\mathcal{C} \gets \{(\mathcal{S},\mathcal{S}') \mid Q \text{ satisfies multi-\req for } (\mathcal{S},\mathcal{S}')\}$
+\For{each $(\mathcal{S},\mathcal{S}') \in \mathcal{C}$}
+    \State $b_{\min} \gets 0$, $b_{\max} \gets 0$ 
+    \State $I \gets \smt\!\left(F \land Q[0]\right)$
+    \While{$I \neq \bot$}
+        \State Construct $\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$ and $\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S}')$ \Comment{\cref{def:interval-extension-formulas-param}}
+        \If{$\smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x] \land \Psi_{\text{up}} \land \Psi_{\text{down}}\right) \neq \bot$}
+            \State \Return \textsc{Sat} 
+        \EndIf
+        \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
+        \State $I \gets \smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right)$
+    \EndWhile
+\EndFor
 \State \Return \textsc{Unsat}
 \end{algorithmic}
 \end{algorithm}
 
-\begin{corollary}[Soundness]
-\cref{alg:interval-check} is sound: if it returns \textsc{Sat}, then $\phi$ is satisfiable.
+\begin{corollary}[Soundness (parameterised version)]
+\cref{alg:interval-check-param} is sound: if it returns \textsc{Sat}, then $\phi$ is satisfiable.
 \end{corollary}
 \begin{proof}
-When the algorithm returns \textsc{Sat}, it has found an interval $B$ and an interpretation satisfying the three conditions of \cref{thm:interval-certificate}. Hence $\phi$ is satisfiable.
+When the algorithm returns \textsc{Sat}, it has found an interval $B$ and an interpretation satisfying the conditions of \cref{thm:interval-certificate-param} for some $(\mathcal{S},\mathcal{S}')$. Hence $\phi$ is satisfiable.
 \end{proof}
 
-\begin{theorem}[Relative Completeness]
-\label{thm:relative-completeness}
+\begin{theorem}[Relative Completeness (parameterised version)]
+\label{thm:relative-completeness-param}
 Let $\phi = F \land \forall x.\, Q$ be a formula in our fragment. If
 \begin{enumerate}
     \item $\phi$ is satisfiable, and
-    \item $\phi$ satisfies the multi‑\req condition (\cref{def:multi-reqpivot}),
+    \item $\phi$ satisfies the multi‑\req condition for some $(\mathcal{S},\mathcal{S}')$ as defined in \cref{def:multi-reqpivot-param},
 \end{enumerate}
-then \cref{alg:interval-check} terminates and returns \textsc{Sat}.
+then \cref{alg:interval-check-param} terminates and returns \textsc{Sat}.
 \end{theorem}
 
 \begin{proof}
-Assume $\phi$ is satisfiable and satisfies multi‑\req. Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding entity interpretation $I^*$. By multi‑\req, there exist subsets $S_1^{\uparrow}, \dots, S_r^{\uparrow}$ satisfying $\Phi_{\text{max}}$ and $\Phi_{\text{prop-up}}$, and subsets $S_1^{\downarrow}, \dots, S_r^{\downarrow}$ satisfying $\Phi_{\text{min}}$ and $\Phi_{\text{prop-down}}$.
+Assume $\phi$ is satisfiable and satisfies multi‑\req for some pair $(\mathcal{S},\mathcal{S}') = (S_1,\dots,S_r, S'_1,\dots,S'_r)$. Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding entity interpretation $I^*$.
 
 For each $i$, define:
 \[
 v_{\max}^i = \max\{\, I^*(t) \mid t \in T_i \,\}, \qquad
 v_{\min}^i = \min\{\, I^*(t) \mid t \in T_i \,\}.
 \]
-The conditions $\Phi_{\text{max}}$ and $\Phi_{\text{min}}$ ensure that for $t \in S_i^{\uparrow}$ we have $I^*(t) = v_{\max}^i$, and for $t \in S_i^{\downarrow}$ we have $I^*(t) = v_{\min}^i$.
+
+The conditions $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{min}}(\mathcal{S}')$ ensure that:
+\begin{itemize}
+    \item For all $t \in S_i$: $I^*(t) = v_{\max}^i$,
+    \item For all $t \in S_i'$: $I^*(t) = v_{\min}^i$.
+\end{itemize}
 
 Now choose
 \[
@@ -1181,17 +1184,49 @@ b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f_i),\; i=1,\dots
 b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\}.
 \]
 
-Set $B = [b_{\min}, b_{\max}]$. By construction:
+Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies the three conditions:
+
 \begin{enumerate}
-    \item $I^* \models F \land \bigwedge_{x \in B} Q[x]$ (since $\mathcal{M} \models \phi$),
-    \item $I^*$ satisfies the disjunct of $\Psi_{\text{up}}(B)$ corresponding to $\{S_i^{\uparrow}\}$,
-    \item $I^*$ satisfies the disjunct of $\Psi_{\text{down}}(B)$ corresponding to $\{S_i^{\downarrow}\}$.
+    \item \textbf{Base interval satisfiability:} 
+    $I^* \models F \land \bigwedge_{x \in B} Q[x]$ since $\mathcal{M} \models \phi$.
+    
+    \item \textbf{Upward extension:} 
+    For $\Psi_{\text{up}}(B,\mathcal{S})$, we have:
+    \begin{itemize}
+        \item $\Phi_{\text{max}}(\mathcal{S})$ holds by definition of $\mathcal{S}$.
+        \item $\Phi_{\text{prop-up}}(\mathcal{S})$ holds by the multi-\req condition for $(\mathcal{S},\mathcal{S}')$.
+        \item For each $i$ and each $t_g \in \args(F,f_i)$ with $t \in S_i$:
+        \[
+        I^*(t_g) \leq b_{\max} + v_{\max}^i = b_{\max} + I^*(t)
+        \]
+        by construction of $b_{\max}$.
+    \end{itemize}
+    
+    \item \textbf{Downward extension:} 
+    For $\Psi_{\text{down}}(B,\mathcal{S}')$, we have:
+    \begin{itemize}
+        \item $\Phi_{\text{min}}(\mathcal{S}')$ holds by definition of $\mathcal{S}'$.
+        \item $\Phi_{\text{prop-down}}(\mathcal{S}')$ holds by the multi-\req condition for $(\mathcal{S},\mathcal{S}')$.
+        \item For each $i$ and each $t_g \in \args(F,f_i)$ with $t \in S_i'$:
+        \[
+        I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
+        \]
+        by construction of $b_{\min}$.
+    \end{itemize}
 \end{enumerate}
 
-Let $N = \max(|b_{\min}|, |b_{\max}|)$. Algorithm~\ref{alg:interval-check} expands $B$ symmetrically from $[0,0]$. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$. At that point the $\smt$ call on line~5 will be satisfiable (witnessed by $I^*$), and the algorithm returns \textsc{Sat}.
+Thus $I^*$ satisfies all conditions. Let $N = \max(|b_{\min}|, |b_{\max}|)$. 
+
+Now consider \cref{alg:interval-check-param}. For the pair $(\mathcal{S},\mathcal{S}')$, the algorithm starts with $[b_{\min}, b_{\max}] = [0, 0]$ and expands symmetrically. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$. 
+
+At that iteration, the $\smt$ call on line~8 of \cref{alg:interval-check-param} will check:
+\[
+F \land \bigwedge_{x=-N}^{N} Q[x] \land \Psi_{\text{up}}([-N,N],\mathcal{S}) \land \Psi_{\text{down}}([-N,N],\mathcal{S}')
+\]
+Since $[-N, N]$ contains $B$, and $I^*$ satisfies all the conditions, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm will return \textsc{Sat} for this pair $(\mathcal{S},\mathcal{S}')$.
 \end{proof}
 
-We kept Algorithm~\ref{alg:interval-check} as simple as possible, not taking into account efficiency considerations. We will now turn to efficiency.
+We keep \cref{alg:interval-check-param} as simple as possible, not taking into account efficiency considerations. We will now turn to efficiency.
 
 Observations:
 \begin{itemize}
