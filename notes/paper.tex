@@ -1214,6 +1214,20 @@ Observations:
 \item Perhaps pre‑compute candidate subsets $S_i$ that satisfy $\Phi_{\text{max}}$ or $\Phi_{\text{min}}$, then check only those disjuncts.
 \end{itemize}
 
+Idea for CNF representation:
+\begin{enumerate}
+\item For each offset term $t_j^{f_i}, i\in \{ 1,\dots, r\}, j\in \{ 1,\dots, l_i\} $ use a propositional variable $s_j^{f_i}$ that is true iff $s_1^{f_i}\in S_i$. 
+  
+\item Replace the disjunction $\bigvee_{S_1\subseteq T_1,\dots,S_r\subseteq T_r}$ by an encoding using these variables. For example, the maximality condition $\Phi_{\text{max}}$ then reads as
+        % $\Phi_{\text{max}}(S_1,\dots,S_r)$:}
+        \[
+        \bigwedge_{i\in \{1,\dots, r\}} 
+          \bigwedge_{j,j' \in \{1,\dots, l_i\} } [\neg s_j\vee \neg s_{j'}\vee  t^{f_i}_{j}=t^{f_i}_{j'}] \;\land\; [\neg s_j\vee s_{j'} \vee  t^{f_i}_{j}>t^{f_i}_{j'} ]
+        \]
+
+\end{enumerate}
+
+
 
 \section*{Related Work}\label{}
 Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
