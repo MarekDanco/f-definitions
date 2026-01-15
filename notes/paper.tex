@@ -1225,6 +1225,116 @@ Thus all certificate requirements are satisfied. By \cref{prop:certThenSat}, $\p
 % Since $[-N, N]$ contains $B$, and $I^*$ satisfies all the conditions, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm will return \textsc{Sat} for this pair $(\mathcal{S},\mathcal{S}')$.
 % \end{proof}
 
+\begin{corollary}[Soundness of \cref{alg:interval-check-param-withBigvee}]
+\label{cor:soundness-bigvee}
+\cref{alg:interval-check-param-withBigvee} is sound: if it returns \textsc{Sat}, then $\phi = F \land \forall x.\, Q$ is satisfiable.
+\end{corollary}
+
+\begin{proof}
+Assume \cref{alg:interval-check-param-withBigvee} returns \textsc{Sat} at some iteration. Then there exists:
+\begin{itemize}
+    \item An interval $B = [b_{\min}, b_{\max}]$,
+    \item An interpretation $I$ satisfying:
+    \[
+    I \models F \land \bigwedge_{x \in B} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}},
+    \]
+    where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are the disjunctions defined in lines 4--5 of the algorithm.
+\end{itemize}
+
+Since $I \models \text{max}_{\text{up}}$, there exists some $\mathcal{S} = (S_1,\dots,S_r)$ such that 
+$I \models \Psi_{\text{up}}(B,\mathcal{S})$. Similarly, $I \models \text{min}_{\text{down}}$ implies there exists 
+$\mathcal{S}' = (S'_1,\dots,S'_r)$ such that $I \models \Psi_{\text{down}}(B,\mathcal{S}')$.
+
+Thus $I$ satisfies:
+\[
+F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Psi_{\text{down}}(B,\mathcal{S}').
+\]
+
+By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a satisfiability certificate 
+for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiable.
+\end{proof}
+
+\begin{theorem}[Relative Completeness of \cref{alg:interval-check-param-withBigvee}]
+\label{thm:completeness-bigvee}
+Let $\phi = F \land \forall x.\, Q$ be a formula in our fragment. If
+\begin{enumerate}
+    \item $\phi$ is satisfiable, and
+    \item $\phi$ satisfies the multi‑\req condition for some pair $(\mathcal{S}^*,\mathcal{S}'^*)$ 
+          as defined in \cref{def:multi-reqpivot-param},
+\end{enumerate}
+then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{Sat}.
+\end{theorem}
+
+\begin{proof}
+Assume $\phi$ is satisfiable and satisfies multi‑\req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
+Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding entity interpretation $I^*$.
+
+For each $i$, define:
+\[
+v_{\max}^i = \max\{\, I^*(t) \mid t \in T_i \,\}, \qquad
+v_{\min}^i = \min\{\, I^*(t) \mid t \in T_i \,\}.
+\]
+
+The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathcal{S}'^*)$ ensure that:
+\begin{itemize}
+    \item For all $t \in S_i^*$: $I^*(t) = v_{\max}^i$,
+    \item For all $t \in S_i'^*$: $I^*(t) = v_{\min}^i$.
+\end{itemize}
+
+Now choose
+\[
+b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\},
+\]
+\[
+b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\}.
+\]
+
+Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
+
+\begin{enumerate}
+    \item \textbf{Base formula}: $I^* \models F \land \bigwedge_{x \in B} Q[x]$ (since $\mathcal{M} \models \phi$).
+    
+    \item \textbf{Upward disjunction $\text{max}_{\text{up}}$}: 
+    For the specific $\mathcal{S}^*$, we have:
+    \begin{itemize}
+        \item $\Phi_{\text{max}}(\mathcal{S}^*)$ holds by definition,
+        \item $\Phi_{\text{prop-up}}(\mathcal{S}^*)$ holds by the multi-\req condition,
+        \item For each $i$ and $t_g \in \args(F,f_i)$ with $t \in S_i^*$:
+        \[
+        I^*(t_g) \leq b_{\max} + v_{\max}^i = b_{\max} + I^*(t)
+        \]
+        by construction of $b_{\max}$.
+    \end{itemize}
+    Thus $I^* \models \Psi_{\text{up}}(B,\mathcal{S}^*)$, and consequently $I^* \models \text{max}_{\text{up}}$.
+    
+    \item \textbf{Downward disjunction $\text{min}_{\text{down}}$}: 
+    Similarly, for $\mathcal{S}'^*$ we have:
+    \begin{itemize}
+        \item $\Phi_{\text{min}}(\mathcal{S}'^*)$ holds,
+        \item $\Phi_{\text{prop-down}}(\mathcal{S}'^*)$ holds,
+        \item For each $i$ and $t_g \in \args(F,f_i)$ with $t \in S_i'^*$:
+        \[
+        I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
+        \]
+        by construction of $b_{\min}$.
+    \end{itemize}
+    Thus $I^* \models \Psi_{\text{down}}(B,\mathcal{S}'^*)$, and consequently $I^* \models \text{min}_{\text{down}}$.
+\end{enumerate}
+
+Let $N = \max(|b_{\min}|, |b_{\max}|)$. Algorithm~\ref{alg:interval-check-param-withBigvee} expands the 
+interval symmetrically from $[0,0]$. When it reaches iteration $n = N$, the interval becomes 
+$[-N, N]$, which contains $B$.
+
+At this iteration, the $\smt$ call on line 6 checks:
+\[
+F \land \bigwedge_{x=-N}^{N} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}
+\]
+where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are constructed for the interval $[-N, N]$.
+
+Since $[-N, N]$ contains $B$, and $I^*$ satisfies all three conditions as shown above, this formula 
+is satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
+\end{proof}
+
 We keep \cref{alg:interval-check-param-withBigvee} as simple as possible, not taking into account efficiency considerations. We will now turn to efficiency.
 
 Observations:
@@ -1232,7 +1342,7 @@ Observations:
 \item $\Phi_{\text{max}}$ and $\Phi_{\text{prop-up}}$ (and their dual counter-parts) do not depend on the interval $B$.
 \item Some special cases (e.g., all offsets are fixed integers) might enable some more efficient treatment.
 \item We may exploit the capability of SMT solvers to do incremental solving.
-\item The formula used in Algorithm~\ref{alg:interval-check} is not in CNF, which is required by SMT solvers. We can either call the solver separately on the individual disjuncts of $\Psi_{\text{up}}([b_{\min},b_{\max}])$ and $\Psi_{\text{down}}([b_{\min},b_{\max}])$, or transform it into CNF using auxiliary variables.
+\item The formula used in \cref{alg:interval-check-param-withBigvee} is not in CNF, which is required by SMT solvers. We can either call the solver separately on the individual disjuncts of $\Psi_{\text{up}}([b_{\min},b_{\max}])$ and $\Psi_{\text{down}}([b_{\min},b_{\max}])$, or transform it into CNF using auxiliary variables.
 \item The idea of using unsat cores to decide how to expand the interval (Algorithm~\ref{alg:sr2}) is also applicable.
 \item The more elements $S_i$ contains, the weaker the pivot condition becomes (i.e., the easier it is to satisfy). On the other hand, if $S_i$ is empty, then the clash condition is trivially satisfied, which may avoid many algorithm iterations (e.g., in cases where $f_i$ as a big integer argument in the ground part~$F$).
 \item In the case where big integers arguments occur in the ground part~$F$, we may use these integers to appropriately initialize the interval $[b_{\min},b_{\max}]$.
@@ -1274,6 +1384,8 @@ Idea for CNF representation:
 \State \Return \textsc{Unsat}
 \end{algorithmic}
 \end{algorithm}
+
+\newpage
 
 
 
