@@ -919,7 +919,7 @@ We say $Q$ satisfies the \emph{multi-\req condition} if there exists \emph{some}
 Intuitively, the multi‑\req condition generalises the single‑pivot \req condition by allowing \emph{multiple functions} to serve as pivots simultaneously. For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The old single‑pivot \req is the special case where exactly one $S_i$ is non‑empty and contains a single offset. The downward condition is symmetric.
 
 
-\begin{example}[Multi-\req Illustration]
+\begin{example}[Multi-\req Illustration---parameterised]
 Consider the formula:
 \[
 \forall x.\ f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
@@ -935,19 +935,19 @@ We have three offsets for $f$: a ground term $c+3$, and two numerals $4$ and $1$
 
 % \begin{enumerate}
 %     \item \textbf{Choice 1: Take only the numerically maximal offset}
-Consider the choice $S_f = \{4\}, \quad S_g = \{2\}, \quad S_h = \emptyset$.
+Consider the choice $\mathcal{S} = (S_f, S_g, S_h) = (\{4\}, \{2\}, \emptyset)$.
     \begin{enumerate}
-        \item \textbf{Maximality $\Phi_{\text{max}}$:}
+        \item \textbf{Maximality $\Phi_{\text{max}}(\mathcal{S})$:}
         \begin{itemize}
         \item For $f$: $S_f = \{4\}$, $T_f \setminus S_f = \{c+3, 1\}$
           % $4 > 1$ is true. $4 > c+3$ becomes a constraint: $c < 1$.
             \item For $g$: $S_g = \{2\}$, $T_g \setminus S_g = \emptyset$
             \item For $h$: $S_h = \emptyset$
             \end{itemize}
-This results in $\Phi_{\text{max}}\equiv 4 = 4 \land 4 > c+3 \land 4 > 1 \land\ 2=2$, which is true 
+This results in $\Phi_{\text{max}}(\mathcal{S})\equiv 4 = 4 \land 4 > c+3 \land 4 > 1 \land\ 2=2$, which is true 
 provided $c < 1$.
 
-        \item \textbf{Propagability $\Phi_{\text{prop-up}}$:}
+        \item \textbf{Propagability $\Phi_{\text{prop-up}}(\mathcal{S})$:}
         We introduce
         \begin{itemize}
             \item $v_f$ for $f(x+4)$,
@@ -977,18 +977,18 @@ provided $c < 1$.
 
 \medskip\noindent\textbf{Downward propagation:}
 Consider the choice %Choice for downward: Take the numerically minimal offset}
-$S'_f = \{1\}, \quad S'_g = \emptyset, \quad S'_h = \{0\}$.
+$\mathcal{S}' = (S'_f, S'_g, S'_h) = (\{1\}, \emptyset, \{0\})$.
 \begin{enumerate}
-    \item \textbf{Minimality $\Phi_{\text{min}}$:}
+    \item \textbf{Minimality $\Phi_{\text{min}}(\mathcal{S}')$:}
     \begin{itemize}
         \item For $f$: $S'_f = \{1\}$, $T_f \setminus S'_f = \{c+3, 4\}$
         \item For $h$: $S'_h = \{0\}$, $T_h \setminus S'_h = \emptyset$
         \item For $g$: $S'_g = \emptyset$
         \end{itemize}
-This results in $\Phi_{\text{min}}\equiv 1 = 1\land 1 < c+3 \land 1 < 4 \ \land\  0=0$, which is true provided
+This results in $\Phi_{\text{min}(\mathcal{S}')}\equiv 1 = 1\land 1 < c+3 \land 1 < 4 \ \land\  0=0$, which is true provided
  $c > -2$.
 
-    \item \textbf{Propagability $\Phi_{\text{prop-down}}$:}
+    \item \textbf{Propagability $\Phi_{\text{prop-down}}(\mathcal{S}')$:}
     We introduce
     \begin{itemize}
         \item $v'_f$ for $f(x+1)$,
@@ -1010,12 +1010,12 @@ This results in $\Phi_{\text{min}}\equiv 1 = 1\land 1 < c+3 \land 1 < 4 \ \land\
 \end{enumerate}
 
 \noindent\textbf{Putting it together:}
-$Q$ satisfies multi-\req if we can find $c$ satisfying both:
+$Q$ satisfies multi-\req for the pair $(\mathcal{S},\mathcal{S}')$ if we can find $c$ satisfying both:
 \begin{itemize}
     \item For upward: $c < 1$
     \item For downward: $c > -2$
 \end{itemize}
-Thus any $c \in (-2, 1)$ works. %If $c \geq 1$, we could use Choice 2 for upward ($c > 1$).
+Thus any $c \in (-2, 1)$ works. This demonstrates that for such $c$, the specific choices $\mathcal{S} = (\{4\},\{2\},\emptyset)$ and $\mathcal{S}' = (\{1\},\emptyset,\{0\})$ witness the multi‑\req condition. %If $c \geq 1$, we could use Choice 2 for upward ($c > 1$). 
 \end{example}
 
 Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the entities generated during propagation from clashing with the ground part $F$.
