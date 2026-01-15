@@ -937,7 +937,7 @@ Intuitively, the multi‑\req condition generalises the single‑pivot \req cond
 \begin{example}[Multi-\req Illustration]
 Consider the formula:
 \[
-\forall x.\ Q(x) \quad \text{where} \quad Q(x): f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
+\forall x.\ f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
 \]
 where $c$ is a ground constant. The offset terms for each function are:
 \begin{align*}
@@ -946,86 +946,77 @@ T_f &= \{c+3,\ 4,\ 1\}, \quad T_g = \{2\}, \quad T_h = \{0\}.
 We have three offsets for $f$: a ground term $c+3$, and two numerals $4$ and $1$.
 
 \medskip\noindent\textbf{Upward propagation:}
-Consider two possible choices:
+% Consider two possible choices:
 
-\begin{enumerate}
-    \item \textbf{Choice 1: Take only the numerically maximal offset}
-    \[
-    S_f = \{4\}, \quad S_g = \{2\}, \quad S_h = \emptyset.
-    \]
+% \begin{enumerate}
+%     \item \textbf{Choice 1: Take only the numerically maximal offset}
+Consider the choice $S_f = \{4\}, \quad S_g = \{2\}, \quad S_h = \emptyset$.
     \begin{enumerate}
         \item \textbf{Maximality $\Phi_{\text{max}}$:}
         \begin{itemize}
-            \item For $f$: $S_f = \{4\}$, $T_f \setminus S_f = \{c+3, 1\}$, so we need:
-            \[
-            4 = 4 \quad\text{and}\quad 4 > c+3 \ \land\ 4 > 1
-            \]
-            $4 > 1$ is true. $4 > c+3$ becomes a constraint: $c < 1$.
-            \item For $g$: $S_g = \{2\}$, $T_g \setminus S_g = \emptyset$, so $2=2$ (true).
-            \item For $h$: $S_h = \emptyset$, vacuously true.
-        \end{itemize}
-        Thus $\Phi_{\text{max}}$ holds provided $c < 1$.
+        \item For $f$: $S_f = \{4\}$, $T_f \setminus S_f = \{c+3, 1\}$
+          % $4 > 1$ is true. $4 > c+3$ becomes a constraint: $c < 1$.
+            \item For $g$: $S_g = \{2\}$, $T_g \setminus S_g = \emptyset$
+            \item For $h$: $S_h = \emptyset$
+            \end{itemize}
+This results in $\Phi_{\text{max}}\equiv 4 = 4 \land 4 > c+3 \land 4 > 1 \land\ 2=2$, which is true 
+provided $c < 1$.
 
         \item \textbf{Propagability $\Phi_{\text{prop-up}}$:}
-        We introduce:
+        We introduce
         \begin{itemize}
-            \item $v_f$ for $f(x+4)$
-            \item $v_g$ for $g(x+2)$
-            \item $u_f^{c+3}$ for $f(x+c+3)$ and $u_f^1$ for $f(x+1)$
-            \item $u_h^0$ for $h(x)$
+            \item $v_f$ for $f(x+4)$,
+            \item $v_g$ for $g(x+2)$,
+            \item $u_f^{c+3}$ for $f(x+c+3)$ and $u_f^1$ for $f(x+1)$,
+            \item $u_h^0$ for $h(x)$,
         \end{itemize}
-        The transformed $Q'$ is:
-        \[
-        u_f^{c+3} + v_f + u_f^1 = v_g + u_h^0
-        \]
-        The propagability condition requires:
+        % The transformed $Q'$ is:
+        % \[
+        % u_f^{c+3} + v_f + u_f^1 = v_g + u_h^0
+        % \]
+         and get the propagability condition 
         \[
         \forall x \forall u_f^{c+3} \forall u_f^1 \forall u_h^0 \exists v_f \exists v_g.\ 
-        u_f^{c+3} + v_f + u_f^1 = v_g + u_h^0
+        u_f^{c+3} + v_f + u_f^1 = v_g + u_h^0.
         \]
         This is true: for any $u_f^{c+3}, u_f^1, u_h^0$, choose $v_g = 0$ and $v_f = u_h^0 - u_f^{c+3} - u_f^1$.
     \end{enumerate}
     
-    \item \textbf{Choice 2: Take the general term if it's maximal}
-    Alternatively, if $c+3 \geq 4$ (i.e., $c \geq 1$), we could choose:
-    \[
-    S_f = \{c+3\}, \quad S_g = \{2\}, \quad S_h = \emptyset.
-    \]
-    Then $\Phi_{\text{max}}$ requires $c+3 > 4$ and $c+3 > 1$, i.e., $c > 1$.
-\end{enumerate}
+%     \item \textbf{Choice 2: Take the general term if it's maximal}
+%     Alternatively, if $c+3 \geq 4$ (i.e., $c \geq 1$), we could choose:
+%     \[
+%     S_f = \{c+3\}, \quad S_g = \{2\}, \quad S_h = \emptyset.
+%     \]
+%     Then $\Phi_{\text{max}}$ requires $c+3 > 4$ and $c+3 > 1$, i.e., $c > 1$.
+% \end{enumerate}
 
 \medskip\noindent\textbf{Downward propagation:}
-\paragraph{Choice for downward: Take the numerically minimal offset}
-\[
-S'_f = \{1\}, \quad S'_g = \emptyset, \quad S'_h = \{0\}.
-\]
-
-\begin{enumerate}[label=(\alph*)]
+Consider the choice %Choice for downward: Take the numerically minimal offset}
+$S'_f = \{1\}, \quad S'_g = \emptyset, \quad S'_h = \{0\}$.
+\begin{enumerate}
     \item \textbf{Minimality $\Phi_{\text{min}}$:}
     \begin{itemize}
-        \item For $f$: $S'_f = \{1\}$, $T_f \setminus S'_f = \{c+3, 4\}$, so we need:
-              \[
-              1 = 1 \quad\text{and}\quad 1 < c+3 \ \land\ 1 < 4
-              \]
-              $1 < 4$ is true. $1 < c+3$ gives $c > -2$.
-        \item For $h$: $S'_h = \{0\}$, $T_h \setminus S'_h = \emptyset$, so $0=0$ (true).
-        \item For $g$: $S'_g = \emptyset$, vacuously true.
-    \end{itemize}
-    Thus $\Phi_{\text{min}}$ holds provided $c > -2$.
+        \item For $f$: $S'_f = \{1\}$, $T_f \setminus S'_f = \{c+3, 4\}$
+        \item For $h$: $S'_h = \{0\}$, $T_h \setminus S'_h = \emptyset$
+        \item For $g$: $S'_g = \emptyset$
+        \end{itemize}
+This results in $\Phi_{\text{min}}\equiv 1 = 1\land 1 < c+3 \land 1 < 4 \ \land\  0=0$, which is true provided
+ $c > -2$.
 
     \item \textbf{Propagability $\Phi_{\text{prop-down}}$:}
-    We introduce:
+    We introduce
     \begin{itemize}
-        \item $v'_f$ for $f(x+1)$
-        \item $v'_h$ for $h(x)$
-        \item $u_f^{c+3}$ for $f(x+c+3)$ and $u_f^4$ for $f(x+4)$
-        \item $u_g^2$ for $g(x+2)$
+        \item $v'_f$ for $f(x+1)$,
+        \item $v'_h$ for $h(x)$,
+        \item $u_f^{c+3}$ for $f(x+c+3)$ and $u_f^4$ for $f(x+4)$,
+        \item $u_g^2$ for $g(x+2)$,
     \end{itemize}
-    The transformed $Q'$ is:
-    \[
-    u_f^{c+3} + u_f^4 + v'_f = u_g^2 + v'_h
-    \]
-    The propagability condition requires:
+    % The transformed $Q'$ is:
+    % \[
+    % u_f^{c+3} + u_f^4 + v'_f = u_g^2 + v'_h
+    % \]
+    % The propagability condition requires:
+    and get the propagability condition
     \[
     \forall x \forall u_f^{c+3} \forall u_f^4 \forall u_g^2 \exists v'_f \exists v'_h.\ 
     u_f^{c+3} + u_f^4 + v'_f = u_g^2 + v'_h
@@ -1036,10 +1027,10 @@ S'_f = \{1\}, \quad S'_g = \emptyset, \quad S'_h = \{0\}.
 \noindent\textbf{Putting it together:}
 $Q$ satisfies multi-\req if we can find $c$ satisfying both:
 \begin{itemize}
-    \item For upward (Choice 1): $c < 1$
+    \item For upward: $c < 1$
     \item For downward: $c > -2$
 \end{itemize}
-Thus any $c \in (-2, 1)$ works. If $c \geq 1$, we could use Choice 2 for upward ($c > 1$).
+Thus any $c \in (-2, 1)$ works. %If $c \geq 1$, we could use Choice 2 for upward ($c > 1$).
 \end{example}
 
 Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the entities generated during propagation from clashing with the ground part $F$.
