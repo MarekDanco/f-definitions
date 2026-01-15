@@ -1043,7 +1043,7 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots
 \end{enumerate}
 \end{definition}
 
-Thus, $\Psi_{\text{up}}(B)$ (resp. $\Psi_{\text{down}}(B)$) asserts that there exist subsets $S_1,\dots,S_r$ satisfying the upward (resp. downward) conditions of multi‑\req and \emph{additionally} satisfying the clash condition for interval $B$. The clash condition ensures that no entity $f_i(z+t)$ with $z > b_{\max}$ (resp. $z < b_{\min}$) and $t \in S_i$ already appears in the ground part $F$.
+Thus, for any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\Psi_{\text{up}}(\mathcal{S}, B)$ (resp.\ $\Psi_{\text{down}}(\mathcal{S}', B)$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of multi‑\req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition ensures that no entity $f_i(z+t)$ with $z > b_{\max}$ (resp. $z < b_{\min}$) and $t \in S_i$ already appears in the ground part $F$.
 
 \begin{theorem}[Interval Satisfiability (parameterised version)]
 \label{thm:interval-certificate-param}
