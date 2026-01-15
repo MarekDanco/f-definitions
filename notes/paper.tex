@@ -1132,7 +1132,7 @@ Thus all certificate requirements are satisfied. By \cref{prop:certThenSat}, $\p
 \State $I \gets \smt\!\left(F \land Q[0]\right)$
 \While{$I \neq \bot$}
     \State $\text{max}_\text{up}\gets\bigvee_{S_1\subseteq T_1,\dots,S_r\subseteq T_r}\Psi_{\text{up}}([b_{\min},b_{\max}],(S_1,\dots,S_r))$
-    \State $\text{min}_\text{down}\gets\bigvee_{S_1'\subseteq T_1,\dots,S_r'\subseteq T_r}\Psi_{\text{up}}([b_{\min},b_{\max}],(S_1',\dots,S_r'))$ 
+    \State $\text{min}_\text{down}\gets\bigvee_{S_1'\subseteq T_1,\dots,S_r'\subseteq T_r}\Psi_{\text{down}}([b_{\min},b_{\max}],(S_1',\dots,S_r'))$ 
     \If{$\smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}\right) \neq \bot$}
         \State \Return \textsc{Sat} 
     \EndIf
