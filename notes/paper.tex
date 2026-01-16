@@ -1269,19 +1269,89 @@ Observations:
 
 \subsection{Handling Disjunction Using Auxiliary Propositional Variables}
 
-\begin{enumerate}
-\item For each offset term $t_j^{f_i}, i\in \{ 1,\dots, r\}, j\in \{ 1,\dots, l_i\} $ use a propositional variable $s_j^{f_i}$ that is true iff $s_1^{f_i}\in S_i$. 
+The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S} = (S_1,\dots,S_r)$ and $\mathcal{S}' = (S'_1,\dots,S'_r)$. While theoretically elegant, these disjunctions lead to formulas with exponential size, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
+
+% \begin{enumerate}
+% \item For each offset term $t_j^{f_i}, i\in \{ 1,\dots, r\}, j\in \{ 1,\dots, l_i\} $ use a propositional variable $s_j^{f_i}$ that is true iff $s_1^{f_i}\in S_i$. 
   
-\item Replace the disjunction $\bigvee_{S_1\subseteq T_1,\dots,S_r\subseteq T_r}$ by an encoding using these variables. For example, the maximality condition $\Phi_{\text{max}}$ then reads as
-        % $\Phi_{\text{max}}(S_1,\dots,S_r)$:}
-        \[
-        \bigwedge_{i\in \{1,\dots, r\}} 
-          \bigwedge_{j,j' \in \{1,\dots, l_i\} } [\neg s_j\vee \neg s_{j'}\vee  t^{f_i}_{j}=t^{f_i}_{j'}] \;\land\; [\neg s_j\vee s_{j'} \vee  t^{f_i}_{j}>t^{f_i}_{j'} ]
-        \]
+% \item Replace the disjunction $\bigvee_{S_1\subseteq T_1,\dots,S_r\subseteq T_r}$ by an encoding using these variables. For example, the maximality condition $\Phi_{\text{max}}$ then reads as
+%         % $\Phi_{\text{max}}(S_1,\dots,S_r)$:}
+%         \[
+%         \bigwedge_{i\in \{1,\dots, r\}} 
+%           \bigwedge_{j,j' \in \{1,\dots, l_i\} } [\neg s_j\vee \neg s_{j'}\vee  t^{f_i}_{j}=t^{f_i}_{j'}] \;\land\; [\neg s_j\vee s_{j'} \vee  t^{f_i}_{j}>t^{f_i}_{j'} ]
+%         \]
+% \end{enumerate}
 
+\paragraph{Encoding Idea.} Instead of enumerating all subset choices, we introduce auxiliary Boolean variables that represent membership in the subsets $S_i$ and $S'_i$. For each offset term $t_j^{f_i} \in T_i$, we create:
+\begin{itemize}
+    \item $s_{i,j}$: true iff $t_j^{f_i} \in S_i$ (for upward propagation)
+    \item $s'_{i,j}$: true iff $t_j^{f_i} \in S'_i$ (for downward propagation)
+\end{itemize}
+
+We then encode the conditions $\Phi_{\text{max}}$, $\Phi_{\text{min}}$, $\Psi_\text{up}$, $\Psi_\text{down}$, and the clash conditions using these variables.
+
+\begin{definition}[CNF Encoding of Interval Extension Formulas]
+\label{def:interval-extension-formulas-CNF}
+For an interval $B = [b_{\min}, b_{\max}]$, define the encoded formulas:
+\begin{align*}
+\Psi_{\text{up}}^\text{e}(B) &\equiv \Phi_\text{max}^\text{e} \land \Phi_\text{prop-up}^\text{e} \land \text{ClashUpEnc} \\
+\Psi_{\text{down}}^\text{e}(B) &\equiv \Phi_\text{min}^\text{e} \land \Phi_\text{prop-down}^\text{e} \land \text{ClashDownEnc}
+\end{align*}
+where:
+\begin{itemize}
+    \item Maximality encoding:\todoSN{Or use its $\lor$-equivalent.}
+    \begin{align*}
+    \Phi_\text{max}^\text{e} \equiv \bigwedge_{i=1}^r \Big[& 
+        \bigwedge_{j<k} \big(s_{i,j} \land s_{i,k} \Rightarrow (t_j^{f_i} = t_k^{f_i})\big) \ \land \\
+        & \bigwedge_{j,k} \big(s_{i,j} \land \neg s_{i,k} \Rightarrow (t_j^{f_i} > t_k^{f_i})\big) \Big]
+    \end{align*}
+    
+    \item Minimality encoding: $\Phi_\text{min}^\text{e}$ defined analogously with $s'_{i,j}$ and $<$ instead of $>$.
+    
+    \item Upward propagation encoding: Given Boolean variables $\{s_{i,j}\}$ representing the choice $\mathcal{S} = (S_1,\dots,S_r)$ where $S_i = \{t_j^{f_i} \mid s_{i,j} \text{ is true}\}$, we define:
+    \begin{align*}
+        \Phi_{\text{prop-up}}^\text{e}(\{s_{i,j}\}) &\equiv \forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1 \dots \exists v_r.\ Q' 
+    \end{align*}
+    where $\bar{u}_i = \{u_{i,j} \mid \neg s_{i,j}\}$ denotes a set of variables $u_{i,j}$, one for each offset $t_j^{f_i}$ whenever $s_{i,j}$ is false. The formula $Q'$ is obtained from $Q$ by simultaneously substituting:
+    \begin{itemize}
+        \item $f_i(x+t_j^{f_i})$ by $v_i$ whenever $s_{i,j}$ is true,
+        \item $f_i(x+t_j^{f_i})$ by $u_{i,j}$ whenever $s_{i,j}$ is false.
+    \end{itemize}
+
+    \item Downward propagation encoding: Symmetrically, for downward propagation with variables $\{s'_{i,j}\}$ representing $\mathcal{S}'$, define $\Phi_{\text{prop-down}}^\text{e}(\{s'_{i,j}\})$.
+    
+    \item Clash condition encoding:
+    \begin{align*}
+    \text{ClashUpEnc} &\equiv \bigwedge_{i=1}^r \bigwedge_{t_g \in \args(F,f_i)} \bigwedge_{j=1}^{l_i}
+           \big(s_{i,j} \Rightarrow (t_g \leq b_{\max} + t_j^{f_i})\big) \\
+    \text{ClashDownEnc} &\equiv \bigwedge_{i=1}^r \bigwedge_{t_g \in \args(F,f_i)} \bigwedge_{j=1}^{l_i}
+           \big(s'_{i,j} \Rightarrow (t_g \geq b_{\min} + t_j^{f_i})\big)
+    \end{align*}
+\end{itemize}
+\end{definition}
+
+Note that if for some $i\in \{1,\dots, r\}$ all offset terms of $f_i$ are pairwise different numerals, then at most one $s_{i,j}$ can be true in any satisfying assignment of $\Psi_{\text{up}}^\text{e}(B)$ or $\Psi_{\text{down}}^\text{e}(B)$. This is because the maximality condition $\bigwedge_{t,t' \in S_i} t = t'$ would require two different numerals to be equal, which is impossible. Similarly for minimality condition.
+
+\begin{lemma}[Encoding Correctness]
+\label{lem:encoding-correctness}
+For any interval $B = [b_{\min}, b_{\max}]$:
+\begin{enumerate}
+    \item $\Psi_\text{up}^\text{e}(B)$ is satisfiable iff there exists $\mathcal{S} = (S_1,\dots,S_r)$ such that $\Psi_{\text{up}}(B,\mathcal{S})$ holds.
+    \item $\Psi_\text{down}^\text{e}(B)$ is satisfiable iff there exists $\mathcal{S}' = (S'_1,\dots,S'_r)$ such that $\Psi_{\text{down}}(B,\mathcal{S}')$ holds.
 \end{enumerate}
+% Moreover, from a satisfying assignment to $\Psi_\text{up}^\text{e}(B) \land \Psi_\text{down}^\text{e}(B)$, we can extract witnessing subsets $\mathcal{S},\mathcal{S}'$ by setting $S_i = \{t_j^{f_i} \mid s_{i,j} \text{ is true}\}$ and $S'_i = \{t_j^{f_i} \mid s'_{i,j} \text{ is true}\}$.
+\end{lemma}
+\begin{proof}
+    ($\Rightarrow$) Suppose $\Psi_\text{up}^\text{e}(B)$ is satisfiable by an assignment $I$. Define $S_i = \{t_j^{f_i} \mid I(s_{i,j}) = \text{true}\}$. By $\Phi_{\text{max}}^\text{e}$, all $t \in S_i$ have equal values under $I$, and they are strictly greater than any $t' \in T_i \setminus S_i$. Thus $\Phi_{\text{max}}(\mathcal{S})$ holds. By $\Phi_{\text{prop-up}}^\text{e}$, all $f_i(x+t)$ with $t \in S_i$ are equal to $v_i$, satisfying the substitution in $\Phi_{\text{prop-up}}(\mathcal{S})$. Finally, $\text{ClashUpEnc}$ ensures the clash condition. Hence $\Psi_{\text{up}}(B,\mathcal{S})$ holds.
 
-Note that if  for an $i\in \{1,\dots, r\}$ all offset terms of $f_i$ are pair-wise different numerals, not more than one $s^{f_i}$ can be true.
+    ($\Leftarrow$) Suppose $\Psi_{\text{up}}(B,\mathcal{S})$ holds for some $\mathcal{S}$. Set $s_{i,j}$ true iff $t_j^{f_i} \in S_i$. By $\Phi_{\text{max}}(\mathcal{S})$, all selected terms are equal and greater than non-selected ones, so $\Phi_{\text{max}}^\text{e}$ holds. Let $v_i$ be the common value for $f_i(x+t)$ with $t \in S_i$ (guaranteed by $\Phi_{\text{prop-up}}(\mathcal{S})$), then $\Phi_{\text{prop-up}}^\text{e}$ holds. The clash condition from $\Psi_{\text{up}}(B,\mathcal{S})$ ensures $\text{ClashUpEnc}$. Thus $\Psi_\text{up}^\text{e}(B)$ is satisfiable.
+    
+    The proof for $\Psi_\text{down}^\text{e}(B)$ is symmetric.
+\end{proof}
+
+\paragraph{Practical Considerations.}
+The exponential disjunctions in \cref{alg:interval-check-param-withBigvee} 
+(lines 4--5) can be replaced by the CNF encodings $\Psi_\text{up}^\text{e}$ and $\Psi_\text{down}^\text{e}$ as defined above, which are equi-satisfiable by Lemma~\ref{lem:encoding-correctness}. This yields a practical implementation while preserving all theoretical guarantees. Thus, the CNF encoding approach provides a practical bridge between the theoretical multi‑\req framework and implementable algorithm, while avoiding exponential formula size.
 
 \subsection{Handling Disjunction by Enumeration}
 
