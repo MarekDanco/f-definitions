@@ -1356,6 +1356,7 @@ The exponential disjunctions in \cref{alg:interval-check-param-withBigvee}
 
 \subsection{Handling Disjunction by Enumeration}
 
+This would be as in \cref{alg:interval-check-param} or \cref{alg:two-phase-precompute}.
 
 \begin{algorithm}
 \caption{Interval‑Based Satisfiability Check (parameterised multi-\req)}
@@ -1374,6 +1375,40 @@ The exponential disjunctions in \cref{alg:interval-check-param-withBigvee}
         \EndIf
         \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
         \State $I \gets \smt\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right)$
+    \EndWhile
+\EndFor
+\State \Return \textsc{Unsat}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Two‑Phase Interval Check with Subset Pre‑computation}
+\label{alg:two-phase-precompute}
+\begin{algorithmic}[1]
+\Require Formula $\phi = F \land \forall x . Q$
+\Ensure \textsc{Sat} or \textsc{Unsat}
+
+\State \textbf{Phase 1: Pre‑compute useful subset pairs}
+\State $\mathcal{C} \gets \emptyset$ \Comment{Set of candidate $(\mathcal{S}, \mathcal{S}')$ pairs}
+\For{each $(\mathcal{S}, \mathcal{S}')$}
+    \If{$\Phi_{\text{prop-up}}(\mathcal{S}) \land \Phi_{\text{prop-down}}(\mathcal{S}')$ is valid}
+        \State $\mathcal{C} \gets \mathcal{C} \cup \{(\mathcal{S}, \mathcal{S}')\}$
+    \EndIf
+\EndFor
+
+\State \textbf{Phase 2: Interval expansion for each candidate}
+\For{each $(\mathcal{S}, \mathcal{S}') \in \mathcal{C}$}
+    \State $b_{\min} \gets 0$, $b_{\max} \gets 0$
+    \State $I \gets \smt\!\left(F \land Q[0]\right)$
+    \While{$I \neq \bot$}
+        \State Construct $\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$ and $\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S'})$ \Comment{Definition~\ref{def:interval-extension-formulas-param}}
+        
+        \If{$\smt\!\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x] \land \Psi_{\text{up}} \land \Psi_{\text{down}}\right) \neq \bot$}
+            \State \Return \textsc{Sat}
+        \EndIf
+        
+        \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$
+        \State $I \gets \smt\!\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right)$
     \EndWhile
 \EndFor
 \State \Return \textsc{Unsat}
