@@ -1313,7 +1313,8 @@ where:
     \begin{align*}
         \Phi_{\text{prop-up}}^\text{e}(\{s_{i,j}\}) &\equiv \forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1 \dots \exists v_r.\ Q' 
     \end{align*}
-    where $\bar{u}_i = \{u_{i,j} \mid \neg s_{i,j}\}$ denotes a set of variables $u_{i,j}$, one for each offset $t_j^{f_i}$ whenever $s_{i,j}$ is false. The formula $Q'$ is obtained from $Q$ by simultaneously substituting:
+    where each $\bar{u}_i$, $i\in \{1,\dots,r\}$ stands for those variables $u_{i,j}$ for which $\neg s_{i,j}$, $j\in \{1,\dots, l_i\}$.%      where $\bar{u}_i = \{u_{i,j} \mid \neg s_{i,j}\}$ denotes a set of variables $u_{i,j}$, one for each offset $t_j^{f_i}$ whenever $s_{i,j}$ is false.
+    The formula $Q'$ is obtained from $Q$ by simultaneously substituting:
     \begin{itemize}
         \item $f_i(x+t_j^{f_i})$ by $v_i$ whenever $s_{i,j}$ is true,
         \item $f_i(x+t_j^{f_i})$ by $u_{i,j}$ whenever $s_{i,j}$ is false.
