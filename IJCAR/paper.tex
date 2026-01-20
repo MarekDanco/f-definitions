@@ -67,40 +67,26 @@
 
 \marek{Mention these \cite{bradley-manna07,bradley-vmcai06,ge-cav09,habermehl-etaps08}}
 
-Current as SMT solvers have limited capabilities to produce counterexamples
-for complex systems. Yet, counterexamples are important during modeling as
-they uncover  errors. For example, the user may wrongly assume that an input
-stream with increasing values will contain  two neighboring values that are
-equal.  Negating and skolemizing yields the following simple SMT formula.
+Current as SMT solvers have limited capabilities to produce counterexamples for complex systems. Yet, counterexamples are important during modeling as they uncover  errors. For example, the user may wrongly assume that an input stream with increasing values will contain  two neighboring values that are equal.  Negating and skolemizing yields the following simple SMT formula.
 \begin{equation}
 	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)<f(x+1)
 \end{equation}
 
-The formula has trivial counter-models, e.g. $f$ being the
-identity function. Such solution can be found by synthesis approaches, such as
-\sygus.  But it is  easy to get out of the reach of these tools because they
-are primarily based on templates and candidate-solution enumeration. The
-following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
+The formula has trivial counter-models, e.g. $f$ being the identity function. Such solution can be found by synthesis approaches, such as \sygus.  But it is  easy to get out of the reach of these tools because they are primarily based on templates and candidate-solution enumeration. The following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
+
 \begin{equation}\label{eq:periodic}
 	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)=f(x+2)
 \end{equation}
-These constraints allow only periodic functions whose neighboring values alternate.
-For such functions the \sygus grammar would have to guess an \textit{ite} term of the form
-$\mathit{ite}(x\,\mathit{mod}\,2 = 0\enspace a\enspace b)$, for integers $a \not = b$.
-Even if \sygus tools were improved, they could not yield a decision procedure for UFLIA,
-due to the inherent undecidability of arithmetic.
 
-We instead isolate a fragment of UFLIA where formulas like~\eqref{eq:periodic}
-can be decided using SMT techniques. Succinctly, we show that if the arguments of non-constant
-uninterpreted function symbols are restricted to terms of the form $x + k$, where $x$ is
-universally quantified and $k$ is a numeral, then the formula’s satisfiability
-becomes decidable via an inductive argument.
+These constraints allow only periodic functions whose neighboring values alternate. For such functions the \sygus grammar would have to guess an \textit{ite} term of the form $\mathit{ite}(x\,\mathit{mod}\,2 = 0\enspace a\enspace b)$, for integers $a \not = b$. Even if \sygus tools were improved, they could not yield a decision procedure for UFLIA, due to the inherent undecidability of arithmetic.
+
+We instead isolate a fragment of UFLIA where formulas like~\eqref{eq:periodic} can be decided using SMT techniques. Succinctly, we show that if the arguments of non-constant uninterpreted function symbols are restricted to terms of the form $x + k$, where $x$ is universally quantified and $k$ is a numeral, then the formula’s satisfiability becomes decidable via an inductive argument.
 
 We treat each quantifier as introducing infinitely many constraints on function calls,
-which we refer to as entities. A single entity may appear in multiple constraints, so we must
+which we refer to as cells. A single cell may appear in multiple constraints, so we must
 ensure that it is assigned a consistent value throughout. To show satisfiability within
 our fragment, we impose an order on these constraints and construct a symbolic assignment
-to the entities such that, when processed in this order, no conflicting assignments arise.
+to the cells such that, when processed in this order, no conflicting assignments arise.
 
 \section{Related Work}\label{}
 Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
@@ -128,8 +114,7 @@ Here, I am considering the works~\cite{bradley-vmcai06,ge-cav09,habermehl-etaps0
 
 The syntax in~\cite{habermehl-etaps08} includes $\leq$ but does not include $<$. It does include negation though, but only if it
 results in the quantified variables being existential. This cannot be solved by~\cite{bradley-vmcai06} (see Theorem 4 in their paper).
-\textsc{Z3} cannot solve this on its own but with the addition of Lemma~\ref{eq:ind-needed-lemma} it can.
-Adding the lemma also helps Vampire but not \textsc{cvc5}.
+\textsc{Z3} cannot solve this on its own but with the addition of Lemma~\ref{eq:ind-needed-lemma} it can. Adding the lemma also helps Vampire but not \textsc{cvc5}.
 
 \paragraph{Two-Valued Constant Function}
 
@@ -159,50 +144,43 @@ Include information on well-orders and induction on well-orders, here?
 \todoSR{I intend to add a running example and a figure}
 We will view quantifier-free formulas as formulas with a universal quantifier that ranges over an empty tuple of variables. Hence, quantifier-free formulas have precisely one instantiation.
 
-\begin{definition}[entity]\label{def:entity}
-	An \emph{entity} is a term of the form $f(c_1,\dots, c_k)$ where $f$ is an uninterpreted function symbol and $c_1,\dots, c_k$ are integers.\todoSR{Mikoláš used the term ``cell'', which might more succinct and descriptive.}
+\begin{definition}[Cell]\label{def:cell}
+	A \emph{cell} is a term of the form $f(n_1,\dots, n_k)$ where $f$ is an uninterpreted function symbol and $n_1,\dots, n_k$ are integers.\todoSR{Mikoláš used the term ``cell'', which might more succinct and descriptive.}
 	\mj{Potentially change notation from $c_i$ to $n_i$ to distinguish numerals
 		and constants.}
 \end{definition}
-Examples of entities are $c$, and $f(7)$. The term $f(c+7)$ is not an entity.
+Examples of cells are $c$, and $f(7)$. The term $f(c+7)$ is not a cell.
 
-% For now, we restrict ourselves to the case where the arguments of uninterpreted function symbols may not include further uninterpreted function symbols (e.g., $\forall x\;.\; f(x+1)=f(x)+1$ is OK, but $\forall x\;.\; f(x+c)=f(x)+1$ not). As a consequence, in each instantiation, all arguments to uninterpreted function symbols evaluate to constants, and hence the instantiation constrains a fixed finite set of entities, which we call the \emph{entities of the instantiation}.
-
-\begin{definition}[entity interpretation]
-	An \emph{entity interpretation} is a partial function whose domain is the set of entities. An entity interpretation $I$ is \emph{compatible} with an interpretation $\mathcal{I}$ iff $I$ and $\mathcal{I}$ agree on all entities where $I$ is defined.
+\begin{definition}[Cell Interpretation]
+	A \emph{cell interpretation} is a partial function whose domain is the set of cells. A cell interpretation $I$ is \emph{compatible} with an interpretation $\mathcal{I}$ iff $I$ and $\mathcal{I}$ agree on all cells where $I$ is defined.
 \end{definition}
 
-Given an entity interpretation $I$, we denote by $\mathit{def}(I)$ the set of entities for which $I$ is defined. Given a term $t$ and an entity interpretation $I$  we define $I(t):=\mathcal{I}(t)$, if  $\mathcal{I}(t)$ is unique for every interpretation $\mathcal{I}$ compatible with $I$, and otherwise $I(t):=\bot$.\todoSR{This is not completely formal, we could also use a more formal, but less readable version.}
-For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but $I(f(1))=\bot$. Also note that $I(f(1)-f(1))=0\neq\bot$\todoSR{I went for a semantic definition here, since it works very generally without taking much space to define.}. In a similar way, for a formula $\phi$, we define that an entity interpretation~$I$ satisfies $\phi$ iff for every interpretation $\mathcal{I}$ compatible with $I$, $\mathcal{I}$ satisfies $\phi$, in which case we also write $I\models \phi$.
-
-% \begin{definition}
-% 	We say that an entity interpretation $I$ \emph{interprets the arguments} of a quantifier-free formula $\phi$ iff for all argument terms $t$ of uninterpreted function symbols in $\phi$, $I(t)\neq\bot$. For an entity interpretation $I$ that interprets the arguments of a formula~$\phi$, we say that an entity $f(c_1,\dots, c_k)$ is an \emph{$I$-interpreted entity in $\phi$} iff $\phi$ has a sub-term of the form $f(t_1,\dots, t_k)$, and $I(t_1)=c_1$, $\dots$, $I(t_k)=c_k$.
-% \end{definition}
-% For example, the interpretation $I=\{ a\mapsto 5 \}$ interprets the arguments of the formula $f(a)\geq 0$, and the entity $f(5)$ is an $I$-interpreted entity in $f(a)\geq 0$.
+Given a cell interpretation $I$, we denote by $\mathit{def}(I)$ the set of cells for which $I$ is defined. Given a term $t$ and a cell interpretation $I$  we define $I(t):=\mathcal{I}(t)$, if  $\mathcal{I}(t)$ is unique for every interpretation $\mathcal{I}$ compatible with $I$, and otherwise $I(t):=\bot$.\todoSR{This is not completely formal, we could also use a more formal, but less readable version.}
+For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but $I(f(1))=\bot$. Also note that $I(f(1)-f(1))=0\neq\bot$\todoSR{I went for a semantic definition here, since it works very generally without taking much space to define.}. In a similar way, for a formula $\phi$, we define that a cell interpretation~$I$ satisfies $\phi$ iff for every interpretation $\mathcal{I}$ compatible with $I$, $\mathcal{I}$ satisfies $\phi$, in which case we also write $I\models \phi$.
 
 \begin{definition}
 	\label{def:pre-sat-cert}
-	Given a formula $\phi$ of the form $F\wedge \forall x\;.\; Q$, we call an entity interpretation $I$ such that
+	Given a formula $\phi$ of the form $F\wedge \forall x\;.\; Q$, we call a cell interpretation $I$ such that
         \begin{itemize}
         \item $I\models F$, and
         \item for all $z\in\mathbb{Z}$, for every uninterpreted function symbol~$f$ and its argument terms $t\in args(Q, f)$, $I(\subst{t}{x}{\repr{z}})\neq\bot$
         \end{itemize}
- a \emph{pre-satisfiability certificate} of $\phi$. For any $z\in\mathbb{Z}$, we denote by $\Gamma_{I,z}(\phi)$ the resulting set of entities \[\{ I(\subst{t}{x}{\repr{z}}) \mid t\in args(Q, f), f \emph{ is an uninterpreted function symbol}\}.\]
+ a \emph{pre-satisfiability assignment} of $\phi$. For any $z\in\mathbb{Z}$, we denote by $\Gamma_{I,z}(\phi)$ the resulting set of cells \[\{ I(\subst{t}{x}{\repr{z}}) \mid t\in args(Q, f), f \emph{ is an uninterpreted function symbol}\}.\]
 \end{definition}
 
-For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
+For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability assignment of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
 \begin{definition}
 	\label{def:certificate}
-	Given a formula $\phi$  of the form $F\wedge \forall x\;.\; Q$, a \emph{satisfiability certificate} is
+	Given a formula $\phi$  of the form $F\wedge \forall x\;.\; Q$, a \emph{cell propagation certificate} is
 	\begin{itemize}
 		\item a well-order $\preceq$ on $\mathbb{Z}$,%\footnote{A well-order total order for which every non-empty subset has a least element. This enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}
-		\item a pre-satisfiability certificate $I$ of $\phi$,
+		\item a pre-satisfiability assignment $I$ of $\phi$,
 		\item for every $z\in\mathbb{Z}$
                   \begin{itemize}
-                  \item a set $X_z\subseteq \Gamma_{I,z}(\phi)$  (the \emph{existential entities})\todoSR{alternative term ``propagated entities''} such that \[X_z\cap (\mathit{def}(I)\cup\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi))=\emptyset,\] and
+                  \item a set $X_z\subseteq \Gamma_{I,z}(\phi)$  (the \emph{propagated cells})\todoSR{alternative term ``propagated cells''} such that \[X_z\cap (\mathit{def}(I)\cup\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi))=\emptyset,\] and
                     %that are neither assigned a value by $I$, nor occur in any $\Gamma_{I,z'}(\phi)$ for any $z'\prec z$
-                  \item a certificate (the \emph{satisfiability propagator}) showing that for all values of entities in $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ there exist values for the entities in $X_z$ such that for the entity assignment $I_{X_z}$ assigning these values to $X_z$, $I\cup I_{X_z}\models \subst{Q}{x}{\repr{z}}$.
+                  \item a certificate (the \emph{satisfiability propagator}) showing that for all values of cells in $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ there exist values for the cells in $X_z$ such that for the cell interpretation $I_{X_z}$ assigning these values to $X_z$, $I\cup I_{X_z}\models \subst{Q}{x}{\repr{z}}$.
                   \end{itemize}
 
 	\end{itemize}
@@ -210,54 +188,38 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 
 
 For the sake of generality, at this point we do not require the satisfiability propagator to be constructive. Below, we will then work with algorithms computing the values only required to exist, here.
 
-% \addtocounter{definition}{-1}
-% \begin{definition}[Simplified]
-% 	Given a formula $\phi$, a \emph{satisfiability certificate} is
-% 	\begin{itemize}
-% 		\item a pre-satisfiability certificate $I$
-% 		\item a total order $\preceq$ on instantiations of the quantified part of $\phi$,
-% 		\item for each instantiation $\psi$ of the quantified part of $\phi$ a set of corresponding
-% 		      \emph{existential} entities -- entities occurring in $\psi$ but not occurring in the ground part of $\phi$
-% 		      or in any instantiation $\psi'$, where $\psi' \prec \psi$,
-% 		\item for each instantiation $\psi$ of the quantified part of $\phi$ a corresponding
-% 		      \emph{satisfiability propagator} -- a certificate showing that for all values of entities that are not existential and
-% 		      do not occur in the ground part, there exist values of existential entities that satisfy $\psi$.
-% 	\end{itemize}
-% \end{definition}
-
-
-Also note that for $z\in\mathbb{Z}$ such that $\Gamma_{I,z}\subseteq \mathit{def}(I)$, the set of existential variables $X_z$ must be empty, and the satisfiability propagator only needs to certify that $I\models \subst{Q}{x}{\repr{z}}$. In other words, the entity interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator. 
+Also note that for $z\in\mathbb{Z}$ such that $\Gamma_{I,z}\subseteq \mathit{def}(I)$, the set of fresh variables $X_z$ must be empty, and the satisfiability propagator only needs to certify that $I\models \subst{Q}{x}{\repr{z}}$. In other words, the cell interpretation~$I$ serving as a pre-satisfiability assignment already plays the role of the satisfiability propagator. 
 
 \begin{property}\label{prop:certThenSat}
-	Every formula formula $\phi$  of the form $F\wedge \forall x\;.\; Q$ that has a satisfiability certificate is satisfiable.
+	Every formula formula $\phi$  of the form $F\wedge \forall x\;.\; Q$ that has a cell propagation certificate is satisfiable.
 \end{property}
 
 \begin{proof}
-	Assume a formula of the given form and assume that it  has a satisfiability certificate.
-	The corresponding pre-satisfiability certificate $I$ satisfies the quantifier free part~$F$ of $\phi$.
+	Assume a formula of the given form and assume that it  has a cell propagation certificate.
+	The corresponding pre-satisfiability assignment $I$ satisfies the quantifier free part~$F$ of $\phi$.
 
 We start by showing
- that for every $z\in\mathbb{Z}$ there is an extension $I'$ of $I$ such that $I'\models\{ \subst{Q}{x}{\repr{z}'} \mid z'\preceq z\}$. For this we use the principle of induction on well-orders: Let $z\in\mathbb{Z}$, and let $\Phi$ be $\{ \subst{Q}{x}{\repr{z}'} \mid z'\prec z\}$. We assume that there is an extension $I_{\Phi}$ of $I$ with $I_{\Phi}\models\Phi$, and prove that there is an extension $I'$ of $I$ with $I'\models\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$. Since the formula has a satisfiability certificate, the existential entities of $\subst{Q}{x}{\repr{z}}$ do not occur in any element of $\Phi$. Let $I'$ be the extension of $I_{\Phi}$ that assigns to the existential entities $X_z$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $\Phi$, $I'$ and $I_{\Phi}$ coincide on entities occurring in $\Phi$. Hence $I'$ satisfies both $\Phi$ and $\subst{Q}{x}{\repr{z}}$, and so it satisfies $\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$.
+ that for every $z\in\mathbb{Z}$ there is an extension $I'$ of $I$ such that $I'\models\{ \subst{Q}{x}{\repr{z}'} \mid z'\preceq z\}$. For this we use the principle of induction on well-orders: Let $z\in\mathbb{Z}$, and let $\Phi$ be $\{ \subst{Q}{x}{\repr{z}'} \mid z'\prec z\}$. We assume that there is an extension $I_{\Phi}$ of $I$ with $I_{\Phi}\models\Phi$, and prove that there is an extension $I'$ of $I$ with $I'\models\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$. Since the formula has a cell propagation certificate, the propagated cells of $\subst{Q}{x}{\repr{z}}$ do not occur in any element of $\Phi$. Let $I'$ be the extension of $I_{\Phi}$ that assigns to the propagated cells $X_z$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $\Phi$, $I'$ and $I_{\Phi}$ coincide on cells occurring in $\Phi$. Hence $I'$ satisfies both $\Phi$ and $\subst{Q}{x}{\repr{z}}$, and so it satisfies $\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$.
 
-	Now denote for every $z\in\mathbb{Z}$ the entity interpretation  satisfying $\subst{Q}{x}{\repr{z}}$ as constructed in the previous paragraph by $I_z$.
-	% From the well-order $\prec$ we get a corresponding well-order on these entity interpretations.
-	% Let $I_{\phi}$ be the entity interpretation that, for any entity $u$, assigns the value to $u$ that $I_{z}$ assigns to it for the smallest $z$ (wrt. $\prec$) that assigns a value to $u$. This smallest $z$ exists, since $\prec$ is a well-order. The entity interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
-Observe that for every entity $u$, and $z, z'\in \mathbb{Z}$ with $I_z(u)\neq \bot$ and $I_{z'}(u)\neq \bot$, $I_z(u)=I_{z'}(u)$.      Let $I_\phi$ be the interpretation that, for any entity $u$, if there is a $z$ such that $I_z(u)\neq \bot$, then $I_\phi(u)=I_z(u)$, and otherwise $I_\phi(u)=0$. Certainly $I_\phi\models F$. Moreover, for every $z\in\mathbb{Z}$,  $I_\phi\models  \subst{Q}{x}{\repr{z}}$, since $I_\phi$ coincides with $I_z$ for all elements, where it is defined. Hence  $I_\phi\models \phi$.
+	Now denote for every $z\in\mathbb{Z}$ the cell interpretation  satisfying $\subst{Q}{x}{\repr{z}}$ as constructed in the previous paragraph by $I_z$.
+	% From the well-order $\prec$ we get a corresponding well-order on these cell interpretations.
+	% Let $I_{\phi}$ be the cell interpretation that, for any cell $u$, assigns the value to $u$ that $I_{z}$ assigns to it for the smallest $z$ (wrt. $\prec$) that assigns a value to $u$. This smallest $z$ exists, since $\prec$ is a well-order. The cell interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
+Observe that for every cell $u$, and $z, z'\in \mathbb{Z}$ with $I_z(u)\neq \bot$ and $I_{z'}(u)\neq \bot$, $I_z(u)=I_{z'}(u)$.      Let $I_\phi$ be the assignment that, for any cell $u$, if there is a $z$ such that $I_z(u)\neq \bot$, then $I_\phi(u)=I_z(u)$, and otherwise $I_\phi(u)=0$. Certainly $I_\phi\models F$. Moreover, for every $z\in\mathbb{Z}$,  $I_\phi\models  \subst{Q}{x}{\repr{z}}$, since $I_\phi$ coincides with $I_z$ for all elements, where it is defined. Hence  $I_\phi\models \phi$.
 \end{proof}
 
-A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\mathbb{Z}$ and for each $u\in X_z$ we assume a function $prop_{u,z}$ such that for
-an entity interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$, $I\cup I'\cup \{ u \mapsto prop_{u,z}(I\cup I') \mid u\in{X_z}\}\models\subst{Q}{x}{\repr{z}}$.
+A cell propagation certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model. We now show how to compute such values from a given cell propagation certificate containing a pre-satisfiability assignment $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\mathbb{Z}$ and for each $u\in X_z$ we assume a function $prop_{u,z}$ such that for
+a cell interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$, $I\cup I'\cup \{ u \mapsto prop_{u,z}(I\cup I') \mid u\in{X_z}\}\models\subst{Q}{x}{\repr{z}}$.
  
-% for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
+% for any $\hat{v}_1,\dots,\hat{v}_r$, the cell interpretation
 % \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$
 
-% For any instantiation $\psi$ of a quantified sub-formula with existential entities $u_1,\dots, u_s$ and non-existential entities $v_1,\dots, v_r$, the satisfiability propagator defines  functions $prop_{u_1},\dots, prop_{u_s}$ such that for any $\hat{v}_1,\dots,\hat{v}_r$, the entity interpretation
+% For any instantiation $\psi$ of a quantified sub-formula with propagated cells $u_1,\dots, u_s$ and non-propagated cells $v_1,\dots, v_r$, the satisfiability propagator defines  functions $prop_{u_1},\dots, prop_{u_s}$ such that for any $\hat{v}_1,\dots,\hat{v}_r$, the cell interpretation
 % \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.\marek{Is \cite{kuncak-sttt13} applicable in our case too?}
 
 
-Now, observe that for any entity $u$ there is at most one $z\in\mathbb{Z}$ with $u\in X_z$ (if there would be more than one then, due to $\preceq$ being a well-order, there is a minimal one, let us say $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any entity $u$, let $\mathit{inst}(u)$ either be the $z\in\mathbb{Z}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
+Now, observe that for any cell $u$ there is at most one $z\in\mathbb{Z}$ with $u\in X_z$ (if there would be more than one then, due to $\preceq$ being a well-order, there is a minimal one, let us say $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any cell $u$, let $\mathit{inst}(u)$ either be the $z\in\mathbb{Z}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
 
-Then, for the interpretation $I_\phi$ from the proof of Property~\ref{prop:certThenSat}, which satisfies a given formula~$\phi$, and a given entity~$u$, the value of $I_\phi(u)$ can be computed by the following recursive function $val(u)$:
+Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenSat}, which satisfies a given formula~$\phi$, and a given cell~$u$, the value of $I_\phi(u)$ can be computed by the following recursive function $val(u)$:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
 	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
 	\textbf{if} $\mathit{inst}(u)=\bot$ \textbf{then} \textbf{return} 0\\
@@ -266,7 +228,7 @@ Then, for the interpretation $I_\phi$ from the proof of Property~\ref{prop:certT
 
 Here, the recursive calls go down the order $\prec$ in the following sense:
 \begin{property}
-	Let $u$ be an entity such that $\mathit{inst}(u)\neq\bot$. Then for any $v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, $\mathit{inst}(v)\prec \mathit{inst}(u)$.
+	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any $v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, $\mathit{inst}(v)\prec \mathit{inst}(u)$.
 \end{property}
 
 So each recursive call of the program $val$ either results in $\mathit{inst}(u)$ either decreasing or being $\bot$. In the latter case, the program terminates immediately, and the former case cannot happen infinitely often, since the used order is well-founded. So we have:
@@ -277,7 +239,7 @@ The program $val$ terminates.
 Note that, in general, it is not possible to compute $val(u)$ by computing the values of $X_z, z \in \mathbb{Z}$, with $z$ being initialized with the minimal $z$ wrt. $\prec$, and then using a loop that increases $z$ from one successor wrt. $\prec$ to the next. For example, if  $\prec$  orders all even numbers before all odd ones, then this loop would have to iterate over infinitely many even numbers before computing the value of an odd one.
      
 
-The goal is now an algorithm that computes such satisfiability certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
+The goal is now an algorithm that computes such cell propagation certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
 
 \section{Algorithm}\label{sec:alg}
 
@@ -290,17 +252,17 @@ where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, and the  $t^{f_i}_
 % % \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
 % % \todoSR{Correct. It applies to both parts individually, but not to the conjunction. This is  restrictive, of course, but allowed for an easy generalization to the case of several occurrences of the same function symbol with different arguments.}
 % \begin{itemize}
-%     \item for all values of entities\mj{I still think that the terminology is wrong. Entity is $f(1)$, not $f(x+1)$ by \cref{def:entity}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
-%     \item for all values of entities in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
+%     \item for all values of cells\mj{I still think that the terminology is wrong. Cell is $f(1)$, not $f(x+1)$ by \cref{def:cell}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
+%     \item for all values of cells in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
 % \end{itemize}
 
 % In the following, we will call this condition \req. We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate})
 % available.
 
-We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require the \req condition described as follows.
+We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require the multi-\req condition described as follows.
 
 
-\paragraph{Multi-\req Condition} First, we formalise the condition that enables propagation in both directions, generalising the single-pivot \req condition to allow multiple functions to serve as pivots.
+% \paragraph{\textbf{Multi-\req Condition}} First, we formalise the condition that enables propagation in both directions, generalising the single-pivot \req condition to allow multiple functions to serve as pivots.
 
 \begin{definition}[Multi-\req Condition (parametric version)]
 \label{def:multi-reqpivot-param}
@@ -324,8 +286,7 @@ For any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$ with $S_i \subseteq T_
         \end{itemize}
 \end{itemize}
 
-Symmetrically, for downward propagation with subsets $\mathcal{S}' = (S'_1,\dots,S'_r)$, define 
-$\Phi_{\text{min}}(\mathcal{S}')$ (with $<$ instead of $>$) and $\Phi_{\text{prop-down}}(\mathcal{S}')$.
+Symmetrically, for downward propagation with subsets $\mathcal{S}' = (S'_1,\dots,S'_r)$, define $\Phi_{\text{min}}(\mathcal{S}')$ (with $<$ instead of $>$) and $\Phi_{\text{prop-down}}(\mathcal{S}')$.
 
 We say that $Q$ satisfies the \emph{multi-\req condition for $(\mathcal{S}, \mathcal{S}')$} if
 \begin{itemize}
@@ -339,7 +300,7 @@ We say $Q$ satisfies the \emph{multi-\req condition} if there exists \emph{some}
 Intuitively, the multi‑\req condition generalises the single‑pivot \req condition by allowing \emph{multiple functions} to serve as pivots simultaneously. For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The old single‑pivot \req is the special case where exactly one $S_i$ is non‑empty and contains a single offset. The downward condition is symmetric.
 
 
-\begin{example}[Multi-\req Illustration---parameterised]
+\begin{example}[Multi-\req Illustration]
 Consider the formula:
 \[
 \forall x.\ f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
@@ -360,7 +321,6 @@ Consider the choice $\mathcal{S} = (S_f, S_g, S_h) = (\{4\}, \{2\}, \emptyset)$.
         \item \textbf{Maximality $\Phi_{\text{max}}(\mathcal{S})$:}
         \begin{itemize}
         \item For $f$: $S_f = \{4\}$, $T_f \setminus S_f = \{c+3, 1\}$
-          % $4 > 1$ is true. $4 > c+3$ becomes a constraint: $c < 1$.
             \item For $g$: $S_g = \{2\}$, $T_g \setminus S_g = \emptyset$
             \item For $h$: $S_h = \emptyset$
             \end{itemize}
@@ -375,10 +335,7 @@ provided $c < 1$.
             \item $u_f^{c+3}$ for $f(x+c+3)$ and $u_f^1$ for $f(x+1)$,
             \item $u_h^0$ for $h(x)$,
         \end{itemize}
-        % The transformed $Q'$ is:
-        % \[
-        % u_f^{c+3} + v_f + u_f^1 = v_g + u_h^0
-        % \]
+
          and get the propagability condition 
         \[
         \forall x \forall u_f^{c+3} \forall u_f^1 \forall u_h^0 \exists v_f \exists v_g.\ 
@@ -416,11 +373,6 @@ This results in $\Phi_{\text{min}(\mathcal{S}')}\equiv 1 = 1\land 1 < c+3 \land 
         \item $u_f^{c+3}$ for $f(x+c+3)$ and $u_f^4$ for $f(x+4)$,
         \item $u_g^2$ for $g(x+2)$,
     \end{itemize}
-    % The transformed $Q'$ is:
-    % \[
-    % u_f^{c+3} + u_f^4 + v'_f = u_g^2 + v'_h
-    % \]
-    % The propagability condition requires:
     and get the propagability condition
     \[
     \forall x \forall u_f^{c+3} \forall u_f^4 \forall u_g^2 \exists v'_f \exists v'_h.\ 
@@ -435,10 +387,10 @@ $Q$ satisfies multi-\req for the pair $(\mathcal{S},\mathcal{S}')$ if we can fin
     \item For upward: $c < 1$
     \item For downward: $c > -2$
 \end{itemize}
-Thus any $c \in (-2, 1)$ works. This demonstrates that for such $c$, the specific choices $\mathcal{S} = (\{4\},\{2\},\emptyset)$ and $\mathcal{S}' = (\{1\},\emptyset,\{0\})$ witness the multi‑\req condition. %If $c \geq 1$, we could use Choice 2 for upward ($c > 1$). 
+Thus any $c \in (-2, 1)$ works. This demonstrates that for such $c$, the specific choices $\mathcal{S} = (\{4\},\{2\},\emptyset)$ and $\mathcal{S}' = (\{1\},\emptyset,\{0\})$ witness the multi‑\req condition.
 \end{example}
 
-Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the entities generated during propagation from clashing with the ground part $F$.
+Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the cells generated during propagation from clashing with the ground part $F$.
 
 \begin{definition}[Interval Extension Formulas (parameterised)]
 \label{def:interval-extension-formulas-param}
@@ -463,12 +415,12 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots
 \end{enumerate}
 \end{definition}
 
-Thus, for any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\Psi_{\text{up}}(\mathcal{S}, B)$ (resp.\ $\Psi_{\text{down}}(\mathcal{S}', B)$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of multi‑\req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition ensures that no entity $f_i(z+t)$ with $z > b_{\max}$ (resp. $z < b_{\min}$) and $t \in S_i$ already appears in the ground part $F$.
+Thus, for any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\Psi_{\text{up}}(\mathcal{S}, B)$ (resp.\ $\Psi_{\text{down}}(\mathcal{S}', B)$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of multi‑\req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition ensures that no cell $f_i(z+t)$ with $z > b_{\max}$ (resp. $z < b_{\min}$) and $t \in S_i$ already appears in the ground part $F$.
 
 \begin{theorem}[Interval Satisfiability (parameterised version)]
 \label{thm:interval-certificate-param}
 Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and let $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$ be subsets satisfying the multi-\req condition for $(\mathcal{S}, \mathcal{S}')$ as defined in \cref{def:multi-reqpivot-param}.  
-Then $\phi = F \land \forall x.\, Q$ has a satisfiability certificate — and hence is satisfiable — provided that
+Then $\phi = F \land \forall x.\, Q$ has a cell propagation certificate — and hence is satisfiable — provided that
 \[
 \Bigl(F \land \bigwedge_{x \in B} Q[x]\Bigr) \;\land\; \Psi_{\text{up}}(B,\mathcal{S}) \;\land\; \Psi_{\text{down}}(B,\mathcal{S}')
 \]
@@ -487,9 +439,9 @@ We construct a certificate as in \cref{def:certificate}:
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
     \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
         
-    \item \textbf{Pre‑satisfiability certificate:} $I$ 
+    \item \textbf{Pre‑satisfiability assignment:} $I$ 
     
-    \item \textbf{Existential entities $X_z$ for $z \in \mathbb{Z}$:}
+    \item \textbf{Propagated cells $X_z$ for $z \in \mathbb{Z}$:}
     \[
     X_z = 
     \begin{cases}
@@ -502,8 +454,8 @@ We construct a certificate as in \cref{def:certificate}:
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
         \item For $z \in B$: $I$ itself satisfies $Q[z]$.
-        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(\mathcal{S})$ provides a function that, given values for all non‑existential entities in $\Gamma_{I,z}(\phi)$, returns values $v_1,\dots,v_r$ to assign to every $f_i(z+t)$ with $t \in S_i$, thereby satisfying $Q[z]$.
-        \item For $z < b_{\min}$: the condition $\Phi_{\text{prop-down}}(\mathcal{S}')$ yields a propagator for the entities $f_i(z+t)$ with $t \in S_i'$.
+        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(\mathcal{S})$ provides a function that, given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$, returns values $v_1,\dots,v_r$ to assign to every $f_i(z+t)$ with $t \in S_i$, thereby satisfying $Q[z]$.
+        \item For $z < b_{\min}$: the condition $\Phi_{\text{prop-down}}(\mathcal{S}')$ yields a propagator for the cells $f_i(z+t)$ with $t \in S_i'$.
     \end{itemize}
 \end{enumerate}
 
@@ -525,22 +477,12 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
     \end{itemize}
 
     \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition.
-    % \item For $z < b_{\min}$, consider any $f_i(z+t)$ with $t \in S_i'$.
-    % \begin{itemize}
-    %     \item It cannot belong to $\mathit{def}(I)$ because the clash condition $t_g \geq b_{\min} + t$ in $\Psi_{\text{down}}(B,\mathcal{S}')$ guarantees $I(t_g) \geq b_{\min} + I(t) > z + I(t)$ for every $t_g \in \args(F,f_i)$.
-    %     \item It cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$ because either:
-    %     \begin{enumerate}
-    %         \item $z' \geq b_{\min}$: then $z'+I(t') \geq b_{\min} + I(t') > z + I(t)$ for all $t' \in T_i$,
-    %         \item $z < z' < b_{\min}$: then $z'+I(t') \geq z'+ \min_{t'' \in T_i} I(t'') > z + I(t)$ since $I(t)$ is minimal among $\{I(t'') \mid t'' \in T_i\}$ by $\Phi_{\text{min}}(\mathcal{S}')$.
-    %     \end{enumerate}
-    % \end{itemize}
 \end{itemize}
 
-Thus all certificate requirements are satisfied. By \cref{prop:certThenSat}, $\phi$ is satisfiable.
+Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \end{proof}
 
-\cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. 
-% To use the parameterised version, the algorithm can iterate over candidate pairs $(\mathcal{S},\mathcal{S}')$.
+\cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. This can be seen in \cref{alg:interval-check-param-withBigvee}.
 
 \begin{algorithm}
 \caption{Interval‑Based Sat Check (par. multi-\req) with $\bigvee$}
@@ -588,7 +530,7 @@ Thus $I$ satisfies:
 F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Psi_{\text{down}}(B,\mathcal{S}').
 \]
 
-By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a satisfiability certificate 
+By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a cell propagation certificate 
 for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiable.
 \end{proof}
 
@@ -605,7 +547,7 @@ then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{S
 
 \begin{proof}
 Assume $\phi$ is satisfiable and satisfies multi‑\req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
-Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding entity interpretation $I^*$.
+Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$.
 
 For each $i$, define:
 \[
@@ -659,9 +601,7 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     Thus $I^* \models \Psi_{\text{down}}(B,\mathcal{S}'^*)$, and consequently $I^* \models \text{min}_{\text{down}}$.
 \end{enumerate}
 
-Let $N = \max(|b_{\min}|, |b_{\max}|)$. Algorithm~\ref{alg:interval-check-param-withBigvee} expands the 
-interval symmetrically from $[0,0]$. When it reaches iteration $n = N$, the interval becomes 
-$[-N, N]$, which contains $B$.
+Let $N = \max(|b_{\min}|, |b_{\max}|)$. Algorithm~\ref{alg:interval-check-param-withBigvee} expands the interval symmetrically from $[0,0]$. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$.
 
 At this iteration, the $\smt$ call on line 6 checks:
 \[
@@ -669,8 +609,7 @@ F \land \bigwedge_{x=-N}^{N} Q[x] \land \text{max}_{\text{up}} \land \text{min}_
 \]
 where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are constructed for the interval $[-N, N]$.
 
-Since $[-N, N]$ contains $B$, and $I^*$ satisfies all three conditions as shown above, this formula 
-is satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
+Since $[-N, N]$ contains $B$, and $I^*$ satisfies all three conditions as shown above, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
 \end{proof}
 
 \section{Experiments}
@@ -768,17 +707,6 @@ In general, \cref{alg:sr} is complete in the following senses:
 
 The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S} = (S_1,\dots,S_r)$ and $\mathcal{S}' = (S'_1,\dots,S'_r)$. While theoretically elegant, these disjunctions lead to formulas with exponential size, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
 
-% \begin{enumerate}
-% \item For each offset term $t_j^{f_i}, i\in \{ 1,\dots, r\}, j\in \{ 1,\dots, l_i\} $ use a propositional variable $s_j^{f_i}$ that is true iff $s_1^{f_i}\in S_i$. 
-  
-% \item Replace the disjunction $\bigvee_{S_1\subseteq T_1,\dots,S_r\subseteq T_r}$ by an encoding using these variables. For example, the maximality condition $\Phi_{\text{max}}$ then reads as
-%         % $\Phi_{\text{max}}(S_1,\dots,S_r)$:}
-%         \[
-%         \bigwedge_{i\in \{1,\dots, r\}} 
-%           \bigwedge_{j,j' \in \{1,\dots, l_i\} } [\neg s_j\vee \neg s_{j'}\vee  t^{f_i}_{j}=t^{f_i}_{j'}] \;\land\; [\neg s_j\vee s_{j'} \vee  t^{f_i}_{j}>t^{f_i}_{j'} ]
-%         \]
-% \end{enumerate}
-
 \paragraph{Encoding Idea.} Instead of enumerating all subset choices, we introduce auxiliary Boolean variables that represent membership in the subsets $S_i$ and $S'_i$. For each offset term $t_j^{f_i} \in T_i$, we create:
 \begin{itemize}
     \item $s_{i,j}$: true iff $t_j^{f_i} \in S_i$ (for upward propagation)
@@ -809,7 +737,7 @@ where:
     \begin{align*}
         \Phi_{\text{prop-up}}^\text{e}(\{s_{i,j}\}) &\equiv \forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1 \dots \exists v_r.\ Q' 
     \end{align*}
-    where each $\bar{u}_i$, $i\in \{1,\dots,r\}$ stands for those variables $u_{i,j}$ for which $\neg s_{i,j}$, $j\in \{1,\dots, l_i\}$.%      where $\bar{u}_i = \{u_{i,j} \mid \neg s_{i,j}\}$ denotes a set of variables $u_{i,j}$, one for each offset $t_j^{f_i}$ whenever $s_{i,j}$ is false.
+    where each $\bar{u}_i$, $i\in \{1,\dots,r\}$ stands for those variables $u_{i,j}$ for which $\neg s_{i,j}$, $j\in \{1,\dots, l_i\}$.
     The formula $Q'$ is obtained from $Q$ by simultaneously substituting:
     \begin{itemize}
         \item $f_i(x+t_j^{f_i})$ by $v_i$ whenever $s_{i,j}$ is true,
@@ -837,7 +765,6 @@ For any interval $B = [b_{\min}, b_{\max}]$:
     \item $\Psi_\text{up}^\text{e}(B)$ is satisfiable iff there exists $\mathcal{S} = (S_1,\dots,S_r)$ such that $\Psi_{\text{up}}(B,\mathcal{S})$ holds.
     \item $\Psi_\text{down}^\text{e}(B)$ is satisfiable iff there exists $\mathcal{S}' = (S'_1,\dots,S'_r)$ such that $\Psi_{\text{down}}(B,\mathcal{S}')$ holds.
 \end{enumerate}
-% Moreover, from a satisfying assignment to $\Psi_\text{up}^\text{e}(B) \land \Psi_\text{down}^\text{e}(B)$, we can extract witnessing subsets $\mathcal{S},\mathcal{S}'$ by setting $S_i = \{t_j^{f_i} \mid s_{i,j} \text{ is true}\}$ and $S'_i = \{t_j^{f_i} \mid s'_{i,j} \text{ is true}\}$.
 \end{lemma}
 \begin{proof}
     ($\Rightarrow$) Suppose $\Psi_\text{up}^\text{e}(B)$ is satisfiable by an assignment $I$. Define $S_i = \{t_j^{f_i} \mid I(s_{i,j}) = \text{true}\}$. By $\Phi_{\text{max}}^\text{e}$, all $t \in S_i$ have equal values under $I$, and they are strictly greater than any $t' \in T_i \setminus S_i$. Thus $\Phi_{\text{max}}(\mathcal{S})$ holds. By $\Phi_{\text{prop-up}}^\text{e}$, all $f_i(x+t)$ with $t \in S_i$ are equal to $v_i$, satisfying the substitution in $\Phi_{\text{prop-up}}(\mathcal{S})$. Finally, $\text{ClashUpEnc}$ ensures the clash condition. Hence $\Psi_{\text{up}}(B,\mathcal{S})$ holds.
