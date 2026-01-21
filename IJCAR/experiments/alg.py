@@ -3,8 +3,7 @@ from z3 import *
 solver = z3.SolverFor("UFLIA")
 solver.set(mbqi=True)
 
-pf1= Bool('pf1')          # is a pivot
-pf2= Bool('pf2')          
+pf= [Bool('pf1'), Bool('pf2')]          # is a pivot
 f= Function('f', IntSort(), IntSort())
 offsets= [1, 0]
 x= Int('x')
@@ -19,15 +18,15 @@ res="UNSAT"
 solver.add(F, substitute(Q, (x, IntVal(0))))
 while(solver.check()!=unsat):
     solver.reset()
-    solver.add(Or(Not(pf1), Not(pf2), offsets[0]==offsets[1]))
-    solver.add(Or(Not(pf1), pf2, offsets[0]>offsets[1]))
-    solver.add(Or(Not(pf2), pf1, offsets[1]>offsets[0]))
-    solver.add(Or(pf1, pf2, ForAll(x, ForAll(occf1, ForAll(occf2, Qp)))))
-    solver.add(Or(pf1, Not(pf2), ForAll(x, ForAll(occf2, Exists(occf1, Qp)))))
-    solver.add(Or(Not(pf1), pf2, ForAll(x, ForAll(occf1, Exists(occf2, Qp)))))
-    solver.add(Or(Not(pf1), Not(pf2), Exists(x, Exists(occf2, ForAll(occf1, Qp)))))
-    solver.add(Or(Not(pf1), And([argf[arg]<=bmax+offsets[0] for arg in range(0, len(argf))])))
-    solver.add(Or(Not(pf2), And([argf[arg]<=bmax+offsets[1] for arg in range(0, len(argf))])))
+    solver.add(Or(Not(pf[0]), Not(pf[1]), offsets[0]==offsets[1]))
+    solver.add(Or(Not(pf[0]), pf[1], offsets[0]>offsets[1]))
+    solver.add(Or(Not(pf[1]), pf[0], offsets[1]>offsets[0]))
+    solver.add(Or(pf[0], pf[1], ForAll(x, ForAll(occf1, ForAll(occf2, Qp)))))
+    solver.add(Or(pf[0], Not(pf[1]), ForAll(x, ForAll(occf2, Exists(occf1, Qp)))))
+    solver.add(Or(Not(pf[0]), pf[1], ForAll(x, ForAll(occf1, Exists(occf2, Qp)))))
+    solver.add(Or(Not(pf[0]), Not(pf[1]), Exists(x, Exists(occf2, ForAll(occf1, Qp)))))
+    solver.add(Or(Not(pf[0]), And([argf[arg]<=bmax+offsets[0] for arg in range(0, len(argf))])))
+    solver.add(Or(Not(pf[1]), And([argf[arg]<=bmax+offsets[1] for arg in range(0, len(argf))])))
     subs=[ (x, IntVal(i)) for i in range(0,bmax+1)]
     print(subs)
     solver.add(F)
