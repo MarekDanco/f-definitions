@@ -15,6 +15,10 @@ def def_example():
     Qp= Or(x<0, x>=1000, occf[0]==occf[1]+1)
 
 
+# current restrictions:
+  # one function symbol
+  # two occurrences of function symbol in quantified part
+  # positive indices only
 def_example()
 pf= [Bool('pf1'), Bool('pf2')]          # is a pivot
 bmax= 0
