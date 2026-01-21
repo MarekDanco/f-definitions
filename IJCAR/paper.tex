@@ -67,12 +67,12 @@
 
 \marek{Mention these \cite{bradley-manna07,bradley-vmcai06,ge-cav09,habermehl-etaps08}}
 
-Current as SMT solvers have limited capabilities to produce counterexamples for complex systems. Yet, counterexamples are important during modeling as they uncover  errors. For example, the user may wrongly assume that an input stream with increasing values will contain  two neighboring values that are equal.  Negating and skolemizing yields the following simple SMT formula.
+Current SMT solvers have limited capabilities to produce counterexamples for complex systems. Yet, counterexamples are important during modeling as they uncover  errors. For example, the user may wrongly assume that an input stream with increasing values will contain  two neighboring values that are equal.  Negating and skolemizing this assumption yields the simple UFLIA formula:
 \begin{equation}
 	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)<f(x+1)
 \end{equation}
 
-The formula has trivial counter-models, e.g. $f$ being the identity function. Such solution can be found by synthesis approaches, such as \sygus.  But it is  easy to get out of the reach of these tools because they are primarily based on templates and candidate-solution enumeration. The following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
+While this formula has trivial counter-models (e.g. $f$ being the identity function), and such solutions can be found by synthesis approaches like \sygus, it is easy to get out of the reach of these tools because they are primarily based on templates and candidate-solution enumeration. The following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
 
 \begin{equation}\label{eq:periodic}
 	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)=f(x+2)
@@ -80,13 +80,10 @@ The formula has trivial counter-models, e.g. $f$ being the identity function. Su
 
 These constraints allow only periodic functions whose neighboring values alternate. For such functions the \sygus grammar would have to guess an \textit{ite} term of the form $\mathit{ite}(x\,\mathit{mod}\,2 = 0\enspace a\enspace b)$, for integers $a \not = b$. Even if \sygus tools were improved, they could not yield a decision procedure for UFLIA, due to the inherent undecidability of arithmetic.
 
-We instead isolate a fragment of UFLIA where formulas like~\eqref{eq:periodic} can be decided using SMT techniques. Succinctly, we show that if the arguments of non-constant uninterpreted function symbols are restricted to terms of the form $x + k$, where $x$ is universally quantified and $k$ is a numeral, then the formula’s satisfiability becomes decidable via an inductive argument.
+More generally, the full UFLIA is undecidable due to the inherent undecidability of integer arithmetic combined with uninterpreted functions. We therefore isolate a fragment where formulas like~\eqref{eq:periodic} can be decided using SMT techniques. Succinctly, we show that if the arguments of non-constant uninterpreted function symbols are restricted to terms of the form $x + t$, where $x$ is universally quantified and $t$ is a ground term, then the formula’s satisfiability becomes decidable via inductive reasoning.
 
-We treat each quantifier as introducing infinitely many constraints on function calls,
-which we refer to as cells. A single cell may appear in multiple constraints, so we must
-ensure that it is assigned a consistent value throughout. To show satisfiability within
-our fragment, we impose an order on these constraints and construct a symbolic assignment
-to the cells such that, when processed in this order, no conflicting assignments arise.
+The key idea is to treat each quantifier as introducing infinitely many constraints on function calls, which we refer to as cells. A single cell may appear in multiple constraints, so we must
+ensure that it is assigned a consistent value throughout. To show satisfiability within our fragment, we impose an order on these constraints and construct a symbolic assignment to the cells such that, when processed in this order, no conflicting assignments arise.
 
 \section{Related Work}\label{}
 Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
@@ -133,8 +130,29 @@ third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
 
 \section{Problem Statement}
 
-\todoSN{Test pushing to Overleaf}.
-\todoSN{Last test to push to Github}.
+We focus on formulas that combine uninterpreted functions with linear integer arithmetic in a way that frequently appears in verification conditions, yet challenges existing decision procedures.
+
+\paragraph{Formula Class}
+Formally, we study formulas of the shape
+\begin{equation}\label{eq:main-fragment}
+\phi = F \land \forall x.\; Q\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
+\end{equation}
+where
+\begin{itemize}
+    \item $F$ is a quantifier‑free formula,
+    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
+    \item For each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct ground terms of linear integer arithmetic,
+    \item All occurrences of $f_i$ inside $Q$ are of the form $f_i(x+t)$ with $t$ being one of the offset terms; no nested applications of uninterpreted functions are allowed.
+\end{itemize}
+
+\paragraph{Core Problem}
+
+\paragraph{Challenges}
+
+
+\paragraph{Our Contributions}
+
+
 
 
 \section{Notation}\todoSR{We will see where to put this, in the end}
