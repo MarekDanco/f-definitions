@@ -4,9 +4,7 @@ solver = z3.SolverFor("UFLIA")
 solver.set(mbqi=True)
 
 def def_example():
-    global pf, f, offsets, x, occf, argf, F, Q, Qp
-    
-    pf= [Bool('pf1'), Bool('pf2')]          # is a pivot
+    global f, offsets, x, occf, argf, F, Q, Qp
     f= Function('f', IntSort(), IntSort())
     offsets= [1, 0]
     x= Int('x')
@@ -17,7 +15,8 @@ def def_example():
     Qp= Or(x<0, x>=1000, occf[0]==occf[1]+1)
 
 
-def_example()    
+def_example()
+pf= [Bool('pf1'), Bool('pf2')]          # is a pivot
 bmax= 0
 res="UNSAT"
 solver.add(F, substitute(Q, (x, IntVal(0))))
