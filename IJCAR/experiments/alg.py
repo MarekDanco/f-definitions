@@ -4,7 +4,7 @@ solver = z3.SolverFor("UFLIA")
 solver.set(mbqi=True)
 
 def def_example():
-    global f, offsets, x, occf, argf, F, Q, Qp
+    global offsets, x, occf, argf, F, Q, Qp
     f= Function('f', IntSort(), IntSort())
     offsets= [1, 0]
     x= Int('x')
@@ -27,7 +27,7 @@ bmax= 0
 res="UNSAT"
 solver.add(F, substitute(Q, (x, IntVal(0))))
 while(solver.check()!=unsat):
-    solver.reset()
+    solver.reset() 
     solver.add(Or(Not(pf[0]), Not(pf[1]), offsets[0]==offsets[1]))
     solver.add(Or(Not(pf[0]), pf[1], offsets[0]>offsets[1]))
     solver.add(Or(Not(pf[1]), pf[0], offsets[1]>offsets[0]))
