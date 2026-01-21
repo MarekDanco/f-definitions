@@ -142,19 +142,25 @@ third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
 \todoSN{Should we instead move this section to before Related Work? Also, is the current version too long?}
 
 \paragraph{Formula Class}
-Formally, we study formulas of the form
-
+We study formulas of the form
 \begin{equation}\label{eq:main-fragment}
-    \phi = F \land \forall x.\; Q\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
+    F \land \forall x.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
 where
 \begin{itemize}
-    \item $F$ is a quantifier‑free formula,
-    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
-    \item For each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms,
-    \item All occurrences of $f_i$ inside $Q$ are of the form $f_i(x+t)$ where $t$ is one of the offset terms; no nested applications of uninterpreted functions are allowed.
-\end{itemize}
+    \item $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic,
+%    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
+%    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
+    \item all uninterpreted function symbols have maximal arity $1$\todoSR{for now}
+    \item all arguments of uninterpreted function symbols in $Q$ are either of the form $x$ or of the form $x+t$ where $t$ is a ground term.
+    \end{itemize}
 
+    \begin{example}
+      \[f(0)=0 \wedge \forall x \,.\, f(x+c)=f(x)+c+1,\]
+      where $c$ is an uninterpreted constant.
+    \end{example}
+
+    
 \paragraph{Core Problem}
 Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, we want to decide its satisfiability over the standard integers. Because the quantifier ranges over the infinite set $\mathbb{Z}$, a na\"ive instantiation‑based approach may not terminate. Instead, we aim to reduce the problem into checking two conditions on a finite interval $B = [b_{\min}, b_{\max}]$:
 
