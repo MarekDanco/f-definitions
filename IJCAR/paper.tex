@@ -82,7 +82,7 @@ These constraints allow only periodic functions whose neighboring values alterna
 
 More generally, the full UFLIA is undecidable due to the inherent undecidability of integer arithmetic combined with uninterpreted functions. We therefore isolate a fragment where formulas like~\eqref{eq:periodic} can be decided using SMT techniques. Succinctly, we show that if the arguments of non-constant uninterpreted function symbols are restricted to terms of the form $x + t$, where $x$ is universally quantified and $t$ is a ground term, then the formula’s satisfiability becomes decidable via inductive reasoning.
 
-The key idea is to treat each quantifier as introducing infinitely many constraints on function calls, which we refer to as cells. A single cell may appear in multiple constraints, so we must
+The key idea is to treat each quantifier instantiation as introducing infinitely many constraints on function calls, which we refer to as cells. A single cell may appear in multiple constraints, so we must
 ensure that it is assigned a consistent value throughout. To show satisfiability within our fragment, we impose an order on these constraints and construct a symbolic assignment to the cells such that, when processed in this order, no conflicting assignments arise.
 
 \section{Related Work}\label{}
@@ -90,8 +90,10 @@ Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
 Synthesis of strategies on LIA problems Murphy and Kincaid~\cite{kincaid-cav24}.
 Synthesis, single invocation Kun\v cak et
 al.~\cite{kuncak-pldi10,kuncak-sttt13}.
+
 Array decision procedures~\cite{bradley-vmcai06}: no arithmetic on universally quantified variables allowed.
 Habermehl et al.~\cite{habermehl-etaps08} allow difference bounded constraints on array offsets of the form $a[i+c]$. From the MBQI paper: ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA does not refer to linear integer arithmetic, but to the logic allowed by Habermehl et al.}  will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.''
+
 Alberti et al.~\cite{alberti2014decision}: only one universally quantified variable allowed.
 Elad et al.~\cite{elad2024infinite}: The fragment of FOL for which they prove decidability (OSC, Section~6) does not allow anything like integer arithmetic.
 
@@ -129,30 +131,49 @@ third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
 \textsc{Z3} cannot solve this -- Compactness section in~\cite{ge-cav09}.
 
 \section{Problem Statement}
-
-We focus on formulas that combine uninterpreted functions with linear integer arithmetic in a way that frequently appears in verification conditions, yet challenges existing decision procedures.
+\label{sec:problem-statement}
+\todoSN{Should we instead move this section to before Related Work? Also, is the current version too long?}
 
 \paragraph{Formula Class}
-Formally, we study formulas of the shape
+Formally, we study formulas of the form
+
 \begin{equation}\label{eq:main-fragment}
-\phi = F \land \forall x.\; Q\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
+    \phi = F \land \forall x.\; Q\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
 where
 \begin{itemize}
     \item $F$ is a quantifier‑free formula,
     \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
-    \item For each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct ground terms of linear integer arithmetic,
-    \item All occurrences of $f_i$ inside $Q$ are of the form $f_i(x+t)$ with $t$ being one of the offset terms; no nested applications of uninterpreted functions are allowed.
+    \item For each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms,
+    \item All occurrences of $f_i$ inside $Q$ are of the form $f_i(x+t)$ where $t$ is one of the offset terms; no nested applications of uninterpreted functions are allowed.
 \end{itemize}
 
 \paragraph{Core Problem}
+Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, we want to decide its satisfiability over the standard integers. Because the quantifier ranges over the infinite set $\mathbb{Z}$, a na\"ive instantiation‑based approach may not terminate. Instead, we aim to reduce the problem into checking two conditions on a finite interval $B = [b_{\min}, b_{\max}]$:
 
-\paragraph{Challenges}
+\begin{enumerate}
+    \item \textbf{Base satisfiability:} $F \land \bigwedge_{z \in B} Q[z]$ is satisfiable (where $Q[z]$ denotes $Q$ with $x$ replaced by the numeral $z$).
+    \item \textbf{Propagation:} From a model of the base interval, we can extend the assignment to all integers $z \notin B$ without creating any conflicts. This requires that for each function $f_i$, certain occurrences in $Q$ can be treated as ``pivots'' whose values can be chosen after fixing all other occurrences.
+\end{enumerate}
 
+The second condition is formalised as the \emph{multi‑\req condition} in \cref{sec:alg}. Intuitively, it ensures that when moving outward from $B$ (to larger or smaller integers), we always have at least one cell in each instantiation whose value can be adjusted to satisfy $Q$, given the values already assigned to cells that appear in earlier instantiations.
+
+\paragraph{Challenges}\todoSN{Stefan R, could you please check whether I formulate this paragraph (and the next one) correctly?}
+\begin{itemize}
+    \item \textbf{Detecting propagability:} How can we automatically check whether a formula $Q$ satisfies the required pivot condition?
+    \item \textbf{Finding a suitable base interval:} The interval $B$ must be large enough to avoid clashes between cells generated during propagation and cells that appear in the ground part $F$.
+    \item \textbf{Completeness:} Under what conditions does the existence of a finite base interval together with propagation guarantees imply satisfiability? Conversely, when can unsatisfiability be detected finitely?
+\end{itemize}
 
 \paragraph{Our Contributions}
-
-
+We address these challenges through the following steps:
+\begin{enumerate}
+    \item We introduce \emph{cell propagation certificates} (Definition~\ref{def:certificate}) as a formal witness for satisfiability in our fragment.
+    \item We define the \emph{multi‑\req condition} (Definition~\ref{def:multi-reqpivot-param}) that characterises when propagation is possible.
+    \item We prove that if a formula satisfies the multi‑\req condition and a suitable base interval exists, then the formula is satisfiable (Theorem~\ref{thm:interval-certificate-param}).
+    \item We present an algorithm (Algorithm~\ref{alg:interval-check-param-withBigvee}) that enumerates candidate intervals and checks both base satisfiability and propagation conditions using an $\smt$ solver.
+    \item We establish soundness and relative completeness theorems for our algorithm (Corollary~\ref{cor:soundness-bigvee} and Theorem~\ref{thm:completeness-bigvee}).
+\end{enumerate}
 
 
 \section{Notation}\todoSR{We will see where to put this, in the end}
@@ -200,7 +221,7 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability assignment of $c\geq 5
 		\item a pre-satisfiability assignment $I$ of $\phi$,
 		\item for every $z\in\mathbb{Z}$
                   \begin{itemize}
-                  \item a set $X_z\subseteq \Gamma_{I,z}(\phi)$  (the \emph{propagated cells})\todoSR{alternative term ``propagated cells''} such that \[X_z\cap (\mathit{def}(I)\cup\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi))=\emptyset,\] and
+                  \item a set $X_z\subseteq \Gamma_{I,z}(\phi)$  (the \emph{propagated cells}) such that \[X_z\cap (\mathit{def}(I)\cup\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi))=\emptyset,\] and
                     %that are neither assigned a value by $I$, nor occur in any $\Gamma_{I,z'}(\phi)$ for any $z'\prec z$
                   \item a certificate (the \emph{satisfiability propagator}) showing that for all values of cells in $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ there exist values for the cells in $X_z$ such that for the cell interpretation $I_{X_z}$ assigning these values to $X_z$, $I\cup I_{X_z}\models \subst{Q}{x}{\repr{z}}$.
                   \end{itemize}
@@ -263,28 +284,16 @@ Note that, in general, it is not possible to compute $val(u)$ by computing the v
 
 The goal is now an algorithm that computes such cell propagation certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
 
-\section{Algorithm}\label{sec:alg}
+\section{Algorithm}\label{sec:alg}\todoSN{I changed the intro of this section into this one. What do you think?}
 
-Class of formulas:
-\[ F\wedge \forall x\;.\; Q(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\dots,f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})),\]
-where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, and the  $t^{f_i}_{1},\dots,t^{f_i}_{l_i}$ are pairwise different LIA ground terms.~\todoSR{We are about to extend the algorithm to this case. Is ``LIA ground term'' correct terminology?}
+Building on the problem formulation in 
+\cref{sec:problem-statement}, we now present our decision procedure for formulas of the form~\eqref{eq:main-fragment}. The core idea is to search for a finite interval $B = [b_{\min}, b_{\max}]$ from which a model can be inductively extended to all integers. This requires two components:
+\begin{enumerate}
+    \item A method to check whether a given interval $B$ can serve as a suitable base (satisfying both ground constraints and all instantiations within $B$).
+    \item A propagation condition ensuring that from such a base, we can consistently assign values to cells outside $B$ without conflicts.
+\end{enumerate}
 
-
-% We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require that for one of the $f_1,\dots,f_r$, let us say for $f_{i^*}$, for both its highest argument $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ and lowest argument $f_{i^*}(x+c^{f_{i^*}}_1)$ we can always find values satisfying $Q$. More formally, there must be an $i^*\in \{1,\dots, r\}$ such that
-% % \mj{Just to be clear, the requirement above does not apply to $f(x)<f(x+1)\land f(x+1)<f(x+3)$?}
-% % \todoSR{Correct. It applies to both parts individually, but not to the conjunction. This is  restrictive, of course, but allowed for an easy generalization to the case of several occurrences of the same function symbol with different arguments.}
-% \begin{itemize}
-%     \item for all values of cells\mj{I still think that the terminology is wrong. Cell is $f(1)$, not $f(x+1)$ by \cref{def:cell}.} in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_{l_{i^*}})$ satisfying $Q$, and
-%     \item for all values of cells in $Q$ except for $f_{i^*}(x+c^{f_{i^*}}_1)$ there is a value for $f_{i^*}(x+c^{f_{i^*}}_1)$ satisfying $Q$.
-% \end{itemize}
-
-% In the following, we will call this condition \req. We will assume that we have corresponding satisfiability propagators (see Definition~\ref{def:certificate})
-% available.
-
-We will satisfy the universal quantifier by an inductive argument going both up and down. For making this argument work, we require the multi-\req condition described as follows.
-
-
-% \paragraph{\textbf{Multi-\req Condition}} First, we formalise the condition that enables propagation in both directions, generalising the single-pivot \req condition to allow multiple functions to serve as pivots.
+Our algorithm relies on the ability to propagate solutions outward from a base interval. We first formalise the propagation condition as the \emph{multi-\req condition}, then show how to combine it with interval expansion to obtain a complete decision procedure. 
 
 \begin{definition}[Multi-\req Condition (parametric version)]
 \label{def:multi-reqpivot-param}
