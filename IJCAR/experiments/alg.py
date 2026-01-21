@@ -20,7 +20,9 @@ def def_example():
   # two occurrences of function symbol in quantified part
   # positive indices only
 def_example()
+assert(len(offsets)==len(occf))
 pf= [Bool('pf1'), Bool('pf2')]          # is a pivot
+assert(len(pf)==len(occf))
 bmax= 0
 res="UNSAT"
 solver.add(F, substitute(Q, (x, IntVal(0))))
