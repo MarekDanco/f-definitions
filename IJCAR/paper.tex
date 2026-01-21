@@ -308,7 +308,7 @@ Building on the problem formulation in
 
 Our algorithm relies on the ability to propagate solutions outward from a base interval. We first formalise the propagation condition as the \emph{multi-\req condition}, then show how to combine it with interval expansion to obtain a complete decision procedure. 
 
-\begin{definition}[Multi-\req Condition (parametric version)]
+\begin{definition}[Multi-\req Condition]
 \label{def:multi-reqpivot-param}
 Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$, with $T_i = \{t^{f_i}_1, \dots, t^{f_i}_{l_i}\}$ being the offset terms for $f_i$.
 
@@ -436,7 +436,7 @@ Thus any $c \in (-2, 1)$ works. This demonstrates that for such $c$, the specifi
 
 Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the cells generated during propagation from clashing with the ground part $F$.
 
-\begin{definition}[Interval Extension Formulas (parameterised)]
+\begin{definition}[Interval Extension Formulas]
 \label{def:interval-extension-formulas-param}
 For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$, define:
 
@@ -461,7 +461,7 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots
 
 Thus, for any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\Psi_{\text{up}}(\mathcal{S}, B)$ (resp.\ $\Psi_{\text{down}}(\mathcal{S}', B)$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of multi‑\req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition ensures that no cell $f_i(z+t)$ with $z > b_{\max}$ (resp. $z < b_{\min}$) and $t \in S_i$ already appears in the ground part $F$.
 
-\begin{theorem}[Interval Satisfiability (parameterised version)]
+\begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
 Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and let $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$ be subsets satisfying the multi-\req condition for $(\mathcal{S}, \mathcal{S}')$ as defined in \cref{def:multi-reqpivot-param}.  
 Then $\phi = F \land \forall x.\, Q$ has a cell propagation certificate — and hence is satisfiable — provided that
