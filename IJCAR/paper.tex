@@ -95,7 +95,7 @@ These constraints allow only periodic functions whose neighboring values alterna
 
 \paragraph{Contributions.} This paper makes the following contributions:
 \begin{itemize}
-    \item We formalise the notion of \emph{cell propagation certificates} (\cref{def:certificate}) that witness satisfiability through inductive extension of finite base assignments.
+    \item We formalize the notion of \emph{cell propagation certificates} (\cref{def:certificate}) that witness satisfiability through inductive extension of finite base assignments.
     \item We introduce the \emph{multi-\req condition} (\cref{def:multi-reqpivot-param}), propagation conditions that allows multiple functions to serve as pivots simultaneously.
     \item We present an interval-based algorithm (\cref{alg:interval-check-param-withBigvee}) that searches for suitable base intervals and checks propagation conditions using $\smt$ queries.
     \item We prove soundness (\cref{cor:soundness-bigvee}) and relative completeness (\cref{thm:completeness-bigvee}) for our algorithm.: it returns \textsc{Sat} for all satisfiable formulas meeting the multi-\req condition, and \textsc{Unsat} for formulas whose unsatisfiability can be detected through \emph{finite instantiation}.
@@ -176,13 +176,13 @@ Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we addr
     \emph{Decide whether $\phi$ is satisfiable over the standard integers, and if so, construct a model (an interpretation of all uninterpreted function symbols) that satisfies $\phi$.}
 \end{quote}
 
-\paragraph{Why is this Hard?}\todoSN{Not sure about this part! I'm just trying to summarise it from what's written in the Intro and Related Work sections.}
+\paragraph{Why is this Hard?}\todoSN{Not sure about this part! I'm just trying to summarize it from what's written in the Intro and Related Work sections.}
 Although UFLIA is undecidable in general, formulas of the above form constitute a fragment that appears frequently in verification conditions (e.g. for programs with arrays or recursive functions). Yet, existing SMT techniques struggle:
 \begin{itemize}
     \item \textbf{Finite instantiation} may not terminate because the universal quantifier ranges over the infinite domain $\mathbb{Z}$.
     \item \textbf{Synthesis-based approaches} (SyGuS) rely on syntactic templates and fail when the required function does not match the template.
     \item \textbf{Model-based quantifier instantiation (MBQI)} can sometimes find models but often produces large, uninterpretable assignments and scales poorly.
-    \item \textbf{Specialised array decision procedures} either forbid arithmetic on indices or are limited to difference‑bounded constraints.
+    \item \textbf{Specialized array decision procedures} either forbid arithmetic on indices or are limited to difference‑bounded constraints.
 \end{itemize}
 The presence of both arithmetic constraints and uninterpreted functions, combined with the universal quantifier, makes this fragment challenging for current solvers.
 
@@ -213,7 +213,7 @@ These restrictions enable the inductive reasoning that underlies our solution, w
 %     \item \textbf{Propagation:} From a model of the base interval, we can extend the assignment to all integers $z \notin B$ without creating any conflicts. This requires that for each function $f_i$, certain occurrences in $Q$ can be treated as ``pivots'' whose values can be chosen after fixing all other occurrences.
 % \end{enumerate}
 
-% The second condition is formalised as the \emph{multi‑\req condition} in \cref{sec:alg}. Intuitively, it ensures that when moving outward from $B$ (to larger or smaller integers), we always have at least one cell in each instantiation whose value can be adjusted to satisfy $Q$, given the values already assigned to cells that appear in earlier instantiations.
+% The second condition is formalized as the \emph{multi‑\req condition} in \cref{sec:alg}. Intuitively, it ensures that when moving outward from $B$ (to larger or smaller integers), we always have at least one cell in each instantiation whose value can be adjusted to satisfy $Q$, given the values already assigned to cells that appear in earlier instantiations.
 
 % \paragraph{Challenges}\todoSN{Stefan R, could you please check whether I formulate this paragraph (and the next one) correctly?}
 % \begin{itemize}
@@ -226,7 +226,7 @@ These restrictions enable the inductive reasoning that underlies our solution, w
 % We address these challenges through the following steps:
 % \begin{enumerate}
 %     \item We introduce \emph{cell propagation certificates} (Definition~\ref{def:certificate}) as a formal witness for satisfiability in our fragment.
-%     \item We define the \emph{multi‑\req condition} (Definition~\ref{def:multi-reqpivot-param}) that characterises when propagation is possible.
+%     \item We define the \emph{multi‑\req condition} (Definition~\ref{def:multi-reqpivot-param}) that characterizes when propagation is possible.
 %     \item We prove that if a formula satisfies the multi‑\req condition and a suitable base interval exists, then the formula is satisfiable (Theorem~\ref{thm:interval-certificate-param}).
 %     \item We present an algorithm (Algorithm~\ref{alg:interval-check-param-withBigvee}) that enumerates candidate intervals and checks both base satisfiability and propagation conditions using an $\smt$ solver.
 %     \item We establish soundness and relative completeness theorems for our algorithm (Corollary~\ref{cor:soundness-bigvee} and Theorem~\ref{thm:completeness-bigvee}).
@@ -354,7 +354,7 @@ Building on the problem formulation in
     \item A propagation condition ensuring that from such a base, we can consistently assign values to cells outside $B$ without conflicts.
 \end{enumerate}
 
-Our algorithm relies on the ability to propagate solutions outward from a base interval. We first formalise the propagation condition as the \emph{multi-\req condition}, then show how to combine it with interval expansion to obtain a complete decision procedure. 
+Our algorithm relies on the ability to propagate solutions outward from a base interval. We first formalize the propagation condition as the \emph{multi-\req condition}, then show how to combine it with interval expansion to obtain a complete decision procedure. 
 
 \begin{definition}[Multi-\req Condition]
 \label{def:multi-reqpivot-param}
@@ -389,7 +389,7 @@ We say that $Q$ satisfies the \emph{multi-\req condition for $(\mathcal{S}, \mat
 We say $Q$ satisfies the \emph{multi-\req condition} if there exists \emph{some} pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the multi-\req condition for $(\mathcal{S}, \mathcal{S}')$.
 \end{definition}
 
-Intuitively, the multi‑\req condition generalises the single‑pivot \req condition by allowing \emph{multiple functions} to serve as pivots simultaneously. For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The old single‑pivot \req is the special case where exactly one $S_i$ is non‑empty and contains a single offset. The downward condition is symmetric.
+Intuitively, the multi‑\req condition generalizes the single‑pivot \req condition by allowing \emph{multiple functions} to serve as pivots simultaneously. For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The old single‑pivot \req is the special case where exactly one $S_i$ is non‑empty and contains a single offset. The downward condition is symmetric.
 
 
 \begin{example}[Multi-\req Illustration]
