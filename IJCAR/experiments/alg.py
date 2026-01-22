@@ -16,20 +16,21 @@ def def_example():                          # f(0)=0 /\ forall x . x<0 \/ x>=100
     Qp= Or(x<0, x>=1000, occ[0][0]==occ[0][1]+1)
     print(offsets)
 
-def maximality():
-    return [Or(Not(p[0][0]), Not(p[0][1]), offsets[0][0]==offsets[0][1]),  # equality
-            Or(Not(p[0][0]), p[0][1], offsets[0][0]>offsets[0][1]),        # rest
-            Or(Not(p[0][1]), p[0][0], offsets[0][1]>offsets[0][0])]
+def maximality(i):
+    return [Or(Not(p[i][0]), Not(p[i][1]), offsets[i][0]==offsets[i][1]),  # equality
+            Or(Not(p[i][0]), p[i][1], offsets[i][0]>offsets[i][1]),        # rest
+            Or(Not(p[i][1]), p[i][0], offsets[i][1]>offsets[i][0])]
 
 def reqpivot():
+    assert(len(p)==1)                                                      # TODO: implement for several function symbols
     return [(Or(p[0][0], p[0][1], ForAll(x, ForAll(occ[0][0], ForAll(occ[0][1], Qp))))),
             (Or(p[0][0], Not(p[0][1]), ForAll(x, ForAll(occ[0][1], Exists(occ[0][0], Qp))))),
             (Or(Not(p[0][0]), p[0][1], ForAll(x, ForAll(occ[0][0], Exists(occ[0][1], Qp))))),
             (Or(Not(p[0][0]), Not(p[0][1]), Exists(x, Exists(occ[0][1], ForAll(occ[0][0], Qp)))))]
 
-def clash():
-    return [(Or(Not(p[0][0]), And([argF[0][arg]<=bmax+offsets[0][0] for arg in range(0, len(argF[0]))]))),
-            (Or(Not(p[0][1]), And([argF[0][arg]<=bmax+offsets[0][1] for arg in range(0, len(argF[0]))])))]
+def clash(i):
+    return [(Or(Not(p[i][0]), And([argF[0][arg]<=bmax+offsets[i][0] for arg in range(0, len(argF[i]))]))),
+            (Or(Not(p[i][1]), And([argF[0][arg]<=bmax+offsets[i][1] for arg in range(0, len(argF[i]))])))]
     
 # current restrictions:
   # one function symbol
@@ -51,9 +52,9 @@ res="UNSAT"
 solver.add(F, substitute(Q, (x, IntVal(0))))
 while(solver.check()!=unsat):
     solver.reset() 
-    solver.add(*maximality())
+    solver.add(*maximality(0))
     solver.add(*reqpivot())
-    solver.add(*clash())        
+    solver.add(*clash(0))        
     subs=[ (x, IntVal(i)) for i in range(0,bmax+1)]                 # list of wanted substitutions
     print(subs)    
     print(list(map(lambda x : substitute(Q, x), subs)))
