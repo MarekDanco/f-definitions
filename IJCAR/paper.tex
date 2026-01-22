@@ -584,7 +584,7 @@ Thus all certificate requirements are satisfied. By Property \ref{prop:certThenS
 \Ensure \textsc{Sat} or \textsc{Unsat}
 \State $b_{\min} \gets 0$, $b_{\max} \gets 0$ 
 % \State $I \gets \smt\!\left(F \land Q[0]\right)$
-% \While{$I \neq \bot$}
+%\While{$I \neq \bot$}
 \While{$F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is satisfiable}
     \State $\text{max}_\text{up}\gets\bigvee_{S_1\subseteq T_1,\dots,S_r\subseteq T_r}\Psi_{\text{up}}([b_{\min},b_{\max}],(S_1,\dots,S_r))$
     \State $\text{min}_\text{down}\gets\bigvee_{S_1'\subseteq T_1,\dots,S_r'\subseteq T_r}\Psi_{\text{down}}([b_{\min},b_{\max}],(S_1',\dots,S_r'))$ 
