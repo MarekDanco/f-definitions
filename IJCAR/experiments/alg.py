@@ -2,47 +2,49 @@ from z3 import *
 
 global x
 x= Int('x')                                 # the quantified variable
-    
-global offsets, occf, argf, F, Q, Qp        # the variable needed to define a problem instance
 
 def def_example():                          # f(0)=0 /\ forall x . x<0 \/ x>=1000 \/ f(x+1)=f(x)+1
-    f= Function('f', IntSort(), IntSort())
-    offsets= [1, 0]
-
-    occf= [Int('occf1'), Int('occf2')]      # variables for occurrences of f (u, v in the paper)
-    argf= [0]                               # arguments of f in F
-    F= f(argf[0])==0
-    Q= Or(x<0, x>=1000, f(x+offsets[0])==f(x+offsets[1])+1)
-    Qp= Or(x<0, x>=1000, occf[0]==occf[1]+1)
-
+    global offsets, occ, argF, F, Q, Qp         # the variable needed to define a problem instance
     
+    f= Function('f', IntSort(), IntSort())
+    offsets= [[1, 0]]
+
+    occ= [[Int('occf1'), Int('occf2')]]     # variables for occurrences of funct. symb. (u, v in the paper)
+    argF= [[0]]                             # arguments of uninterpreted function symbols in F
+    F= f(argF[0][0])==0
+    Q= Or(x<0, x>=1000, f(x+offsets[0][0])==f(x+offsets[0][1])+1)
+    Qp= Or(x<0, x>=1000, occ[0][0]==occ[0][1]+1)
+    print(offsets)
 
 # current restrictions:
   # one function symbol
   # two occurrences of function symbol in quantified part
   # positive indices only
 def_example()
-assert(len(offsets)==len(occf))
+print(offsets)
+assert(len(offsets)==len(occ))
+assert(len(occ)==len(argF))
+assert(all(len(offsets[i])==len(occ[i]) for i in range(len(offsets))))
 
 solver = z3.SolverFor("UFLIA")
 # solver.set(mbqi=True)
 
-pf= [Bool('pf1'), Bool('pf2')]          # is a pivot
-assert(len(pf)==len(occf))
+p= list(map(lambda l : list(map(lambda v : Bool(v.__repr__()+"p"), l)), occ))  # is a pivot
+print(p)
 bmax= 0
 res="UNSAT"
 solver.add(F, substitute(Q, (x, IntVal(0))))
 while(solver.check()!=unsat):
     solver.reset() 
-    solver.add(Or(Not(pf[0]), Not(pf[1]), offsets[0]==offsets[1]))  # maximality condition, equality
-    solver.add(Or(Not(pf[0]), pf[1], offsets[0]>offsets[1]))        # maximality condition, rest
-    solver.add(Or(Not(pf[1]), pf[0], offsets[1]>offsets[0]))
-    solver.add(Or(pf[0], pf[1], ForAll(x, ForAll(occf[0], ForAll(occf[1], Qp)))))       # ReqPivot (4 cases)
-    solver.add(Or(pf[0], Not(pf[1]), ForAll(x, ForAll(occf[1], Exists(occf[0], Qp)))))
-    solver.add(Or(Not(pf[0]), pf[1], ForAll(x, ForAll(occf[0], Exists(occf[1], Qp)))))
-    solver.add(Or(Not(pf[0]), Not(pf[1]), Exists(x, Exists(occf[1], ForAll(occf[0], Qp)))))
-    solver.add(Or(Not(pf[0]), And([argf[arg]<=bmax+offsets[0] for arg in range(0, len(argf))]))) # clash condition
-    solver.add(Or(Not(pf[1]), And([argf[arg]<=bmax+offsets[1] for arg in range(0, len(argf))])))
+    solver.add(Or(Not(p[0][0]), Not(p[0][1]), offsets[0][0]==offsets[0][1]))  # maximality condition, equality
+    solver.add(Or(Not(p[0][0]), p[0][1], offsets[0][0]>offsets[0][1]))        # maximality condition, rest
+    solver.add(Or(Not(p[0][1]), p[0][0], offsets[0][1]>offsets[0][0]))
+    solver.add(Or(p[0][0], p[0][1], ForAll(x, ForAll(occ[0][0], ForAll(occ[0][1], Qp)))))       # ReqPivot (4 cases)
+    solver.add(Or(p[0][0], Not(p[0][1]), ForAll(x, ForAll(occ[0][1], Exists(occ[0][0], Qp)))))
+    solver.add(Or(Not(p[0][0]), p[0][1], ForAll(x, ForAll(occ[0][0], Exists(occ[0][1], Qp)))))
+    solver.add(Or(Not(p[0][0]), Not(p[0][1]), Exists(x, Exists(occ[0][1], ForAll(occ[0][0], Qp)))))
+    solver.add(Or(Not(p[0][0]), And([argF[0][arg]<=bmax+offsets[0][0] for arg in range(0, len(argF[0]))]))) # clash condition
+    solver.add(Or(Not(p[0][1]), And([argF[0][arg]<=bmax+offsets[0][1] for arg in range(0, len(argF[0]))])))
     solver.add(F)
     subs=[ (x, IntVal(i)) for i in range(0,bmax+1)]                 # list of wanted substitutions
     print(subs)    
