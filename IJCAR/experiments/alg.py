@@ -16,6 +16,21 @@ def def_example():                          # f(0)=0 /\ forall x . x<0 \/ x>=100
     Qp= Or(x<0, x>=1000, occ[0][0]==occ[0][1]+1)
     print(offsets)
 
+def maximality():
+    return [Or(Not(p[0][0]), Not(p[0][1]), offsets[0][0]==offsets[0][1]),  # equality
+            Or(Not(p[0][0]), p[0][1], offsets[0][0]>offsets[0][1]),        # rest
+            Or(Not(p[0][1]), p[0][0], offsets[0][1]>offsets[0][0])]
+
+def reqpivot():
+    return [(Or(p[0][0], p[0][1], ForAll(x, ForAll(occ[0][0], ForAll(occ[0][1], Qp))))),
+            (Or(p[0][0], Not(p[0][1]), ForAll(x, ForAll(occ[0][1], Exists(occ[0][0], Qp))))),
+            (Or(Not(p[0][0]), p[0][1], ForAll(x, ForAll(occ[0][0], Exists(occ[0][1], Qp))))),
+            (Or(Not(p[0][0]), Not(p[0][1]), Exists(x, Exists(occ[0][1], ForAll(occ[0][0], Qp)))))]
+
+def clash():
+    return [(Or(Not(p[0][0]), And([argF[0][arg]<=bmax+offsets[0][0] for arg in range(0, len(argF[0]))]))),
+            (Or(Not(p[0][1]), And([argF[0][arg]<=bmax+offsets[0][1] for arg in range(0, len(argF[0]))])))]
+    
 # current restrictions:
   # one function symbol
   # two occurrences of function symbol in quantified part
@@ -36,16 +51,9 @@ res="UNSAT"
 solver.add(F, substitute(Q, (x, IntVal(0))))
 while(solver.check()!=unsat):
     solver.reset() 
-    solver.add(Or(Not(p[0][0]), Not(p[0][1]), offsets[0][0]==offsets[0][1]))  # maximality condition, equality
-    solver.add(Or(Not(p[0][0]), p[0][1], offsets[0][0]>offsets[0][1]))        # maximality condition, rest
-    solver.add(Or(Not(p[0][1]), p[0][0], offsets[0][1]>offsets[0][0]))
-    solver.add(Or(p[0][0], p[0][1], ForAll(x, ForAll(occ[0][0], ForAll(occ[0][1], Qp)))))       # ReqPivot (4 cases)
-    solver.add(Or(p[0][0], Not(p[0][1]), ForAll(x, ForAll(occ[0][1], Exists(occ[0][0], Qp)))))
-    solver.add(Or(Not(p[0][0]), p[0][1], ForAll(x, ForAll(occ[0][0], Exists(occ[0][1], Qp)))))
-    solver.add(Or(Not(p[0][0]), Not(p[0][1]), Exists(x, Exists(occ[0][1], ForAll(occ[0][0], Qp)))))
-    solver.add(Or(Not(p[0][0]), And([argF[0][arg]<=bmax+offsets[0][0] for arg in range(0, len(argF[0]))]))) # clash condition
-    solver.add(Or(Not(p[0][1]), And([argF[0][arg]<=bmax+offsets[0][1] for arg in range(0, len(argF[0]))])))
-    solver.add(F)
+    solver.add(*maximality())
+    solver.add(*reqpivot())
+    solver.add(*clash())        
     subs=[ (x, IntVal(i)) for i in range(0,bmax+1)]                 # list of wanted substitutions
     print(subs)    
     print(list(map(lambda x : substitute(Q, x), subs)))
