@@ -102,50 +102,78 @@ These constraints allow only periodic functions whose neighboring values alterna
     \item We show\todoSN{From the experimental part, hopefully?} experimentally that our method can handle problems beyond the reach of current SyGuS and MBQI approaches, often producing more interpretable models.
 \end{itemize}
 
-\section{Related Work}\label{}
-Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
-Synthesis of strategies on LIA problems Murphy and Kincaid~\cite{kincaid-cav24}.
-Synthesis, single invocation Kun\v cak et
-al.~\cite{kuncak-pldi10,kuncak-sttt13}.
+% \section{Related Work}\label{}
+% Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
+% Synthesis of strategies on LIA problems Murphy and Kincaid~\cite{kincaid-cav24}.
+% Synthesis, single invocation Kun\v cak et
+% al.~\cite{kuncak-pldi10,kuncak-sttt13}.
 
-Array decision procedures~\cite{bradley-vmcai06}: no arithmetic on universally quantified variables allowed.
-Habermehl et al.~\cite{habermehl-etaps08} allow difference bounded constraints on array offsets of the form $a[i+c]$. From the MBQI paper: ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA does not refer to linear integer arithmetic, but to the logic allowed by Habermehl et al.}  will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.''
+% Array decision procedures~\cite{bradley-vmcai06}: no arithmetic on universally quantified variables allowed.
+% Habermehl et al.~\cite{habermehl-etaps08} allow difference bounded constraints on array offsets of the form $a[i+c]$. From the MBQI paper: ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA does not refer to linear integer arithmetic, but to the logic allowed by Habermehl et al.}  will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.''
 
-Alberti et al.~\cite{alberti2014decision}: only one universally quantified variable allowed.
-Elad et al.~\cite{elad2024infinite}: The fragment of FOL for which they prove decidability (OSC, Section~6) does not allow anything like integer arithmetic.
+% Alberti et al.~\cite{alberti2014decision}: only one universally quantified variable allowed.
+% Elad et al.~\cite{elad2024infinite}: The fragment of FOL for which they prove decidability (OSC, Section~6) does not allow anything like integer arithmetic.
 
-\cite{reynolds2016model}: needs to user to ensure admissibility (Definition~2), the underlying finite model finding algorithm~\cite{reynolds2013finite} may introduce many case splits (``merge lemmas'') for satisfying cardinality constraints. \todoSR{I added a few words here}
+% \cite{reynolds2016model}: needs to user to ensure admissibility (Definition~2), the underlying finite model finding algorithm~\cite{reynolds2013finite} may introduce many case splits (``merge lemmas'') for satisfying cardinality constraints. \todoSR{I added a few words here}
 
-computer algebra algorithms for solving difference equations
+% computer algebra algorithms for solving difference equations
 
-\subsection{What Can't the Previous Work Solve?}
+% \subsection{What Can't the Previous Work Solve?}
 
-Here, I am considering the works~\cite{bradley-vmcai06,ge-cav09,habermehl-etaps08}.
+% Here, I am considering the works~\cite{bradley-vmcai06,ge-cav09,habermehl-etaps08}.
 
-\paragraph{Infinitely Increasing But Bounded Integer Sequence}
+% \paragraph{Infinitely Increasing But Bounded Integer Sequence}
 
-\[
-	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
-\]
+% \[
+% 	\forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
+% \]
 
-The syntax in~\cite{habermehl-etaps08} includes $\leq$ but does not include $<$. It does include negation though, but only if it
-results in the quantified variables being existential. This cannot be solved by~\cite{bradley-vmcai06} (see Theorem 4 in their paper).
-\textsc{Z3} cannot solve this on its own but with the addition of Lemma~\ref{eq:ind-needed-lemma} it can. Adding the lemma also helps Vampire but not \textsc{cvc5}.
+% The syntax in~\cite{habermehl-etaps08} includes $\leq$ but does not include $<$. It does include negation though, but only if it
+% results in the quantified variables being existential. This cannot be solved by~\cite{bradley-vmcai06} (see Theorem 4 in their paper).
+% \textsc{Z3} cannot solve this on its own but with the addition of Lemma~\ref{eq:ind-needed-lemma} it can. Adding the lemma also helps Vampire but not \textsc{cvc5}.
 
-\paragraph{Two-Valued Constant Function}
+% \paragraph{Two-Valued Constant Function}
 
-\[
-	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
-\]
+% \[
+% 	f(0) = 0 \,\land \,f(c) = 3 \,\land \,\forall{x}. \,f(x+1) = f(x)
+% \]
 
-In the last meeting I hand-wavedly assumed this cannot be in the fragment of~\cite{habermehl-etaps08}.
-However, it is. They accept the literals $f(x) - f(x+1) \leq 0$ and $f(x+1) - f(x) \leq 0$, which in conjunction simplify
-to $f(x) = f(x+1)$. They can then universally quantify this to form an array property. The other equalities can
-be formed as value expressions $A \leq B \,\land \,B \leq A$. I can look more thoroughly at the paper
-to see how can they solve this.
-This cannot be solved by~\cite{bradley-vmcai06}, because the
-third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
+% In the last meeting I hand-wavedly assumed this cannot be in the fragment of~\cite{habermehl-etaps08}.
+% However, it is. They accept the literals $f(x) - f(x+1) \leq 0$ and $f(x+1) - f(x) \leq 0$, which in conjunction simplify
+% to $f(x) = f(x+1)$. They can then universally quantify this to form an array property. The other equalities can
+% be formed as value expressions $A \leq B \,\land \,B \leq A$. I can look more thoroughly at the paper
+% to see how can they solve this.
+% This cannot be solved by~\cite{bradley-vmcai06}, because the
+% third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
+% \textsc{Z3} cannot solve this -- Compactness section in~\cite{ge-cav09}.
+
+\section{Related Work}\todoSN{Stefan R, could you please check this? I am afraid that I use wrong words or wrong summaries of the papers cited.}
+
+Our work intersects several areas of automated reasoning: synthesis, decision procedures for arrays, and model-based quantifier instantiation.
+
+\paragraph{Synthesis approaches.}
+Syntax-Guided Synthesis (SyGuS) \cite{cvc5} enumerates candidate functions from a grammar. While powerful for template-matching problems, it fails on formulas requiring non-template solutions like periodic functions (Equation~\ref{eq:periodic}). Kunčak et al. \cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation synthesis. Hozzová et al. \cite{hozzova-ijcar24} synthesize recursive programs from constraints.
+
+\paragraph{Decision procedures for arrays and quantified formulas.}
+Bradley et al. \cite{bradley-vmcai06} present a decision procedure for array properties but explicitly forbid arithmetic on the universally quantified variables. Habermehl et al. \cite{habermehl-etaps08} allow constraints of the form $a[i+c]$ with difference bounds, but remain limited to offset-bounded indices. Alberti et al. \cite{alberti2014decision} consider only one universally quantified variable. Elad et al. \cite{elad2024infinite} prove decidability for a first‑order fragment without arithmetic, unable to express our constraints.
+
+\paragraph{Model-based and instantiation methods.}
+Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model finding techniques for quantified formulas. Their method requires users to ensure admissibility and may introduce many case splits (``merge lemmas'') to satisfy cardinality constraints. Ge and de Moura \cite{ge-cav09} introduce the Model-Based Quantifier Instantiation (MBQI) but noting that ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA refers to the logic of Habermehl et al.} will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.'' Our work attempts to  address this open question.
+
+\paragraph{Computer algebra.}\todoSN{No explanation in the previous version.}
+Computer algebra algorithms for solving difference equations
+
+\paragraph{Limitations illustrated.}\todoSN{In the previous version, there is a sentence: ``Here, I am considering the works~\cite{bradley-vmcai06,ge-cav09,habermehl-etaps08}." }
+To see where existing methods fall short, consider:
+\begin{itemize}
+    \item \textbf{Infinitely increasing bounded sequence:} $\forall x.\, f(x) < 0 \land \forall x.\, f(x) < f(x+1)$. 
+    Habermehl et al.'s fragment excludes strict inequalities. It does include negation, but only if it results in the quantified variables being existential. Bradley et al. forbid $x+1$ as an argument (Theorem 4 in \cite{bradley-vmcai06}). \textsc{Z3} cannot solve this on its own\todoSN{In the previous version, there is ``but with the addition of Lemma~\ref{eq:ind-needed-lemma} it can. Adding the lemma also helps Vampire but not \textsc{cvc5}."}. 
+    \item \textbf{Two‑valued constant function:} $f(0) = 0 \land f(c) = 3 \land \forall x.\, f(x+1) = f(x)$.
+    \todoSN{I didn't change anything here.} In the last meeting I hand-wavedly assumed this cannot be in the fragment of~\cite{habermehl-etaps08}. However, it is. They accept the literals $f(x) - f(x+1) \leq 0$ and $f(x+1) - f(x) \leq 0$, which in conjunction simplify to $f(x) = f(x+1)$. They can then universally quantify this to form an array property. The other equalities can be formed as value expressions $A \leq B \,\land \,B \leq A$. I can look more thoroughly at the paper to see how can they solve this. This cannot be solved by~\cite{bradley-vmcai06}, because the third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
 \textsc{Z3} cannot solve this -- Compactness section in~\cite{ge-cav09}.
+\end{itemize}
+
+These examples demonstrate the need for a method that handles arithmetic offsets while providing finite certificates for satisfiability.
 
 \section{Problem Statement}
 \label{sec:problem-statement}
