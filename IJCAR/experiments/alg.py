@@ -2,18 +2,24 @@ from z3 import *
 from benchmarks import *
 
 def maximality(i):
+    assert(len(b.offsets[i])==2);
     return [Or(Not(p[i][0]), Not(p[i][1]), b.offsets[i][0]==b.offsets[i][1]),  # equality
             Or(Not(p[i][0]), p[i][1], b.offsets[i][0]>b.offsets[i][1]),        # rest
             Or(Not(p[i][1]), p[i][0], b.offsets[i][1]>b.offsets[i][0])]
 
+def get_bitvectors(k):
+    # repeat=k ensures we get vectors of length k
+    return list(product([0, 1], repeat=k))
+
 def reqpivot():
-    assert(len(p)==1)                                                      # TODO: implement for several function symbols
+    assert(len(p)==1 and len(p[0])==2)                                      # TODO: implement this using the get_bitvectors from above
     return [(Or(p[0][0], p[0][1], ForAll(b.x, ForAll(b.occ[0][0], ForAll(b.occ[0][1], b.Qp))))),
             (Or(p[0][0], Not(p[0][1]), ForAll(b.x, ForAll(b.occ[0][1], Exists(b.occ[0][0], b.Qp))))),
             (Or(Not(p[0][0]), p[0][1], ForAll(b.x, ForAll(b.occ[0][0], Exists(b.occ[0][1], b.Qp))))),
             (Or(Not(p[0][0]), Not(p[0][1]), Exists(b.x, Exists(b.occ[0][1], ForAll(b.occ[0][0], b.Qp)))))]
 
 def clash(i):
+    assert(len(b.offsets[i])==2);    
     return [(Or(Not(p[i][0]), And([b.argF[0][arg]<=bmax+b.offsets[i][0] for arg in range(0, len(b.argF[i]))]))),
             (Or(Not(p[i][1]), And([b.argF[0][arg]<=bmax+b.offsets[i][1] for arg in range(0, len(b.argF[i]))])))]
     
