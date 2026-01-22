@@ -1,10 +1,14 @@
 from z3 import *
 
+global x
+x= Int('x')                                 # the quantified variable
+    
+global offsets, occf, argf, F, Q, Qp        # the variable needed to define a problem instance
+
 def def_example():                          # f(0)=0 /\ forall x . x<0 \/ x>=1000 \/ f(x+1)=f(x)+1
-    global offsets, x, occf, argf, F, Q, Qp
     f= Function('f', IntSort(), IntSort())
     offsets= [1, 0]
-    x= Int('x')
+
     occf= [Int('occf1'), Int('occf2')]      # variables for occurrences of f (u, v in the paper)
     argf= [0]                               # arguments of f in F
     F= f(argf[0])==0
