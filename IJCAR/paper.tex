@@ -160,33 +160,67 @@ where
       where $c$ is an uninterpreted constant.
     \end{example}
 
-    
 \paragraph{Core Problem}
-Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, we want to decide its satisfiability over the standard integers. Because the quantifier ranges over the infinite set $\mathbb{Z}$, a na\"ive instantiation‑based approach may not terminate. Instead, we aim to reduce the problem into checking two conditions on a finite interval $B = [b_{\min}, b_{\max}]$:
+Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we address is:
+\begin{quote}
+    \emph{Decide whether $\phi$ is satisfiable over the standard integers, and if so, construct a model (an interpretation of all uninterpreted function symbols) that satisfies $\phi$.}
+\end{quote}
 
-\begin{enumerate}
-    \item \textbf{Base satisfiability:} $F \land \bigwedge_{z \in B} Q[z]$ is satisfiable (where $Q[z]$ denotes $Q$ with $x$ replaced by the numeral $z$).
-    \item \textbf{Propagation:} From a model of the base interval, we can extend the assignment to all integers $z \notin B$ without creating any conflicts. This requires that for each function $f_i$, certain occurrences in $Q$ can be treated as ``pivots'' whose values can be chosen after fixing all other occurrences.
-\end{enumerate}
-
-The second condition is formalised as the \emph{multi‑\req condition} in \cref{sec:alg}. Intuitively, it ensures that when moving outward from $B$ (to larger or smaller integers), we always have at least one cell in each instantiation whose value can be adjusted to satisfy $Q$, given the values already assigned to cells that appear in earlier instantiations.
-
-\paragraph{Challenges}\todoSN{Stefan R, could you please check whether I formulate this paragraph (and the next one) correctly?}
+\paragraph{Why is this Hard?}\todoSN{Not sure about this part! I'm just trying to summarise it from what's written in the Intro and Related Work sections.}
+Although UFLIA is undecidable in general, formulas of the above form constitute a fragment that appears frequently in verification conditions (e.g. for programs with arrays or recursive functions). Yet, existing SMT techniques struggle:
 \begin{itemize}
-    \item \textbf{Detecting propagability:} How can we automatically check whether a formula $Q$ satisfies the required pivot condition?
-    \item \textbf{Finding a suitable base interval:} The interval $B$ must be large enough to avoid clashes between cells generated during propagation and cells that appear in the ground part $F$.
-    \item \textbf{Completeness:} Under what conditions does the existence of a finite base interval together with propagation guarantees imply satisfiability? Conversely, when can unsatisfiability be detected finitely?
+    \item \textbf{Finite instantiation} may not terminate because the universal quantifier ranges over the infinite domain $\mathbb{Z}$.
+    \item \textbf{Synthesis-based approaches} (SyGuS) rely on syntactic templates and fail when the required function does not match the template.
+    \item \textbf{Model-based quantifier instantiation (MBQI)} can sometimes find models but often produces large, uninterpretable assignments and scales poorly.
+    \item \textbf{Specialised array decision procedures} either forbid arithmetic on indices or are limited to difference‑bounded constraints.
 \end{itemize}
+The presence of both arithmetic constraints and uninterpreted functions, combined with the universal quantifier, makes this fragment challenging for current solvers.
 
-\paragraph{Our Contributions}
-We address these challenges through the following steps:
+\paragraph{Scope and Limitations}
+We make the following additional assumptions about the structure of the formulas:
 \begin{enumerate}
-    \item We introduce \emph{cell propagation certificates} (Definition~\ref{def:certificate}) as a formal witness for satisfiability in our fragment.
-    \item We define the \emph{multi‑\req condition} (Definition~\ref{def:multi-reqpivot-param}) that characterises when propagation is possible.
-    \item We prove that if a formula satisfies the multi‑\req condition and a suitable base interval exists, then the formula is satisfiable (Theorem~\ref{thm:interval-certificate-param}).
-    \item We present an algorithm (Algorithm~\ref{alg:interval-check-param-withBigvee}) that enumerates candidate intervals and checks both base satisfiability and propagation conditions using an $\smt$ solver.
-    \item We establish soundness and relative completeness theorems for our algorithm (Corollary~\ref{cor:soundness-bigvee} and Theorem~\ref{thm:completeness-bigvee}).
+    \item For each uninterpreted function $f$, the set of offset terms $\{t \mid f(x+t) \text{ occurs in } Q\}$ is finite and consists of ground terms.
+    \item We do not allow nested applications of uninterpreted functions (e.g., $f(g(x))$ is excluded).
+    \item We do not consider multiple universal quantifiers over different variables or existential quantification over functions.
 \end{enumerate}
+These restrictions enable the inductive reasoning that underlies our solution, while still covering many practical verification conditions. The technical details of our solution—how we detect satisfiability, what propagation conditions we require, and how we construct models—are presented in the following sections.
+
+% \paragraph{Expected Outcomes}
+% For formulas within this fragment, we aim to provide:
+% \begin{itemize}
+%     \item A \emph{sound} decision procedure: if the procedure returns \textsc{Sat}, the formula is indeed satisfiable.
+%     \item A \emph{relatively complete} procedure: for a large subclass (characterized by a propagation condition), the procedure will terminate and return the correct answer.
+%     \item Constructive models: when the formula is satisfiable, the procedure should produce an explicit interpretation of the uninterpreted functions.
+% \end{itemize}
+
+
+    
+% \paragraph{Core Problem}
+% Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, we want to decide its satisfiability over the standard integers. Because the quantifier ranges over the infinite set $\mathbb{Z}$, a na\"ive instantiation‑based approach may not terminate. Instead, we aim to reduce the problem into checking two conditions on a finite interval $B = [b_{\min}, b_{\max}]$:
+
+% \begin{enumerate}
+%     \item \textbf{Base satisfiability:} $F \land \bigwedge_{z \in B} Q[z]$ is satisfiable (where $Q[z]$ denotes $Q$ with $x$ replaced by the numeral $z$).
+%     \item \textbf{Propagation:} From a model of the base interval, we can extend the assignment to all integers $z \notin B$ without creating any conflicts. This requires that for each function $f_i$, certain occurrences in $Q$ can be treated as ``pivots'' whose values can be chosen after fixing all other occurrences.
+% \end{enumerate}
+
+% The second condition is formalised as the \emph{multi‑\req condition} in \cref{sec:alg}. Intuitively, it ensures that when moving outward from $B$ (to larger or smaller integers), we always have at least one cell in each instantiation whose value can be adjusted to satisfy $Q$, given the values already assigned to cells that appear in earlier instantiations.
+
+% \paragraph{Challenges}\todoSN{Stefan R, could you please check whether I formulate this paragraph (and the next one) correctly?}
+% \begin{itemize}
+%     \item \textbf{Detecting propagability:} How can we automatically check whether a formula $Q$ satisfies the required pivot condition?
+%     \item \textbf{Finding a suitable base interval:} The interval $B$ must be large enough to avoid clashes between cells generated during propagation and cells that appear in the ground part $F$.
+%     \item \textbf{Completeness:} Under what conditions does the existence of a finite base interval together with propagation guarantees imply satisfiability? Conversely, when can unsatisfiability be detected finitely?
+% \end{itemize}
+
+% \paragraph{Our Contributions}
+% We address these challenges through the following steps:
+% \begin{enumerate}
+%     \item We introduce \emph{cell propagation certificates} (Definition~\ref{def:certificate}) as a formal witness for satisfiability in our fragment.
+%     \item We define the \emph{multi‑\req condition} (Definition~\ref{def:multi-reqpivot-param}) that characterises when propagation is possible.
+%     \item We prove that if a formula satisfies the multi‑\req condition and a suitable base interval exists, then the formula is satisfiable (Theorem~\ref{thm:interval-certificate-param}).
+%     \item We present an algorithm (Algorithm~\ref{alg:interval-check-param-withBigvee}) that enumerates candidate intervals and checks both base satisfiability and propagation conditions using an $\smt$ solver.
+%     \item We establish soundness and relative completeness theorems for our algorithm (Corollary~\ref{cor:soundness-bigvee} and Theorem~\ref{thm:completeness-bigvee}).
+% \end{enumerate}
 
 
 \section{Notation}\todoSR{We will see where to put this, in the end}
@@ -298,6 +332,10 @@ Note that, in general, it is not possible to compute $val(u)$ by computing the v
 The goal is now an algorithm that computes such cell propagation certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
 
 \section{Algorithm}\label{sec:alg}\todoSN{I changed the intro of this section into this one. What do you think?}
+
+% Class of formulas:
+% \[ F\wedge \forall x\;.\; Q(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\dots,f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})),\]
+% where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, and the  $t^{f_i}_{1},\dots,t^{f_i}_{l_i}$ are pairwise different LIA ground terms
 
 Building on the problem formulation in 
 \cref{sec:problem-statement}, we now present our decision procedure for formulas of the form~\eqref{eq:main-fragment}. The core idea is to search for a finite interval $B = [b_{\min}, b_{\max}]$ from which a model can be inductively extended to all integers. This requires two components:
