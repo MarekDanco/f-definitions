@@ -156,7 +156,7 @@ This paper makes several contributions towards deciding satisfiability in our fr
 % third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
 % \textsc{Z3} cannot solve this -- Compactness section in~\cite{ge-cav09}.
 
-\section{Related Work}\todoSN{Stefan R, could you please check this? I am afraid that I use wrong words or wrong summaries of the papers cited.}
+\section{Related Work}\todoSR{potentially relevant PC members: Reynolds, Barrett, Tinelli, anybody else}
 
 Our work intersects several areas of automated reasoning: synthesis, decision procedures for arrays, and model-based quantifier instantiation.
 
@@ -292,8 +292,8 @@ Examples of cells are $c$, and $f(7)$. The term $f(c+7)$ is not a cell.
 	A \emph{cell interpretation} is a partial function whose domain is the set of cells. A cell interpretation $I$ is \emph{compatible} with an interpretation $\mathcal{I}$ iff $I$ and $\mathcal{I}$ agree on all cells where $I$ is defined.
 \end{definition}
 
-Given a cell interpretation $I$, we denote by $\mathit{def}(I)$ the set of cells for which $I$ is defined. Given a term $t$ and a cell interpretation $I$  we define $I(t):=\mathcal{I}(t)$, if  $\mathcal{I}(t)$ is unique for every interpretation $\mathcal{I}$ compatible with $I$, and otherwise $I(t):=\bot$.\todoSR{This is not completely formal, we could also use a more formal, but less readable version.}
-For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but $I(f(1))=\bot$. Also note that $I(f(1)-f(1))=0\neq\bot$\todoSR{I went for a semantic definition here, since it works very generally without taking much space to define.}. In a similar way, for a formula $\phi$, we define that a cell interpretation~$I$ satisfies $\phi$ iff for every interpretation $\mathcal{I}$ compatible with $I$, $\mathcal{I}$ satisfies $\phi$, in which case we also write $I\models \phi$.
+Given a cell interpretation $I$, we denote by $\mathit{def}(I)$ the set of cells for which $I$ is defined. Given a term $t$ and a cell interpretation $I$  we define $I(t):=\mathcal{I}(t)$, if  $\mathcal{I}(t)$ is unique for every interpretation $\mathcal{I}$ compatible with $I$, and otherwise $I(t):=\bot$.
+For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but $I(f(1))=\bot$. Also note that $I(f(1)-f(1))=0\neq\bot$. In a similar way, for a formula $\phi$, we define that a cell interpretation~$I$ satisfies $\phi$ iff for every interpretation $\mathcal{I}$ compatible with $I$, $\mathcal{I}$ satisfies $\phi$, in which case we also write $I\models \phi$.
 
 \begin{definition}
 	\label{def:pre-sat-cert}
