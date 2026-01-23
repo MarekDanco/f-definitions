@@ -2,6 +2,7 @@ from z3 import *
 from benchmarks import *
 import operator 
 import functools
+import itertools
 
 def flatten(l):                                         # flatten a list of lists
     return functools.reduce(operator.concat, l)
@@ -15,7 +16,7 @@ def maximality(i):
 
 def get_bitvectors(k):
     # repeat=k ensures we get vectors of length k
-    return list(product([0, 1], repeat=k))
+    return list(itertools.product([False, True], repeat=k))
 
 def reqpivot_case(bl):
     pl= flatten(p)
@@ -24,13 +25,19 @@ def reqpivot_case(bl):
     univ_vars= [ b.x ] + [ occl[i] for i in range(len(bl)) if not bl[i] ]
     exist_vars= [ occl[i] for i in range(len(bl)) if bl[i] ]
     boolguard= [ Not(pl[i]) if bl[i] else pl[i] for i in range(len(bl)) ]
-    return Or(boolguard+ [ForAll(univ_vars, Exists(exist_vars, b.Qp))])
+    if exist_vars==[]:
+        return Or(boolguard+ [ForAll(univ_vars, b.Qp)])
+    else:
+        return Or(boolguard+ [ForAll(univ_vars, Exists(exist_vars, b.Qp))])
 
 def reqpivot():
-    assert(len(p)==1 and len(p[0])==2)                                      # TODO: implement this using the get_bitvectors from above
+    return list(map(lambda t: reqpivot_case(list(t)), get_bitvectors(2)))
+    
+def reqpivot_():                                                      # old implementation of special case
+    assert(len(p)==1 and len(p[0])==2)                                     
     return [(Or(p[0][0], p[0][1], ForAll(b.x, ForAll(b.occ[0][0], ForAll(b.occ[0][1], b.Qp))))),
-            (Or(p[0][0], Not(p[0][1]), ForAll(b.x, ForAll(b.occ[0][1], Exists(b.occ[0][0], b.Qp))))),
-            (Or(Not(p[0][0]), p[0][1], ForAll(b.x, ForAll(b.occ[0][0], Exists(b.occ[0][1], b.Qp))))),
+            (Or(p[0][0], Not(p[0][1]), ForAll(b.x, ForAll(b.occ[0][0], Exists(b.occ[0][1], b.Qp))))),
+            (Or(Not(p[0][0]), p[0][1], ForAll(b.x, ForAll(b.occ[0][1], Exists(b.occ[0][0], b.Qp))))),
             (Or(Not(p[0][0]), Not(p[0][1]), Exists(b.x, Exists(b.occ[0][1], ForAll(b.occ[0][0], b.Qp)))))]
 
 def clash(i):
@@ -54,8 +61,6 @@ solver = z3.SolverFor("UFLIA")
 
 p= list(map(lambda l : list(map(lambda v : Bool(v.__repr__()+"p"), l)), b.occ))  # is a pivot
 # print(p)
-
-#print(reqpivot_case([False, False]))
 
 bmax= 0
 res="UNSAT"
