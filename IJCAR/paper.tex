@@ -57,8 +57,9 @@
 \newcommand{\todoSN}[1]{\todo[color=orange!50]{#1 -SN}}
 
 \title{%
-    Inductive Function Definitions\todoSN{We will change this title. For the affiliation, I'm not sure what to put for Mikoláš and Marek.}
-}
+    Inductive Function Definitions\todoSN{We will change this title. For the affiliation, I'm not sure what to put for Mikoláš and Marek.} \todoSN{Title options: ``Inductive Cell Propagation for Quantified UFLIA" or ``Deciding UFLIA with Offset Constraints through Inductive Propagation" or ``Cell Propagation Certificates: A Decision Procedure for Offset-Restricted UFLIA"}
+    }
+
 % \author{Stefan Ratschan \and Anggha Nugraha \and Mikoláš Janota \and Marek Dančo}
 \author{Stefan Ratschan\inst{1,2}\orcidlink{0000-0003-1710-1513} \and
 Anggha Nugraha\inst{1,2}\orcidlink{0000-0002-7139-4487} \and
@@ -780,10 +781,8 @@ where:
     
     \item Clash condition encoding:
     \begin{align*}
-    \text{ClashUpEnc} &\equiv \bigwedge_{i=1}^r \bigwedge_{t_g \in \args(F,f_i)} \bigwedge_{j=1}^{l_i}
-           \big(s_{i,j} \Rightarrow (t_g \leq b_{\max} + t_j^{f_i})\big) \\
-    \text{ClashDownEnc} &\equiv \bigwedge_{i=1}^r \bigwedge_{t_g \in \args(F,f_i)} \bigwedge_{j=1}^{l_i}
-           \big(s'_{i,j} \Rightarrow (t_g \geq b_{\min} + t_j^{f_i})\big)
+        \text{ClashUpEnc} &\equiv \bigwedge_{i=1}^r \bigwedge_{t_g \in \args(F,f_i)} \bigwedge_{j=1}^{l_i}\big(s_{i,j} \Rightarrow (t_g \leq b_{\max} + t_j^{f_i})\big) \\
+        \text{ClashDownEnc} &\equiv \bigwedge_{i=1}^r \bigwedge_{t_g \in \args(F,f_i)} \bigwedge_{j=1}^{l_i}\big(s'_{i,j} \Rightarrow (t_g \geq b_{\min} + t_j^{f_i})\big)
     \end{align*}
 \end{itemize}
 \end{definition}
