@@ -7,7 +7,6 @@ import itertools
 def flatten(l):                                         # flatten a list of lists
     return functools.reduce(operator.concat, l)
 
-
 def maximality(i):
     assert(len(b.offsets[i])==2);
     return [Or(Not(p[i][0]), Not(p[i][1]), b.offsets[i][0]==b.offsets[i][1]),  # equality
@@ -33,7 +32,7 @@ def reqpivot_case(bl):
 def reqpivot():
     return list(map(lambda t: reqpivot_case(list(t)), get_bitvectors(2)))
     
-def reqpivot_():                                                      # old implementation of special case
+def reqpivot_2():                                                      # old implementation of special case
     assert(len(p)==1 and len(p[0])==2)                                     
     return [(Or(p[0][0], p[0][1], ForAll(b.x, ForAll(b.occ[0][0], ForAll(b.occ[0][1], b.Qp))))),
             (Or(p[0][0], Not(p[0][1]), ForAll(b.x, ForAll(b.occ[0][0], Exists(b.occ[0][1], b.Qp))))),
@@ -52,8 +51,9 @@ def clash(i):
 
 b= Incr                                                              # choose the benchmark here
 # print(b.offsets)
-assert(len(b.offsets)==len(b.occ))
-assert(len(b.occ)==len(b.argF))
+num_f= len(b.offsets)
+assert(len(b.occ)==num_f)
+assert(len(b.argF)==num_f)
 assert(all(len(b.offsets[i])==len(b.occ[i]) for i in range(len(b.offsets))))
 
 solver = z3.SolverFor("UFLIA")
@@ -67,9 +67,9 @@ res="UNSAT"
 solver.add(b.F, substitute(b.Q, (b.x, IntVal(0))))
 while(solver.check()!=unsat):
     solver.reset() 
-    solver.add(*maximality(0))    
+    solver.add(*(maximality(i) for i in range(0, num_f)))
     solver.add(*reqpivot())
-    solver.add(*clash(0))        
+    solver.add(*(clash(i) for i in range(0, num_f)))
     subs=[ (b.x, IntVal(i)) for i in range(0,bmax+1)]                 # list of wanted substitutions
 #    print(subs)    
 #    print(list(map(lambda x : substitute(b.Q, x), subs)))
