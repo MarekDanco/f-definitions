@@ -56,8 +56,7 @@ def clash_2(i):                                                         # old im
 
 
 # current restrictions:
-  # one function symbol
-  # two occurrences of function symbol in quantified part
+  # maximally two occurrences of function symbol in quantified part
   # positive indices only
 
 b= Incr                                                  # choose the benchmark here
