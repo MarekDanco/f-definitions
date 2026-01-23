@@ -1,5 +1,10 @@
 from z3 import *
 from benchmarks import *
+import functools
+
+def flatten(l):                                         # flatten a list of lists
+    return functools.reduce(operator.concat(l))
+
 
 def maximality(i):
     assert(len(b.offsets[i])==2);
@@ -10,6 +15,15 @@ def maximality(i):
 def get_bitvectors(k):
     # repeat=k ensures we get vectors of length k
     return list(product([0, 1], repeat=k))
+
+def reqpivot_case(bl):
+    pl= flatten(p)
+    occl= flatten(occ)
+    assert(len(bl)==len(pl) and len(pl)==len(occl))
+    univ_vars= [ x ] + [ occl[i] for i in range(len(bl)) if not bl(i) ]
+    exist_vars= [ occl[i] for i in range(len(bl)) if bl(i) ]
+    boolguard= [ p[i] if Not(bl[i]) else p[i] for i in range(len(bl)) ]
+    return Or(boolguard, ForAll(univ_vars, Exists(exist_vars, b.Qp)))
 
 def reqpivot():
     assert(len(p)==1 and len(p[0])==2)                                      # TODO: implement this using the get_bitvectors from above
@@ -44,7 +58,7 @@ res="UNSAT"
 solver.add(b.F, substitute(b.Q, (b.x, IntVal(0))))
 while(solver.check()!=unsat):
     solver.reset() 
-    solver.add(*maximality(0))
+    solver.add(*maximality(0))    
     solver.add(*reqpivot())
     solver.add(*clash(0))        
     subs=[ (b.x, IntVal(i)) for i in range(0,bmax+1)]                 # list of wanted substitutions
