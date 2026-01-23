@@ -7,12 +7,19 @@ import itertools
 def flatten(l):                                         # flatten a list of lists
     return functools.reduce(operator.concat, l)
 
-def maximality(i):
-    assert(len(b.offsets[i])==2);
-    return [Or(Not(p[i][0]), Not(p[i][1]), b.offsets[i][0]==b.offsets[i][1]),  # equality
-            Or(Not(p[i][0]), p[i][1], b.offsets[i][0]>b.offsets[i][1]),        # rest
-            Or(Not(p[i][1]), p[i][0], b.offsets[i][1]>b.offsets[i][0])]
+def maximality_i(i):
+    if(len(b.offsets[i])==2):
+        return [Or(Not(p[i][0]), Not(p[i][1]), b.offsets[i][0]==b.offsets[i][1]),  # equality
+                Or(Not(p[i][0]), p[i][1], b.offsets[i][0]>b.offsets[i][1]),        # rest
+                Or(Not(p[i][1]), p[i][0], b.offsets[i][1]>b.offsets[i][0])]
+    elif(len(b.offsets[i])==1):
+         return []       # if there just one occurrence the maximality condition is vacuously true
+    else:
+        assert(false)    # not yet implemented
 
+def maximality():
+    return flatten([maximality_i(i) for i in range(0, num_f)])
+        
 def get_bitvectors(k):
     # repeat=k ensures we get vectors of length k
     return list(itertools.product([False, True], repeat=k))
@@ -30,7 +37,7 @@ def reqpivot_case(bl):
         return Or(boolguard+ [ForAll(univ_vars, Exists(exist_vars, b.Qp))])
 
 def reqpivot():
-    return list(map(lambda t: reqpivot_case(list(t)), get_bitvectors(2)))
+    return list(map(lambda t: reqpivot_case(list(t)), get_bitvectors(len(flatten(p)))))
     
 def reqpivot_2():                                                      # old implementation of special case
     assert(len(p)==1 and len(p[0])==2)                                     
@@ -39,17 +46,21 @@ def reqpivot_2():                                                      # old imp
             (Or(Not(p[0][0]), p[0][1], ForAll(b.x, ForAll(b.occ[0][1], Exists(b.occ[0][0], b.Qp))))),
             (Or(Not(p[0][0]), Not(p[0][1]), Exists(b.x, Exists(b.occ[0][1], ForAll(b.occ[0][0], b.Qp)))))]
 
-def clash(i):
-    assert(len(b.offsets[i])==2);    
+def clash():
+    return [Or(Not(p[i][j]), b.argF[0][arg]<=bmax+b.offsets[i][j]) for i in range(0, num_f) for arg in range(0, len(b.argF[i])) for j in range(0, len(b.offsets[i]))]
+
+def clash_2(i):                                                         # old implementation of special case
+    assert(len(b.offsets[i])==2)   
     return [(Or(Not(p[i][0]), And([b.argF[0][arg]<=bmax+b.offsets[i][0] for arg in range(0, len(b.argF[i]))]))),
             (Or(Not(p[i][1]), And([b.argF[0][arg]<=bmax+b.offsets[i][1] for arg in range(0, len(b.argF[i]))])))]
-    
+
+
 # current restrictions:
   # one function symbol
   # two occurrences of function symbol in quantified part
   # positive indices only
 
-b= Incr                                                              # choose the benchmark here
+b= Incr                                                  # choose the benchmark here
 # print(b.offsets)
 num_f= len(b.offsets)
 assert(len(b.occ)==num_f)
@@ -67,9 +78,9 @@ res="UNSAT"
 solver.add(b.F, substitute(b.Q, (b.x, IntVal(0))))
 while(solver.check()!=unsat):
     solver.reset() 
-    solver.add(*(maximality(i) for i in range(0, num_f)))
+    solver.add(*maximality())
     solver.add(*reqpivot())
-    solver.add(*(clash(i) for i in range(0, num_f)))
+    solver.add(*clash())
     subs=[ (b.x, IntVal(i)) for i in range(0,bmax+1)]                 # list of wanted substitutions
 #    print(subs)    
 #    print(list(map(lambda x : substitute(b.Q, x), subs)))
