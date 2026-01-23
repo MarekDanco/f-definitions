@@ -20,6 +20,7 @@
 \usepackage{commath}
 \usepackage[most]{tcolorbox}
 \usepackage{enumitem}
+\usepackage{orcidlink}
 
 \usepackage{accents} % for \ubar
 \newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
@@ -56,10 +57,23 @@
 \newcommand{\todoSN}[1]{\todo[color=orange!50]{#1 -SN}}
 
 \title{%
-    Inductive Function Definitions\todoSN{We will change this.}
+    Inductive Function Definitions\todoSN{We will change this title. For the affiliation, I'm not sure what to put for Mikoláš and Marek.}
 }
-\author{Stefan Ratschan \and Stefan Nugraha \and Mikoláš Janota \and Marek Dančo}
-\date{}
+% \author{Stefan Ratschan \and Anggha Nugraha \and Mikoláš Janota \and Marek Dančo}
+\author{Stefan Ratschan\inst{1,2}\orcidlink{0000-0003-1710-1513} \and
+Anggha Nugraha\inst{1,2}\orcidlink{0000-0002-7139-4487} \and
+Mikoláš Janota\orcidlink{0000-0003-3487-784X} \and 
+Marek Dančo\orcidlink{0009-0008-3031-113X}}
+%
+\authorrunning{F. Author et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+\institute{Institute of Computer Science, The Czech Academy of Sciences,
+Prague, Czech Republic \\
+\email{stefan.ratschan@cs.cas.cz} \and 
+Faculty of Information Technology, Czech Technical University in Prague,
+Prague, Czech Republic \and }
 
 \begin{document}
 \maketitle
@@ -89,18 +103,12 @@ These constraints allow only periodic functions whose neighboring values alterna
 
 \paragraph{What We Solve.} We therefore isolate a relevant fragment of UFLIA where formulas like~\eqref{eq:periodic} become decidable. In this fragment, arguments of uninterpreted functions within quantified subformulas are restricted to terms of the form $x + t$, where $x$ is the universally quantified variable and $t$ is a ground term. Such formulas frequently arise in verification conditions for programs with arrays, recursive functions, or inductive data structures.
 
-\paragraph{How We Solve It.} Our approach is based on \emph{inductive cell propagation}. We view each quantifier instantiation as imposing constraints on \emph{cells}—terms $f(c_1,\dots,c_k)$ with integer arguments. The key insight is that if we can: 1) Find a finite interval $[b_{\min}, b_{\max}]$ where all instantiations are simultaneously satisfiable, and 2) Ensure that from this base, solutions can be \emph{propagated} outward in both directions without conflicts, then the entire universally quantified formula is satisfiable. This reduces the infinite satisfiability problem to checking two finite conditions: base satisfiability and a propagation property formalized as the \emph{multi-ReqPivot condition}.
+\paragraph{How We Solve It.} Our approach is based on \emph{inductive cell propagation}. We view each quantifier instantiation as imposing constraints on \emph{cells}—terms $f(n_1,\dots,n_k)$ with integer arguments. The key insight is that if we can: 1) Find a finite interval $[b_{\min}, b_{\max}]$ where all instantiations are simultaneously satisfiable, and 2) Ensure that from this base, solutions can be \emph{propagated} outward in both directions without conflicts, then the entire universally quantified formula is satisfiable. This reduces the infinite satisfiability problem to checking two finite conditions: base satisfiability and a propagation property formalized as the \emph{multi-ReqPivot condition}.
 
 % The key idea is to treat each quantifier instantiation as introducing infinitely many constraints on function calls, which we refer to as cells. A single cell may appear in multiple constraints, so we must ensure that it is assigned a consistent value throughout. To show satisfiability within our fragment, we impose an order on these constraints and construct a symbolic assignment to the cells such that, when processed in this order, no conflicting assignments arise.
 
-\paragraph{Contributions.} This paper makes the following contributions:
-\begin{itemize}
-    \item We formalize the notion of \emph{cell propagation certificates} (\cref{def:certificate}) that witness satisfiability through inductive extension of finite base assignments.
-    \item We introduce the \emph{multi-\req condition} (\cref{def:multi-reqpivot-param}), propagation conditions that allows multiple functions to serve as pivots simultaneously.
-    \item We present an interval-based algorithm (\cref{alg:interval-check-param-withBigvee}) that searches for suitable base intervals and checks propagation conditions using $\smt$ queries.
-    \item We prove soundness (\cref{cor:soundness-bigvee}) and relative completeness (\cref{thm:completeness-bigvee}) for our algorithm.: it returns \textsc{Sat} for all satisfiable formulas meeting the multi-\req condition, and \textsc{Unsat} for formulas whose unsatisfiability can be detected through \emph{finite instantiation}.
-    \item We show\todoSN{From the experimental part, hopefully?} experimentally that our method can handle problems beyond the reach of current SyGuS and MBQI approaches, often producing more interpretable models.
-\end{itemize}
+\paragraph{Contributions.} 
+This paper makes several contributions towards deciding satisfiability in our fragment. We formalize \emph{cell propagation certificates} (\cref{def:certificate}) that witness satisfiability through inductive extension of finite base assignments.  We introduce the \emph{multi-\req condition} (\cref{def:multi-reqpivot-param}), propagation conditions that allows multiple functions to serve as pivots simultaneously. Building on this, we present an interval‑based algorithm (\cref{alg:interval-check-param-withBigvee}) that searches for suitable base intervals and checks propagation conditions using satisfiability queries. We prove \emph{soundness} (\cref{cor:soundness-bigvee}) and \emph{relative completeness} (\cref{thm:completeness-bigvee}) for our algorithm. Finally\todoSN{Hopefully!}, we provide experimental evidence that our method handles problems beyond the reach of current SyGuS and MBQI approaches, often producing more interpretable models.
 
 % \section{Related Work}\label{}
 % Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
