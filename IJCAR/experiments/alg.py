@@ -1,9 +1,10 @@
 from z3 import *
 from benchmarks import *
+import operator 
 import functools
 
 def flatten(l):                                         # flatten a list of lists
-    return functools.reduce(operator.concat(l))
+    return functools.reduce(operator.concat, l)
 
 
 def maximality(i):
@@ -18,12 +19,12 @@ def get_bitvectors(k):
 
 def reqpivot_case(bl):
     pl= flatten(p)
-    occl= flatten(occ)
+    occl= flatten(b.occ)
     assert(len(bl)==len(pl) and len(pl)==len(occl))
-    univ_vars= [ x ] + [ occl[i] for i in range(len(bl)) if not bl(i) ]
-    exist_vars= [ occl[i] for i in range(len(bl)) if bl(i) ]
-    boolguard= [ p[i] if Not(bl[i]) else p[i] for i in range(len(bl)) ]
-    return Or(boolguard, ForAll(univ_vars, Exists(exist_vars, b.Qp)))
+    univ_vars= [ b.x ] + [ occl[i] for i in range(len(bl)) if not bl[i] ]
+    exist_vars= [ occl[i] for i in range(len(bl)) if bl[i] ]
+    boolguard= [ Not(pl[i]) if bl[i] else pl[i] for i in range(len(bl)) ]
+    return Or(boolguard+ [ForAll(univ_vars, Exists(exist_vars, b.Qp))])
 
 def reqpivot():
     assert(len(p)==1 and len(p[0])==2)                                      # TODO: implement this using the get_bitvectors from above
@@ -42,8 +43,8 @@ def clash(i):
   # two occurrences of function symbol in quantified part
   # positive indices only
 
-b= Incr                                                                          # choose the benchmark here
-print(b.offsets)
+b= Incr                                                              # choose the benchmark here
+# print(b.offsets)
 assert(len(b.offsets)==len(b.occ))
 assert(len(b.occ)==len(b.argF))
 assert(all(len(b.offsets[i])==len(b.occ[i]) for i in range(len(b.offsets))))
@@ -52,7 +53,10 @@ solver = z3.SolverFor("UFLIA")
 # solver.set(mbqi=True)
 
 p= list(map(lambda l : list(map(lambda v : Bool(v.__repr__()+"p"), l)), b.occ))  # is a pivot
-print(p)
+# print(p)
+
+#print(reqpivot_case([False, False]))
+
 bmax= 0
 res="UNSAT"
 solver.add(b.F, substitute(b.Q, (b.x, IntVal(0))))
@@ -62,8 +66,9 @@ while(solver.check()!=unsat):
     solver.add(*reqpivot())
     solver.add(*clash(0))        
     subs=[ (b.x, IntVal(i)) for i in range(0,bmax+1)]                 # list of wanted substitutions
-    print(subs)    
-    print(list(map(lambda x : substitute(b.Q, x), subs)))
+#    print(subs)    
+#    print(list(map(lambda x : substitute(b.Q, x), subs)))
+    solver.add(b.F)
     solver.add(And(list(map(lambda x : substitute(b.Q, x), subs))))
     if(solver.check()==sat):
         res="SAT"
