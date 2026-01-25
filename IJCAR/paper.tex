@@ -395,6 +395,9 @@ Our algorithm relies on the ability to propagate solutions outward from a base i
 
 Throughout this section we assume that $\phi$ is a formula of the form   $F \land \forall x.\; Q$, as defined in Section~\ref{sec:problem-statement}, with $f_1, \dots, f_r$ being the uninterpreted function symbols appearing in $Q$, with the arguments of $f_i$ being of the form $x+t^{f_i}_1, \dots, x+t^{f_i}_{l_i}$. We denote the set of \emph{offsets} $t^{f_i}_1, \dots, x+t^{f_i}_{l_i}$ by $T_i$.
 
+
+\todoSR{My preferred order is: (1) intuition, (2) formalism, (3) example} For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values.  The downward condition is symmetric.
+
 \begin{definition}[Multi-\req Condition]
 \label{def:multi-reqpivot-param}
 
@@ -425,8 +428,6 @@ We say that $Q$ satisfies the \emph{multi-\req condition for $(\mathcal{S}, \mat
 
 We say $Q$ satisfies the \emph{multi-\req condition} if there exists \emph{some} pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the multi-\req condition for $(\mathcal{S}, \mathcal{S}')$.
 \end{definition}
-
-For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values.  The downward condition is symmetric.
 
 
 \begin{example}[Multi-\req Illustration]
@@ -637,7 +638,7 @@ Thus all certificate requirements are satisfied. By Property \ref{prop:certThenS
 
 \begin{corollary}[Soundness of \cref{alg:interval-check-param-withBigvee}]
 \label{cor:soundness-bigvee}
-\cref{alg:interval-check-param-withBigvee} is sound: if it returns \textsc{Sat}, then $\phi = F \land \forall x.\, Q$ is satisfiable.
+ If \cref{alg:interval-check-param-withBigvee} returns \textsc{Sat}, then $\phi$ is satisfiable.
 \end{corollary}
 
 \begin{proof}
