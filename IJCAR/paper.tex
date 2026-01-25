@@ -426,7 +426,7 @@ We say that $Q$ satisfies the \emph{multi-\req condition for $(\mathcal{S}, \mat
 We say $Q$ satisfies the \emph{multi-\req condition} if there exists \emph{some} pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the multi-\req condition for $(\mathcal{S}, \mathcal{S}')$.
 \end{definition}
 
-Intuitively, the multi‑\req condition generalizes the single‑pivot \req condition by allowing \emph{multiple functions} to serve as pivots simultaneously. For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The old single‑pivot \req is the special case where exactly one $S_i$ is non‑empty and contains a single offset. The downward condition is symmetric.
+For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The old single‑pivot \req is the special case where exactly one $S_i$ is non‑empty and contains a single offset. The downward condition is symmetric.
 
 
 \begin{example}[Multi-\req Illustration]
