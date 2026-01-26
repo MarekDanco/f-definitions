@@ -629,7 +629,7 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \end{proof}
 
-\cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. This can be seen in \cref{alg:interval-check-param-withBigvee}.
+\cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. This can be seen in \cref{alg:interval-check-param-withBigvee}. 
 
 \begin{algorithm}
 \caption{Interval‑Based Satisfiability Check}
@@ -679,6 +679,8 @@ F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Ps
 By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a satisfiability certificate 
 for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiable.
 \end{proof}
+
+The proof of~\cref{thm:interval-certificate-param} also shows how the return value \textsc{Sat} results in a corresponding satisfiability certificate, and extending the algorithm to also return such a certificate is an easy exercise.
 
 \begin{theorem}[Relative Completeness of \cref{alg:interval-check-param-withBigvee}]
 \label{thm:completeness-bigvee}
