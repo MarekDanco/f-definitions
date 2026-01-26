@@ -335,7 +335,7 @@ Given a pre-satisfiability certificate, we can now certify the advisability of f
 	\end{itemize}
 \end{definition}
 
-For the sake of generality, at this point we do not require the satisfiability propagator to be constructive. Below, we will then work with algorithms computing the values only required to exist, here.
+For the sake of generality, the satisfiability propagator only shows existence of values for the propagated cells. At this point we do not require it to be constructive. Still, below we will work with algorithms computing actual values. In addition, the definition allows infinitely many different sets of propagated cells and satisfiability propagators. In practice, for allowing computer representation, we will only work with finitely many different ones.
 
 Also note that for $z\in\mathbb{Z}$ such that $\Gamma_{I,z}(\phi)\subseteq \mathit{def}(I)$, the set of propagated cells $X_z$ must be empty, and the satisfiability propagator only needs to certify that $I\models \subst{Q}{x}{\repr{z}}$. In other words, the cell interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator. 
 
