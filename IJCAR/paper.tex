@@ -201,12 +201,11 @@ We study formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall x.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for showing detecting satisfiability under the additional assumptions that
 \begin{itemize}
-    \item $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic,
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
-    \item all uninterpreted function symbols have maximal arity $1$\todoSR{Section~\ref{sec:certificate} does not require this. It would also be not too difficult to generalize that section to several quantified variables.}
+    \item all uninterpreted function symbols have maximal arity $1$
     \item all arguments of uninterpreted function symbols in $Q$ are either of the form $x$ or of the form $x+t$ where $t$ is a ground term.
     \end{itemize}
 
