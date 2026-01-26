@@ -354,7 +354,7 @@ We start by showing
 	% From the well-order $\prec$ we get a corresponding well-order on these cell interpretations.
 	% Let $I_{\phi}$ be the cell interpretation that, for any cell $u$, assigns the value to $u$ that $I_{z}$ assigns to it for the smallest $z$ (wrt. $\prec$) that assigns a value to $u$. This smallest $z$ exists, since $\prec$ is a well-order. The cell interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
 Observe that for every cell $u$, and $z, z'\in \mathbb{Z}$ with $I_z(u)\neq \bot$ and $I_{z'}(u)\neq \bot$, $I_z(u)=I_{z'}(u)$.      Let $I_\phi$ be the assignment that, for any cell $u$, if there is a $z$ such that $I_z(u)\neq \bot$, then $I_\phi(u)=I_z(u)$, and otherwise $I_\phi(u)=0$. Certainly $I_\phi\models F$. Moreover, for every $z\in\mathbb{Z}$,  $I_\phi\models  \subst{Q}{x}{\repr{z}}$, since $I_\phi$ coincides with $I_z$ for all elements, where it is defined. Hence  $I_\phi\models \phi$.
-\end{proof}
+\qedhere\end{proof}
 
 A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\mathbb{Z}$ and for each $u\in X_z$ we assume a function $prop_{u,z}$ such that for
 a cell interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$, $I\cup I'\cup \{ u \mapsto prop_{u,z}(I\cup I') \mid u\in{X_z}\}\models\subst{Q}{x}{\repr{z}}$.
@@ -627,7 +627,7 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
 \end{itemize}
 
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
-\end{proof}
+\qedhere\end{proof}
 
 \cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. This can be seen in \cref{alg:interval-check-param-withBigvee}. 
 
@@ -678,7 +678,7 @@ F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Ps
 
 By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a satisfiability certificate 
 for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiable.
-\end{proof}
+\qedhere\end{proof}
 
 The proof of~\cref{thm:interval-certificate-param} also shows how the return value \textsc{Sat} results in a corresponding satisfiability certificate, and extending the algorithm to also return such a certificate is an easy exercise.
 
@@ -754,7 +754,7 @@ Let $N = \max(|b_{\min}|, |b_{\max}|)$. \cref{alg:interval-check-param-withBigve
 F \land \bigwedge_{x=-N}^{N} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}
 \]
 where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are constructed for the interval $[-N, N]$. Since $[-N, N]$ contains $B$, and $I^*$ satisfies all three conditions as shown above, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
-\end{proof}
+\qedhere\end{proof}
 
 \section{Handling Disjunction Using Auxiliary Propositional Variables}
 
@@ -823,7 +823,7 @@ For any interval $B = [b_{\min}, b_{\max}]$:
     ($\Leftarrow$) Suppose $\Psi_{\text{up}}(B,\mathcal{S})$ holds for some $\mathcal{S}$. Set $s_{i,j}$ true iff $t_j^{f_i} \in S_i$. By $\Phi_{\text{max}}(\mathcal{S})$, all selected terms are equal and greater than non-selected ones, so $\Phi_{\text{max}}^\text{e}$ holds. Let $v_i$ be the common value for $f_i(x+t)$ with $t \in S_i$ (guaranteed by $\Phi_{\text{prop-up}}(\mathcal{S})$), then $\Phi_{\text{prop-up}}^\text{e}$ holds. The clash condition from $\Psi_{\text{up}}(B,\mathcal{S})$ ensures $\text{ClashUpEnc}$. Thus $\Psi_\text{up}^\text{e}(B)$ is satisfiable.
     
     The proof for $\Psi_\text{down}^\text{e}(B)$ is symmetric.
-\end{proof}
+\qedhere\end{proof}
 
 \paragraph{Practical Considerations.}
 The exponential disjunctions in \cref{alg:interval-check-param-withBigvee} 
@@ -935,7 +935,7 @@ Let $\phi$ be a formula of the form $F \land \forall x.\, Q$ as defined in \cref
 
 \begin{proof}
 If such a finite set exists, let $M = \max\{|k_1|, \dots, |k_n|\}$. \cref{alg:interval-check-param-withBigvee} expands the interval symmetrically from $[0,0]$ to $[-m,m]$ at each iteration. When $m \geq M$, the interval $[-m,m]$ contains all $k_i$, making the formula $F \land \bigwedge_{x=-m}^{m} Q$ unsatisfiable. At this iteration, the $\smt$ call on line 2 returns $\bot$, causing the algorithm to exit the while-loop and return \textsc{Unsat}.
-\end{proof}
+\qedhere\end{proof}
 
 \paragraph{Limitations and Non-Terminating Cases.}
 There are unsatisfiable formulas for which our algorithm may not terminate. This occurs when the unsatisfiability relies on reasoning that cannot be captured by finite instantiation alone.
