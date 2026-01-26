@@ -31,7 +31,7 @@ class IncrConstArg:
 
     occ= [[Int('occf1'), Int('occf2')]]     # variables for occurrences of funct. symb. (u, v in the paper)
     argF= [[c+1]]                             # arguments of uninterpreted function symbols in F
-    F= And(c>=0, f(argF[0][0])==c)
+    F= [c>=0, f(argF[0][0])==c]
     Q= Or(x<0, x>=1000, f(x+offsets[0][0])==f(x+offsets[0][1])+1)
     Qp= Or(x<0, x>=1000, occ[0][0]==occ[0][1]+1)
     
