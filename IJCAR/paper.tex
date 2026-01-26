@@ -376,7 +376,7 @@ Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenS
 
 Here, the recursive calls go down the order $\prec$ in the following sense:
 \begin{property}
-	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any $v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, $\mathit{inst}(v)\prec \mathit{inst}(u)$.
+	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any other cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, $\mathit{inst}(v)\prec \mathit{inst}(u)$.
 \end{property}
 
 So each recursive call of the program $val$ either results in $\mathit{inst}(u)$ either decreasing or being $\bot$. In the latter case, the program terminates immediately, and the former case cannot happen infinitely often, since the used order is well-founded. So we have:
