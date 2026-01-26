@@ -285,6 +285,11 @@ Include information on well-orders and induction on well-orders, here?
 
 \todoSR{I intend to add a running example and a figure}
 
+In this section, we will define objects that certifies that a formula in the form defined in~\cref{sec:problem-statement} is satisfiable. In the next section, will then introduce an algorithm for compute such certificates.
+
+Traditionally, satisfiability of a logical formula is certified by an interpretation that assigns a value to each non-logical symbol in such way that the formula is true. However, the set of integers is infinite. Due to this,  the interpretation of an uninterpreted function symbol with integer domain is a function that assigns values to the infinitely many integers that form this domain. This opens the question of how to represent such a function using a finite object that can be represented on computers.
+
+Our approach will not assign values to the whole infinite domain of uninterpreted function symbols in one step, but to each individual element of this domain:
 \begin{definition}[Cell]\label{def:cell}
 	A \emph{cell} is a term of the form $f(n_1,\dots, n_k)$ where $f$ is an uninterpreted function symbol and $n_1,\dots, n_k$ are integers.
 \end{definition}
