@@ -398,8 +398,7 @@ The goal is now an algorithm that computes such satisfiability certificates and 
 
 In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. This certificate will explicitly certify satisfiability of the quantifier free part $F$, and of a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations the quantified part $Q$. It will certify satisfiability of the quantified part outside of the interval $B$ using the satisfiability propagator and an order that goes upward from $b_{\max}+1$, and downward from $b_{\max}-1$. \todoSR{I wrote this to better connect this section to the previous one}
 
-Building on the problem formulation in 
-\cref{sec:problem-statement}, we now present our decision procedure for formulas of the form~\eqref{eq:main-fragment}. The core idea is to search for a finite interval $B = [b_{\min}, b_{\max}]$ from which a model can be inductively extended to all integers. This requires two components:
+The core idea of the algorithm is to search for the interval $B = [b_{\min}, b_{\max}]$ from which a model can be inductively extended to all integers. This requires two components:
 \begin{enumerate}
     \item A method to check whether a given interval $B$ can serve as a suitable base (satisfying both ground constraints and all instantiations within $B$).
     \item A propagation condition ensuring that from such a base, we can consistently assign values to cells outside $B$ without conflicts.
