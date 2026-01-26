@@ -379,6 +379,13 @@ Here, the recursive calls go down the order $\prec$ in the following sense:
 	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any other cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, $\mathit{inst}(v)\prec \mathit{inst}(u)$.
 \end{property}
 
+\begin{proof}
+  Assume a cell $u$ with $\mathit{inst}(u)\neq\bot$, a  cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, and assume that $\mathit{inst}(v)\succeq \mathit{inst}(u)$. Then both $v\in X_{\mathit{inst}(v)}$ and $v \in \Gamma_{I,\mathit{inst}(u)}(\phi)$, and hence $X_{\mathit{inst}(v)}\cap \Gamma_{I,\mathit{inst}(u)}(\phi)\neq\emptyset$. 
+%  Then $u\in X_{\mathit{inst}(u)}\subseteq \Gamma_{I,\mathit{inst}(u)}$ and $v\in X_{\mathit{inst}(v)}$.
+  This contradicts the requirement that $X_{inst(v)}\cap (\mathit{def}(I)\cup\bigcup_{z'\prec inst(v)} \Gamma_{I,z'}(\phi))=\emptyset$.
+  \qedhere
+\end{proof}
+
 So each recursive call of the program $val$ either results in $\mathit{inst}(u)$ either decreasing or being $\bot$. In the latter case, the program terminates immediately, and the former case cannot happen infinitely often, since the used order is well-founded. So we have:
 \begin{property}
 The program $val$ terminates.
