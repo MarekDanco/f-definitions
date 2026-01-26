@@ -636,7 +636,7 @@ Thus all certificate requirements are satisfied. By Property \ref{prop:certThenS
 \end{algorithmic}
 \end{algorithm}
 
-\begin{corollary}[Soundness of \cref{alg:interval-check-param-withBigvee}]
+\begin{corollary}[Soundness]
 \label{cor:soundness-bigvee}
  If \cref{alg:interval-check-param-withBigvee} returns \textsc{Sat}, then $\phi$ is satisfiable.
 \end{corollary}
@@ -665,10 +665,10 @@ for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiabl
 
 \begin{theorem}[Relative Completeness of \cref{alg:interval-check-param-withBigvee}]
 \label{thm:completeness-bigvee}
-Let $\phi = F \land \forall x.\, Q$ be a formula in our fragment. If
+If the input formula~$\phi$
 \begin{enumerate}
-    \item $\phi$ is satisfiable, and
-    \item $\phi$ satisfies the multi‑\req condition for some pair $(\mathcal{S}^*,\mathcal{S}'^*)$ 
+    \item is satisfiable, and
+    \item satisfies the multi‑\req condition for some pair $(\mathcal{S}^*,\mathcal{S}'^*)$ 
           as defined in \cref{def:multi-reqpivot-param},
 \end{enumerate}
 then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{Sat}.
