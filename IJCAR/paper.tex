@@ -542,7 +542,7 @@ Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``
 
 \begin{definition}[Interval Extension Formulas]
 \label{def:interval-extension-formulas-param}
-For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$, define:\todoSR{potential improvement: conjunction over only one element of $S_i$ (the maximality condition forces them to be equal)}
+For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$, define:\todoSR{potential improvement (to be left for later): conjunction over only one element of $S_i$ (the maximality condition forces them to be equal)}
 
 \begin{enumerate}
     \item \textbf{Upward extension formula $\Psi_{\text{up}}(B,\mathcal{S})$}:
@@ -551,7 +551,7 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots
     \Phi_{\text{prop-up}}(\mathcal{S}) \;\land
     \bigwedge_{i=1}^{r} \bigwedge_{\substack{t_g \in \args(F,f_i) \\ t \in S_i}} t_g \leq b_{\max}+t
     \]
-    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:multi-reqpivot-param}.
+    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:multi-reqpivot-param}.\todoSR{The similarity of the names $t_g$ and $t$ seems to suggest that both are offsets, but $t_g$ is not.}
     
     \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
     \[
