@@ -59,8 +59,8 @@ def clash_2(i):                                                         # old im
   # maximally two occurrences of function symbol in quantified part
   # positive indices only
 
-b= Incr                                                  # choose the benchmark here
-# print(b.offsets)
+b= IncrConstArg                                                  # choose the benchmark here
+# print(b.F)
 num_f= len(b.offsets)
 assert(len(b.occ)==num_f)
 assert(len(b.argF)==num_f)
@@ -79,6 +79,7 @@ while(solver.check()!=unsat):
     solver.reset() 
     solver.add(*maximality())
     solver.add(*reqpivot())
+#    print(clash())
     solver.add(*clash())
     subs=[ (b.x, IntVal(i)) for i in range(0,bmax+1)]                 # list of wanted substitutions
 #    print(subs)    
@@ -95,7 +96,7 @@ while(solver.check()!=unsat):
     solver.add(b.F);
     solver.add(And(list(map(lambda x : substitute(b.Q, x), subs))))
 print(res);
-print("Interval: ", [0, bmax])
+print("Interval: ", [0, bmax])     # TODO: print information on which cells have fixed values due to this
 # solver.add(F)
 #print(solver.to_smt2())
 
