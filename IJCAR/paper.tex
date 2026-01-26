@@ -89,18 +89,12 @@ For abstract.
 
 \marek{Mention these \cite{bradley-manna07,bradley-vmcai06,ge-cav09,habermehl-etaps08}}
 
-Current SMT solvers have limited capabilities to produce counterexamples for complex systems. Yet, counterexamples are important during modeling as they uncover  errors. For example, a user may wrongly assume that an input stream with increasing values will contain two equal consecutive values. Negating and skolemizing this assumption yields the simple UFLIA formula:
-\begin{equation}
-	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)<f(x+1)
-\end{equation}
+Current SMT solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
 
-While this formula has trivial counter-models (e.g. $f$ being the identity function), and such solutions can be found by synthesis approaches like \sygus, it is easy to get out of the reach of these tools because they are primarily based on templates and candidate-solution enumeration. The following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
+In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols over the integers, which corresponds to the SMTLIB logic UFLIA. Such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays.
 
-\begin{equation}\label{eq:periodic}
-	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)=f(x+2)
-\end{equation}
 
-These constraints allow only periodic functions whose neighboring values alternate. For such functions the \sygus grammar would have to guess an \textit{ite} term of the form $\mathit{ite}(x\,\mathit{mod}\,2 = 0\enspace a\enspace b)$, for integers $a \not = b$. Even if \sygus tools were improved, they could not yield a decision procedure for full UFLIA due to the inherent undecidability of integer arithmetic combines with uninterpreted functions.
+
 
 \paragraph{What We Solve.} We therefore isolate a relevant fragment of UFLIA where formulas like~\eqref{eq:periodic} become decidable. In this fragment, arguments of uninterpreted functions within quantified subformulas are restricted to terms of the form $x + t$, where $x$ is the universally quantified variable and $t$ is a ground term. Such formulas frequently arise in verification conditions for programs with arrays, recursive functions, or inductive data structures.
 
@@ -162,6 +156,20 @@ Our work intersects several areas of automated reasoning: synthesis, decision pr
 
 \paragraph{Synthesis approaches.}
 Syntax-Guided Synthesis (SyGuS) \cite{cvc5} enumerates candidate functions from a grammar. While powerful for template-matching problems, it fails on formulas requiring non-template solutions like periodic functions (Equation~\ref{eq:periodic}). Kunčak et al. \cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation synthesis. Hozzová et al. \cite{hozzova-ijcar24} synthesize recursive programs from constraints.
+
+produce counterexamples for complex systems. Yet, counterexamples are important during modeling as they uncover  errors. For example, a user may wrongly assume that an input stream with increasing values will contain two equal consecutive values. Negating and skolemizing this assumption yields the simple UFLIA formula:
+\begin{equation}
+	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)<f(x+1)
+\end{equation}
+
+While this formula has trivial counter-models (e.g. $f$ being the identity function), and such solutions can be found by synthesis approaches like \sygus, it is easy to get out of the reach of these tools because they are primarily based on templates and candidate-solution enumeration. The following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
+
+\begin{equation}\label{eq:periodic}
+	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)=f(x+2)
+\end{equation}
+
+These constraints allow only periodic functions whose neighboring values alternate. For such functions the \sygus grammar would have to guess an \textit{ite} term of the form $\mathit{ite}(x\,\mathit{mod}\,2 = 0\enspace a\enspace b)$, for integers $a \not = b$. Even if \sygus tools were improved, they could not yield a decision procedure for full UFLIA due to the inherent undecidability of integer arithmetic combines with uninterpreted functions.
+
 
 \paragraph{Decision procedures for arrays and quantified formulas.}
 Bradley et al. \cite{bradley-vmcai06} present a decision procedure for array properties but explicitly forbid arithmetic on the universally quantified variables. Habermehl et al. \cite{habermehl-etaps08} allow constraints of the form $a[i+c]$ with difference bounds, but remain limited to offset-bounded indices. Alberti et al. \cite{alberti2014decision} consider only one universally quantified variable. Elad et al. \cite{elad2024infinite} prove decidability for a first‑order fragment without arithmetic, unable to express our constraints.
