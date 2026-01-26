@@ -590,11 +590,14 @@ Suppose the conjunction is satisfiable, and let $I$ be an interpretation satisfy
     \bigl\{ f_i(z+I(t)) \mid i=1,\dots,r,\; t \in S_i' \bigr\} & \text{if } z < b_{\min}.
     \end{cases}
     \]
+    Note that the maximality conditions ensure that for $z\not\in B$, $|X_z|=1$.
+
     
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
         \item For $z \in B$: $I$ itself satisfies $Q[z]$.
-        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(\mathcal{S})$ provides a function that, given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$, returns values $v_1,\dots,v_r$ to assign to every $f_i(z+t)$ with $t \in S_i$, thereby satisfying $Q[z]$.
+        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(\mathcal{S})$ provides a function that, given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$, returns values $v_1,\dots,v_r$ to assign to every
+         \todoSR{replace $f_i(z+t)$ by $X_z$?}$f_i(z+t)$ with $t \in S_i$, thereby satisfying $Q[z]$.
         \item For $z < b_{\min}$: the condition $\Phi_{\text{prop-down}}(\mathcal{S}')$ yields a propagator for the cells $f_i(z+t)$ with $t \in S_i'$.
     \end{itemize}
 \end{enumerate}
