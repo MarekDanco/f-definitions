@@ -60,7 +60,7 @@ def clash_2(i):                                                         # old im
   # positive indices only
 
 b= IncrConstArg                                                  # choose the benchmark here
-# print(b.F)
+#print(b.F)
 num_f= len(b.offsets)
 assert(len(b.occ)==num_f)
 assert(len(b.argF)==num_f)
@@ -74,7 +74,8 @@ p= list(map(lambda l : list(map(lambda v : Bool(v.__repr__()+"p"), l)), b.occ)) 
 
 bmax= 0
 res="UNSAT"
-solver.add(b.F, substitute(b.Q, (b.x, IntVal(0))))
+solver.add(b.F)
+solver.add(substitute(b.Q, (b.x, IntVal(0))))
 while(solver.check()!=unsat):
     solver.reset() 
     solver.add(*maximality())
@@ -85,16 +86,17 @@ while(solver.check()!=unsat):
 #    print(subs)    
 #    print(list(map(lambda x : substitute(b.Q, x), subs)))
     solver.add(b.F)
-    solver.add(And(list(map(lambda x : substitute(b.Q, x), subs))))
+    solver.add(list(map(lambda x : substitute(b.Q, x), subs)))
     if(solver.check()==sat):
         res="SAT"
+ #       print(solver)
         print(solver.model())
         break
     
     bmax= bmax+1
     solver.reset()
     solver.add(b.F);
-    solver.add(And(list(map(lambda x : substitute(b.Q, x), subs))))
+    solver.add(list(map(lambda x : substitute(b.Q, x), subs)))
 print(res);
 print("Interval: ", [0, bmax])     # TODO: print information on which cells have fixed values due to this
 # solver.add(F)
