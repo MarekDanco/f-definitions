@@ -833,73 +833,117 @@ There are two basic reasons why verification conditions may fail to hold: (1) a 
 \appendix
 
 \section{Discussion on Completeness}\label{sec:completeness}
-The completeness of algorithms that operate on integers in SMT is tricky because
-integers themselves are not recursively axiomatizable.
-% Hence, it is meaningful to discuss completeness with respect to some set
-% of axioms.
-Further, nonlinear integer arithmetic is undecidable already without
-quantifiers. So for the following discussion we assume that ground problems are
-always decided on line~\ref{ln:check} of \cref{alg:sr}.
+% The completeness of algorithms that operate on integers in SMT is tricky because
+% integers themselves are not recursively axiomatizable.
+% % Hence, it is meaningful to discuss completeness with respect to some set
+% % of axioms.
+% Further, nonlinear integer arithmetic is undecidable already without
+% quantifiers. So for the following discussion we assume that ground problems are
+% always decided on line~\ref{ln:check} of \cref{alg:sr}.
 
+% % \cref{alg:sr} terminates if the given formula satisfies \req and is satisfiable in integers.
+% % Unsatisfible formulas are more nuanced. Consider the following formula,
+% % which requires $f$ to be bounded by 0 but to be strictly increasing.
+% % \begin{equation}\label{eq:completeness}
+% %     \forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
+% % \end{equation}
+% % The formula is unsatisfiable as long as we have access to induction.%
+% % \footnote{%
+% % By induction show that $\forall n\in\mathbb{N}.\,f(n)\geq n+f(0)$.
+% % From~\eqref{eq:completeness}, $f(0)<0$, substituting $-f(0)$ for $n$ gives the
+% % contradiction $f(-f(0))\geq 0$.
+% % }
+% %%%%%%%%%%%
 % \cref{alg:sr} terminates if the given formula satisfies \req and is satisfiable in integers.
-% Unsatisfible formulas are more nuanced. Consider the following formula,
-% which requires $f$ to be bounded by 0 but to be strictly increasing.
+% Unsatisfiable formulas are more nuanced. Consider the following formula,
+% which requires $f$ to be constantly $0$, yet different from $0$ at some point.
 % \begin{equation}\label{eq:completeness}
-%     \forall{x}. \,f(x)<0 \,\land \,\forall{x}. \,f(x)<f(x+1)
+% 	f(0)=0\land f(c)\neq 0\land\forall x.\,f(x)=f(x+1)
 % \end{equation}
 % The formula is unsatisfiable as long as we have access to induction.%
-% \footnote{%
-% By induction show that $\forall n\in\mathbb{N}.\,f(n)\geq n+f(0)$.
-% From~\eqref{eq:completeness}, $f(0)<0$, substituting $-f(0)$ for $n$ gives the
-% contradiction $f(-f(0))\geq 0$.
-% }
-%%%%%%%%%%%
-\cref{alg:sr} terminates if the given formula satisfies \req and is satisfiable in integers.
-Unsatisfiable formulas are more nuanced. Consider the following formula,
-which requires $f$ to be constantly $0$, yet different from $0$ at some point.
-\begin{equation}\label{eq:completeness}
-	f(0)=0\land f(c)\neq 0\land\forall x.\,f(x)=f(x+1)
-\end{equation}
-The formula is unsatisfiable as long as we have access to induction.%
-\footnote{Apply induction in both directions to obtain $\forall n.\,f(n)=0$.}
-%%%%%%%%%%%
-Formula~\eqref{eq:completeness} satisfies \req but
-\cref{alg:sr} does not terminate since the interval~$I$ will grow
-indefinitely. This is due to the fact that instantiating~\eqref{eq:completeness}
-finitely many times always yields a satisfiable ground formula by setting the
-value of $c$ to an arbitrary large integer.
-Further, the formula has a model, which does not admit induction.
-Consider all polynomials on $\mathbb{Z}$, which gives the ring $\mathbb{Z}[X]$,
-where two polynomials are ordered lexicographically---giving a total order.
-Then, the function $f(p)$ can be defined as $0$ for all constant polynomials and
-$1$ everywhere else and then set $c$ to  an arbitrary non-constant polynomial,
-such as $x$.
+% \footnote{Apply induction in both directions to obtain $\forall n.\,f(n)=0$.}
+% %%%%%%%%%%%
+% Formula~\eqref{eq:completeness} satisfies \req but
+% \cref{alg:sr} does not terminate since the interval~$I$ will grow
+% indefinitely. This is due to the fact that instantiating~\eqref{eq:completeness}
+% finitely many times always yields a satisfiable ground formula by setting the
+% value of $c$ to an arbitrary large integer.
 % Further, the formula has a model, which does not admit induction.
 % Consider all polynomials on $\mathbb{Z}$, which gives the ring $\mathbb{Z}[X]$,
 % where two polynomials are ordered lexicographically---giving a total order.
-% Then, the function $f(p)$ can be defined as $-x + \text{``constant term of }p\text{''}$.
-% Such function is always below the $0$ polynomial, and it is increasing.
+% Then, the function $f(p)$ can be defined as $0$ for all constant polynomials and
+% $1$ everywhere else and then set $c$ to  an arbitrary non-constant polynomial,
+% such as $x$.
+% % Further, the formula has a model, which does not admit induction.
+% % Consider all polynomials on $\mathbb{Z}$, which gives the ring $\mathbb{Z}[X]$,
+% % where two polynomials are ordered lexicographically---giving a total order.
+% % Then, the function $f(p)$ can be defined as $-x + \text{``constant term of }p\text{''}$.
+% % Such function is always below the $0$ polynomial, and it is increasing.
 
-\cref{alg:sr} terminates if the given formula is unsatisfiable in
-arithmetic without induction.\mj{We need to make more
-	specific what this means. Is it clear that it hols?}
+% \cref{alg:sr} terminates if the given formula is unsatisfiable in
+% arithmetic without induction.\mj{We need to make more
+% 	specific what this means. Is it clear that it hols?}
 
-\todoSN{So I think we need to remove the above sentence because of the counter example $f(c)=f(c+1)\land\forall x.f(x)<f(x+1)$? If we need to say something about \textsc{Unsat} formulas, perhaps like this one below?}
-~\cref{alg:sr} terminates with \textsc{Unsat} for formulas whose unsatisfiability can be detected through finite instantiation alone. Formally:
-\begin{theorem}
-    \label{thm:finiteunsatThenUNSAT}
-    Let $\phi$ be a formula of the form described in \cref{thm:satisfiableThenSAT} that is unsatisfiable in the standard model of integer arithmetic. If there exists a finite set of instantiations $\{x = k_1, \dots, x = k_n\}$ such that $F\land\bigwedge_{i=1}^n Q[x\mapsto k_i]$ is unsatisfiable, then Algorithm~\ref{alg:sr} will terminate and return \textsc{Unsat}.
+% \todoSN{So I think we need to remove the above sentence because of the counter example $f(c)=f(c+1)\land\forall x.f(x)<f(x+1)$? If we need to say something about \textsc{Unsat} formulas, perhaps like this one below?}
+% ~\cref{alg:sr} terminates with \textsc{Unsat} for formulas whose unsatisfiability can be detected through finite instantiation alone. Formally:
+% \begin{theorem}
+%     \label{thm:finiteunsatThenUNSAT}
+%     Let $\phi$ be a formula of the form described in \cref{thm:satisfiableThenSAT} that is unsatisfiable in the standard model of integer arithmetic. If there exists a finite set of instantiations $\{x = k_1, \dots, x = k_n\}$ such that $F\land\bigwedge_{i=1}^n Q[x\mapsto k_i]$ is unsatisfiable, then Algorithm~\ref{alg:sr} will terminate and return \textsc{Unsat}.
+% \end{theorem}
+% \begin{proof}
+%     If such a finite set exists, let $M = \max\{|k_1|, \dots, |k_n|\}$. Algorithm~\ref{alg:sr} expands the interval $I$ symmetrically from $[0,0]$ to $[-m,m]$ at each iteration. When $m\geq M$, the interval $[-m,m]$ contains all $k_i$, making the formula $F \land \bigwedge_{x=-m}^{m} Q$ unsatisfiable. At this iteration, the $\smt$ call on line~9 returns $\bot$, causing the algorithm to exit the while-loop and return \textsc{Unsat}.
+% \end{proof}
+
+% In general, \cref{alg:sr} is complete in the following senses:
+% \begin{itemize}
+%     \item For \textsc{Sat}: It terminates on all satisfiable formulas within the fragment that satisfy \req (\cref{thm:satisfiableThenSAT}).
+%     \item For \textsc{Unsat}: It terminates on formulas whose unsatisfiability is detectable through finite instantiation (\cref{thm:finiteunsatThenUNSAT}).
+%     \item For formulas whose unsatisfiability relies on instantiations at offsets not captured by the expanding interval $I$, the algorithm may not terminate. This includes both inductive cases like Formula \eqref{eq:completeness} and non‑inductive cases like $f(c)=f(c+1)\land\forall x.f(x)<f(x+1)$ whose unsatisfiability does not require induction over all integers.
+%     \end{itemize}
+
+Our algorithm provides strong guarantees for satisfiable formulas within our fragment, but termination on unsatisfiable formulas requires careful consideration due to the interplay between finite instantiation and induction over integers.
+
+\paragraph{Termination for Satisfiable Formulas.}
+For satisfiable formulas satisfying the multi-\req condition, \cref{alg:interval-check-param-withBigvee} is guaranteed to terminate and return \textsc{Sat}. This follows directly from \cref{thm:completeness-bigvee}, which shows that for any formula satisfying the multi-\req condition, we can construct a finite base interval $B$ that triggers termination.
+
+\paragraph{Termination for Finitely Unsatisfiable Formulas.}
+For unsatisfiable formulas, we have the following termination guarantee:
+
+\begin{theorem}[Termination for Finitely Unsatisfiable Formulas]
+\label{thm:finiteunsatThenUNSAT}
+Let $\phi$ be a formula of the form $F \land \forall x.\, Q$ as defined in \cref{sec:problem-statement}. If $\phi$ is unsatisfiable in the standard model of integer arithmetic and there exists a finite set of instantiations $\{x = k_1, \dots, x = k_n\}$ such that $F \land \bigwedge_{i=1}^n Q[x \mapsto k_i]$ is unsatisfiable, then \cref{alg:interval-check-param-withBigvee} will terminate and return \textsc{Unsat}.
 \end{theorem}
+
 \begin{proof}
-    If such a finite set exists, let $M = \max\{|k_1|, \dots, |k_n|\}$. Algorithm~\ref{alg:sr} expands the interval $I$ symmetrically from $[0,0]$ to $[-m,m]$ at each iteration. When $m\geq M$, the interval $[-m,m]$ contains all $k_i$, making the formula $F \land \bigwedge_{x=-m}^{m} Q$ unsatisfiable. At this iteration, the $\smt$ call on line~9 returns $\bot$, causing the algorithm to exit the while-loop and return \textsc{Unsat}.
+If such a finite set exists, let $M = \max\{|k_1|, \dots, |k_n|\}$. \cref{alg:interval-check-param-withBigvee} expands the interval symmetrically from $[0,0]$ to $[-m,m]$ at each iteration. When $m \geq M$, the interval $[-m,m]$ contains all $k_i$, making the formula $F \land \bigwedge_{x=-m}^{m} Q$ unsatisfiable. At this iteration, the $\smt$ call on line 2 returns $\bot$, causing the algorithm to exit the while-loop and return \textsc{Unsat}.
 \end{proof}
 
-In general, \cref{alg:sr} is complete in the following senses:
+\paragraph{Limitations and Non-Terminating Cases.}
+There are unsatisfiable formulas for which our algorithm may not terminate. This occurs when the unsatisfiability relies on reasoning that cannot be captured by finite instantiation alone.
+
+\begin{example}[Formula Requiring Induction]
+Consider the formula:
+\[
+f(0) = 0 \land f(c) \neq 0 \land \forall x.\, f(x) = f(x+1)
+\]
+This formula is unsatisfiable in standard integer arithmetic (applying induction in both directions yields $\forall n.\, f(n) = 0$, contradicting $f(c) \neq 0$). However, any finite set of instantiations is satisfiable by choosing $c$ to be a sufficiently large integer. Thus, \cref{alg:interval-check-param-withBigvee} will expand the interval indefinitely without detecting unsatisfiability.
+\end{example}
+
+\begin{example}[Non-Inductive Unsatisfiability]
+Consider:
+\[
+f(c) = f(c+1) \land \forall x.\, f(x) < f(x+1)
+\]
+This formula is unsatisfiable (the quantifier forces $f(c) < f(c+1)$, contradicting the ground equality), but its unsatisfiability does not require induction over all integers. Depending on the value of $c$, finite instantiation may or may not detect the contradiction.
+\end{example}
+
+\paragraph{Summary.}
+In summary, our algorithm:
 \begin{itemize}
-    \item For \textsc{Sat}: It terminates on all satisfiable formulas within the fragment that satisfy \req (\cref{thm:satisfiableThenSAT}).
-    \item For \textsc{Unsat}: It terminates on formulas whose unsatisfiability is detectable through finite instantiation (\cref{thm:finiteunsatThenUNSAT}).
-    \item For formulas whose unsatisfiability relies on instantiations at offsets not captured by the expanding interval $I$, the algorithm may not terminate. This includes both inductive cases like Formula \eqref{eq:completeness} and non‑inductive cases like $f(c)=f(c+1)\land\forall x.f(x)<f(x+1)$ whose unsatisfiability does not require induction over all integers.
-    \end{itemize}
+    \item Terminates with \textsc{Sat} for all satisfiable formulas within the fragment that satisfy the multi-\req condition (\cref{thm:completeness-bigvee}).
+    \item Terminates with \textsc{Unsat} for formulas whose unsatisfiability can be detected through finite instantiation alone (\cref{thm:finiteunsatThenUNSAT}).
+    \item May not terminate for formulas whose unsatisfiability requires induction over all integers or instantiations at unbounded offsets.
+\end{itemize}
 
 \section{Handling Disjunction by Enumeration}
 
