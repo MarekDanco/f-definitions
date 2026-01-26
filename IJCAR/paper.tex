@@ -316,6 +316,7 @@ In order to allow a computer representation of cell interpretations, we will alw
 
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
+Given a pre-satisfiability certificate, we can now certify the satisfiablity of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
 \begin{definition}
 	\label{def:certificate}
 	Given a formula $\phi$  of the form $F\wedge \forall x\;.\; Q$, a \emph{cell propagation certificate} is
