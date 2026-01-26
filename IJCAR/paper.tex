@@ -276,7 +276,7 @@ We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for 
 
 For a formula $F$ and uninterpreted function symbol $f$, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
 
-Include information on well-orders and induction on well-orders, here?
+We will use the classical mathematical notion of a well-order. A well-order on a set $S$ is a total ordering on $S$ such that every non-empty subset of $S$ has a least element. Any well-order allows well-founded induction: For a  proving that a property $P$ holds for all $x$, it suffices to prove that for every $x\in S$, if for all $y\prec x$, $P(y)$ then also $P(x)$.
 
 We use SMT terminology (which differs from classical logic by being typed, and defining notions such as satisfiability in a slightly different way).
 
