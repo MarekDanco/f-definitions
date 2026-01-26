@@ -321,8 +321,8 @@ Given a pre-satisfiability certificate, we can now certify the satisfiablity of 
 	\label{def:certificate}
 	Given a formula $\phi$  of the form $F\wedge \forall x\;.\; Q$, a \emph{cell propagation certificate} is
 	\begin{itemize}
+        \item a pre-satisfiability certificate $I$ of $\phi$,
 		\item a well-order $\preceq$ on $\mathbb{Z}$,%\footnote{A well-order total order for which every non-empty subset has a least element. This enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}
-		\item a pre-satisfiability certificate $I$ of $\phi$,
 		\item for every $z\in\mathbb{Z}$
                   \begin{itemize}
                   \item a set $X_z\subseteq \Gamma_{I,z}(\phi)$  (the \emph{propagated cells}) such that \[X_z\cap (\mathit{def}(I)\cup\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi))=\emptyset,\] and
