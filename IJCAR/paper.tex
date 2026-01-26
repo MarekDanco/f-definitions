@@ -388,11 +388,13 @@ Note that, in general, it is not possible to compute $val(u)$ by computing the v
 
 The goal is now an algorithm that computes such satisfiability certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
 
-\section{Algorithm}\label{sec:alg}\todoSN{I changed the intro of this section into this one. What do you think?}
+\section{Algorithm}\label{sec:alg}
 
 % Class of formulas:
 % \[ F\wedge \forall x\;.\; Q(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\dots,f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})),\]
 % where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, and the  $t^{f_i}_{1},\dots,t^{f_i}_{l_i}$ are pairwise different LIA ground terms
+
+In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. This certificate will explicitly certify satisfiability of the quantifier free part $F$, and of a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations the quantified part $Q$. It will certify satisfiability of the quantified part outside of the interval $B$ using the satisfiability propagator and an order that goes upward from $b_{\max}+1$, and downward from $b_{\max}-1$. \todoSR{I wrote this to better connect this section to the previous one}
 
 Building on the problem formulation in 
 \cref{sec:problem-statement}, we now present our decision procedure for formulas of the form~\eqref{eq:main-fragment}. The core idea is to search for a finite interval $B = [b_{\min}, b_{\max}]$ from which a model can be inductively extended to all integers. This requires two components:
