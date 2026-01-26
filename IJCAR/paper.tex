@@ -316,10 +316,10 @@ In order to allow a computer representation of cell interpretations, we will alw
 
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
-Given a pre-satisfiability certificate, we can now certify the satisfiablity of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
+Given a pre-satisfiability certificate, we can now certify the advisability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
 \begin{definition}
 	\label{def:certificate}
-	Given a formula $\phi$  of the form $F\wedge \forall x\;.\; Q$, a \emph{cell propagation certificate} is
+	Given a formula $\phi$  of the form $F\wedge \forall x\;.\; Q$, a \emph{satisfiability certificate}\todoSR{I changed the name back to emphasize the \emph{what} over the \emph{how}} is
 	\begin{itemize}
         \item a pre-satisfiability certificate $I$ of $\phi$,
 		\item a well-order $\preceq$ on $\mathbb{Z}$,%\footnote{A well-order total order for which every non-empty subset has a least element. This enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}
@@ -338,15 +338,15 @@ For the sake of generality, at this point we do not require the satisfiability p
 Also note that for $z\in\mathbb{Z}$ such that $\Gamma_{I,z}(\phi)\subseteq \mathit{def}(I)$, the set of propagated cells $X_z$ must be empty, and the satisfiability propagator only needs to certify that $I\models \subst{Q}{x}{\repr{z}}$. In other words, the cell interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator. 
 
 \begin{property}\label{prop:certThenSat}
-	Every formula formula $\phi$  of the form $F\wedge \forall x\;.\; Q$ that has a cell propagation certificate is satisfiable.
+	Every formula formula $\phi$  of the form $F\wedge \forall x\;.\; Q$ that has a satisfiability certificate is satisfiable.
 \end{property}
 
 \begin{proof}
-	Assume a formula of the given form and assume that it  has a cell propagation certificate.
+	Assume a formula of the given form and assume that it  has a satisfiability certificate.
 	The corresponding pre-satisfiability certificate $I$ satisfies the quantifier free part~$F$ of $\phi$.
 
 We start by showing
- that for every $z\in\mathbb{Z}$ there is an extension $I'$ of $I$ such that $I'\models\{ \subst{Q}{x}{\repr{z}'} \mid z'\preceq z\}$. For this we use the principle of induction on well-orders: Let $z\in\mathbb{Z}$, and let $\Phi$ be $\{ \subst{Q}{x}{\repr{z}'} \mid z'\prec z\}$. We assume that there is an extension $I_{\Phi}$ of $I$ with $I_{\Phi}\models\Phi$, and prove that there is an extension $I'$ of $I$ with $I'\models\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$. Since the formula has a cell propagation certificate, the propagated cells of $\subst{Q}{x}{\repr{z}}$ do not occur in any element of $\Phi$. Let $I'$ be the extension of $I_{\Phi}$ that assigns to the propagated cells $X_z$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $\Phi$, $I'$ and $I_{\Phi}$ coincide on cells occurring in $\Phi$. Hence $I'$ satisfies both $\Phi$ and $\subst{Q}{x}{\repr{z}}$, and so it satisfies $\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$.
+ that for every $z\in\mathbb{Z}$ there is an extension $I'$ of $I$ such that $I'\models\{ \subst{Q}{x}{\repr{z}'} \mid z'\preceq z\}$. For this we use the principle of induction on well-orders: Let $z\in\mathbb{Z}$, and let $\Phi$ be $\{ \subst{Q}{x}{\repr{z}'} \mid z'\prec z\}$. We assume that there is an extension $I_{\Phi}$ of $I$ with $I_{\Phi}\models\Phi$, and prove that there is an extension $I'$ of $I$ with $I'\models\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$. Since the formula has a satisfiability certificate, the propagated cells of $\subst{Q}{x}{\repr{z}}$ do not occur in any element of $\Phi$. Let $I'$ be the extension of $I_{\Phi}$ that assigns to the propagated cells $X_z$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $\Phi$, $I'$ and $I_{\Phi}$ coincide on cells occurring in $\Phi$. Hence $I'$ satisfies both $\Phi$ and $\subst{Q}{x}{\repr{z}}$, and so it satisfies $\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$.
 
 	Now denote for every $z\in\mathbb{Z}$ the cell interpretation  satisfying $\subst{Q}{x}{\repr{z}}$ as constructed in the previous paragraph by $I_z$.
 	% From the well-order $\prec$ we get a corresponding well-order on these cell interpretations.
@@ -354,7 +354,7 @@ We start by showing
 Observe that for every cell $u$, and $z, z'\in \mathbb{Z}$ with $I_z(u)\neq \bot$ and $I_{z'}(u)\neq \bot$, $I_z(u)=I_{z'}(u)$.      Let $I_\phi$ be the assignment that, for any cell $u$, if there is a $z$ such that $I_z(u)\neq \bot$, then $I_\phi(u)=I_z(u)$, and otherwise $I_\phi(u)=0$. Certainly $I_\phi\models F$. Moreover, for every $z\in\mathbb{Z}$,  $I_\phi\models  \subst{Q}{x}{\repr{z}}$, since $I_\phi$ coincides with $I_z$ for all elements, where it is defined. Hence  $I_\phi\models \phi$.
 \end{proof}
 
-A cell propagation certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model. We now show how to compute such values from a given cell propagation certificate containing a pre-satisfiability certificate $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\mathbb{Z}$ and for each $u\in X_z$ we assume a function $prop_{u,z}$ such that for
+A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\mathbb{Z}$ and for each $u\in X_z$ we assume a function $prop_{u,z}$ such that for
 a cell interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$, $I\cup I'\cup \{ u \mapsto prop_{u,z}(I\cup I') \mid u\in{X_z}\}\models\subst{Q}{x}{\repr{z}}$.
  
 % for any $\hat{v}_1,\dots,\hat{v}_r$, the cell interpretation
@@ -386,7 +386,7 @@ The program $val$ terminates.
 Note that, in general, it is not possible to compute $val(u)$ by computing the values of $X_z, z \in \mathbb{Z}$, with $z$ being initialized with the minimal $z$ wrt. $\prec$, and then using a loop that increases $z$ from one successor wrt. $\prec$ to the next. For example, if  $\prec$  orders all even numbers before all odd ones, then this loop would have to iterate over infinitely many even numbers before computing the value of an odd one.
      
 
-The goal is now an algorithm that computes such cell propagation certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
+The goal is now an algorithm that computes such satisfiability certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
 
 \section{Algorithm}\label{sec:alg}\todoSN{I changed the intro of this section into this one. What do you think?}
 
@@ -564,7 +564,7 @@ Assume that
 \[
 \Bigl(F \land \bigwedge_{x \in B} Q[x]\Bigr) \;\land\; \Psi_{\text{up}}(B,\mathcal{S}) \;\land\; \Psi_{\text{down}}(B,\mathcal{S}')
 \]
-holds. Then $\phi$ has a cell propagation certificate, and hence is satisfiable.
+holds. Then $\phi$ has a satisfiability certificate, and hence is satisfiable.
 \end{theorem}
 
 \begin{proof}
@@ -669,7 +669,7 @@ $\mathcal{S}' = (S'_1,\dots,S'_r)$ such that $I \models \Psi_{\text{down}}(B,\ma
 F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Psi_{\text{down}}(B,\mathcal{S}').
 \]
 
-By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a cell propagation certificate 
+By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a satisfiability certificate 
 for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiable.
 \end{proof}
 
