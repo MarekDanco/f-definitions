@@ -71,6 +71,7 @@ solver = z3.SolverFor("UFLIA")
 
 if(len(sys.argv)>1):
     if(sys.argv[1]=='-smtlib'):
+        print('(set-logic UFLIA)')
         solver.add(b.F)
         solver.add(ForAll(b.x, b.Q))
         print(solver.to_smt2())
