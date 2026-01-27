@@ -91,7 +91,7 @@ For abstract.
 
 Current SMT solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
 
-In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols over the integers, which corresponds to the SMTLIB logic UFLIA. Such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays.
+In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols over the integers, which corresponds to the SMTLIB logic UFLIA. This logic is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays.
 
 
 
@@ -150,7 +150,7 @@ This paper makes several contributions towards deciding satisfiability in our fr
 % third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
 % \textsc{Z3} cannot solve this -- Compactness section in~\cite{ge-cav09}.
 
-\section{Related Work}\todoSR{potentially relevant PC members: Reynolds, Barrett, Tinelli, anybody else?}
+\section{Related Work}\todoSR{potentially relevant PC members: Reynolds, Barrett, Tinelli, Weidenbach, anybody else?}
 
 Our work intersects several areas of automated reasoning: synthesis, decision procedures for arrays, and model-based quantifier instantiation.
 
