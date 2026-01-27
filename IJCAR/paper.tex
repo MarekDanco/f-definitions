@@ -610,9 +610,8 @@ Suppose the conjunction is satisfiable, and let $I$ be an interpretation satisfy
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
         \item For $z \in B$: $I$ itself satisfies $Q[z]$.
-        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(\mathcal{S})$ provides a function that, given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$, returns values $v_1,\dots,v_r$ to assign to every
-         \todoSR{replace $f_i(z+t)$ by $X_z$?}$f_i(z+t)$ with $t \in S_i$, thereby satisfying $Q[z]$.
-        \item For $z < b_{\min}$: the condition $\Phi_{\text{prop-down}}(\mathcal{S}')$ yields a propagator for the cells $f_i(z+t)$ with $t \in S_i'$.
+        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$, values $v_1,\dots,v_r$ such that assigning $v_i$ to each cell of function $f_i$ in $X_z$ satisfies $Q[z]$.
+        \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop-down}}(\mathcal{S}')$ to assign values to propagated cells.
     \end{itemize}
 \end{enumerate}
 
@@ -623,7 +622,7 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
 
 \begin{itemize}
     \item For $z \in B$, $X_z = \emptyset$ holds trivially.
-    \item For $z > b_{\max}$, consider any $f_i(z+t)$ with $t \in S_i$.
+    \item For $z > b_{\max}$, consider any $f_i(z+I(t))$ with $t \in S_i$.
     \begin{itemize}
         \item It cannot belong to $\mathit{def}(I)$ because the clash condition $t_g \leq b_{\max} + t$ in $\Psi_{\text{up}}(B,\mathcal{S})$ guarantees $I(t_g) \leq b_{\max} + I(t) < z + I(t)$ for every $t_g \in \args(F,f_i)$.
         \item It cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$ because either:
