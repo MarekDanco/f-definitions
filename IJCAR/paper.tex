@@ -775,7 +775,8 @@ While proofs of unsatisfiability are not the main goal of this paper, \Cref{alg:
 If there exists a finite set $Z\subseteq\mathbb{Z}$ such that $F \land \bigwedge_{z\in Z} Q[x \mapsto \repr{z}]$ is unsatisfiable, then \cref{alg:interval-check-param-withBigvee} will terminate and return \textsc{Unsat}.
 \end{theorem}
 
-There are unsatisfiable formulas for which our algorithm may not terminate. This occurs when the unsatisfiability relies on reasoning that cannot be captured by finite instantiation alone.
+However, there are formulas that are not satisfiable in a standard model\todoSR{Should we make a more general statement? (see the discussion in the MBQI paper)}, for which the algorithm does not terminate.
+%This occurs when the unsatisfiability relies on reasoning that cannot be captured by finite instantiation alone.
 
 \begin{example}[Formula Requiring Induction]
 Consider the formula:
@@ -785,14 +786,13 @@ f(0) = 0 \land f(c) \neq 0 \land \forall x.\, f(x) = f(x+1)
 This formula is unsatisfiable in standard integer arithmetic (applying induction in both directions yields $\forall n.\, f(n) = 0$, contradicting $f(c) \neq 0$). However, any finite set of instantiations is satisfiable by choosing $c$ to be a sufficiently large integer. Thus, \cref{alg:interval-check-param-withBigvee} will expand the interval indefinitely without detecting unsatisfiability.
 \end{example}
 
-
-\paragraph{Summary.}
-In summary, our algorithm:
-\begin{itemize}
-    \item Terminates with \textsc{Sat} for all satisfiable formulas within the fragment that satisfy the multi-\req condition (\cref{thm:completeness-bigvee}).
-    \item Terminates with \textsc{Unsat} for formulas whose unsatisfiability can be detected through finite instantiation alone (\cref{thm:finiteunsatThenUNSAT}).
-    \item May not terminate for formulas whose unsatisfiability requires induction over all integers or instantiations at unbounded offsets.
-\end{itemize}
+% \paragraph{Summary.}
+% In summary, our algorithm:
+% \begin{itemize}
+%     \item Terminates with \textsc{Sat} for all satisfiable formulas within the fragment that satisfy the multi-\req condition (\cref{thm:completeness-bigvee}).
+%     \item Terminates with \textsc{Unsat} for formulas whose unsatisfiability can be detected through finite instantiation alone (\cref{thm:finiteunsatThenUNSAT}).
+%     \item May not terminate for formulas whose unsatisfiability requires induction over all integers or instantiations at unbounded offsets.
+% \end{itemize}
 
 
 
