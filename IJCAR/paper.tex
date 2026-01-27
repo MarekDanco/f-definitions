@@ -91,7 +91,7 @@ For abstract.
 
 Current SMT solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
 
-In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols over the integers, which corresponds to the SMTLIB logic UFLIA. This logic is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays.
+In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols over the integers, which corresponds to the SMTLIB logic UFLIA. This logic is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays. Current SMT solvers use heuristics\todoSR{reference?} to prove unsatisfiability of such formulas. However, they struggle to prove satisfiability.\todoSR{we need make this more precise}
 
 
 
