@@ -595,7 +595,7 @@ Suppose the conjunction is satisfiable, and let $I$ be an interpretation satisfy
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
     \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
     
-    \item \textbf{Propagated cells $X_z$ for $z \in \mathbb{Z}$:}\todoSR{I had to change $t$ to $I(t)$ to take into account the case where $t$ contains uninterpreted constants}
+    \item \textbf{Propagated cells $X_z$ for $z \in \mathbb{Z}$:}
     \[
     X_z = 
     \begin{cases}
@@ -604,7 +604,7 @@ Suppose the conjunction is satisfiable, and let $I$ be an interpretation satisfy
     \bigl\{ f_i(z+I(t)) \mid i=1,\dots,r,\; t \in S_i' \bigr\} & \text{if } z < b_{\min}.
     \end{cases}
     \]
-    Note that the maximality conditions ensure that for $z\not\in B$, $|X_z|=1$.
+    Note that the maximality conditions ensure that for $z\not\in B$, $i\in 1,\dots,r$, $|\{ n \mid f_i(n)\in X_z\}|=1$.\todoSR{better now?}
 
     
     \item \textbf{Satisfiability propagators:}
