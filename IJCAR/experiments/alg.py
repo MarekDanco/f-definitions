@@ -69,10 +69,13 @@ assert(all(len(b.offsets[i])==len(b.occ[i]) for i in range(len(b.offsets))))
 solver = z3.SolverFor("UFLIA")
 # solver.set(mbqi=True)
 
-if(len(sys.argv)>1 and sys.argv[1]=='-smtlib'):
-    solver.add(b.F)
-    solver.add(ForAll(b.x, b.Q))
-    print(solver.to_smt2())
+if(len(sys.argv)>1):
+    if(sys.argv[1]=='-smtlib'):
+        solver.add(b.F)
+        solver.add(ForAll(b.x, b.Q))
+        print(solver.to_smt2())
+    else:
+        print("Allowed option: -smtlib")
 else:
 
     p= list(map(lambda l : list(map(lambda v : Bool(v.__repr__()+"p"), l)), b.occ))  # is a pivot
