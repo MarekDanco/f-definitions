@@ -627,9 +627,9 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
         \item It cannot belong to $\mathit{def}(I)$ because the clash condition $t_g \leq b_{\max} + t$ in $\Psi_{\text{up}}(B,\mathcal{S})$ guarantees $I(t_g) \leq b_{\max} + I(t) < z + I(t)$ for every $t_g \in \args(F,f_i)$.
         \item It cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$ because either:
         \begin{enumerate}
-            \item $z' \leq b_{\max}$: then $z'+I(t') \leq b_{\max} + I(t') < z + I(t)$ for all $t' \in T_i$,
+            \item $z' \leq b_{\max}$: then $z'+I(t') \leq b_{\max} + I(t') < z + I(t)$ for all $t' \in T_i$, since $z > b_{\max}$ and $I(t)$ is maximal among offsets of $f_i$.
             \item $b_{\max} < z' < z$: then $z'+I(t') \leq z'+ \max_{t'' \in T_i} I(t'') < z + I(t)$ since $I(t)$ is maximal among $\{I(t'') \mid t'' \in T_i\}$ by $\Phi_{\text{max}}(\mathcal{S})$.
-        \end{enumerate}
+        \end{enumerate}        
     \end{itemize}
 
     \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition.
