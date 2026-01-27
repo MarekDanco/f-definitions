@@ -765,6 +765,24 @@ F \land \bigwedge_{x=-N}^{N} Q[x] \land \text{max}_{\text{up}} \land \text{min}_
 where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are constructed for the interval $[-N, N]$. Since $[-N, N]$ contains $B$, and $I^*$ satisfies all three conditions as shown above, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
 \qedhere\end{proof}
 
+While proofs of unsatisfiability are not the main goal of this paper, \Cref{alg:interval-check-param-withBigvee} can also detect unsatisfiability, in some cases.
+
+\begin{theorem}[Termination for Finitely Unsatisfiable Formulas]
+\label{thm:finiteunsatThenUNSAT}
+If there exists a finite set $Z\subseteq\mathbb{Z}$ such that $F \land \bigwedge_{z\in Z} Q[x \mapsto \repr{z}]$ is unsatisfiable, then \cref{alg:interval-check-param-withBigvee} will terminate and return \textsc{Unsat}.
+\end{theorem}
+
+There are unsatisfiable formulas for which our algorithm may not terminate. This occurs when the unsatisfiability relies on reasoning that cannot be captured by finite instantiation alone.
+
+\begin{example}[Formula Requiring Induction]
+Consider the formula:
+\[
+f(0) = 0 \land f(c) \neq 0 \land \forall x.\, f(x) = f(x+1)
+\]
+This formula is unsatisfiable in standard integer arithmetic (applying induction in both directions yields $\forall n.\, f(n) = 0$, contradicting $f(c) \neq 0$). However, any finite set of instantiations is satisfiable by choosing $c$ to be a sufficiently large integer. Thus, \cref{alg:interval-check-param-withBigvee} will expand the interval indefinitely without detecting unsatisfiability.
+\end{example}
+
+
 \section{Handling Disjunction Using Auxiliary Propositional Variables}
 
 The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S} = (S_1,\dots,S_r)$ and $\mathcal{S}' = (S'_1,\dots,S'_r)$. While theoretically elegant, these disjunctions lead to formulas with exponential size, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
