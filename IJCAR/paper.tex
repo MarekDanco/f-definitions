@@ -664,11 +664,14 @@ Thus all certificate requirements are satisfied. By Property \ref{prop:certThenS
 
 \begin{corollary}[Soundness]
 \label{cor:soundness-bigvee}
- If \cref{alg:interval-check-param-withBigvee} returns \textsc{Sat}, then $\phi$ is satisfiable.
+If \cref{alg:interval-check-param-withBigvee} terminates, then it returns a correct result.
+
 \end{corollary}
 
 \begin{proof}
-Assume \cref{alg:interval-check-param-withBigvee} returns \textsc{Sat} at some iteration. Then there exists:
+  If the result is $\textsc{Unsat}$, then $F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is unsatisfiable. This formula is implied by the input formula, and hence the result is correct. 
+
+  If the result is $\textsc{Sat}$, then this happens during a certain iteration of the while loop. Then there exists:
 \begin{itemize}
     \item An interval $B = [b_{\min}, b_{\max}]$,
     \item An interpretation $I$ satisfying:
