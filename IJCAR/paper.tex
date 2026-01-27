@@ -939,7 +939,7 @@ For unsatisfiable formulas, we have the following termination guarantee:
 
 \begin{theorem}[Termination for Finitely Unsatisfiable Formulas]
 \label{thm:finiteunsatThenUNSAT}
-Let $\phi$ be a formula of the form $F \land \forall x.\, Q$ as defined in \cref{sec:problem-statement}. If $\phi$ is unsatisfiable in the standard model of integer arithmetic and there exists a finite set of instantiations $\{x = k_1, \dots, x = k_n\}$ such that $F \land \bigwedge_{i=1}^n Q[x \mapsto k_i]$ is unsatisfiable, then \cref{alg:interval-check-param-withBigvee} will terminate and return \textsc{Unsat}.
+Let $\phi$ be a formula of the form $F \land \forall x.\, Q$ as defined in \cref{sec:problem-statement}. If $\phi$ is unsatisfiable in the standard model of integer arithmetic\todoSR{Why is this necessary? I do not see any place in the proof that refers to this.} and there exists a finite set of instantiations $\{x = k_1, \dots, x = k_n\}$ such that $F \land \bigwedge_{i=1}^n Q[x \mapsto k_i]$ is unsatisfiable, then \cref{alg:interval-check-param-withBigvee} will terminate and return \textsc{Unsat}.
 \end{theorem}
 
 \begin{proof}
