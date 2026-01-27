@@ -69,36 +69,42 @@ assert(all(len(b.offsets[i])==len(b.occ[i]) for i in range(len(b.offsets))))
 solver = z3.SolverFor("UFLIA")
 # solver.set(mbqi=True)
 
-p= list(map(lambda l : list(map(lambda v : Bool(v.__repr__()+"p"), l)), b.occ))  # is a pivot
-# print(p)
-
-bmax= 0
-res="UNSAT"
-solver.add(b.F)
-solver.add(substitute(b.Q, (b.x, IntVal(0))))
-while(solver.check()!=unsat):
-    solver.reset() 
-    solver.add(*maximality())
-    solver.add(*reqpivot())
-#    print(clash())
-    solver.add(*clash())
-    subs=[ (b.x, IntVal(i)) for i in range(0,bmax+1)]                 # list of wanted substitutions
-#    print(subs)    
-#    print(list(map(lambda x : substitute(b.Q, x), subs)))
+if(len(sys.argv)>1 and sys.argv[1]=='-smtlib'):
     solver.add(b.F)
-    solver.add(list(map(lambda x : substitute(b.Q, x), subs)))
-    if(solver.check()==sat):
-        res="SAT"
- #       print(solver)
-        print(solver.model())
-        break
-    
-    bmax= bmax+1
-    solver.reset()
-    solver.add(b.F);
-    solver.add(list(map(lambda x : substitute(b.Q, x), subs)))
-print(res);
-print("Interval: ", [0, bmax])     # TODO: print information on which cells have fixed values due to this
-# solver.add(F)
-#print(solver.to_smt2())
+    solver.add(ForAll(b.x, b.Q))
+    print(solver.to_smt2())
+else:
+
+    p= list(map(lambda l : list(map(lambda v : Bool(v.__repr__()+"p"), l)), b.occ))  # is a pivot
+    # print(p)
+
+    bmax= 0
+    res="UNSAT"
+    solver.add(b.F)
+    solver.add(substitute(b.Q, (b.x, IntVal(0))))
+    while(solver.check()!=unsat):
+        solver.reset() 
+        solver.add(*maximality())
+        solver.add(*reqpivot())
+        #    print(clash())
+        solver.add(*clash())
+        subs=[ (b.x, IntVal(i)) for i in range(0,bmax+1)]                 # list of wanted substitutions
+        #    print(subs)    
+        #    print(list(map(lambda x : substitute(b.Q, x), subs)))
+        solver.add(b.F)
+        solver.add(list(map(lambda x : substitute(b.Q, x), subs)))
+        if(solver.check()==sat):
+            res="SAT"
+            #       print(solver)
+            print(solver.model())
+            break
+        
+        bmax= bmax+1
+        solver.reset()
+        solver.add(b.F);
+        solver.add(list(map(lambda x : substitute(b.Q, x), subs)))
+        print(res);
+        print("Interval: ", [0, bmax])     # TODO: print information on which cells have fixed values due to this
+        # solver.add(F)
+        #print(solver.to_smt2())
 
