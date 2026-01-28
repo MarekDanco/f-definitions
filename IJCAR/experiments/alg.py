@@ -1,3 +1,8 @@
+# current restrictions:
+  # maximally two occurrences of function symbol in quantified part
+  # positive indices only
+
+
 from z3 import *
 from benchmarks import *
 import operator 
@@ -54,10 +59,12 @@ def clash_2(i):                                                         # old im
     return [(Or(Not(p[i][0]), And([b.argF[0][arg]<=bmax+b.offsets[i][0] for arg in range(0, len(b.argF[i]))]))),
             (Or(Not(p[i][1]), And([b.argF[0][arg]<=bmax+b.offsets[i][1] for arg in range(0, len(b.argF[i]))])))]
 
+################################################################################################
 
-# current restrictions:
-  # maximally two occurrences of function symbol in quantified part
-  # positive indices only
+import argparse
+parser= argparse.ArgumentParser()
+parser.add_argument("-smtlib", "--smtlib", help="print benchmark problem in smtlib format", action="store_true")
+args= parser.parse_args()
 
 b= IncrConstArg                                                  # choose the benchmark here
 lb= 0     # non-strict
@@ -74,14 +81,12 @@ assert(all(len(b.offsets[i])==len(b.occ[i]) for i in range(len(b.offsets))))
 solver = z3.SolverFor("UFLIA")
 # solver.set(mbqi=True)
 
-if(len(sys.argv)>1):
-    if(sys.argv[1]=='-smtlib'):
-        print('(set-logic UFLIA)')
-        solver.add(b.F)
-        solver.add(ForAll(b.x, Q))
-        print(solver.to_smt2())
-    else:
-        print("Allowed option: -smtlib")
+if args.smtlib:
+    print('(set-logic UFLIA)')
+    solver.add(b.F)
+    solver.add(ForAll(b.x, Q))
+    print(solver.to_smt2())
+
 else:
 
     p= list(map(lambda l : list(map(lambda v : Bool(v.__repr__()+"p"), l)), b.occ))  # is a pivot
