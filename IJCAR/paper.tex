@@ -161,20 +161,24 @@ The sub-class of UFLIA formulas that the algorithm can handle\todoSR{We will upd
 Our work intersects several areas of automated reasoning: synthesis, decision procedures for arrays, and model-based quantifier instantiation.
 
 \paragraph{Synthesis approaches.}
-Syntax-Guided Synthesis (SyGuS) \cite{cvc5} enumerates candidate functions from a grammar. While powerful for template-matching problems, it fails on formulas requiring non-template solutions like periodic functions (Equation~\ref{eq:periodic}). Kunčak et al. \cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation synthesis. Hozzová et al. \cite{hozzova-ijcar24} synthesize recursive programs from constraints.
+Syntax-Guided Synthesis (SyGuS) \cite{cvc5} enumerates candidate functions from a grammar. Hence its performance depends crucially on the chosen grammar. Moreover, it synthesizes function in an explicit representation, disallowing recursion\todoSR{right?}. Our method does beyond that, using inductive reasoning.
+Kunčak et al. \cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation synthesis. Hozzová et al. \cite{hozzova-ijcar24} synthesize recursive programs from constraints.\todoSR{Do we want to keep these references? If yes, we need a better description.}
 
-produce counterexamples for complex systems. Yet, counterexamples are important during modeling as they uncover  errors. For example, a user may wrongly assume that an input stream with increasing values will contain two equal consecutive values. Negating and skolemizing this assumption yields the simple UFLIA formula:
-\begin{equation}
-	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)<f(x+1)
-\end{equation}
+% While powerful for template-matching problems, it fails on formulas requiring non-template solutions like periodic functions (Equation~\ref{eq:periodic}). 
 
-While this formula has trivial counter-models (e.g. $f$ being the identity function), and such solutions can be found by synthesis approaches like \sygus, it is easy to get out of the reach of these tools because they are primarily based on templates and candidate-solution enumeration. The following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
+% produce counterexamples for complex systems. Yet, counterexamples are important during modeling as they uncover  errors. For example, a user may wrongly assume that an input stream with increasing values will contain two equal consecutive values. Negating and skolemizing this assumption yields the simple UFLIA formula:
+% \begin{equation}
+% 	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)<f(x+1)
+% \end{equation}
 
-\begin{equation}\label{eq:periodic}
-	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)=f(x+2)
-\end{equation}
+% While this formula has trivial counter-models (e.g. $f$ being the identity function), and such solutions can be found by synthesis approaches like \sygus, it is easy to get out of the reach of these tools because they are primarily based on templates and candidate-solution enumeration. The following modification is no longer solved by cvc5~\cite{cvc5} in its \sygus mode.
 
-These constraints allow only periodic functions whose neighboring values alternate. For such functions the \sygus grammar would have to guess an \textit{ite} term of the form $\mathit{ite}(x\,\mathit{mod}\,2 = 0\enspace a\enspace b)$, for integers $a \not = b$. Even if \sygus tools were improved, they could not yield a decision procedure for full UFLIA due to the inherent undecidability of integer arithmetic combines with uninterpreted functions.
+% \begin{equation}\label{eq:periodic}
+% 	f(0)\neq f(1)\land\forall x:\mathbb{Z}.\,f(x)=f(x+2)
+% \end{equation}
+
+% These constraints allow only periodic functions whose neighboring values alternate. For such functions the \sygus grammar would have to guess an \textit{ite} term of the form $\mathit{ite}(x\,\mathit{mod}\,2 = 0\enspace a\enspace b)$, for integers $a \not = b$.
+%Even if \sygus tools were improved, they could not yield a decision procedure for full UFLIA due to the inherent undecidability of integer arithmetic combines with uninterpreted functions. 
 
 
 \paragraph{Decision procedures for arrays and quantified formulas.}
