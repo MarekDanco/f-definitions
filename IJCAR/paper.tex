@@ -80,8 +80,9 @@ Prague, Czech Republic \and }
 \maketitle
 
 \begin{abstract}
-For abstract.
-\keywords{First keyword  \and Second keyword \and Another keyword.}
+  The combination of integer arithmetic, uninterpreted function symbols, and universal quantification occurs in many applications of automated reasoning, for example, due to its ability to reason about arrays. However, the satisfiability of such formulas is, in general, undecidable. In practice, SMT solvers are often successful in the unsatisfiable case, using heuristics. However, in the satisfiable case, they rely on  explicit model construction, which fails for formulas whose smallest model is not small enough. We introduce an alternative approach that certifies satisfiability using induction arguments, and provide an algorithm that is able to proof satisfiability of formulas out of reach of current SMT solvers. 
+
+%\keywords{First keyword  \and Second keyword \and Another keyword.}
 \end{abstract}
 
 
@@ -205,7 +206,7 @@ We study formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall x.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for showing detecting satisfiability under the additional assumptions that\todoSR{Is this restricted class still undecidable?}
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for showing detecting satisfiability under the additional assumptions that
 \begin{itemize}
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
@@ -217,6 +218,8 @@ where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of 
       \[f(0)=0 \wedge \forall x \,.\, f(x+c)=f(x)+c+1,\]
       where $c$ is an uninterpreted constant.
     \end{example}
+\todoSR{What about decidability of this restricted class? I am currently working with the assumption that it is unknown}
+    
 
 \paragraph{Core Problem}
 Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we address is:
