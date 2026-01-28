@@ -334,7 +334,7 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 
 Given a pre-satisfiability certificate, we can now certify the advisability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
 \begin{definition}
 	\label{def:certificate}
-	Given a formula $\phi$  of the form $F\wedge \forall x\;.\; Q$, a \emph{satisfiability certificate}\todoSR{I changed the name back to emphasize the \emph{what} over the \emph{how}} is
+	Given a formula $\phi$  of the form $F\wedge \forall x\;.\; Q$, a \emph{satisfiability certificate} is
 	\begin{itemize}
         \item a pre-satisfiability certificate $I$ of $\phi$,
 		\item a well-order $\preceq$ on $\mathbb{Z}$,%\footnote{A well-order total order for which every non-empty subset has a least element. This enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}
