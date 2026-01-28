@@ -161,7 +161,7 @@ The sub-class of UFLIA formulas that the algorithm can handle\todoSR{We will upd
 Our work intersects several areas of automated reasoning: synthesis, decision procedures for arrays, and model-based quantifier instantiation.
 
 \paragraph{Synthesis approaches.}
-Syntax-Guided Synthesis (SyGuS) \cite{cvc5} enumerates candidate functions from a grammar. Hence its performance depends crucially on the chosen grammar. Moreover, it synthesizes function in an explicit representation, disallowing recursion\todoSR{right?}. Our method does beyond that, using inductive reasoning.
+Syntax-Guided Synthesis (SyGuS) \cite{cvc5} enumerates candidate functions from a grammar. Hence its performance depends crucially on the chosen grammar. Moreover, it synthesizes functions in an explicit representation, disallowing recursion\todoSR{right?}. Our method does beyond that, using inductive reasoning.
 Kunčak et al. \cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation synthesis. Hozzová et al. \cite{hozzova-ijcar24} synthesize recursive programs from constraints.\todoSR{Do we want to keep these references? If yes, we need a better description.}
 
 % While powerful for template-matching problems, it fails on formulas requiring non-template solutions like periodic functions (Equation~\ref{eq:periodic}). 
