@@ -63,14 +63,24 @@ def clash_2(i):                                                         # old im
 
 import argparse
 parser= argparse.ArgumentParser()
+parser.add_argument("benchmark")
 parser.add_argument("-smtlib", "--smtlib", help="print benchmark problem in smtlib format", action="store_true")
+parser.add_argument("-b", "--bounded", type=int, metavar='<ub>', help="add bounds to the problem (with lower bound 0 and upper bound <ub>)")
 args= parser.parse_args()
 
-b= IncrConstArg                                                  # choose the benchmark here
-lb= 0     # non-strict
-ub= 1000  # strict
-Q= Or(b.x<lb, b.x>=ub, b.Q)
-Qp= Or(b.x<lb, b.x>=ub, b.Qp)
+b= globals().get(args.benchmark)                 # choose the benchmark here
+if(not b):
+    print("benchmark not found")
+    exit(1)
+
+if args.bounded:
+    lb= 0     # non-strict
+    ub= args.bounded  # strict
+    Q= Or(b.x<lb, b.x>=ub, b.Q)
+    Qp= Or(b.x<lb, b.x>=ub, b.Qp)
+else:
+    Q= b.Q
+    Qp= b.Qp
 
 #print(b.F)
 num_f= len(b.offsets)
