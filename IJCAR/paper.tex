@@ -182,7 +182,7 @@ Bradley et al. \cite{bradley-vmcai06} present a decision procedure for array pro
 \paragraph{Model-based and instantiation methods.}
 Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model finding techniques for quantified formulas. Their method requires users to ensure admissibility and may introduce many case splits (``merge lemmas'') to satisfy cardinality constraints. Ge and de Moura \cite{ge-cav09} introduce the Model-Based Quantifier Instantiation (MBQI) but noting that ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA refers to the logic of Habermehl et al.} will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.'' Our work attempts to  address this open question.
 
-\paragraph{Computer algebra.}\todoSN{No explanation in the previous version.}
+\paragraph{Computer algebra.}
 Computer algebra algorithms for solving difference equations
 
 \paragraph{Limitations illustrated.}\todoSN{In the previous version, there is a sentence: ``Here, I am considering the works~\cite{bradley-vmcai06,ge-cav09,habermehl-etaps08}." }
@@ -191,7 +191,7 @@ To see where existing methods fall short, consider:
     \item \textbf{Infinitely increasing bounded sequence:} $\forall x.\, f(x) < 0 \land \forall x.\, f(x) < f(x+1)$. 
     Habermehl et al.'s fragment excludes strict inequalities. It does include negation, but only if it results in the quantified variables being existential. Bradley et al. forbid $x+1$ as an argument (Theorem 4 in \cite{bradley-vmcai06}). \textsc{Z3} cannot solve this on its own\todoSN{In the previous version, there is ``but with the addition of Lemma~\ref{eq:ind-needed-lemma} it can. Adding the lemma also helps Vampire but not \textsc{cvc5}."}. 
     \item \textbf{Two‑valued constant function:} $f(0) = 0 \land f(c) = 3 \land \forall x.\, f(x+1) = f(x)$.
-    \todoSN{I didn't change anything here.} In the last meeting I hand-wavedly assumed this cannot be in the fragment of~\cite{habermehl-etaps08}. However, it is. They accept the literals $f(x) - f(x+1) \leq 0$ and $f(x+1) - f(x) \leq 0$, which in conjunction simplify to $f(x) = f(x+1)$. They can then universally quantify this to form an array property. The other equalities can be formed as value expressions $A \leq B \,\land \,B \leq A$. I can look more thoroughly at the paper to see how can they solve this. This cannot be solved by~\cite{bradley-vmcai06}, because the third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
+ In the last meeting I hand-wavedly assumed this cannot be in the fragment of~\cite{habermehl-etaps08}. However, it is. They accept the literals $f(x) - f(x+1) \leq 0$ and $f(x+1) - f(x) \leq 0$, which in conjunction simplify to $f(x) = f(x+1)$. They can then universally quantify this to form an array property. The other equalities can be formed as value expressions $A \leq B \,\land \,B \leq A$. I can look more thoroughly at the paper to see how can they solve this. This cannot be solved by~\cite{bradley-vmcai06}, because the third conjunct contains $x+1$ as an argument of $f$ (Theorem 4 in their paper).
 \textsc{Z3} cannot solve this -- Compactness section in~\cite{ge-cav09}.
 \end{itemize}
 
@@ -199,14 +199,13 @@ These examples demonstrate the need for a method that handles arithmetic offsets
 
 \section{Problem Statement}
 \label{sec:problem-statement}
-\todoSN{Should we instead move this section to before Related Work? Also, is the current version too long?}
 
 \paragraph{Formula Class}
 We study formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall x.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for showing detecting satisfiability under the additional assumptions that
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for showing detecting satisfiability under the additional assumptions that\todoSR{Is this restricted class still undecidable?}
 \begin{itemize}
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
