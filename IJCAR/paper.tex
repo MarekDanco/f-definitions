@@ -417,7 +417,6 @@ The goal is now an algorithm that computes such satisfiability certificates and 
 % where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, and the  $t^{f_i}_{1},\dots,t^{f_i}_{l_i}$ are pairwise different LIA ground terms
 
 In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. This certificate will explicitly certify satisfiability of the quantifier free part $F$, and of a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. It will certify satisfiability of the quantified part outside of the interval $B$ using the satisfiability propagator and an order that goes upward from $b_{\max}+1$, and downward from $b_{\max}-1$. We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
-\todoSR{I wrote this to better connect this section to the previous one}
 
 Throughout this section we assume that $\phi$ is a formula of the form   $F \land \forall x.\; Q$, as defined in Section~\ref{sec:problem-statement}, with $f_1, \dots, f_r$ being the uninterpreted function symbols appearing in $Q$, with the arguments of $f_i$ being of the form $x+t^{f_i}_1, \dots, x+t^{f_i}_{l_i}$. We denote the set of \emph{offsets} $t^{f_i}_1, \dots, x+t^{f_i}_{l_i}$ by $T_i$.
 
