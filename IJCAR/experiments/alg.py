@@ -65,7 +65,7 @@ import argparse
 parser= argparse.ArgumentParser()
 parser.add_argument("benchmark")
 parser.add_argument("-smtlib", "--smtlib", help="print benchmark problem in smtlib format", action="store_true")
-parser.add_argument("-b", "--bounded", type=int, metavar='<ub>', help="add bounds to the problem (with lower bound 0 and upper bound <ub>)")
+parser.add_argument("-b", "--bounded", type=int, metavar='<ub>', help="add bounds to the problem (with nonstrict lower bound 0 and strict upper bound <ub>)")
 args= parser.parse_args()
 
 b= globals().get(args.benchmark)                 # choose the benchmark here
