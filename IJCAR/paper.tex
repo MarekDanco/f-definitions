@@ -216,11 +216,16 @@ where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of 
     \item For each function symbol $f_i$, all its arguments in $Q$ have the \emph{same} coefficient of $x$ and this coefficient is non-negative.
 \end{itemize}
 
-    \begin{example}
-      \[f(0)=0 \wedge \forall x \,.\, f(x+c)=f(x)+c+1,\]
-      where $c$ is an uninterpreted constant.
-    \end{example}
+\begin{example}
+  \[f(0)=0 \wedge \forall x \,.\, f(2x+3)=g(x)+f(2x+c+1),\]
+  where $f$ has coefficient $2$ in all its arguments, $g$ has coefficient $1$, and $c$ is an uninterpreted constant. Both functions satisfy the same‑coefficient requirement.
+\end{example}
 \todoSR{What about decidability of this restricted class? I am currently working with the assumption that it is unknown}
+
+\begin{example}[Invalid]
+  \[\forall x \,.\, f(2x+3) = f(x+1)\]
+  This formula is \emph{not} in our fragment because $f$ appears with arguments having different coefficients ($2$ and $1$).
+\end{example}
 
 \paragraph{Core Problem}
 Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we address is:
