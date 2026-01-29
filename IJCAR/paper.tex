@@ -435,7 +435,7 @@ In this section, we will introduce an algorithm that will check satisfiability o
 
 Throughout this section we assume that $\phi$ is a formula of the form $F \land \forall x.\; Q$, as defined in ~\cref{sec:problem-statement}. Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$. For each $f_i$, let $T_i = \args(Q, f_i) = \{t^{f_i}_1, \dots, t^{f_i}_{l_i}\}$ be its argument terms in $Q$.
 
-We will now formalize the condition ensuring propagation outward from a base interval $B$ is possible. For upward propagation, we select for each function $f_i$ a subset $S_i \subseteq T_i$ of its argument terms that are \emph{maximal} (all equal and strictly greater than other terms of $f_i$). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
+We will now formalize the condition ensuring propagation outward from a base interval $B$ is possible. For upward propagation, we select for each function~$f_i$ a subset $S_i \subseteq T_i$ of its argument terms that are \emph{maximal} (all equal and strictly greater than other terms of $f_i$). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
 
 \begin{definition}[Multi-\req Condition]
 \label{def:multi-reqpivot-param}
@@ -585,7 +585,7 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots
     \Phi_{\text{prop-up}}(\mathcal{S}) \;\land
     \bigwedge_{i=1}^{r} \bigwedge_{\substack{a \in \args(F,f_i) \\ t \in S_i}} a \leq \subst{t}{x}{b_{\max}}
     \]
-    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:multi-reqpivot-param}. \todoSR{The similarity of the names $t_g$ and $t$ seems to suggest that both are offsets, but $t_g$ is not. I might have a solution to this problem that does \emph{not} need renaming.}
+    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:multi-reqpivot-param}. 
     
     \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
     \[
