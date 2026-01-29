@@ -207,21 +207,31 @@ We study formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall x.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall x$ stands for universal quantification of arbitrarily many variables. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for showing detecting satisfiability under the additional assumptions that
+where $\forall x$ stands for universal quantification of arbitrarily many variables, $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic. Additionally:
 \begin{itemize}
-%    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
-%    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
-    \item the number of universally quantified variables is $1$
-    \item all uninterpreted function symbols have maximal arity $1$
-    \item all arguments of uninterpreted function symbols in $Q$ are either of the form $x$ or of the form $x+t$ where $t$ is a ground term.
-    \end{itemize}
+    \item All arguments of uninterpreted function symbols in $Q$ are LIA terms in which the universally quantified variable $x$ appears with positive coefficient.
+    \item For each function symbol $f_i$, all its arguments in $Q$ have the \emph{same} coefficient of $x$.
+\end{itemize}
+We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}.
 
-    \begin{example}
-      \[f(0)=0 \wedge \forall x \,.\, f(x+c)=f(x)+c+1,\]
-      where $c$ is an uninterpreted constant.
-    \end{example}
+\begin{example}
+  \[f(0)=0 \wedge \forall x \,.\, f(2x+3)=g(x)+f(2x+c+1),\]
+  where $f$ has coefficient $2$ in all its arguments, $g$ has coefficient $1$, and $c$ is an uninterpreted constant. Both functions satisfy the same‑coefficient requirement.
+\end{example}
 \todoSR{What about decidability of this restricted class? I am currently working with the assumption that it is unknown}
-    
+
+\begin{example}[Invalid]
+  \[f(2x+3) = f(x+1)\]
+  This formula is \emph{not} in our fragment because $f$ appears with arguments having different coefficients ($2$ and $1$).
+\end{example}
+
+\paragraph{Implementation Focus.} 
+Based on this, we will design an algorithm for detecting satisfiability under the additional assumptions that:
+\begin{itemize}
+     \item the number of universally quantified variables is $1$,
+    \item all uninterpreted function symbols have arity $1$,
+    \item all arguments of uninterpreted function symbols in $Q$ are of the form $x + \tau$ where $\tau$ is a ground term.
+\end{itemize}
 
 \paragraph{Core Problem}
 Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we address is:
@@ -242,11 +252,12 @@ The presence of both arithmetic constraints and uninterpreted functions, combine
 \paragraph{Scope and Limitations}
 We make the following additional assumptions about the structure of the formulas:
 \begin{enumerate}
-    \item For each uninterpreted function $f$, the set of offset terms $\{t \mid f(x+t) \text{ occurs in } Q\}$ is finite and consists of ground terms.
+    \item Each uninterpreted function symbol appears with only finitely many distinct argument terms in $Q$.
+    \item All argument terms in $Q$ are linear in the quantified variable $x$ with a positive integer coefficient (the same for all arguments of a given function).
     \item We do not allow nested applications of uninterpreted functions (e.g., $f(g(x))$ is excluded).
     \item We do not consider multiple universal quantifiers over different variables or existential quantification over functions.
 \end{enumerate}
-These restrictions enable the inductive reasoning that underlies our solution, while still covering many practical verification conditions. The technical details of our solution—how we detect satisfiability, what propagation conditions we require, and how we construct models—are presented in the following sections.
+These restrictions enable the inductive propagation reasoning that underlies our solution, while still covering many practical verification conditions. The technical details of our solution—how we detect satisfiability, what propagation conditions we require, and how we construct models—are presented in the following sections.
 
 % \paragraph{Expected Outcomes}
 % For formulas within this fragment, we aim to provide:
@@ -288,7 +299,7 @@ These restrictions enable the inductive reasoning that underlies our solution, w
 
 \section{Notation}\todoSR{We will see where to put this, in the end}
 
-We already used the notation $\forall x$ as an abbreviation for universal quantification over several variables. In this case, we will write $\numvar{x}$ for the number of those variables. We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the term~$s$. Here, $v$ may again represent several variables, in which case we require $t$ to represent a $\numvar{v}$-vector of terms, and assume substitution to be parallel. For an integer $z\in\mathbb{Z}$, we will denote the constant representing $z$ in a logical formula by $\repr{z}$\todoSR{Does there exist some standard notation for this?}.
+We already used the notation $\forall x$ as an abbreviation for universal quantification over several variables. In this case, we will write $\numvar{x}$ for the number of those variables. We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the formula~$s$. Here, $v$ may again represent several variables, in which case we require $t$ to represent a $\numvar{v}$-vector of terms, and assume substitution to be parallel. For an integer $z\in\mathbb{Z}$, we will denote the constant representing $z$ in a logical formula by $\repr{z}$\todoSR{Does there exist some standard notation for this?}.
 
 For a formula $F$ and uninterpreted function symbol $f$, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
 
@@ -420,24 +431,11 @@ The goal is now an algorithm that computes such satisfiability certificates and 
 % \[ F\wedge \forall x\;.\; Q(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\dots,f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})),\]
 % where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, and the  $t^{f_i}_{1},\dots,t^{f_i}_{l_i}$ are pairwise different LIA ground terms
 
-In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. This certificate will explicitly certify satisfiability of the quantifier free part $F$, and of a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. It will certify satisfiability of the quantified part outside of the interval $B$ using the satisfiability propagator and an order that goes upward from $b_{\max}+1$, and downward from $b_{\max}-1$. We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
+In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. \todoSN{Add this?}While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables ($\numvar{x} \geq 1$), the algorithm presented here focuses on the case $\numvar{x}=1$. This certificate will explicitly certify: (1) satisfiability of the quantifier-free part $F$, and (2) satisfiability over a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. For values outside $B$, it uses satisfiability propagators with an order that propagates upward from $b_{\max}+1$ and downward from $b_{\min}-1$.  We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
 
-Throughout this section we assume that $\phi$ is a formula of the form   $F \land \forall x.\; Q$, as defined in Section~\ref{sec:problem-statement}, with $f_1, \dots, f_r$ being the uninterpreted function symbols appearing in $Q$, with the arguments of $f_i$ being of the form $x+t^{f_i}_1, \dots, x+t^{f_i}_{l_i}$. We denote the set of \emph{offsets} $t^{f_i}_1, \dots, x+t^{f_i}_{l_i}$ by $T_i$.
+Throughout this section we assume that $\phi$ is a formula of the form $F \land \forall x.\; Q$, as defined in ~\cref{sec:problem-statement}. Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$. For each $f_i$, let $T_i = \args(Q, f_i) = \{t^{f_i}_1, \dots, t^{f_i}_{l_i}\}$ be its argument terms in $Q$.
 
-
-
-% The core idea of the algorithm is to search for the interval $B = [b_{\min}, b_{\max}]$ from which a model can be inductively extended to all integers. This requires two components:
-% \begin{enumerate}
-%     \item A method to check whether a given interval $B$ can serve as a suitable base (satisfying both ground constraints and all instantiations within $B$).
-%     \item A propagation condition ensuring that from such a base, we can consistently assign values to cells outside $B$ without conflicts.
-% \end{enumerate}
-
-
-
-% Our algorithm relies on the ability to propagate solutions outward from a base interval. We first formalize the propagation condition as the \emph{multi-\req condition}, then show how to combine it with interval expansion to obtain a complete decision procedure. 
-
-We will now formalize the condition ensuring propagation outward from a base interval $B$ is possible.
- For upward propagation, we select for each function $f_i$ a subset $S_i$ of its offsets that are maximal (all equal and strictly greater than other offsets of $f_i$). The propagability condition then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(x+t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values.  The downward condition is symmetric.
+We will now formalize the condition ensuring propagation outward from a base interval $B$ is possible. For upward propagation, we select for each function $f_i$ a subset $S_i \subseteq T_i$ of its argument terms that are \emph{maximal} (all equal and strictly greater than other terms of $f_i$). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
 
 \begin{definition}[Multi-\req Condition]
 \label{def:multi-reqpivot-param}
@@ -445,18 +443,19 @@ We will now formalize the condition ensuring propagation outward from a base int
 For any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$ with $S_i \subseteq T_i$, define:
 \begin{itemize}
     \item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}
-        \[
-        \bigwedge_{i=1}^{r} \left(
-        \bigwedge_{t,t' \in S_i} t = t' \;\land\;
+    \[
+        \subst{\left[ \bigwedge_{i=1}^{r} \left(\bigwedge_{t,t' \in S_i} t = t' \;\land\;
         \bigwedge_{t \in S_i, t' \in T_i \setminus S_i} t > t'
-        \right).
-        \]
-    \item \textbf{Upward propagability condition $\Phi_{\text{prop-up}}(\mathcal{S})$:}\\
-        \[\forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1\dots \exists v_r.\ Q'(\mathcal{S})\] where  $Q'(\mathcal{S})$ is the formula obtained from $Q$ by simultaneously replacing for all $i\in\{1,\dots,r\}$,
+        \right)\right]}{x}{0}.
+    \]
+    \item \textbf{Upward propagability condition $\Phi_{\text{prop-up}}(\mathcal{S})$:}
+        \[\forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1\dots \exists v_r.\ Q'(\mathcal{S})\]
+        where $Q'(\mathcal{S})$ is obtained from $Q$ by simultaneously replacing:
         \begin{itemize}
-            \item every $f_i(x+t)$ such that $t \in S_i$ by $v_i$,
-            \item every $f_i(x+t)$ such that $t \in T_i \setminus S_i$ by the corresponding $u_i^t \in \bar{u}_i$, where $\bar{u}_i = \{u_i^t \mid t \in T_i \setminus S_i\}$.
+            \item every $f_i(t)$ with $t \in S_i$ by $v_i$,
+            \item every $f_i(t)$ with $t \in T_i \setminus S_i$ by $u_i^t$.
         \end{itemize}
+        The variables $\bar{u}_i = \{u_i^t \mid t \in T_i \setminus S_i\}$ represent the non‑propagated cells.
 \end{itemize}
 
 Symmetrically, for downward propagation with subsets $\mathcal{S}' = (S'_1,\dots,S'_r)$, define $\Phi_{\text{min}}(\mathcal{S}')$ (with $<$ instead of $>$) and $\Phi_{\text{prop-down}}(\mathcal{S}')$.
@@ -470,138 +469,151 @@ We say that $Q$ satisfies the \emph{multi-\req condition for $(\mathcal{S}, \mat
 We say $Q$ satisfies the \emph{multi-\req condition} if there exists \emph{some} pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the multi-\req condition for $(\mathcal{S}, \mathcal{S}')$.
 \end{definition}
 
-
 \begin{example}[Multi-\req Illustration]
+\label{ex:multi-req-illustration}
 Consider the formula:
 \[
 \forall x.\ f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
 \]
-where $c$ is a ground constant. The offset terms for each function are:
+where $c$ is a ground constant. All function arguments have the form $x + \tau$ where $\tau$ is ground. We extract the offset parts:
 \begin{align*}
-T_f &= \{c+3,\ 4,\ 1\}, \quad T_g = \{2\}, \quad T_h = \{0\}.
+T_f &= \{x+c+3,\ x+4,\ x+1\}, \\
+T_g &= \{x+2\}, \\
+T_h &= \{x\}.
 \end{align*}
-We have three offsets for $f$: a ground term $c+3$, and two numerals $4$ and $1$.
+Note that these are terms containing $x$, not just ground offsets.
 
 \medskip\noindent\textbf{Upward propagation:}
-% Consider two possible choices:
-
-% \begin{enumerate}
-%     \item \textbf{Choice 1: Take only the numerically maximal offset}
-Consider the choice $\mathcal{S} = (S_f, S_g, S_h) = (\{4\}, \{2\}, \emptyset)$.
-    \begin{enumerate}
-        \item \textbf{Maximality $\Phi_{\text{max}}(\mathcal{S})$:}
+Consider $\mathcal{S} = (S_f, S_g, S_h) = (\{x+4\}, \{x+2\}, \emptyset)$.
+\begin{enumerate}
+    \item \textbf{Maximality $\Phi_{\text{max}}(\mathcal{S})$:}
+        \[
+        \subst{\left[
+        \begin{aligned}
+        &\bigwedge_{t,t' \in S_f} t = t' \ \land\ 
+        \bigwedge_{t \in S_f, t' \in T_f \setminus S_f} t > t' \\
+        \land\ &\bigwedge_{t,t' \in S_g} t = t' \ \land\ 
+        \bigwedge_{t \in S_g, t' \in T_g \setminus S_g} t > t' \\
+        \land\ &\bigwedge_{t,t' \in S_h} t = t' \ \land\ 
+        \bigwedge_{t \in S_h, t' \in T_h \setminus S_h} t > t'
+        \end{aligned}
+        \right]}{x}{0}
+        \]
+        Since $S_f = \{x+4\}$, the first conjunction $(x+4 = x+4)$ is trivial. 
+        $T_f \setminus S_f = \{x+c+3, x+1\}$, so we get:
+        \[
+        (x+4 > x+c+3) \land (x+4 > x+1) \land (x+2 = x+2)
+        \]
+        Substituting $x=0$ gives:
+        \[
+        (4 > c+3) \land (4 > 1) \land (2 = 2)
+        \]
+        which simplifies to $c < 1$.
+        
+    \item \textbf{Propagability $\Phi_{\text{prop-up}}(\mathcal{S})$:}
+        In $Q$, replace:
         \begin{itemize}
-        \item For $f$: $S_f = \{4\}$, $T_f \setminus S_f = \{c+3, 1\}$
-            \item For $g$: $S_g = \{2\}$, $T_g \setminus S_g = \emptyset$
-            \item For $h$: $S_h = \emptyset$
-            \end{itemize}
-This results in $\Phi_{\text{max}}(\mathcal{S})\equiv 4 = 4 \land 4 > c+3 \land 4 > 1 \land\ 2=2$, which is true 
-provided $c < 1$.
-
-        \item \textbf{Propagability $\Phi_{\text{prop-up}}(\mathcal{S})$:}
-        We introduce
-        \begin{itemize}
-            \item $v_f$ for $f(x+4)$,
-            \item $v_g$ for $g(x+2)$,
-            \item $u_f^{c+3}$ for $f(x+c+3)$ and $u_f^1$ for $f(x+1)$,
-            \item $u_h^0$ for $h(x)$,
+            \item $f(x+4)$ by a fresh variable $v_f$,
+            \item $g(x+2)$ by $v_g$,
+            \item $f(x+c+3)$ by $u_f^{c+3}$,
+            \item $f(x+1)$ by $u_f^1$,
+            \item $h(x)$ by $u_h^0$.
         \end{itemize}
-
-         and get the propagability condition 
+        The resulting formula is:
         \[
         \forall x \forall u_f^{c+3} \forall u_f^1 \forall u_h^0 \exists v_f \exists v_g.\ 
         u_f^{c+3} + v_f + u_f^1 = v_g + u_h^0.
         \]
-        This is true: for any $u_f^{c+3}, u_f^1, u_h^0$, choose $v_g = 0$ and $v_f = u_h^0 - u_f^{c+3} - u_f^1$.
-    \end{enumerate}
-    
-%     \item \textbf{Choice 2: Take the general term if it's maximal}
-%     Alternatively, if $c+3 \geq 4$ (i.e., $c \geq 1$), we could choose:
-%     \[
-%     S_f = \{c+3\}, \quad S_g = \{2\}, \quad S_h = \emptyset.
-%     \]
-%     Then $\Phi_{\text{max}}$ requires $c+3 > 4$ and $c+3 > 1$, i.e., $c > 1$.
-% \end{enumerate}
-
-\medskip\noindent\textbf{Downward propagation:}
-Consider the choice %Choice for downward: Take the numerically minimal offset}
-$\mathcal{S}' = (S'_f, S'_g, S'_h) = (\{1\}, \emptyset, \{0\})$.
-\begin{enumerate}
-    \item \textbf{Minimality $\Phi_{\text{min}}(\mathcal{S}')$:}
-    \begin{itemize}
-        \item For $f$: $S'_f = \{1\}$, $T_f \setminus S'_f = \{c+3, 4\}$
-        \item For $h$: $S'_h = \{0\}$, $T_h \setminus S'_h = \emptyset$
-        \item For $g$: $S'_g = \emptyset$
-        \end{itemize}
-This results in $\Phi_{\text{min}(\mathcal{S}')}\equiv 1 = 1\land 1 < c+3 \land 1 < 4 \ \land\  0=0$, which is true provided
- $c > -2$.
-
-    \item \textbf{Propagability $\Phi_{\text{prop-down}}(\mathcal{S}')$:}
-    We introduce
-    \begin{itemize}
-        \item $v'_f$ for $f(x+1)$,
-        \item $v'_h$ for $h(x)$,
-        \item $u_f^{c+3}$ for $f(x+c+3)$ and $u_f^4$ for $f(x+4)$,
-        \item $u_g^2$ for $g(x+2)$,
-    \end{itemize}
-    and get the propagability condition
-    \[
-    \forall x \forall u_f^{c+3} \forall u_f^4 \forall u_g^2 \exists v'_f \exists v'_h.\ 
-    u_f^{c+3} + u_f^4 + v'_f = u_g^2 + v'_h
-    \]
-    This is true: choose $v'_h = 0$ and $v'_f = u_g^2 - u_f^{c+3} - u_f^4$.
+        This universally quantified formula is valid: for any values of $u_f^{c+3}, u_f^1, u_h^0$, we can choose $v_g = 0$ and $v_f = u_h^0 - u_f^{c+3} - u_f^1$.
 \end{enumerate}
 
-\noindent\textbf{Putting it together:}
-$Q$ satisfies multi-\req for the pair $(\mathcal{S},\mathcal{S}')$ if we can find $c$ satisfying both:
-\begin{itemize}
-    \item For upward: $c < 1$
-    \item For downward: $c > -2$
-\end{itemize}
-Thus any $c \in (-2, 1)$ works. This demonstrates that for such $c$, the specific choices $\mathcal{S} = (\{4\},\{2\},\emptyset)$ and $\mathcal{S}' = (\{1\},\emptyset,\{0\})$ witness the multi‑\req condition.
+\medskip\noindent\textbf{Downward propagation:}
+Consider $\mathcal{S}' = (S'_f, S'_g, S'_h) = (\{x+1\}, \emptyset, \{x\})$.
+\begin{enumerate}
+    \item \textbf{Minimality $\Phi_{\text{min}}(\mathcal{S}')$:}
+        \[
+        \subst{\left[
+        \begin{aligned}
+        &\bigwedge_{t,t' \in S'_f} t = t' \ \land\ 
+        \bigwedge_{t \in S'_f, t' \in T_f \setminus S'_f} t < t' \\
+        \land\ &\bigwedge_{t,t' \in S'_h} t = t' \ \land\ 
+        \bigwedge_{t \in S'_h, t' \in T_h \setminus S'_h} t < t'
+        \end{aligned}
+        \right]}{x}{0}
+        \]
+        Since $S'_f = \{x+1\}$ and $T_f \setminus S'_f = \{x+c+3, x+4\}$, we get:
+        \[
+        (x+1 < x+c+3) \land (x+1 < x+4) \land (x = x)
+        \]
+        Substituting $x=0$ gives:
+        \[
+        (1 < c+3) \land (1 < 4) \land (0 = 0)
+        \]
+        which simplifies to $c > -2$.
+        
+    \item \textbf{Propagability $\Phi_{\text{prop-down}}(\mathcal{S}')$:}
+        In $Q$, replace:
+        \begin{itemize}
+            \item $f(x+1)$ by $v'_f$,
+            \item $h(x)$ by $v'_h$,
+            \item $f(x+c+3)$ by $u_f^{c+3}$,
+            \item $f(x+4)$ by $u_f^4$,
+            \item $g(x+2)$ by $u_g^2$.
+        \end{itemize}
+        The resulting formula is:
+        \[
+        \forall x \forall u_f^{c+3} \forall u_f^4 \forall u_g^2 \exists v'_f \exists v'_h.\ 
+        u_f^{c+3} + u_f^4 + v'_f = u_g^2 + v'_h.
+        \]
+        This is also valid: choose $v'_h = 0$ and $v'_f = u_g^2 - u_f^{c+3} - u_f^4$.
+\end{enumerate}
+
+\medskip\noindent\textbf{Putting it together:}
+$Q$ satisfies the multi-\req condition for the pair $(\mathcal{S},\mathcal{S}')$ whenever $c$ satisfies both $c < 1$ (from upward maximality) and $c > -2$ (from downward minimality). Hence for any $c \in (-2, 1)$, the specific choices $\mathcal{S} = (\{x+4\},\{x+2\},\emptyset)$ and $\mathcal{S}' = (\{x+1\},\emptyset,\{x\})$ witness the multi‑\req condition.
 \end{example}
 
 Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the cells generated during propagation from clashing with the ground part $F$.
 
 \begin{definition}[Interval Extension Formulas]
 \label{def:interval-extension-formulas-param}
-For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$, define:\todoSR{potential improvement (to be left for later): conjunction over only one element of $S_i$ (the maximality condition forces them to be equal)}
+For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$, define: \todoSR{potential improvement (to be left for later): conjunction over only one element of $S_i$ (the maximality condition forces them to be equal)}
 
 \begin{enumerate}
     \item \textbf{Upward extension formula $\Psi_{\text{up}}(B,\mathcal{S})$}:
     \[
     \Phi_{\text{max}}(\mathcal{S})\;\land\; 
     \Phi_{\text{prop-up}}(\mathcal{S}) \;\land
-    \bigwedge_{i=1}^{r} \bigwedge_{\substack{t_g \in \args(F,f_i) \\ t \in S_i}} t_g \leq b_{\max}+t
+    \bigwedge_{i=1}^{r} \bigwedge_{\substack{a \in \args(F,f_i) \\ t \in S_i}} a \leq \subst{t}{x}{b_{\max}}
     \]
-    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:multi-reqpivot-param}.\todoSR{The similarity of the names $t_g$ and $t$ seems to suggest that both are offsets, but $t_g$ is not. I might have a solution to this problem that does \emph{not} need renaming.}
+    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:multi-reqpivot-param}. \todoSR{The similarity of the names $t_g$ and $t$ seems to suggest that both are offsets, but $t_g$ is not. I might have a solution to this problem that does \emph{not} need renaming.}
     
     \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
     \[
     \Phi_{\text{min}}(\mathcal{S}') \;\land\; 
     \Phi_{\text{prop-down}}(\mathcal{S}') \;\land
-    \bigwedge_{i=1}^{r} \bigwedge_{\substack{t_g \in \args(F,f_i) \\ t \in S_i'}} t_g \geq b_{\min}+t
+    \bigwedge_{i=1}^{r} \bigwedge_{\substack{a \in \args(F,f_i) \\ t \in S_i'}} a \geq \subst{t}{x}{b_{\min}}
     \]
     where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ are as defined in \cref{def:multi-reqpivot-param}.
 \end{enumerate}
 \end{definition}
 
-Thus, for any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\Psi_{\text{up}}(\mathcal{S}, B)$ (resp.\ $\Psi_{\text{down}}(\mathcal{S}', B)$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of multi‑\req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition ensures that no cell $f_i(z+t)$ with $z > b_{\max}$ (resp. $z < b_{\min}$) and $t \in S_i$ already appears in the ground part $F$.
+Thus, for any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\Psi_{\text{up}}(B,\mathcal{S})$ (respectively, $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of multi‑\req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{b_{\max}}$ ensures that for every ground argument $a$ of $f_i$ appearing in $F$, the propagated cell $f_i(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $t \in S_i$ is different from the ground cell $f_i(a)$; similarly for downward propagation.
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
-Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and let $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$ be subsets of offset terms. If 
+Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and let $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$ be subsets of $T_i$ terms. If 
 \[
 \Bigl(F \land \bigwedge_{x \in B} Q[x]\Bigr) \;\land\; \Psi_{\text{up}}(B,\mathcal{S}) \;\land\; \Psi_{\text{down}}(B,\mathcal{S}')
 \]
-is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satisfiable.
+is satisfiable, then $\phi$ has a cell propagation certificate, and hence is satisfiable.
 \end{theorem}
 
 \begin{proof}
 Suppose the conjunction is satisfiable, and let $I$ be an interpretation satisfying it. We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
-      \item \textbf{Pre‑satisfiability assignment:} $I$ 
+    \item \textbf{Pre‑satisfiability assignment:} $I$ 
+    
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
     \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
     
@@ -610,13 +622,12 @@ Suppose the conjunction is satisfiable, and let $I$ be an interpretation satisfy
     X_z = 
     \begin{cases}
     \emptyset & \text{if } z \in B, \\[4pt]
-    \bigl\{ f_i(z+I(t)) \mid i=1,\dots,r,\; t \in S_i \bigr\} & \text{if } z > b_{\max}, \\[4pt]
-    \bigl\{ f_i(z+I(t)) \mid i=1,\dots,r,\; t \in S_i' \bigr\} & \text{if } z < b_{\min}.
+    \bigl\{ f_i(I(\subst{t}{x}{z})) \mid i=1,\dots,r,\; t \in S_i \bigr\} & \text{if } z > b_{\max}, \\[4pt]
+    \bigl\{ f_i(I(\subst{t}{x}{z})) \mid i=1,\dots,r,\; t \in S_i' \bigr\} & \text{if } z < b_{\min}.
     \end{cases}
     \]
     Note that the maximality and minimality conditions ensure that for $z\not\in B$, $i\in 1,\dots,r$, $|\{ n \mid f_i(n)\in X_z\}|\leq 1$.
 
-    
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
         \item For $z \in B$: $I$ itself satisfies $Q[z]$.
@@ -632,23 +643,38 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
 
 \begin{itemize}
     \item For $z \in B$, $X_z = \emptyset$ holds trivially.
-    \item For $z > b_{\max}$, consider any $f_i(z+I(t))$ with $t \in S_i$.
+    
+    \item For $z > b_{\max}$, consider any $f_i(I(\subst{t}{x}{z}))$ with $t \in S_i$:
     \begin{itemize}
-        \item It cannot belong to $\mathit{def}(I)$ because the clash condition $t_g \leq b_{\max} + t$ in $\Psi_{\text{up}}(B,\mathcal{S})$ guarantees $I(t_g) \leq b_{\max} + I(t) < z + I(t)$ for every $t_g \in \args(F,f_i)$.
-        \item It cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$ because either:
+        \item It cannot belong to $\mathit{def}(I)$ because the clash condition $a \leq \subst{t}{x}{b_{\max}}$ in $\Psi_{\text{up}}(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f_i)$:
+        \[
+        I(a) \leq I(\subst{t}{x}{b_{\max}}) < I(\subst{t}{x}{z}),
+        \]
+        where the strict inequality follows because $t$ contains $x$ with positive coefficient and $z > b_{\max}$.
+        
+        \item It cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$ because:
         \begin{enumerate}
-            \item $z' \leq b_{\max}$: then $z'+I(t') \leq b_{\max} + I(t') < z + I(t)$ for all $t' \in T_i$, since $z > b_{\max}$ and $I(t)$ is maximal among offsets of $f_i$.
-            \item $b_{\max} < z' < z$: then $z'+I(t') \leq z'+ \max_{t'' \in T_i} I(t'') < z + I(t)$ since $I(t)$ is maximal among $\{I(t'') \mid t'' \in T_i\}$ by $\Phi_{\text{max}}(\mathcal{S})$.
+            \item If $z' \leq b_{\max}$: For any $t' \in T_i$, 
+            \[
+            I(\subst{t'}{x}{z'}) \leq I(\subst{t'}{x}{b_{\max}}) < I(\subst{t}{x}{z}),
+            \]
+            since $t$ is maximal among $T_i$ by $\Phi_{\text{max}}(\mathcal{S})$ and $z > b_{\max}$.
+            
+            \item If $b_{\max} < z' < z$: Then 
+            \[
+            I(\subst{t'}{x}{z'}) \leq \max_{t'' \in T_i} I(\subst{t''}{x}{z'}) < I(\subst{t}{x}{z})
+            \]
+            since $t$ is maximal and $z' < z$.
         \end{enumerate}        
     \end{itemize}
 
-    \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition.
+    \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition $a \geq \subst{t}{x}{b_{\min}}$.
 \end{itemize}
 
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \qedhere\end{proof}
 
-\cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. This can be seen in \cref{alg:interval-check-param-withBigvee}. 
+\cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. This can be seen in \cref{alg:interval-check-param-withBigvee}. It handles the case where all arguments have the form $x + \tau$ with $\tau$ ground. The general theory supports arguments with arbitrary positive coefficients.
 
 \begin{algorithm}
 \caption{Interval‑Based Satisfiability Check}
@@ -662,7 +688,7 @@ Thus all certificate requirements are satisfied. By Property \ref{prop:certThenS
 \While{$F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is satisfiable}
     \State $\text{max}_\text{up}\gets\bigvee_{S_1\subseteq T_1,\dots,S_r\subseteq T_r}\Psi_{\text{up}}([b_{\min},b_{\max}],(S_1,\dots,S_r))$
     \State $\text{min}_\text{down}\gets\bigvee_{S_1'\subseteq T_1,\dots,S_r'\subseteq T_r}\Psi_{\text{down}}([b_{\min},b_{\max}],(S_1',\dots,S_r'))$ 
-    \If{$F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}$ is satisfiable}
+    \If{$\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right) \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}$ is satisfiable}
         \State \Return \textsc{Sat} 
     \EndIf
     \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
