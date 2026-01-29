@@ -247,7 +247,6 @@ The presence of both arithmetic constraints and uninterpreted functions, combine
 We make the following additional assumptions about the structure of the formulas:
 \begin{enumerate}
     \item Each uninterpreted function symbol appears with only finitely many distinct argument terms in $Q$.
-    \item All argument terms in $Q$ are linear in the quantified variable $x$ with a positive integer coefficient (the same for all arguments of a given function).
     \item We do not allow nested applications of uninterpreted functions (e.g., $f(g(x))$ is excluded).
     \item We do not consider multiple universal quantifiers over different variables or existential quantification over functions.
 \end{enumerate}
@@ -691,25 +690,6 @@ Thus all certificate requirements are satisfied. By Property \ref{prop:certThenS
 \State \Return \textsc{Unsat}
 \end{algorithmic}
 \end{algorithm}
-
-% \begin{algorithm}
-% \caption{Interval‑Based Satisfiability Check (for $\numvar{x}=1$)}
-% \label{alg:interval-check-param-withBigvee}
-% \begin{algorithmic}[1]
-% \Require $\phi = F \land \forall x.\, Q$ with $\numvar{x}=1$, as defined in the implementation focus of Section~\ref{sec:problem-statement}
-% \Ensure \textsc{Sat} or \textsc{Unsat}
-% \State $b_{\min} \gets 0$, $b_{\max} \gets 0$ 
-% \While{$F \land \bigwedge_{z=b_{\min}}^{b_{\max}} \subst{Q}{x}{\repr{z}}$ is satisfiable}
-%     \State $\text{max}_\text{up}\gets\bigvee_{S_1\subseteq T_1,\dots,S_r\subseteq T_r}\Psi_{\text{up}}([b_{\min},b_{\max}],(S_1,\dots,S_r))$
-%     \State $\text{min}_\text{down}\gets\bigvee_{S_1'\subseteq T_1,\dots,S_r'\subseteq T_r}\Psi_{\text{down}}([b_{\min},b_{\max}],(S_1',\dots,S_r'))$ 
-%     \If{$\left(F \land \bigwedge_{z=b_{\min}}^{b_{\max}} \subst{Q}{x}{\repr{z}}\right) \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}$ is satisfiable}
-%         \State \Return \textsc{Sat} 
-%     \EndIf
-%     \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
-% \EndWhile
-% \State \Return \textsc{Unsat}
-% \end{algorithmic}
-% \end{algorithm}
 
 \begin{corollary}[Soundness]
 \label{cor:soundness-bigvee}
