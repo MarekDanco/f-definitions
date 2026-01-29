@@ -207,31 +207,21 @@ We study formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall x.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $\forall x$ stands for universal quantification of arbitrarily many variables, $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic. Additionally:
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall x$ stands for universal quantification of arbitrarily many variables. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for detecting satisfiability under the following additional assumptions:
 \begin{itemize}
-    \item All arguments of uninterpreted function symbols in $Q$ are LIA terms in which the universally quantified variable $x$ appears with positive coefficient.
+%    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
+%    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
+    \item The number of universally quantified variables is $1$.
+    \item All uninterpreted function symbols have maximal arity $1$.
     \item For each function symbol $f_i$, all its arguments in $Q$ have the \emph{same} coefficient of $x$.
+    \item All arguments of uninterpreted function symbols in $Q$ are either of the form $x$ or of the form $x+\tau$ where $\tau$ is a ground term.
 \end{itemize}
-We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}.
 
-\begin{example}
-  \[f(0)=0 \wedge \forall x \,.\, f(2x+3)=g(x)+f(2x+c+1),\]
-  where $f$ has coefficient $2$ in all its arguments, $g$ has coefficient $1$, and $c$ is an uninterpreted constant. Both functions satisfy the same‑coefficient requirement.
-\end{example}
+    \begin{example}
+      \[f(0)=0 \wedge \forall x \,.\, f(x+c)=f(x)+c+1,\]
+      where $c$ is an uninterpreted constant.
+    \end{example}
 \todoSR{What about decidability of this restricted class? I am currently working with the assumption that it is unknown}
-
-\begin{example}[Invalid]
-  \[f(2x+3) = f(x+1)\]
-  This formula is \emph{not} in our fragment because $f$ appears with arguments having different coefficients ($2$ and $1$).
-\end{example}
-
-\paragraph{Implementation Focus.} 
-Based on this, we will design an algorithm for detecting satisfiability under the additional assumptions that:
-\begin{itemize}
-     \item the number of universally quantified variables is $1$,
-    \item all uninterpreted function symbols have arity $1$,
-    \item all arguments of uninterpreted function symbols in $Q$ are of the form $x + \tau$ where $\tau$ is a ground term.
-\end{itemize}
 
 \paragraph{Core Problem}
 Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we address is:
