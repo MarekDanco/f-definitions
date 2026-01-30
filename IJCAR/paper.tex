@@ -473,10 +473,10 @@ For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
     \]
     \item \textbf{Upward propagability condition $\Phi_{\text{prop-up}}(\mathcal{S})$:}
         \[\forall x \forall \bar{u} \exists \bar{v}.\ Q'(\mathcal{S})\]
-        where $\bar{u}$ represents the elements of $\mathcal{T}\setminus\mathcal{S}$ and $Q'$ is obtained from $Q$ by simultaneously replacing
+        where $\bar{u}$ corresponds to the variables $u_{f(t)}$ with $f(t)\in\mathcal{T}\setminus\mathcal{S}$ and $\bar{v}$ to the variables $v_{f(t)}$ with $f(t)\in \mathcal{S}$, and $Q'$ is obtained from $Q$ by simultaneously replacing
         \begin{itemize}
-            \item every element of $\mathcal{T}\setminus\mathcal{S}$ by $u$, and          
-            \item every element of $\mathcal{S}$ by $v$.
+            \item every $f(t)\in\mathcal{T}\setminus\mathcal{S}$ by $u_{f(t)}}$, and          
+            \item every $f(t)\in\mathcal{S}$ by $v_{f(t)}$.
         \end{itemize}
 \end{itemize}
 
