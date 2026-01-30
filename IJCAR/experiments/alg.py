@@ -167,7 +167,14 @@ else:
     Q = b.Q
     Qp = b.Qp
 
-# print(b.F)
+print("input:")
+print(b.F)
+print(b.Q)
+print(b.Qp)
+print(b.x)
+print(b.occ)
+print(b.offsets)
+print("===")
 num_f = len(b.offsets)
 assert len(b.occ) == num_f
 assert len(b.argF) == num_f
