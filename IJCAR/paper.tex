@@ -524,11 +524,17 @@ Consider $\mathcal{S} = \{f(x+4),g(x+2)\}$.
             \item $h(x)$ by $u_{h(x)}$.
         \end{itemize}
         The resulting formula is:
+        % \[
+        % \forall x \forall u_{f(x+c+3)} \forall u_{f(x+1)} \forall u_{h(x)} \exists v_{f(x+4)} \exists v_{g(x+2)}.\ 
+        % u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)}.
+        % \]
+
         \[
-        \forall x \forall u_{f(x+c+3)} \forall u_{f(x+1)} \forall u_{h(x)} \exists v_{f(x+4)} \exists v_{g(x+2)}.\ 
-        u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)}.
+        \forall x \, \forall\bar{u}\, \exists \bar{v}\;. 
+        \bigl( u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)} \bigr),
         \]
-        This universally quantified formula is valid: for any values of $u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}$, we can choose $v_{g(x+2)} = 0$ and $v_{f(x+4)} = u_{h(x)} - u_{f(x+c+3)} - u_{f(x+1)}$.
+        
+        where $\bar{u} = \big(u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}\big)$ and $\bar{v} = \big(v_{f(x+4)}, v_{g(x+2)}\big)$. This universally quantified formula is valid: for any values of $u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}$, we can choose $v_{g(x+2)} = 0$ and $v_{f(x+4)} = u_{h(x)} - u_{f(x+c+3)} - u_{f(x+1)}$.
 \end{enumerate}
 
 \medskip\noindent\textbf{Downward propagation:}
@@ -552,11 +558,16 @@ Consider $\mathcal{S}' = \{f(x+1),h(x)\}$.
             \item $g(x+2)$ by $u_{g(x+2)}$.
         \end{itemize}
         The resulting formula is:
+        % \[
+        % \forall x \forall u_{f(x+c+3)} \forall u_{f(x+4)} \forall u_{g(x+2)} \exists v'_{f(x+1)} \exists v'_{h(x)}.\ 
+        % u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)}.
+        % \]
+
         \[
-        \forall x \forall u_{f(x+c+3)} \forall u_{f(x+4)} \forall u_{g(x+2)} \exists v'_{f(x+1)} \exists v'_{h(x)}.\ 
-        u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)}.
+        \forall x \, \forall\bar{u} \, \exists \bar{v}'. 
+        \bigl( u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)} \bigr),
         \]
-        This is also valid: choose $v'_{h(x)} = 0$ and $v'_{f(x+1)} = u_{g(x+2)} - u_{f(x+c+3)} - u_{f(x+4)}$.
+        where $\bar{u} = \bigl(u_{f(x+c+3)}, u_{f(x+4)}, u_{g(x+2)}\bigr)$ and  $\bar{v}' = \bigl(v'_{f(x+1)}, v'_{h(x)}\bigr)$. This is also valid: choose $v'_{h(x)} = 0$ and $v'_{f(x+1)} = u_{g(x+2)} - u_{f(x+c+3)} - u_{f(x+4)}$.
 \end{enumerate}
 
 \medskip\noindent\textbf{Putting it together:}
@@ -846,31 +857,12 @@ For an interval $B = [b_{\min}, b_{\max}]$, define the encoded formulas:
 \end{align*}
 where:
 \begin{itemize}
-    \item Maximality encoding $\Phi_\text{max}^\text{e}$:\todoSN{Another form is in the comment lines.}
+    \item Maximality encoding $\Phi_\text{max}^\text{e}$:
     \begin{align*}
-        \subst{\left[\bigwedge_{f\in\mathcal{F}} 
-        \bigwedge_{f(t),f(t')\in\mathcal{T}} 
-        \left(
-        \big(s_{f(t)} \land s_{f(t')} \Rightarrow t = t'\big) 
-        \ \land\
-        \big(s_{f(t)} \land \neg s_{f(t')} \Rightarrow t > t'\big)
-        \right)\right]}{x}{0}
+        \subst{
+        \bigwedge_{f \in \mathcal{F}}\ \bigwedge_{\substack{f(t),\, f(t') \in \mathcal{T}}}
+        \left((s_{f(t)} \land s_{f(t')}) \Rightarrow t = t' \;\land\; (s_{f(t)} \land \neg s_{f(t')}) \Rightarrow t > t'\right)}{x}{0}
     \end{align*}
-
-% ANOTHER FORM
-% \item Maximality encoding $\Phi_\text{max}^\text{e}$:
-% \begin{align*}
-% \subst{\left[
-% \bigwedge_{i=1}^r \left(
-% \begin{aligned}
-% \bigwedge_{j<k}\,&
-% s_{i,j} \land s_{i,k} &\Rightarrow&\ t_j^{f_i} = t_k^{f_i} \\
-% \land\ \bigwedge_{j,k}\,&
-% s_{i,j} \land \neg s_{i,k} &\Rightarrow&\ t_j^{f_i} > t_k^{f_i}
-% \end{aligned}
-% \right)
-% \right]}{x}{0}
-% \end{align*}
     
     \item Minimality encoding: $\Phi_\text{min}^\text{e}$ defined analogously with $s'_{f(t)}$ and $<$ instead of $>$.
     
