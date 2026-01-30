@@ -205,9 +205,9 @@ These examples demonstrate the need for a method that handles arithmetic offsets
 \paragraph{Formula Class}
 We study formulas of the form
 \begin{equation}\label{eq:main-fragment}
-    F \land \forall x.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
+    F \land \forall \bar{x}.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall x$ stands for universal quantification of arbitrarily many variables. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for detecting satisfiability under the following additional assumptions:
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for detecting satisfiability under the following additional assumptions:
 \begin{itemize}
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
@@ -328,27 +328,27 @@ In order to allow a computer representation of cell interpretations, we will alw
 
 \begin{definition}
 	\label{def:pre-sat-cert}
-	Given a formula $\phi$ of the form $F\wedge \forall x\;.\; Q$, we call a cell interpretation $I$ such that
+	Given a formula $\phi$ of the form $F\wedge \forall \bar{x}\;.\; Q$, we call a cell interpretation $I$ such that
         \begin{itemize}
         \item $I\models F$, and
-        \item for all $z\in\mathbb{Z}^{\numvar{x}}$, for every uninterpreted function symbol~$f$ and its argument terms $t\in args(Q, f)$, $I(\subst{t}{x}{\repr{z}})\neq\bot$
+        \item for all $z\in\mathbb{Z}^{\numvar{x}}$, for every uninterpreted function symbol~$f$ and its argument terms $t\in args(Q, f)$, $I(\subst{t}{\bar{x}}{\repr{z}})\neq\bot$
         \end{itemize}
- a \emph{pre-satisfiability certificate} of $\phi$. For any $z\in\mathbb{Z}$, we denote by $\Gamma_{I,z}(\phi)$ the resulting set of cells \[\{ f(I(\subst{t}{x}{\repr{z}})) \mid t\in args(Q, f), f \emph{ is an uninterpreted function symbol}\}.\]
+ a \emph{pre-satisfiability certificate} of $\phi$. For any $z\in\mathbb{Z}$, we denote by $\Gamma_{I,z}(\phi)$ the resulting set of cells \[\{ f(I(\subst{t}{\bar{x}}{\repr{z}})) \mid t\in args(Q, f), f \emph{ is an uninterpreted function symbol}\}.\]
 \end{definition}
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
 Given a pre-satisfiability certificate, we can now certify the advisability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
 \begin{definition}
 	\label{def:certificate}
-	Given a formula $\phi$  of the form $F\wedge \forall x\;.\; Q$, a \emph{satisfiability certificate} is
+	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate} is
 	\begin{itemize}
         \item a pre-satisfiability certificate $I$ of $\phi$,
-		\item a well-order $\preceq$ on $\mathbb{Z}^{\numvar{x}}$,%\footnote{A well-order total order for which every non-empty subset has a least element. This enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}
-		\item for every $z\in\mathbb{Z}^{\numvar{x}}$
+		\item a well-order $\preceq$ on $\mathbb{Z}^{\numvar{\bar{x}}}$,%\footnote{A well-order total order for which every non-empty subset has a least element. This enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}
+		\item for every $z\in\mathbb{Z}^{\numvar{\bar{x}}}$
                   \begin{itemize}
                   \item a set $X_z\subseteq \Gamma_{I,z}(\phi)$  (the \emph{propagated cells}) such that \[X_z\cap (\mathit{def}(I)\cup\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi))=\emptyset,\] and
                     %that are neither assigned a value by $I$, nor occur in any $\Gamma_{I,z'}(\phi)$ for any $z'\prec z$
-                  \item a certificate (the \emph{satisfiability propagator}) showing that for all values of cells in $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ there exist values for the cells in $X_z$ such that for the cell interpretation $I_{X_z}$ assigning these values to $X_z$, $I\cup I_{X_z}\models \subst{Q}{x}{\repr{z}}$.
+                  \item a certificate (the \emph{satisfiability propagator}) showing that for all values of cells in $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ there exist values for the cells in $X_z$ such that for the cell interpretation $I_{X_z}$ assigning these values to $X_z$, $I\cup I_{X_z}\models \subst{Q}{\bar{x}}{\repr{z}}$.
                   \end{itemize}
 
 	\end{itemize}
@@ -358,7 +358,7 @@ The notion of certificate defined here is abstract in the sense that it does not
 
 % For the sake of generality, the satisfiability propagator only shows existence of values for the propagated cells. At this point we do not require it to be constructive. Still, below we will work with algorithms computing actual values. In addition, the definition allows infinitely many different sets of propagated cells and satisfiability propagators. In practice, for allowing computer representation, we will only work with finitely many different ones.
 
-Also note that for $z\in\mathbb{Z}^{\numvar{x}}$ such that $\Gamma_{I,z}(\phi)\subseteq \mathit{def}(I)$, the definition requires the set of propagated cells $X_z$ to be empty. As a consequence, for such $z$, the satisfiability propagator only needs to certify that $I\models \subst{Q}{x}{\repr{z}}$. In other words, the cell interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator. 
+Also note that for $z\in\mathbb{Z}^{\numvar{\bar{x}}}$ such that $\Gamma_{I,z}(\phi)\subseteq \mathit{def}(I)$, the definition requires the set of propagated cells $X_z$ to be empty. As a consequence, for such $z$, the satisfiability propagator only needs to certify that $I\models \subst{Q}{\bar{x}}{\repr{z}}$. In other words, the cell interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator. 
 
 \begin{property}\label{prop:certThenSat}
 	Every formula formula $\phi$  of the form $F\wedge \forall x\;.\; Q$ that has a satisfiability certificate is satisfiable.
@@ -368,17 +368,17 @@ Also note that for $z\in\mathbb{Z}^{\numvar{x}}$ such that $\Gamma_{I,z}(\phi)\s
 	Assume a formula of the given form and assume that it  has a satisfiability certificate.
 	The corresponding pre-satisfiability certificate $I$ satisfies the quantifier free part~$F$ of $\phi$.
     
-    We start by showing that for every $z\in\mathbb{Z}^{\numvar{x}}$ there is an extension $I'$ of $I$ such that $I'$ satisfies all quantifier instantiations occurring before $z$ wrt. the order $\preceq$, that is,  $I'\models\{ \subst{Q}{x}{\repr{z}'} \mid z'\preceq z\}$. For this we use the principle of induction on well-orders: Let $z\in\mathbb{Z}^{\numvar{x}}$, and let $\Phi$ be $\{ \subst{Q}{x}{\repr{z}'} \mid z'\prec z\}$. We assume that there is an extension $I_{\Phi}$ of $I$ with $I_{\Phi}\models\Phi$, and prove that there is an extension $I'$ of $I$ with $I'\models\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$. Since the formula has a satisfiability certificate, the propagated cells of $\subst{Q}{x}{\repr{z}}$ do not occur in any element of $\Phi$. Let $I'$ be the extension of $I_{\Phi}$ that assigns to the propagated cells $X_z$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $\Phi$, $I'$ and $I_{\Phi}$ coincide on cells occurring in $\Phi$. Hence $I'$ satisfies both $\Phi$ and $\subst{Q}{x}{\repr{z}}$, and so it satisfies $\Phi\cup \{ \subst{Q}{x}{\repr{z}}\}$.
+    We start by showing that for every $z\in\mathbb{Z}^{\numvar{\bar{x}}}$ there is an extension $I'$ of $I$ such that $I'$ satisfies all quantifier instantiations occurring before $z$ wrt. the order $\preceq$, that is,  $I'\models\{ \subst{Q}{\bar{x}}{\repr{z}'} \mid z'\preceq z\}$. For this we use the principle of induction on well-orders: Let $z\in\mathbb{Z}^{\numvar{\bar{x}}}$, and let $\Phi$ be $\{ \subst{Q}{\bar{x}}{\repr{z}'} \mid z'\prec z\}$. We assume that there is an extension $I_{\Phi}$ of $I$ with $I_{\Phi}\models\Phi$, and prove that there is an extension $I'$ of $I$ with $I'\models\Phi\cup \{ \subst{Q}{\bar{x}}{\repr{z}}\}$. Since the formula has a satisfiability certificate, the propagated cells of $\subst{Q}{\bar{x}}{\repr{z}}$ do not occur in any element of $\Phi$. Let $I'$ be the extension of $I_{\Phi}$ that assigns to the propagated cells $X_z$ the values whose existence is  confirmed by the satisfiability propagator. Since these do not occur in $\Phi$, $I'$ and $I_{\Phi}$ coincide on cells occurring in $\Phi$. Hence $I'$ satisfies both $\Phi$ and $\subst{Q}{\bar{x}}{\repr{z}}$, and so it satisfies $\Phi\cup \{ \subst{Q}{\bar{x}}{\repr{z}}\}$.
 
-	Now denote for every $z\in\mathbb{Z}^{\numvar{x}}$ the cell interpretation  satisfying $\subst{Q}{x}{\repr{z}}$ as constructed in the previous paragraph by $I_z$.
+	Now denote for every $z\in\mathbb{Z}^{\numvar{\bar{x}}}$ the cell interpretation  satisfying $\subst{Q}{\bar{x}}{\repr{z}}$ as constructed in the previous paragraph by $I_z$.
 	% From the well-order $\prec$ we get a corresponding well-order on these cell interpretations.
 	% Let $I_{\phi}$ be the cell interpretation that, for any cell $u$, assigns the value to $u$ that $I_{z}$ assigns to it for the smallest $z$ (wrt. $\prec$) that assigns a value to $u$. This smallest $z$ exists, since $\prec$ is a well-order. The cell interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
     
-    Observe that for every cell~$u$, and for all~$z, z'\in \mathbb{Z}^{\numvar{x}}$ with $I_z(u)\neq \bot$ and $I_{z'}(u)\neq \bot$, $I_z(u)=I_{z'}(u)$.      Let $I_\phi$ be the assignment that, for any cell $u$, if there is a $z$ such that $I_z(u)\neq \bot$, then $I_\phi(u)=I_z(u)$, and otherwise $I_\phi(u)=0$. Certainly $I_\phi\models F$. Moreover, for every $z\in\mathbb{Z}$,  $I_\phi\models  \subst{Q}{x}{\repr{z}}$, since $I_\phi$ coincides with $I_z$ for all elements, where it is defined. Hence  $I_\phi\models \phi$.
+    Observe that for every cell~$u$, and for all~$z, z'\in \mathbb{Z}^{\numvar{\bar{x}}}$ with $I_z(u)\neq \bot$ and $I_{z'}(u)\neq \bot$, $I_z(u)=I_{z'}(u)$.      Let $I_\phi$ be the assignment that, for any cell $u$, if there is a $z$ such that $I_z(u)\neq \bot$, then $I_\phi(u)=I_z(u)$, and otherwise $I_\phi(u)=0$. Certainly $I_\phi\models F$. Moreover, for every $z\in\mathbb{Z}$,  $I_\phi\models  \subst{Q}{\bar{x}}{\repr{z}}$, since $I_\phi$ coincides with $I_z$ for all elements, where it is defined. Hence  $I_\phi\models \phi$.
 \qedhere\end{proof}
 
 A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\mathbb{Z}^{|x|}$ and for each $u\in X_z$ we assume a function $prop_{u,z}$ such that for
-a cell interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$, $I\cup I'\cup \{ u \mapsto prop_{u,z}(I\cup I') \mid u\in{X_z}\}\models\subst{Q}{x}{\repr{z}}$.
+a cell interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$, $I\cup I'\cup \{ u \mapsto prop_{u,z}(I\cup I') \mid u\in{X_z}\}\models\subst{Q}{\bar{x}}{\repr{z}}$.
  
 % for any $\hat{v}_1,\dots,\hat{v}_r$, the cell interpretation
 % \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$
@@ -387,7 +387,7 @@ a cell interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \m
 % \[\{ v_1\mapsto \hat{v}_1,\dots,v_r\mapsto \hat{v}_1, u_1\mapsto  prop_{u_1}(\hat{v}_1,\dots, \hat{v}_r),\dots, u_s\mapsto prop_{u_s}(\hat{v}_1,\dots,\hat{v}_r)\} \] satisfies $\psi$. In many cases, these functions can be synthesized automatically from the corresponding quantifier elimination problem~\cite{kuncak-sttt13}.\marek{Is \cite{kuncak-sttt13} applicable in our case too?}
 
 
-Now, observe that for any cell $u$ there is at most one $z\in\mathbb{Z}^{\numvar{z}}$ with $u\in X_z$ (if there would be more than one then, due to $\preceq$ being a well-order, there is a minimal one, let us say $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any cell $u$, let $\mathit{inst}(u)$ either be the $z\in\mathbb{Z}^{\numvar{x}}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
+Now, observe that for any cell $u$ there is at most one $z\in\mathbb{Z}^{\numvar{z}}$ with $u\in X_z$ (if there would be more than one then, due to $\preceq$ being a well-order, there is a minimal one, let us say $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any cell $u$, let $\mathit{inst}(u)$ either be the $z\in\mathbb{Z}^{\numvar{\bar{x}}}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
 
 Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenSat}, which satisfies a given formula~$\phi$, and a given cell~$u$, the value of $I_\phi(u)$ can be computed by the following recursive function $val(u)$:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
