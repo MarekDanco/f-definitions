@@ -7,3 +7,4 @@
 (assert (= (g 0) 1))
 (assert (forall ((x Int)) (= (f (+ x 1)) (+ (f (+ x 0)) (g (+ x 0))))))
 (check-sat)
+;(get-model)
