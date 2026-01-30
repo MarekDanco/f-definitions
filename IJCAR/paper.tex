@@ -418,37 +418,38 @@ Note that, in general, it is not possible to compute $val(u)$ by computing the v
 
 The goal is now an algorithm that computes such satisfiability certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
 
+
+
 \section{Algorithm}\label{sec:alg}
 
 % Class of formulas:
 % \[ F\wedge \forall x\;.\; Q(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\dots,f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})),\]
 % where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, and the  $t^{f_i}_{1},\dots,t^{f_i}_{l_i}$ are pairwise different LIA ground terms
 
-In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. \todoSN{Add this?}While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables ($\numvar{x} \geq 1$), the algorithm presented here focuses on the case $\numvar{x}=1$. This certificate will explicitly certify: (1) satisfiability of the quantifier-free part $F$, and (2) satisfiability over a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. For values outside $B$, it uses satisfiability propagators with an order that propagates upward from $b_{\max}+1$ and downward from $b_{\min}-1$.  We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
+In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. \todoSN{Add this?}While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables ($\numvar{\bar{x}} \geq 1$), the algorithm presented here focuses on the case $\numvar{\bar{x}}=1$. This certificate will explicitly certify: (1) satisfiability of the quantifier-free part $F$, and (2) satisfiability over a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. For values outside $B$, it uses satisfiability propagators with an order that propagates upward from $b_{\max}+1$ and downward from $b_{\min}-1$.  We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
 
-Throughout this section we assume that $\phi$ is a formula of the form $F \land \forall x.\; Q$, as defined in ~\cref{sec:problem-statement}. Let $f_1, \dots, f_r$ be the uninterpreted function symbols appearing in $Q$. For each $f_i$, let $T_i = \args(Q, f_i) = \{t^{f_i}_1, \dots, t^{f_i}_{l_i}\}$ be its argument terms in $Q$.\todoSR{I am not sure about the argument terms where the coefficient of $x$ is zero.}
+Throughout this section we assume that $\phi$ is a formula of the form $F \land \forall x.\; Q$, as defined in ~\cref{sec:problem-statement}. Let $\mathcal{F}$ be the set of uninterpreted function symbols in $Q$, and $\mathcal{T}$ the set of terms of the form $f(t)$ in $Q$. \todoSR{I am not sure about the elements where the coefficient of $x$ in $t$ is zero.}
 
-We will now formalize the condition ensuring propagation outward from a base interval $B$ is possible. For upward propagation, we select for each function~$f_i$ a subset $S_i \subseteq T_i$ of its argument terms that are \emph{maximal} (all equal and strictly greater than other terms of $f_i$). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences $f_i(t)$ with $t\in S_i$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
+We will now formalize the condition ensuring propagation outward from a base interval $B$ is possible. For upward propagation, we select a $\mathcal{S} \subseteq\mathcal{T}$ whose argument terms are \emph{maximal} (all equal and strictly greater than other argument terms of the same function symbol). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences in $\mathcal{S}$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
 
 \begin{definition}[Multi-\req Condition]
 \label{def:multi-reqpivot-param}
 
-For any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$ with $S_i \subseteq T_i$, define:
+For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
 \begin{itemize}
     \item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}\todoSR{I think this could be weakened if the coefficient of $x$ is $2$ or more, but this would lead too far for our submission.}
     \[
-        \subst{\left[ \bigwedge_{i=1}^{r} \left(\bigwedge_{t,t' \in S_i} t = t' \;\land\;
-        \bigwedge_{t \in S_i, t' \in T_i \setminus S_i} t > t'
+        \subst{\left[ \bigwedge_{f\in\mathcal{F}}\left(\bigwedge_{f(t),f(t') \in \mathcal{S}} t = t' \;\land\;
+        \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}, f(t')\not\in \mathcal{S}} t > t'
         \right)\right]}{x}{0}.
     \]
     \item \textbf{Upward propagability condition $\Phi_{\text{prop-up}}(\mathcal{S})$:}
-        \[\forall x \forall \bar{u}_1 \dots \forall \bar{u}_r \exists v_1\dots \exists v_r.\ Q'(\mathcal{S})\]
-        where $Q'(\mathcal{S})$ is obtained from $Q$ by simultaneously replacing:
+        \[\forall x \forall \bar{u} \exists \bar{v}.\ Q'(\mathcal{S})\]
+        where $\bar{u}$ represents the elements of $\mathcal{T}\setminus\mathcal{S}$ and $Q'$ is obtained from $Q$ by simultaneously replacing
         \begin{itemize}
-            \item every $f_i(t)$ with $t \in S_i$ by $v_i$,
-            \item every $f_i(t)$ with $t \in T_i \setminus S_i$ by $u_i^t$.
+            \item every element of $\mathcal{T}\setminus\mathcal{S}$ by $u$, and          
+            \item every element of $\mathcal{S}$ by $v$.
         \end{itemize}
-        The variables $\bar{u}_i = \{u_i^t \mid t \in T_i \setminus S_i\}$ represent the non‑propagated cells.
 \end{itemize}
 
 Symmetrically, for downward propagation with subsets $\mathcal{S}' = (S'_1,\dots,S'_r)$, define $\Phi_{\text{min}}(\mathcal{S}')$ (with $<$ instead of $>$) and $\Phi_{\text{prop-down}}(\mathcal{S}')$.
@@ -569,14 +570,14 @@ Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``
 
 \begin{definition}[Interval Extension Formulas]
 \label{def:interval-extension-formulas-param}
-For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$, define: \todoSR{potential improvement (to be left for later): conjunction over only one element of $S_i$ (the maximality condition forces them to be equal)}
+For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} \subseteq \mathcal{T}$, $\mathcal{S}'\subseteq \mathcal{T}$, define: \todoSR{potential improvement (to be left for later): conjunction over only one element of $S_i$ (the maximality condition forces them to be equal)}
 
 \begin{enumerate}
     \item \textbf{Upward extension formula $\Psi_{\text{up}}(B,\mathcal{S})$}:
     \[
     \Phi_{\text{max}}(\mathcal{S})\;\land\; 
     \Phi_{\text{prop-up}}(\mathcal{S}) \;\land
-    \bigwedge_{i=1}^{r} \bigwedge_{\substack{a \in \args(F,f_i) \\ t \in S_i}} a \leq \subst{t}{x}{b_{\max}}
+    \bigwedge_{f\in\mathcal{F}} \bigwedge_{\substack{a \in \args(F,f) \\ f(t) \in \mathcal{S}}} a \leq \subst{t}{x}{b_{\max}}
     \]
     where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:multi-reqpivot-param}. 
     
@@ -590,15 +591,14 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S} = (S_1,\dots
 \end{enumerate}
 \end{definition}
 
-Thus, for any choice of subsets $\mathcal{S} = (S_1,\dots,S_r)$, $\Psi_{\text{up}}(B,\mathcal{S})$ (respectively, $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of multi‑\req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{b_{\max}}$ ensures that for every ground argument $a$ of $f_i$ appearing in $F$, the propagated cell $f_i(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $t \in S_i$ is different from the ground cell $f_i(a)$; similarly for downward propagation.
+Thus, for any choice of subsets $\mathcal{S}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (respectively, $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of multi‑\req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{b_{\max}}$ ensures that for every $f(t)\in\mathcal{S}$, and ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ is different from the ground cell $f_i(a)$; similarly for downward propagation.
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
-Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and let $\mathcal{S} = (S_1,\dots,S_r)$, $\mathcal{S}' = (S'_1,\dots,S'_r)$ be subsets of $T_i$ terms. If 
-\[
+Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and let $\mathcal{S}$, $\mathcal{S}'$ be subsets of $\mathcal{T}$. If \[
 \Bigl(F \land \bigwedge_{x \in B} Q[x]\Bigr) \;\land\; \Psi_{\text{up}}(B,\mathcal{S}) \;\land\; \Psi_{\text{down}}(B,\mathcal{S}')
 \]
-is satisfiable, then $\phi$ has a cell propagation certificate, and hence is satisfiable.
+is satisfiable, then $\phi$ has a cell propagation certificate, and hence is satisfiable.\todoSR{a concrete checkable certificate would hence be $I, B, \mathcal{S}, \mathcal{S}'$}
 \end{theorem}
 
 \begin{proof}
@@ -615,16 +615,16 @@ Suppose the conjunction is satisfiable, and let $I$ be an interpretation satisfy
     X_z = 
     \begin{cases}
     \emptyset & \text{if } z \in B, \\[4pt]
-    \bigl\{ f_i(I(\subst{t}{x}{z})) \mid i=1,\dots,r,\; t \in S_i \bigr\} & \text{if } z > b_{\max}, \\[4pt]
-    \bigl\{ f_i(I(\subst{t}{x}{z})) \mid i=1,\dots,r,\; t \in S_i' \bigr\} & \text{if } z < b_{\min}.
+    \bigl\{ f(I(\subst{t}{x}{z})) \mid f(t)\in\mathcal{S} \bigr\} & \text{if } z > b_{\max}, \\[4pt]
+    \bigl\{ f(I(\subst{t}{x}{z})) \mid f(t)\in\mathcal{S}' \bigr\} & \text{if } z < b_{\min}.
     \end{cases}
     \]
-    Note that the maximality and minimality conditions ensure that for $z\not\in B$, $i\in 1,\dots,r$, $|\{ n \mid f_i(n)\in X_z\}|\leq 1$.
+    Note that the maximality and minimality conditions ensure that for $z\not\in B$, $f\in\mathcal{F}$, $|\{ n \mid f(n)\in X_z\}|\leq 1$.
 
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
         \item For $z \in B$: $I$ itself satisfies $Q[z]$.
-        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$, values $v_1,\dots,v_r$ such that assigning $v_i$ to each cell of function $f_i$ in $X_z$ satisfies $Q[z]$.
+        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$, values $\bar{v}$ such that assigning these values to each corresponding cell in $X_z$ satisfies $Q[z]$.
         \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop-down}}(\mathcal{S}')$ to assign values to propagated cells.
     \end{itemize}
 \end{enumerate}
@@ -667,7 +667,7 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \qedhere\end{proof}
 
-\cref{thm:interval-certificate-param} immediately yields an algorithm that searches for an interval $B$ satisfying the three conditions. This can be seen in \cref{alg:interval-check-param-withBigvee}. It handles the case where all arguments have the form $x + \tau$ with $\tau$ ground. The general theory supports arguments with arbitrary positive coefficients.
+The formula in the premise of \cref{thm:interval-certificate-param} belongs to Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Moreover, the theorem immediately yields an algorithm that searches for the parameters $B$, $\mathcal{S}$ and $\mathcal{S}$ of this theorem. This can be seen in \cref{alg:interval-check-param-withBigvee}.
 
 \begin{algorithm}
 \caption{Interval‑Based Satisfiability Check}
@@ -679,8 +679,8 @@ Thus all certificate requirements are satisfied. By Property \ref{prop:certThenS
 % \State $I \gets \smt\!\left(F \land Q[0]\right)$
 %\While{$I \neq \bot$}
 \While{$F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is satisfiable}
-    \State $\text{max}_\text{up}\gets\bigvee_{S_1\subseteq T_1,\dots,S_r\subseteq T_r}\Psi_{\text{up}}([b_{\min},b_{\max}],(S_1,\dots,S_r))$
-    \State $\text{min}_\text{down}\gets\bigvee_{S_1'\subseteq T_1,\dots,S_r'\subseteq T_r}\Psi_{\text{down}}([b_{\min},b_{\max}],(S_1',\dots,S_r'))$ 
+    \State $\text{max}_\text{up}\gets\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S}))$
+    \State $\text{min}_\text{down}\gets\bigvee_{{\mathcal{S}'\subseteq \mathcal{T}}}\Psi_{\text{down}}([b_{\min},b_{\max}],,\mathcal{S}))$ 
     \If{$\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right) \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}$ is satisfiable}
         \State \Return \textsc{Sat} 
     \EndIf
@@ -710,9 +710,9 @@ If \cref{alg:interval-check-param-withBigvee} terminates, then it returns a corr
     where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are the disjunctions defined in lines 3--4 of the algorithm.
 \end{itemize}
 
-Since $I \models \text{max}_{\text{up}}$, there exists some $\mathcal{S} = (S_1,\dots,S_r)$ such that 
+Since $I \models \text{max}_{\text{up}}$, there exists some $\mathcal{S}$ such that 
 $I \models \Psi_{\text{up}}(B,\mathcal{S})$. Similarly, $I \models \text{min}_{\text{down}}$ implies there exists 
-$\mathcal{S}' = (S'_1,\dots,S'_r)$ such that $I \models \Psi_{\text{down}}(B,\mathcal{S}')$. Thus $I$ satisfies:
+$\mathcal{S}'$ such that $I \models \Psi_{\text{down}}(B,\mathcal{S}')$. Thus $I$ satisfies:
 \[
 F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Psi_{\text{down}}(B,\mathcal{S}').
 \]
@@ -740,24 +740,24 @@ then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{S
 Assume $\phi$ is satisfiable and satisfies multi‑\req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
 Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$.
 
-For each $i$, define:
+For each $f\in\mathcal{F}$, define:
 \[
-v_{\max}^i = \max\{\, I^*(t) \mid t \in T_i \,\}, \qquad
-v_{\min}^i = \min\{\, I^*(t) \mid t \in T_i \,\}.
+v_{\max}^f = \max\{\, I^*(t) \mid f(t) \in \mathcal{T}\,\}, \qquad
+v_{\min}^f = \min\{\, I^*(t) \mid f(t) \in \mathcal{T} \,\}.
 \]
 
 The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathcal{S}'^*)$ ensure that:
 \begin{itemize}
-    \item For all $t \in S_i^*$: $I^*(t) = v_{\max}^i$,
-    \item For all $t \in S_i'^*$: $I^*(t) = v_{\min}^i$.
+    \item For all $f(t) \in S^*$: $I^*(t) = v_{\max}^f$,
+    \item For all $f(t) \in S'^*$: $I^*(t) = v_{\min}^f$.
 \end{itemize}
 
 Now choose
 \[
-b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\},
+b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}
 \]
 \[
-b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f_i),\; i=1,\dots,r \,\}.
+b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}.
 \]
 
 Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
@@ -770,9 +770,9 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     \begin{itemize}
         \item $\Phi_{\text{max}}(\mathcal{S}^*)$ holds by definition,
         \item $\Phi_{\text{prop-up}}(\mathcal{S}^*)$ holds by the multi-\req condition,
-        \item For each $i$ and $t_g \in \args(F,f_i)$ with $t \in S_i^*$:
+        \item For each $f\in\mathcal{F}$ and $t_g \in \args(F,f)$ with $f(t) \in \mathcal{S}$:
         \[
-        I^*(t_g) \leq b_{\max} + v_{\max}^i = b_{\max} + I^*(t)
+        I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
         \]
         by construction of $b_{\max}$.
     \end{itemize}
@@ -829,12 +829,12 @@ This formula is unsatisfiable in standard integer arithmetic (applying induction
 
 \section{Handling Disjunction Using Auxiliary Propositional Variables}
 
-The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S} = (S_1,\dots,S_r)$ and $\mathcal{S}' = (S'_1,\dots,S'_r)$. While theoretically elegant, these disjunctions lead to formulas with exponential size, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
+The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S}$ and $\mathcal{S}'$. While theoretically elegant, these disjunctions lead to formulas with exponential size, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
 
-\paragraph{Encoding Idea.} Instead of enumerating all subset choices, we introduce auxiliary Boolean variables that represent membership in the subsets $S_i$ and $S'_i$. For each argument term $t_j^{f_i} \in T_i$, we create:
+\paragraph{Encoding Idea.} Instead of enumerating all subset choices we introduce auxiliary Boolean variables that represent membership of terms in $\mathcal{T}$ in these sets. For each term $f(t)\in\mathcal{T}$, we create:
 \begin{itemize}
-    \item $s_{i,j}$: true iff $t_j^{f_i} \in S_i$ (for upward propagation)
-    \item $s'_{i,j}$: true iff $t_j^{f_i} \in S'_i$ (for downward propagation)
+    \item $s_{f,t}$: true iff $f(t)\in \mathcal{S}$ (for upward propagation)
+    \item $s'_{f,t}$: true iff $f(t)\in \mathcal{S}'_i$ (for downward propagation)
 \end{itemize}
 
 We then encode the conditions $\Phi_{\text{max}}$, $\Phi_{\text{min}}$, $\Psi_\text{up}$, $\Psi_\text{down}$, and the clash conditions using these variables.
@@ -850,9 +850,9 @@ where:
 \begin{itemize}
     \item Maximality encoding $\Phi_\text{max}^\text{e}$:\todoSN{Another form is in the comment lines.}
     \begin{align*}
-        \subst{\left[\bigwedge_{i=1}^r \left(
-        \bigwedge_{j<k} \big(s_{i,j} \land s_{i,k} \Rightarrow t_j^{f_i} = t_k^{f_i}\big) \ \land\
-        \bigwedge_{j,k} \big(s_{i,j} \land \neg s_{i,k} \Rightarrow t_j^{f_i} > t_k^{f_i}\big)\right)\right]}{x}{0}
+        \subst{\left[\bigwedge_{f\in\mathcal{F}} 
+        \bigwedge_{f(t)\in \mathcal{T},f(t')\in\mathcal{T}} \big(s_{f,t} \land s_{f,t'} \Rightarrow t = t'\big) \ \land\
+         \big(s_{f,t} \land \neg s_{f,t'} \Rightarrow t > t')\right]}{x}{0}
     \end{align*}
 
 % ANOTHER FORM
