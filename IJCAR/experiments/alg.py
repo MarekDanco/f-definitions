@@ -10,6 +10,7 @@ import operator
 
 from z3 import *
 
+from benchmarks import *
 from smt2_loader import load_smt2
 
 
