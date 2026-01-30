@@ -1,0 +1,42 @@
+supports_colors() {
+    case "$TERM" in
+        dumb|"") return 1 ;;
+        *) return 0 ;;
+    esac
+}
+
+# Usage
+if supports_colors; then
+   GREEN="\033[0;32m"
+   RED="\033[0;31m"
+   NC="\033[0m"  # No Color
+else
+   GREEN=""
+   RED=""
+   NC=""
+fi
+
+setup_venv() {
+    if [[ -d "venv" ]]; then
+        echo "Found existing venv. Activating..."
+    else
+        echo "No venv found. Creating a new one..."
+        python3 -m venv venv || return 1
+        # Ensure pip is up to date and install dependency
+        venv/bin/pip install --upgrade pip
+        venv/bin/pip install z3-solver
+    fi
+
+    # Activate the virtual environment
+    source venv/bin/activate || return 1
+
+}
+
+
+
+setup_venv
+S=alg.py
+for f in smt2_benchmarks/*.smt2;do 
+  cat $f 
+  python3 ./alg.py $f 
+done
