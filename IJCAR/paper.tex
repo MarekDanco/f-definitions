@@ -57,7 +57,7 @@
 \newcommand{\todoSN}[1]{\todo[color=orange!50]{#1 -SN}}
 
 \title{Proving Satisfiability of\\Universally Quantified Integer Constraints with\\ Uninterpreted Function Symbols%
-   \todoSN{We will change this title. For the affiliation, I'm not sure what to put for Mikoláš and Marek.} \todoSN{Title options: ``Inductive Cell Propagation for Quantified UFLIA" or ``Deciding UFLIA with Offset Constraints through Inductive Propagation" or ``Cell Propagation Certificates: A Decision Procedure for Offset-Restricted UFLIA"}
+   \todoSN{We will change this title. For the affiliation, I'm not sure what to put for Mikoláš and Marek.} \todoSN{Title options seen in comments by mj.}
     }
 
 % === TITLE SUGGESTIONS ===
@@ -454,7 +454,7 @@ The goal is now an algorithm that computes such satisfiability certificates and 
 % \[ F\wedge \forall x\;.\; Q(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\dots,f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})),\]
 % where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, and the  $t^{f_i}_{1},\dots,t^{f_i}_{l_i}$ are pairwise different LIA ground terms
 
-In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. \todoSN{Add this?}While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables ($\numvar{\bar{x}} \geq 1$), the algorithm presented here focuses on the case $\numvar{\bar{x}}=1$. This certificate will explicitly certify: (1) satisfiability of the quantifier-free part $F$, and (2) satisfiability over a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. For values outside $B$, it uses satisfiability propagators with an order that propagates upward from $b_{\max}+1$ and downward from $b_{\min}-1$.  We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
+In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. \todoSN{Might need to change ``While..."}While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables ($\numvar{\bar{x}} \geq 1$), the algorithm presented here focuses on the case $\numvar{\bar{x}}=1$. This certificate will explicitly certify: (1) satisfiability of the quantifier-free part $F$, and (2) satisfiability over a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. For values outside $B$, it uses satisfiability propagators with an order that propagates upward from $b_{\max}+1$ and downward from $b_{\min}-1$.  We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
 
 Throughout this section we assume that $\phi$ is a formula of the form $F \land \forall x.\; Q$, as defined in ~\cref{sec:problem-statement}. Let $\mathcal{F}$ be the set of uninterpreted function symbols in $Q$, and $\mathcal{T}$ the set of terms of the form $f(t)$ in $Q$. 
 
@@ -467,9 +467,9 @@ For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
 \begin{itemize}
     \item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}\todoSR{I think this could be weakened if the coefficient of $x$ is $2$ or more, but this would lead too far for our submission.}
     \[
-        \subst{\left[ \bigwedge_{f\in\mathcal{F}}\left(\bigwedge_{f(t),f(t') \in \mathcal{S}} t = t' \;\land\;
+        \subst{ \bigwedge_{f\in\mathcal{F}}\left(\bigwedge_{f(t),f(t') \in \mathcal{S}} t = t' \;\land\;
         \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}, f(t')\not\in \mathcal{S}} t > t'
-        \right)\right]}{x}{0}.
+        \right)}{x}{0}.
     \]
     \item \textbf{Upward propagability condition $\Phi_{\text{prop-up}}(\mathcal{S})$:}
         \[\forall x \forall \bar{u} \exists \bar{v}.\ Q'(\mathcal{S})\]
