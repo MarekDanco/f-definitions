@@ -464,7 +464,7 @@ We will now formalize the condition ensuring propagation outward from a base int
 \begin{definition}[Multi-\req Condition]
 \label{def:multi-reqpivot-param}
 
-For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
+For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$,\todoSR{I think we could weaken the ``same coefficient condition'' by requiring it only for the $f$ occurring in $\mathcal{S}$. In a similar way, we could allow several quantified variables, and restrict the coefficients of quantified variables in $\mathcal{S}$.} define:
 \begin{itemize}
     \item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}\todoSR{I think this could be weakened if the coefficient of $x$ is $2$ or more, but this would lead too far for our submission.}
     \[
