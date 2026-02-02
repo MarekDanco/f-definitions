@@ -29,14 +29,30 @@ setup_venv() {
 
     # Activate the virtual environment
     source venv/bin/activate || return 1
-
 }
+
+run() {
+    local program="$1"
+    local arg="$2"
+    local file="$3"
+    # local expected="$4"
+
+    echo -n $file ': '
+
+    # Run the program on the file and check stdout for expected
+    if "$program" $arg "$file" 2>/dev/null >/dev/null; then
+        echo -e "${GREEN}success${NC}"
+    else
+        echo -e "${RED}failure${NC}"
+    fi
+}
+
 
 
 
 setup_venv
 S=alg.py
-for f in smt2_benchmarks/*.smt2;do 
-  cat $f 
-  python3 ./alg.py $f 
+for f in smt2_benchmarks/*.smt2; do 
+  # cat $f
+  run ./alg.py "" $f
 done

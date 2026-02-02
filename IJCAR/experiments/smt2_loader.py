@@ -7,11 +7,19 @@ The SMT2 file should contain:
 - A forall assertion where functions are applied to (x + c) expressions
 """
 
+from typing import cast
+
 from z3 import (
     And,
+    ArithRef,
+    BoolRef,
     BoolVal,
+    ExprRef,
     Int,
+    IntNumRef,
+    IntSort,
     IntVal,
+    QuantifierRef,
     Z3_OP_ADD,
     Z3_OP_SUB,
     Z3_OP_UNINTERPRETED,
@@ -24,25 +32,66 @@ from z3 import (
 )
 
 
-def simplify_to_python(expr):
+class SMT2LoadError(Exception):
+    """Exception raised when SMT2 file doesn't match expected format."""
+
+    pass
+
+
+def simplify_to_python(expr: ExprRef) -> int | ExprRef:
     """Convert Z3 expression to Python int if it's a numeric constant."""
     expr = simplify(expr)
     if is_int_value(expr):
+        assert isinstance(expr, IntNumRef)
         return expr.as_long()
     return expr
 
 
 def extract_functions(expr, funcs=None):
-    """Extract all uninterpreted function symbols from an expression."""
+    """Extract all uninterpreted function symbols from an expression.
+
+    Validates that functions are Int -> Int.
+    Raises SMT2LoadError if a function has wrong signature.
+    """
     if funcs is None:
         funcs = {}
     if is_app(expr):
         decl = expr.decl()
         if decl.kind() == Z3_OP_UNINTERPRETED and decl.arity() == 1:
+            # Validate Int -> Int signature
+            if decl.domain(0) != IntSort():
+                raise SMT2LoadError(
+                    f"Function {decl.name()} must have Int domain, "
+                    f"found {decl.domain(0)}"
+                )
+            if decl.range() != IntSort():
+                raise SMT2LoadError(
+                    f"Function {decl.name()} must have Int range, "
+                    f"found {decl.range()}"
+                )
             funcs[decl.name()] = decl
         for child in expr.children():
             extract_functions(child, funcs)
     return funcs
+
+
+def validate_func_applications(expr, var, func_decls):
+    """
+    Validate that all function applications have the form f(var + offset).
+    Raises SMT2LoadError if an invalid application is found.
+    """
+    if is_app(expr):
+        decl = expr.decl()
+        if decl.kind() == Z3_OP_UNINTERPRETED and decl.arity() == 1:
+            arg = expr.arg(0)
+            offset = extract_offset(arg, var)
+            if offset is None:
+                raise SMT2LoadError(
+                    f"Function application {decl.name()}({arg}) is not of the "
+                    f"form {decl.name()}({var} + c)"
+                )
+        for child in expr.children():
+            validate_func_applications(child, var, func_decls)
 
 
 def extract_func_applications(expr, var, func_decls, apps=None):
@@ -133,7 +182,14 @@ def extract_ground_func_args(expr, func_decls, args=None):
 
 class SMT2Benchmark:
     """Benchmark class loaded from an SMT2 file."""
-    pass
+
+    x: ArithRef
+    offsets: list[list[int | ExprRef]]
+    occ: list[list[ArithRef]]
+    argF: list[list[int | ExprRef]]
+    F: BoolRef
+    Q: ExprRef
+    Qp: ExprRef
 
 
 def load_smt2(filename):
@@ -153,19 +209,37 @@ def load_smt2(filename):
     quant_asserts = []
 
     for a in assertions:
-        if is_quantifier(a) and a.is_forall():
-            quant_asserts.append(a)
+        if is_quantifier(a):
+            assert isinstance(a, QuantifierRef)
+            if a.is_forall():
+                quant_asserts.append(a)
+            else:
+                raise SMT2LoadError(
+                    f"Existential quantifiers are not supported: {a}"
+                )
         else:
             ground_asserts.append(a)
 
-    if len(quant_asserts) != 1:
-        raise ValueError(f"Expected exactly one forall assertion, found {len(quant_asserts)}")
+    if len(quant_asserts) == 0:
+        raise SMT2LoadError("Expected exactly one forall assertion, found none")
+    if len(quant_asserts) > 1:
+        raise SMT2LoadError(
+            f"Expected exactly one forall assertion, found {len(quant_asserts)}"
+        )
 
     quant = quant_asserts[0]
 
     # Extract the quantified variable
     if quant.num_vars() != 1:
-        raise ValueError(f"Expected exactly one quantified variable, found {quant.num_vars()}")
+        raise SMT2LoadError(
+            f"Expected exactly one quantified variable, found {quant.num_vars()}"
+        )
+
+    # Check that quantified variable is of Int sort
+    if quant.var_sort(0) != IntSort():
+        raise SMT2LoadError(
+            f"Quantified variable must be of Int sort, found {quant.var_sort(0)}"
+        )
 
     var_name = quant.var_name(0)
     x = Int(var_name)
@@ -182,13 +256,20 @@ def load_smt2(filename):
     for ga in ground_asserts:
         extract_functions(ga, func_decls)
 
+    if not func_decls:
+        raise SMT2LoadError("No unary Int -> Int functions found in the formula")
+
+    # Validate all function applications in Q have form f(x + c)
+    validate_func_applications(Q, x, func_decls)
+
     # Build F from ground assertions
+    F: BoolRef
     if len(ground_asserts) == 0:
         F = BoolVal(True)
     elif len(ground_asserts) == 1:
-        F = ground_asserts[0]
+        F = cast(BoolRef, ground_asserts[0])
     else:
-        F = And(ground_asserts)
+        F = cast(BoolRef, And(ground_asserts))
 
     # Extract function applications and their offsets from Q
     apps = extract_func_applications(Q, x, func_decls)
