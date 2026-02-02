@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 # current restrictions:
 # maximally two occurrences of function symbol in quantified part
 # positive indices only
