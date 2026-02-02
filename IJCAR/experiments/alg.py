@@ -141,7 +141,7 @@ parser.add_argument("benchmark")
 parser.add_argument(
     "-smtlib",
     "--smtlib",
-    help="print benchmark problem in smtlib format",
+    help="print benchmark problem in smtlib format and leave",
     action="store_true",
 )
 parser.add_argument(
@@ -191,7 +191,6 @@ if args.smtlib:
     solver.add(b.F)
     solver.add(ForAll(b.x, Q))
     print(solver.to_smt2())
-
 else:
     p = list(
         map(lambda l: list(map(lambda v: Bool(v.__repr__() + "p"), l)), b.occ)
