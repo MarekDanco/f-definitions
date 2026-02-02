@@ -5,11 +5,10 @@ supports_colors() {
     esac
 }
 
-# Usage
 if supports_colors; then
    GREEN="\033[0;32m"
    RED="\033[0;31m"
-   NC="\033[0m"  # No Color
+   NC="\033[0m"
 else
    GREEN=""
    RED=""
@@ -22,12 +21,9 @@ setup_venv() {
     else
         echo "No venv found. Creating a new one..."
         python3 -m venv venv || return 1
-        # Ensure pip is up to date and install dependency
         venv/bin/pip install --upgrade pip
         venv/bin/pip install z3-solver
     fi
-
-    # Activate the virtual environment
     source venv/bin/activate || return 1
 }
 
@@ -39,7 +35,6 @@ run() {
 
     echo -n $file ': '
 
-    # Run the program on the file and check stdout for expected
     if "$program" $arg "$file" 2>/dev/null >/dev/null; then
         echo -e "${GREEN}success${NC}"
     else
@@ -47,12 +42,8 @@ run() {
     fi
 }
 
-
-
-
 setup_venv
-S=alg.py
-for f in smt2_benchmarks/*.smt2; do 
+for f in smt2_benchmarks/*.smt2; do
   # cat $f
   run ./alg.py "" $f
 done
