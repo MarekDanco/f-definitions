@@ -239,11 +239,11 @@ else:
             break
 
         bmax = bmax + 1
-        print("Interval: ", [0, bmax])
         solver.reset()
         solver.add(b.F)
         solver.add(list(map(lambda x: substitute(Q, x), subs)))
         print(res)
+        print("Interval: ", [0, bmax])
         # TODO: print information on which cells have fixed values due to this
 
         # solver.add(F)
