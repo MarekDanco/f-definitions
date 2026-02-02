@@ -1,3 +1,11 @@
+VERBOSE=false
+while getopts "v" opt; do
+  case $opt in
+    v) VERBOSE=true ;;
+    *) echo "Usage: $0 [-v]"; exit 1 ;;
+  esac
+done
+
 supports_colors() {
     case "$TERM" in
         dumb|"") return 1 ;;
@@ -31,11 +39,10 @@ run() {
     local program="$1"
     local arg="$2"
     local file="$3"
-    # local expected="$4"
 
-    echo -n $file ': '
+    echo -n "$file: "
 
-    if "$program" $arg "$file" 2>/dev/null >/dev/null; then
+    if "$program" $arg "$file" >/dev/null 2>/dev/null; then
         echo -e "${GREEN}success${NC}"
     else
         echo -e "${RED}failure${NC}"
@@ -43,7 +50,13 @@ run() {
 }
 
 setup_venv
+
 for f in smt2_benchmarks/*.smt2; do
-  # cat $f
-  run ./alg.py "" $f
+  if [ "$VERBOSE" = true ]; then
+      echo "$f"
+      ./alg.py "$f"
+      echo
+  else
+      run ./alg.py "" "$f"
+  fi
 done

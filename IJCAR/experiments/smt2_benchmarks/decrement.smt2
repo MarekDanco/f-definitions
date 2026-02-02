@@ -5,3 +5,4 @@
 (assert (= (f 0) 10))
 (assert (forall ((x Int)) (= (f (+ x 1)) (- (f (+ x 0)) 1))))
 (check-sat)
+(get-model)

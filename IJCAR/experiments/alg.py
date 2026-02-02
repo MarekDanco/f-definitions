@@ -17,6 +17,15 @@ from benchmarks import Incr, IncrConst, IncrConstArg, Incr2Functions, Test
 from smt2_loader import load_smt2
 
 
+def get_func_interp(f, model, bmax, consts):
+    args = set(range(bmax + 1)) | set(consts)
+    return {arg: model.eval(f(arg)) for arg in args}
+
+def print_func_interp(interp):
+    for arg, val in interp.items():
+        print(f"    {arg} -> {val}")
+
+
 def flatten(ls):  # flatten a list of lists
     # return functools.reduce(operator.concat, l)
     return [item for subls in ls for item in subls]
@@ -174,10 +183,10 @@ else:
 print("input:")
 print(b.F)
 print(b.Q)
-print(b.Qp)
-print(b.x)
-print(b.occ)
-print(b.offsets)
+# print(b.Qp)
+# print(b.x)
+# print(b.occ)
+# print(b.offsets)
 print("===")
 num_f = len(b.offsets)
 assert len(b.occ) == num_f
@@ -198,7 +207,6 @@ else:
     # print(p)
 
     bmax = 0
-    res = "UNSAT"
     solver.add(b.F)
     solver.add(substitute(Q, (b.x, IntVal(0))))
     while solver.check() != unsat:
@@ -214,19 +222,29 @@ else:
         # print(list(map(lambda x : substitute(Q, x), subs)))
         solver.add(b.F)
         solver.add(list(map(lambda x: substitute(Q, x), subs)))
-        if solver.check() == sat:
-            res = "SAT"
+        res = solver.check()
+        if res == sat:
             # print(solver)
             print(solver.model())
+            print("model:")
+            model = solver.model()
+            funcs = [f for f in model.decls() if f.arity() > 0]
+            consts = [model.eval(c()) for c in model.decls() if c.arity() == 0 if c.range() == IntSort()]
+            for f in funcs:
+                print(f)
+                # print(model.get_interp(f))
+                print_func_interp(get_func_interp(f, model, bmax, consts))
+            print("otherwise defined recursively as:")
+            print(f"    {b.Q}")
             break
 
         bmax = bmax + 1
+        print("Interval: ", [0, bmax])
         solver.reset()
         solver.add(b.F)
         solver.add(list(map(lambda x: substitute(Q, x), subs)))
         print(res)
-        print(
-            "Interval: ", [0, bmax]
-        )  # TODO: print information on which cells have fixed values due to this
+        # TODO: print information on which cells have fixed values due to this
+
         # solver.add(F)
         # print(solver.to_smt2())
