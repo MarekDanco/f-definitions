@@ -7,21 +7,22 @@
 
 
 import argparse
-import functools
+# import functools
+# import operator
 import itertools
-import operator
 
 from z3 import *
 
-from benchmarks import *
+from benchmarks import Incr, IncrConst, IncrConstArg, Incr2Functions, Test
 from smt2_loader import load_smt2
 
 
-def flatten(l):  # flatten a list of lists
-    return functools.reduce(operator.concat, l)
+def flatten(ls):  # flatten a list of lists
+    # return functools.reduce(operator.concat, l)
+    return [item for subls in ls for item in subls]
 
 
-def maximality_i(i):
+def maximality_i(i, b):
     if len(b.offsets[i]) == 2:
         return [
             Or(
@@ -36,8 +37,8 @@ def maximality_i(i):
         raise Exception(f"larger offset not yet implemented {b.offsets[i]}")
 
 
-def maximality():
-    return flatten([maximality_i(i) for i in range(0, num_f)])
+def maximality(b):
+    return flatten([maximality_i(i, b) for i in range(0, num_f)])
 
 
 def get_bitvectors(k):
@@ -45,7 +46,7 @@ def get_bitvectors(k):
     return list(itertools.product([False, True], repeat=k))
 
 
-def reqpivot_case(bl):
+def reqpivot_case(bl, b):
     pl = flatten(p)
     occl = flatten(b.occ)
     assert len(bl) == len(pl) and len(pl) == len(occl)
@@ -58,11 +59,11 @@ def reqpivot_case(bl):
         return Or(boolguard + [ForAll(univ_vars, Exists(exist_vars, b.Qp))])
 
 
-def reqpivot():
-    return list(map(lambda t: reqpivot_case(list(t)), get_bitvectors(len(flatten(p)))))
+def reqpivot(b):
+    return list(map(lambda t: reqpivot_case(t, b), get_bitvectors(len(flatten(p)))))
 
 
-def reqpivot_2():  # old implementation of special case
+def reqpivot_2(b):  # old implementation of special case
     assert len(p) == 1 and len(p[0]) == 2
     return [
         (
@@ -96,7 +97,7 @@ def reqpivot_2():  # old implementation of special case
     ]
 
 
-def clash():
+def clash(b):
     return [
         Or(Not(p[i][j]), b.argF[0][arg] <= bmax + b.offsets[i][j])
         for i in range(0, num_f)
@@ -105,7 +106,7 @@ def clash():
     ]
 
 
-def clash_2(i):  # old implementation of special case
+def clash_2(i, b):  # old implementation of special case
     assert len(b.offsets[i]) == 2
     return [
         (
@@ -139,7 +140,7 @@ def clash_2(i):  # old implementation of special case
 parser = argparse.ArgumentParser()
 parser.add_argument("benchmark")
 parser.add_argument(
-    "-smtlib",
+    "-smt",
     "--smtlib",
     help="print benchmark problem in smtlib format and leave",
     action="store_true",
@@ -192,9 +193,8 @@ if args.smtlib:
     solver.add(ForAll(b.x, Q))
     print(solver.to_smt2())
 else:
-    p = list(
-        map(lambda l: list(map(lambda v: Bool(v.__repr__() + "p"), l)), b.occ)
-    )  # is a pivot
+    # p = list(map(lambda l: list(map(lambda v: Bool(f"{v}p"), l)), b.occ))
+    p = [[Bool(f"{offset}p") for offset in func] for func in b.occ]  # is a pivot
     # print(p)
 
     bmax = 0
@@ -203,20 +203,20 @@ else:
     solver.add(substitute(Q, (b.x, IntVal(0))))
     while solver.check() != unsat:
         solver.reset()
-        solver.add(*maximality())
-        solver.add(*reqpivot())
-        #    print(clash())
-        solver.add(*clash())
+        solver.add(*maximality(b))
+        solver.add(*reqpivot(b))
+        # print(clash())
+        solver.add(*clash(b))
         subs = [
             (b.x, IntVal(i)) for i in range(0, bmax + 1)
         ]  # list of wanted substitutions
-        #    print(subs)
-        #    print(list(map(lambda x : substitute(Q, x), subs)))
+        # print(subs)
+        # print(list(map(lambda x : substitute(Q, x), subs)))
         solver.add(b.F)
         solver.add(list(map(lambda x: substitute(Q, x), subs)))
         if solver.check() == sat:
             res = "SAT"
-            #       print(solver)
+            # print(solver)
             print(solver.model())
             break
 
