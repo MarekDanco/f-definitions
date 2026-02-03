@@ -497,7 +497,7 @@ For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
     \item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}\todoSR{I think this could be weakened if the coefficient of $x$ is $2$ or more, but this would lead too far for our submission.}
     \[
         \subst{ \bigwedge_{f\in\mathcal{F}}\left(\bigwedge_{f(t),f(t') \in \mathcal{S}} t = t' \;\land\;
-        \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}, f(t')\not\in \mathcal{S}} t > t'
+        \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}\setminus\mathcal{S}} t > t'
         \right)}{x}{0}.
     \]
     \item \textbf{Upward propagability condition $\Phi_{\text{prop-up}}(\mathcal{S})$:}
