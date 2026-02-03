@@ -110,7 +110,7 @@ Czech Institute of Informatics, Robotics and Cybernetics, Czech Technical Univer
 \maketitle
 
 \begin{abstract}
-  The combination of integer arithmetic, uninterpreted function symbols, and universal quantification occurs in many applications of automated reasoning, for example, due to its ability to reason about arrays. However, the satisfiability of such formulas is, in general, undecidable. In practice, SMT solvers are often successful in the unsatisfiable case, using heuristics. However, in the satisfiable case, they rely on  explicit model construction, which fails for formulas whose smallest model is not small enough. We introduce an alternative approach that certifies satisfiability using induction arguments, and provide an algorithm that is able to prove satisfiability of formulas that are out of reach of current SMT solvers. 
+The combination of integer arithmetic, uninterpreted function symbols, and universal quantification occurs in many applications of automated reasoning, for example, due to its ability to reason about arrays. However, the satisfiability of such formulas is, in general, undecidable. In practice, SMT solvers are often successful in the unsatisfiable case, using heuristics. However, in the satisfiable case, they rely on  explicit model construction, which fails for formulas whose smallest model is not small enough. We introduce an alternative approach that certifies satisfiability using induction arguments, and provide an algorithm that is able to prove satisfiability of formulas that are out of reach of current SMT solvers. 
 
 %\keywords{First keyword  \and Second keyword \and Another keyword.}
 \end{abstract}
@@ -191,7 +191,10 @@ Our work intersects several areas of automated reasoning: synthesis, decision pr
 
 \paragraph{Synthesis approaches.}
 Syntax-Guided Synthesis (SyGuS)~\cite{cvc5} enumerates candidate functions from a grammar. Hence its performance depends crucially on the chosen grammar. Moreover, it synthesizes functions in an explicit representation, disallowing recursion\todoSR{right?}. Our method does beyond that, using inductive reasoning.
-Kunčak et al.~\cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation synthesis. Hozzová et al.~\cite{hozzova-ijcar24} synthesize recursive programs from constraints.\todoSR{Do we want to keep these references? If yes, we need a better description.}
+Kunčak et al.~\cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation synthesis. Hozzová et al.~\cite{hozzova-ijcar24} synthesize recursive programs from constraints.\todoSR{Do we want to keep these references? If yes, we need a better description. Do we want to add our CADE paper as a template based approach?}
+
+
+
 
 % While powerful for template-matching problems, it fails on formulas requiring non-template solutions like periodic functions (Equation~\ref{eq:periodic}). 
 
@@ -215,6 +218,9 @@ Bradley et al.~\cite{bradley-vmcai06} present a decision procedure for array pro
 
 \paragraph{Model-based and instantiation methods.}
 Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model finding techniques for quantified formulas. Their method requires users to ensure admissibility and may introduce many case splits (``merge lemmas'') to satisfy cardinality constraints. Ge and de Moura~\cite{ge-cav09} introduce the Model-Based Quantifier Instantiation (MBQI) but noting that ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA refers to the logic of Habermehl et al.} will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.'' Our work attempts to  address this open question.
+
+\paragraph{Proof certificates and model representation.} move \cite{elad2024infinite} here? \cite{Ratschan:23} \cite{Barbosa:23}
+
 
 \paragraph{Limitations illustrated.}\todoSN{In the previous version, there is a sentence: ``Here, I am considering the works~\cite{bradley-vmcai06,ge-cav09,habermehl-etaps08}." }
 To see where existing methods fall short, consider:
