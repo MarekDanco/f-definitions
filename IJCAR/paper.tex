@@ -759,26 +759,33 @@ then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{S
 
 \begin{proof}
 Assume $\phi$ is satisfiable and satisfies multi‑\req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
-Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$.
+Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments.
 
-For each $f\in\mathcal{F}$, define:
+For each $f(t)\in\mathcal{F}$, define:
 \[
-v_{\max}^f = \max\{\, I^*(t) \mid f(t) \in \mathcal{T}\,\}, \qquad
-v_{\min}^f = \min\{\, I^*(t) \mid f(t) \in \mathcal{T} \,\}.
+v_{\max}^f = \max\{\, I^*(t_0) \mid f(t) \in \mathcal{T}\,\}, \qquad
+v_{\min}^f = \min\{\, I^*(t_0) \mid f(t) \in \mathcal{T} \,\}.
 \]
-
-The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathcal{S}'^*)$ ensure that:
+where $t_0=\subst{t}{x}{0}$ for each $f(t)\in\mathcal{T}$. The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathcal{S}'^*)$ ensure that:
 \begin{itemize}
-    \item For all $f(t) \in \mathcal{S}^*$: $I^*(t) = v_{\max}^f$,
-    \item For all $f(t) \in \mathcal{S}'^*$: $I^*(t) = v_{\min}^f$.
+    \item For all $f(t) \in \mathcal{S}^*$: $I^*(t_0) = v_{\max}^f$,
+    \item For all $f(t) \in \mathcal{S}'^*$: $I^*(t_0) = v_{\min}^f$.
 \end{itemize}
+
+% Now choose
+% \[
+% b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}
+% \]
+% \[
+% b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}.
+% \]
 
 Now choose
 \[
-b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}
+b_{\max} = \max\left\{\, \left\lceil \frac{I^*(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}
 \]
 \[
-b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}.
+b_{\min} = \min\left\{\, \left\lfloor \frac{I^*(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}.
 \]
 
 Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
@@ -791,11 +798,14 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     \begin{itemize}
         \item $\Phi_{\text{max}}(\mathcal{S}^*)$ holds by definition,
         \item $\Phi_{\text{prop-up}}(\mathcal{S}^*)$ holds by the multi-\req condition,
-        \item For each $f(t)\in\mathcal{S}^*$ and $t_g \in \args(F,f)$ with $f(t) \in \mathcal{S}$:
+        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(t_0)=v_{\max}^f$, we have:
+        % \[
+        % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
+        % \]
         \[
-        I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
+        I^*(a) \leq c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(t_0) = I^*(\subst{t}{x}{b_{\max}})
         \]
-        by construction of $b_{\max}$.
+        by construction of $b_{\max}$, which is exactly the clash condition.
     \end{itemize}
     Thus $I^* \models \Psi_{\text{up}}(B,\mathcal{S}^*)$, and consequently $I^* \models \text{max}_{\text{up}}$.
     
@@ -804,9 +814,12 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     \begin{itemize}
         \item $\Phi_{\text{min}}(\mathcal{S}'^*)$ holds,
         \item $\Phi_{\text{prop-down}}(\mathcal{S}'^*)$ holds,
-        \item For each $f(t)\in\mathcal{S}'^{*}$ and $t_g \in \args(F,f)$:
+        \item For each $f(t)\in\mathcal{S}'^{*}$ and $a \in \args(F,f)$:
+        % \[
+        % I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
+        % \]
         \[
-        I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
+        I^*(a) \geq c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + I^*(t_0) = I^*(\subst{t}{x}{b_{\min}})
         \]
         by construction of $b_{\min}$.
     \end{itemize}
