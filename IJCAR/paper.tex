@@ -883,6 +883,14 @@ where:
         \item $f(t)$ by $v_{f(t)}$ whenever $s_{f(t)}$ is true,
         \item $f(t)$ by $u_{f(t)}$ whenever $s_{f(t)}$ is false.
     \end{itemize}
+      
+    % \item Upward propagation encoding: For the given Boolean variables $\{s_{f(t)}\}$, define $\Phi_{\text{prop-up}}^\text{e}(\{s_{f(t)}\})$ as:
+    % \[
+    %     \forall x \forall \bar{u} \exists \bar{v}.\ 
+    %     \bigwedge_{f(t) \in \mathcal{T}} \Big((s_{f(t)} \Rightarrow (f(t) = v_{f(t)})) \land (\neg s_{f(t)} \Rightarrow (f(t) = u_{f(t)}))\Big) \Rightarrow Q
+    % \]
+    % where $\bar{u} = \{u_{f(t)} \mid f(t) \in \mathcal{T}\}$ and $\bar{v} = \{v_{f(t)} \mid f(t) \in \mathcal{T}\}$.
+
 
     \item Downward propagation encoding: Symmetrically, for downward propagation with variables $\{s'_{f(t)}\}$ representing $\mathcal{S}'$, define $\Phi_{\text{prop-down}}^\text{e}(\{s'_{f(t)}\})$.
     
