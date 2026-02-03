@@ -20,7 +20,7 @@ from sygus import process_formula
 
 
 def get_func_interp(f, model, bmax, consts):
-    args = set(range(bmax + 1)) | set(consts)
+    args = set(range(bmax + 1)) | set(model.eval(c()).as_long() for c in consts)
     return {arg: model.eval(f(arg)) for arg in args}
 
 
@@ -232,24 +232,20 @@ else:
         res = solver.check()
         if res == sat:
             # print(solver)
-            print(solver.model())
+            # print(solver.model())
             print("model:")
             model = solver.model()
             funcs = [f for f in model.decls() if f.arity() > 0]
             consts = [
-                c
-                for c in model.decls()
-                if c.arity() == 0
-                if c.range() == IntSort()
+                c for c in model.decls() if c.arity() == 0 if c.range() == IntSort()
             ]
-            consts_vals = [model.eval(c()) for c in consts]
-            for i, c in enumerate(consts):
-                print(f"{c} -> {consts_vals[i]}")
+            for c in consts:
+                print(f"{c} -> {model.eval(c())}")
             for f in funcs:
                 print(f)
                 # print(model.get_interp(f))
-                print_func_interp(get_func_interp(f, model, bmax, consts_vals))
-            cvc5_sygus = process_formula(b.Qp)
+                print_func_interp(get_func_interp(f, model, bmax, consts))
+            cvc5_sygus = process_formula(b, flatten(p), funcs, consts, model)
             print("otherwise defined recursively as:")
             print(f"    {cvc5_sygus}")
             break
