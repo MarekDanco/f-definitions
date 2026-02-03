@@ -611,15 +611,17 @@ Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, 
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
-Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and let $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$ be subset of terms. If 
+Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and assume that
 \[
-\Biggl(F \land \bigwedge_{x \in B} Q[x]\Biggr) \;\land\; \Psi_{\text{up}}(B,\mathcal{S}) \;\land\; \Psi_{\text{down}}(B,\mathcal{S}')
+  \Biggl(F \land \bigwedge_{x \in B} Q[x]\Biggr) \;\land\;
+  \Biggl(\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})\Biggr)\;\land\;
+  \Biggl(\bigvee_{{\mathcal{S}'\subseteq \mathcal{T}}}\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S})\Biggr)
 \]
-is satisfiable, then $\phi$ has a cell propagation certificate, and hence is satisfiable.
+is satisfiable, then $\phi$ has a cell propagation certificate, and hence is satisfiable.\todoSR{I moved the choice of $\mathcal{S}$ and $\mathcal{S}'$ into the formula, in the same way as in the algorithm}
 \end{theorem}
 
 \begin{proof}
-Suppose the conjunction is satisfiable, and let $I$ be an interpretation satisfying it. We construct a certificate as in \cref{def:certificate}:
+  Suppose the conjunction is satisfiable,   let $I$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I\models \Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$, and $\mathcal{S}'$ such that $I\models \Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S})$.  We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
     \item \textbf{Pre‑satisfiability assignment:} $I$ 
@@ -699,7 +701,7 @@ Moreover, the theorem immediately yields an algorithm that searches for the para
 %\While{$I \neq \bot$}
 \While{$F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is satisfiable}
     \State $\text{max}_\text{up}\gets\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S}))$
-    \State $\text{min}_\text{down}\gets\bigvee_{{\mathcal{S}'\subseteq \mathcal{T}}}\Psi_{\text{down}}([b_{\min},b_{\max}],,\mathcal{S}))$ 
+    \State $\text{min}_\text{down}\gets\bigvee_{{\mathcal{S}'\subseteq \mathcal{T}}}\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S}))$ 
     \If{$\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right) \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}$ is satisfiable}
         \State \Return \textsc{Sat} 
     \EndIf
