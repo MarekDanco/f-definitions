@@ -15,6 +15,7 @@ from z3 import *
 
 from benchmarks import Incr, IncrConst, IncrConstArg, Incr2Functions, Test
 from smt2_loader import load_smt2
+from sygus import process_formula
 
 
 def get_func_interp(f, model, bmax, consts):
@@ -234,8 +235,9 @@ else:
                 print(f)
                 # print(model.get_interp(f))
                 print_func_interp(get_func_interp(f, model, bmax, consts))
+            cvc5_sygus = process_formula(b.Q)
             print("otherwise defined recursively as:")
-            print(f"    {b.Q}")
+            print(f"    {cvc5_sygus}")
             break
 
         bmax = bmax + 1
