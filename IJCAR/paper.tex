@@ -468,20 +468,23 @@ In this section, we will introduce an algorithm that will check satisfiability o
 
 Throughout this section we assume that $\phi$ is a formula of the form $F \land \forall \bar{x}.\; Q$, as defined in ~\cref{sec:problem-statement}. Let $\mathcal{F}$ be the set of uninterpreted function symbols in $Q$, and $\mathcal{T}$ the set of terms of the form $f(t)$ in $Q$. Let $\mathcal{T}_p$ be the set of elements of $\mathcal{T}$ such that there is an uninterpreted function symbols $f$, variable $x_p$ in $\bar{x}$ and $c\in\mathbb{N}$ such that for all $f(t)\in\mathcal{T}$, the coefficient of $x_p$ in $t$ is $c$, and the coefficient of all other variables of $\bar{x}$ in $t$ is zero.
 
-For example for the formula \[g(c)=0\wedge \forall x\forall y\;.\; f(2x+c)= f(2x+c-1)+g(x+y),\] $\mathcal{T}_p$ is $\{ f(2x+c), f(2x+c-1)\}$. The term $g(x+y)$ is not in $\mathcal{T}_p$ since both quantified variables have non-zero coefficient.
-
-\paragraph{Propagation Terms.} For a given universally quantified variable $x_p \in \bar{x}$, we define $\mathcal{T}_p \subseteq \mathcal{T}$ as the set of terms $f(t) \in \mathcal{T}$ such that:
-\begin{itemize}
-    \item For all $f(t) \in \mathcal{T}$ with the same function symbol $f$, the coefficient of $x_p$ in $t$ is the same non-negative integer $c \in \mathbb{N}$.
-    \item For all $f(t) \in \mathcal{T}$ with the same function symbol $f$, the coefficient of all other variables $x_q \in \bar{x}$ with $q \neq p$ in $t$ is zero.
-\end{itemize}
-In other words, $\mathcal{T}_p$ contains those terms where $x_p$ is the only quantified variable that appears with a non-zero coefficient, and this coefficient is uniform across all terms for each function symbol.
-
 \begin{example}
-Consider the formula 
-\[g(c)=0\wedge \forall x\forall y\;.\; f(2x+c)= f(2x+c-1)+g(x+y).\]
-Here, $\mathcal{T}_1 = \{ f(2x+c), f(2x+c-1)\}$ corresponds to variable $x$, since both terms contain $x$ with coefficient 2 and $y$ with coefficient 0. The term $g(x+y)$ is not in any $\mathcal{T}_p$ since both quantified variables have non-zero coefficient.
+    Consider the formula \[g(c)=0\wedge \forall x\forall y\;.\; f(2x+c)= f(2x+c-1)+g(x+y).\]
+    The set $\{ f(2x+c), f(2x+c-1)\}$ can be our $\mathcal{T}_p$ with $x_p=x$. The term $g(x+y)$ cannot be in $\mathcal{T}_p$ since both quantified variables have non-zero coefficient.
 \end{example}
+
+% \paragraph{Propagation Terms.} For a given universally quantified variable $x_p \in \bar{x}$, we define $\mathcal{T}_p \subseteq \mathcal{T}$ as the set of terms $f(t) \in \mathcal{T}$ such that:
+% \begin{itemize}
+%     \item For all $f(t) \in \mathcal{T}$ with the same function symbol $f$, the coefficient of $x_p$ in $t$ is the same non-negative integer $c \in \mathbb{N}$.
+%     \item For all $f(t) \in \mathcal{T}$ with the same function symbol $f$, the coefficient of all other variables $x_q \in \bar{x}$ with $q \neq p$ in $t$ is zero.
+% \end{itemize}
+% In other words, $\mathcal{T}_p$ contains those terms where $x_p$ is the only quantified variable that appears with a non-zero coefficient, and this coefficient is uniform across all terms for each function symbol.
+
+% \begin{example}
+% Consider the formula 
+% \[g(c)=0\wedge \forall x\forall y\;.\; f(2x+c)= f(2x+c-1)+g(x+y).\]
+% Here, $\mathcal{T}_1 = \{ f(2x+c), f(2x+c-1)\}$ corresponds to variable $x$, since both terms contain $x$ with coefficient 2 and $y$ with coefficient 0. The term $g(x+y)$ is not in any $\mathcal{T}_p$ since both quantified variables have non-zero coefficient.
+% \end{example}
 
 
 We will now formalize the condition ensuring propagation outward from a base interval $B$ is possible. For upward propagation, we select a $\mathcal{S} \subseteq\mathcal{T}$ whose argument terms are \emph{maximal} (all equal and strictly greater than other argument terms of the same function symbol). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences in $\mathcal{S}$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
