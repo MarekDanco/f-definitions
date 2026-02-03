@@ -766,13 +766,14 @@ Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interp
 
 For each $f(t)\in\mathcal{F}$, define:
 \[
-v_{\max}^f = \max\{\, I^*(t_0) \mid f(t) \in \mathcal{T}\,\}, \qquad
-v_{\min}^f = \min\{\, I^*(t_0) \mid f(t) \in \mathcal{T} \,\}.
+v_{\max}^f = \max\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
+v_{\min}^f = \min\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
 \]
-where $t_0=\subst{t}{x}{0}$ for each $f(t)\in\mathcal{T}$. The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathcal{S}'^*)$ ensure that:
+% where $t_0=\subst{t}{x}{0}$ for each $f(t)\in\mathcal{T}$.
+The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathcal{S}'^*)$ ensure that:
 \begin{itemize}
-    \item For all $f(t) \in \mathcal{S}^*$: $I^*(t_0) = v_{\max}^f$,
-    \item For all $f(t) \in \mathcal{S}'^*$: $I^*(t_0) = v_{\min}^f$.
+    \item For all $f(t) \in \mathcal{S}^*$: $I^*(\subst{t}{x}{0}) = v_{\max}^f$,
+    \item For all $f(t) \in \mathcal{S}'^*$: $I^*(\subst{t}{x}{0}) = v_{\min}^f$.
 \end{itemize}
 
 % Now choose
@@ -801,12 +802,12 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     \begin{itemize}
         \item $\Phi_{\text{max}}(\mathcal{S}^*)$ holds by definition,
         \item $\Phi_{\text{prop-up}}(\mathcal{S}^*)$ holds by the multi-\req condition,
-        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(t_0)=v_{\max}^f$, we have:
+        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:
         % \[
         % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
         % \]
         \[
-        I^*(a) \leq c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(t_0) = I^*(\subst{t}{x}{b_{\max}})
+        I^*(a) \leq c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{b_{\max}})
         \]
         by construction of $b_{\max}$, which is exactly the clash condition.
     \end{itemize}
@@ -822,7 +823,7 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
         % I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
         % \]
         \[
-        I^*(a) \geq c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + I^*(t_0) = I^*(\subst{t}{x}{b_{\min}})
+        I^*(a) \geq c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{b_{\min}})
         \]
         by construction of $b_{\min}$.
     \end{itemize}
