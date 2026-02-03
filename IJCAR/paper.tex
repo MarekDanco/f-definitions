@@ -692,7 +692,7 @@ Thus all certificate requirements are satisfied. By Property \ref{prop:certThenS
 
 The formula in the premise of \cref{thm:interval-certificate-param} belongs to Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the model of this formula (which has a straightforward finite representation) and the sets $\mathcal{S}$, $\mathcal{S}'$.
 
-Algorithmic implementations of the satisfiability propagators whose existence is ensured by the proof of \cref{thm:interval-certificate-param} can often be obtained from the witness functions that are a 
+Algorithmic implementations of the satisfiability propagators whose existence is ensured by the proof of \cref{thm:interval-certificate-param} can often be obtained from the witness functions that are 
 a side product of quantifier elimination on the
 propagability conditions~$\Phi_{\text{prop-up}}(\mathcal{S})$ and~$\Phi_{\text{prop-down}}(\mathcal{S})$. These propagators  can then be used in the recursive evaluation function $val$ defined in \cref{sec:certificate} to compute values of the function that a model assigns to an uninterpreted function symbol.
 
