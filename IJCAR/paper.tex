@@ -487,7 +487,7 @@ For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$,\todoSR{I think we c
             \item every $f(t)\in\mathcal{S}$ by $v_{f(t)}$.
         \end{itemize}
 \end{itemize}
-
+ 
 Symmetrically, for downward propagation with a subset $\mathcal{S}'\subseteq\mathcal{T}$, define $\Phi_{\text{min}}(\mathcal{S}')$ (with $<$ instead of $>$) and $\Phi_{\text{prop-down}}(\mathcal{S}')$.
 
 We say that $Q$ satisfies the \emph{multi-\req condition for $(\mathcal{S}, \mathcal{S}')$} if
@@ -615,7 +615,7 @@ Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and let $\math
 \[
 \Biggl(F \land \bigwedge_{x \in B} Q[x]\Biggr) \;\land\; \Psi_{\text{up}}(B,\mathcal{S}) \;\land\; \Psi_{\text{down}}(B,\mathcal{S}')
 \]
-is satisfiable, then $\phi$ has a cell propagation certificate, and hence is satisfiable.\todoSR{a concrete checkable certificate would hence be $I, B, \mathcal{S}, \mathcal{S}'$}
+is satisfiable, then $\phi$ has a cell propagation certificate, and hence is satisfiable.
 \end{theorem}
 
 \begin{proof}
@@ -684,7 +684,9 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \qedhere\end{proof}
 
-The formula in the premise of \cref{thm:interval-certificate-param} belongs to Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Moreover, the theorem immediately yields an algorithm that searches for the parameters $B$, $\mathcal{S}$ and $\mathcal{S}$ of this theorem. This can be seen in \cref{alg:interval-check-param-withBigvee}.
+The formula in the premise of \cref{thm:interval-certificate-param} belongs to Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked.
+\todoSR{a concrete checkable certificate would be $I, B, \mathcal{S}, \mathcal{S}'$}
+Moreover, the theorem immediately yields an algorithm that searches for the parameters $B$, $\mathcal{S}$ and $\mathcal{S}$ of this theorem. This can be seen in \cref{alg:interval-check-param-withBigvee}.
 
 \begin{algorithm}
 \caption{Interval‑Based Satisfiability Check}
@@ -874,27 +876,20 @@ where:
     
     \item Minimality encoding: $\Phi_\text{min}^\text{e}$ defined analogously with $s'_{f(t)}$ and $<$ instead of $>$.
     
-    \item Upward propagation encoding: Given Boolean variables $\{s_{f(t)}\}$ representing the choice $\mathcal{S} = \{f(t)\mid s_{f(t)} \text{ is true}\}$, we define:
-    \begin{align*}
-        \Phi_{\text{prop-up}}^\text{e}(\{s_{f(t)}\}) &\equiv \forall x \forall \{u_{f(t)} \mid f(t) \in \mathcal{T}, \neg s_{f(t)}\} \exists \{v_{f(t)} \mid f(t) \in \mathcal{T}, s_{f(t)}\}.\ Q' 
-    \end{align*}
-    where the formula $Q'$ is obtained from $Q$ by simultaneously substituting:
-    \begin{itemize}
-        \item $f(t)$ by $v_{f(t)}$ whenever $s_{f(t)}$ is true,
-        \item $f(t)$ by $u_{f(t)}$ whenever $s_{f(t)}$ is false.
-    \end{itemize}
-      
-    % \item Upward propagation encoding: For the given Boolean variables $\{s_{f(t)}\}$, define $\Phi_{\text{prop-up}}^\text{e}(\{s_{f(t)}\})$ as:
-    % \[
-    %     \forall x \forall \bar{u} \exists \bar{v}.\ 
-    %     \bigwedge_{f(t) \in \mathcal{T}} \Big((s_{f(t)} \Rightarrow (f(t) = v_{f(t)})) \land (\neg s_{f(t)} \Rightarrow (f(t) = u_{f(t)}))\Big) \Rightarrow Q
-    % \]
-    % where $\bar{u} = \{u_{f(t)} \mid f(t) \in \mathcal{T}\}$ and $\bar{v} = \{v_{f(t)} \mid f(t) \in \mathcal{T}\}$.
+    \item Upward propagation encoding\todoSR{any idea for improving notation here, is welcome}:
 
+        \[\bigwedge_{\sigma_{f(t)}\in\{\neg,\cdot\},f(t)\in\mathcal{T}} \big(\bigwedge_{f(t)\in\mathcal{T}} \sigma_{f(t)}s_{f(t)}\Rightarrow\forall x \forall \bar{u} \exists \bar{v}.\ Q'\big)\]
+        where $\bar{u}$ corresponds to the variables $u_{f(t)}$ where $\sigma_{f(t)}$ is $\neg$ and $\bar{v}$ to the variables $v_{f(t)}$ where $\sigma_{f(t)}$ is $\cdot$, and $Q'$ is obtained from $Q$ by simultaneously replacing
+        \begin{itemize}
+            \item every $f(t)\in\mathcal{T}$ with $\sigma_{f(t)}=\neg$ by $u_{f(t)}$, and
+            \item every $f(t)\in\mathcal{T}$ with $\sigma_{f(t)}=\cdot$ by $v_{f(t)}$, 
+        \end{itemize}
+        and $\cdot$ is a dummy symbol, and hence for any propositional variable $p$, $\cdot p$ is the same as $p$.
+        
 
-    \item Downward propagation encoding: Symmetrically, for downward propagation with variables $\{s'_{f(t)}\}$ representing $\mathcal{S}'$, define $\Phi_{\text{prop-down}}^\text{e}(\{s'_{f(t)}\})$.
-    
-    \item Clash condition encoding:
+      \item Downward propagation encoding: symmetrical
+
+      \item Clash condition encoding:
     \begin{align*}
         \text{ClashUpEnc} &\equiv \bigwedge_{f(t)\in\mathcal
         {T}}\bigwedge_{a \in \args(F,f_i)} \big(s_{f(t)} \Rightarrow (a \leq \subst{t}{x}{b_{\max}})\big) \\
