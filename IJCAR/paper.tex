@@ -692,6 +692,13 @@ Thus all certificate requirements are satisfied. By Property \ref{prop:certThenS
 
 The formula in the premise of \cref{thm:interval-certificate-param} belongs to Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the model of this formula (which has a straightforward finite representation) and the sets $\mathcal{S}$, $\mathcal{S}'$.
 
+Algorithmic implementations the satisfiability propagators whose existence is ensured by the proof of \cref{thm:interval-certificate-param} can often be obtained from the witness functions that are a 
+a side product of quantifier elimination on the
+propagability conditions~$\Phi_{\text{prop-up}}(\mathcal{S})$ and~$\Phi_{\text{prop-down}}(\mathcal{S})$. These propagators  can then be used in the recursive evaluation function $val$ defined in \cref{sec:certificate} to compute values of the function that a model assigns to an uninterpreted function symbol.
+
+
+
+
 The theorem immediately yields an algorithm that checks satisfiability by searching for the interval~$[b_{\min},b_{\max}]$. This can be seen in \cref{alg:interval-check-param-withBigvee}. An extension of the algorithm that in the case of the return value \textsc{Sat} also returns a corresponding certificate, is straightforward.
 
 
@@ -747,8 +754,6 @@ The theorem immediately yields an algorithm that checks satisfiability by search
 % for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiable.
 % \qedhere\end{proof}
 
-
-The satisfiability propagators required by \cref{def:certificate} can often be obtained through quantifier elimination. For a given $z \in \mathbb{Z}$ and set of propagated cells $X_z$, the existence of values for $X_z$ that satisfy $Q[z]$ given values for the other cells is an existentially quantified formula $\exists \{v_{f(t)} \mid f(t) \in \mathcal{S}\}.\ Q'[z]$ where $v_{f(t)}$ correspond to the cells in $X_z$ and $Q'[z]$ is $Q[z]$ with those cells replaced by the $v_{f(t)}$. Quantifier elimination techniques for LIA can produce witnesses or solving functions for the $v_{f(t)}$, which serve as the required propagators.  propagators can then be used in the recursive evaluation function $val$ defined in \cref{sec:certificate} to compute values of the function that a model assigns to an uninterpreted function symbol.
 
 The correctness of the result \textsc{Sat} of the algorithm is an immediate consequence of \cref{alg:interval-check-param-withBigvee}. The correctness of the result \textsc{Unsat} follows from the fact that the termination condition of the while loop is a logical consequence of the input formula. However, it might also happen that the algorithm returns forever. We can exclude this under certain conditions:
 
