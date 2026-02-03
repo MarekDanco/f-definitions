@@ -138,7 +138,7 @@ The sub-class of UFLIA formulas that the algorithm can handle\todoSR{We will upd
 % The key idea is to treat each quantifier instantiation as introducing infinitely many constraints on function calls, which we refer to as cells. A single cell may appear in multiple constraints, so we must ensure that it is assigned a consistent value throughout. To show satisfiability within our fragment, we impose an order on these constraints and construct a symbolic assignment to the cells such that, when processed in this order, no conflicting assignments arise.
 
 % \paragraph{Contributions.} 
-% This paper makes several contributions towards deciding satisfiability in our fragment. We formalize \emph{cell propagation certificates} (\cref{def:certificate}) that witness satisfiability through inductive extension of finite base assignments.  We introduce the \emph{multi-\req condition} (\cref{def:multi-reqpivot-param}), propagation conditions that allows multiple functions to serve as pivots simultaneously. Building on this, we present an interval‑based algorithm (\cref{alg:interval-check-param-withBigvee}) that searches for suitable base intervals and checks propagation conditions using satisfiability queries. We prove \emph{soundness} (\cref{cor:soundness-bigvee}) and \emph{relative completeness} (\cref{thm:completeness-bigvee}) for our algorithm. Finally\todoSN{Hopefully!}, we provide experimental evidence that our method handles problems beyond the reach of current SyGuS and MBQI approaches, often producing more interpretable models.
+% This paper makes several contributions towards deciding satisfiability in our fragment. We formalize \emph{cell propagation certificates} (\cref{def:certificate}) that witness satisfiability through inductive extension of finite base assignments.  We introduce the \emph{\req condition} (\cref{def:reqpivot-param}), propagation conditions that allows multiple functions to serve as pivots simultaneously. Building on this, we present an interval‑based algorithm (\cref{alg:interval-check-param-withBigvee}) that searches for suitable base intervals and checks propagation conditions using satisfiability queries. We prove \emph{soundness} (\cref{cor:soundness-bigvee}) and \emph{relative completeness} (\cref{thm:completeness-bigvee}) for our algorithm. Finally\todoSN{Hopefully!}, we provide experimental evidence that our method handles problems beyond the reach of current SyGuS and MBQI approaches, often producing more interpretable models.
 
 % \section{Related Work}\label{}
 % Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
@@ -305,7 +305,7 @@ These restrictions enable the inductive propagation reasoning that underlies our
 %     \item \textbf{Propagation:} From a model of the base interval, we can extend the assignment to all integers $z \notin B$ without creating any conflicts. This requires that for each function $f_i$, certain occurrences in $Q$ can be treated as ``pivots'' whose values can be chosen after fixing all other occurrences.
 % \end{enumerate}
 
-% The second condition is formalized as the \emph{multi‑\req condition} in \cref{sec:alg}. Intuitively, it ensures that when moving outward from $B$ (to larger or smaller integers), we always have at least one cell in each instantiation whose value can be adjusted to satisfy $Q$, given the values already assigned to cells that appear in earlier instantiations.
+% The second condition is formalized as the \emph{\req condition} in \cref{sec:alg}. Intuitively, it ensures that when moving outward from $B$ (to larger or smaller integers), we always have at least one cell in each instantiation whose value can be adjusted to satisfy $Q$, given the values already assigned to cells that appear in earlier instantiations.
 
 % \paragraph{Challenges}\todoSN{Stefan R, could you please check whether I formulate this paragraph (and the next one) correctly?}
 % \begin{itemize}
@@ -318,8 +318,8 @@ These restrictions enable the inductive propagation reasoning that underlies our
 % We address these challenges through the following steps:
 % \begin{enumerate}
 %     \item We introduce \emph{cell propagation certificates} (Definition~\ref{def:certificate}) as a formal witness for satisfiability in our fragment.
-%     \item We define the \emph{multi‑\req condition} (Definition~\ref{def:multi-reqpivot-param}) that characterizes when propagation is possible.
-%     \item We prove that if a formula satisfies the multi‑\req condition and a suitable base interval exists, then the formula is satisfiable (Theorem~\ref{thm:interval-certificate-param}).
+%     \item We define the \emph{\req condition} (Definition~\ref{def:reqpivot-param}) that characterizes when propagation is possible.
+%     \item We prove that if a formula satisfies the \req condition and a suitable base interval exists, then the formula is satisfiable (Theorem~\ref{thm:interval-certificate-param}).
 %     \item We present an algorithm (Algorithm~\ref{alg:interval-check-param-withBigvee}) that enumerates candidate intervals and checks both base satisfiability and propagation conditions using an $\smt$ solver.
 %     \item We establish soundness and relative completeness theorems for our algorithm (Corollary~\ref{cor:soundness-bigvee} and Theorem~\ref{thm:completeness-bigvee}).
 % \end{enumerate}
@@ -472,8 +472,8 @@ For example for the formula \[g(c)=0\wedge \forall x\forall y\;.\; f(2x+c)= f(2x
 
 We will now formalize the condition ensuring propagation outward from a base interval $B$ is possible. For upward propagation, we select a $\mathcal{S} \subseteq\mathcal{T}$ whose argument terms are \emph{maximal} (all equal and strictly greater than other argument terms of the same function symbol). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences in $\mathcal{S}$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
 
-\begin{definition}[Multi-\req Condition]
-\label{def:multi-reqpivot-param}
+\begin{definition}[\req Condition]
+\label{def:reqpivot-param}
 
 For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
 \begin{itemize}
@@ -494,17 +494,17 @@ For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
  
 Symmetrically, for downward propagation with a subset $\mathcal{S}'\subseteq\mathcal{T}$, define $\Phi_{\text{min}}(\mathcal{S}')$ (with $<$ instead of $>$) and $\Phi_{\text{prop-down}}(\mathcal{S}')$.
 
-We say that $Q$ satisfies the \emph{multi-\req condition for $(\mathcal{S}, \mathcal{S}')$} if
+We say that $Q$ satisfies the \emph{\req condition for $(\mathcal{S}, \mathcal{S}')$} if
 \begin{itemize}
     \item $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ hold,
     \item $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ hold.
 \end{itemize}
 
-We say $Q$ satisfies the \emph{multi-\req condition} if there exists \emph{some} pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the multi-\req condition for $(\mathcal{S}, \mathcal{S}')$.
+We say $Q$ satisfies the \emph{\req condition} if there exists \emph{some} pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the \req condition for $(\mathcal{S}, \mathcal{S}')$.
 \end{definition}
 
-\begin{example}[Multi-\req Illustration]
-\label{ex:multi-req-illustration}
+\begin{example}[\req Illustration]
+\label{ex:req-illustration}
 Consider the formula:
 \[
 \forall x.\ f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
@@ -583,7 +583,7 @@ Consider $\mathcal{S}' = \{f(x+1),h(x)\}$.
 \end{enumerate}
 
 \medskip\noindent\textbf{Putting it together:}
-$Q$ satisfies the multi-\req condition for the pair $(\mathcal{S},\mathcal{S}')$ whenever $c$ satisfies both $c < 1$ (from upward maximality) and $c > -2$ (from downward minimality). Hence for any $c \in (-2, 1)$, the specific choices $\mathcal{S} = \{f(x+4),g(x+2)\}$ and $\mathcal{S}' = \{f(x+1),h(x)\}$ witness the multi‑\req condition.
+$Q$ satisfies the \req condition for the pair $(\mathcal{S},\mathcal{S}')$ whenever $c$ satisfies both $c < 1$ (from upward maximality) and $c > -2$ (from downward minimality). Hence for any $c \in (-2, 1)$, the specific choices $\mathcal{S} = \{f(x+4),g(x+2)\}$ and $\mathcal{S}' = \{f(x+1),h(x)\}$ witness the \req condition.
 \end{example}
 
 Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the cells generated during propagation from clashing with the ground part $F$.
@@ -599,7 +599,7 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}'
     \Phi_{\text{prop-up}}(\mathcal{S}) \;\land
     \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a \leq \subst{t}{x}{b_{\max}}
     \]
-    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:multi-reqpivot-param}. 
+    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:reqpivot-param}. 
     
     \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
     \[
@@ -607,11 +607,11 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}'
     \Phi_{\text{prop-down}}(\mathcal{S}') \;\land
     \bigwedge_{f(t) \in \mathcal{S}'} \bigwedge_{\substack{a \in \args(F,f_i)}} a \geq \subst{t}{x}{b_{\min}}
     \]
-    where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ are as defined in \cref{def:multi-reqpivot-param}.
+    where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ are as defined in \cref{def:reqpivot-param}.
 \end{enumerate}
 \end{definition}
 
-Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (resp. $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of multi‑\req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{b_{\max}}$ ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f_i(a)$; similarly for downward propagation.
+Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (resp. $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{b_{\max}}$ ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f_i(a)$; similarly for downward propagation.
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
@@ -757,14 +757,14 @@ The correctness of the result \textsc{Sat} of the algorithm is an immediate cons
 If the input formula~$\phi$
 \begin{enumerate}
     \item is satisfiable, and
-    \item satisfies the multi‑\req condition for some pair $(\mathcal{S}^*,\mathcal{S}'^*)$ 
-          as defined in \cref{def:multi-reqpivot-param},
+    \item satisfies the \req condition for some pair $(\mathcal{S}^*,\mathcal{S}'^*)$ 
+          as defined in \cref{def:reqpivot-param},
 \end{enumerate}
 then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{Sat}.
 \end{theorem}
 
 \begin{proof}
-Assume $\phi$ is satisfiable and satisfies multi‑\req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
+Assume $\phi$ is satisfiable and satisfies \req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
 Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments.
 
 For each $f(t)\in\mathcal{F}$, define:
@@ -804,7 +804,7 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     For the specific $\mathcal{S}^*$, we have:
     \begin{itemize}
         \item $\Phi_{\text{max}}(\mathcal{S}^*)$ holds by definition,
-        \item $\Phi_{\text{prop-up}}(\mathcal{S}^*)$ holds by the multi-\req condition,
+        \item $\Phi_{\text{prop-up}}(\mathcal{S}^*)$ holds by the \req condition,
         \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:
         % \[
         % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
@@ -861,7 +861,7 @@ This formula is unsatisfiable in standard integer arithmetic (applying induction
 % \paragraph{Summary.}
 % In summary, our algorithm:
 % \begin{itemize}
-%     \item Terminates with \textsc{Sat} for all satisfiable formulas within the fragment that satisfy the multi-\req condition (\cref{thm:completeness-bigvee}).
+%     \item Terminates with \textsc{Sat} for all satisfiable formulas within the fragment that satisfy the \req condition (\cref{thm:completeness-bigvee}).
 %     \item Terminates with \textsc{Unsat} for formulas whose unsatisfiability can be detected through finite instantiation alone (\cref{thm:finiteunsatThenUNSAT}).
 %     \item May not terminate for formulas whose unsatisfiability requires induction over all integers or instantiations at unbounded offsets.
 % \end{itemize}
@@ -941,7 +941,7 @@ For any interval $B = [b_{\min}, b_{\max}]$:
 
 \paragraph{Practical Considerations.}
 The exponential disjunctions in \cref{alg:interval-check-param-withBigvee} 
-(lines 3--4) can be replaced by the CNF encodings $\Psi_\text{up}^\text{e}$ and $\Psi_\text{down}^\text{e}$ as defined above, which are equi-satisfiable by \cref{lem:encoding-correctness}. This yields a practical implementation while preserving all theoretical guarantees. Thus, the CNF encoding approach provides a practical bridge between the theoretical multi‑\req framework and implementable algorithm, while avoiding exponential formula size.
+(lines 3--4) can be replaced by the CNF encodings $\Psi_\text{up}^\text{e}$ and $\Psi_\text{down}^\text{e}$ as defined above, which are equi-satisfiable by \cref{lem:encoding-correctness}. This yields a practical implementation while preserving all theoretical guarantees. Thus, the CNF encoding approach provides a practical bridge between the theoretical \req framework and implementable algorithm, while avoiding exponential formula size.
 
 \section{Experiments}
 
