@@ -40,9 +40,9 @@ def process_formula(formula):
 
 
 def run_test():
-    p = z3.Function("p", z3.IntSort(), z3.IntSort(), z3.IntSort())
+    f = z3.Function("f", z3.IntSort(), z3.IntSort(), z3.IntSort())
     x, y = z3.Int("x"), z3.Int("y")
-    prob = z3.ForAll([x, y], z3.And(p(x, y) > x, p(x, y) > y))
+    prob = z3.ForAll([x, y], f(x, y) == x + y)
     s = z3.Solver()
     s.add(prob)
     prob_smt = s.to_smt2()

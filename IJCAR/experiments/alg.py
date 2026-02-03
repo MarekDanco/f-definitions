@@ -7,6 +7,7 @@
 
 
 import argparse
+
 # import functools
 # import operator
 import itertools
@@ -21,6 +22,7 @@ from sygus import process_formula
 def get_func_interp(f, model, bmax, consts):
     args = set(range(bmax + 1)) | set(consts)
     return {arg: model.eval(f(arg)) for arg in args}
+
 
 def print_func_interp(interp):
     for arg, val in interp.items():
@@ -71,6 +73,10 @@ def reqpivot_case(bl, b):
 
 def reqpivot(b):
     return list(map(lambda t: reqpivot_case(t, b), get_bitvectors(len(flatten(p)))))
+    # res = list(map(lambda t: reqpivot_case(t, b), get_bitvectors(len(flatten(p)))))
+    # for r in res:
+    #     print(r)
+    # return res
 
 
 def reqpivot_2(b):  # old implementation of special case
@@ -230,12 +236,20 @@ else:
             print("model:")
             model = solver.model()
             funcs = [f for f in model.decls() if f.arity() > 0]
-            consts = [model.eval(c()) for c in model.decls() if c.arity() == 0 if c.range() == IntSort()]
+            consts = [
+                c
+                for c in model.decls()
+                if c.arity() == 0
+                if c.range() == IntSort()
+            ]
+            consts_vals = [model.eval(c()) for c in consts]
+            for i, c in enumerate(consts):
+                print(f"{c} -> {consts_vals[i]}")
             for f in funcs:
                 print(f)
                 # print(model.get_interp(f))
-                print_func_interp(get_func_interp(f, model, bmax, consts))
-            cvc5_sygus = process_formula(b.Q)
+                print_func_interp(get_func_interp(f, model, bmax, consts_vals))
+            cvc5_sygus = process_formula(b.Qp)
             print("otherwise defined recursively as:")
             print(f"    {cvc5_sygus}")
             break
@@ -250,3 +264,5 @@ else:
 
         # solver.add(F)
         # print(solver.to_smt2())
+    else:
+        print("final: unsat")
