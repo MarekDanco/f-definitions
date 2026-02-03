@@ -749,6 +749,8 @@ The theorem immediately yields an algorithm that checks satisfiability by search
 
 The satisfiability propagators required by \cref{def:certificate} can often be obtained through quantifier elimination. For a given $z \in \mathbb{Z}$ and set of propagated cells $X_z$, the existence of values for $X_z$ that satisfy $Q[z]$ given values for the other cells is an existentially quantified formula $\exists \{v_{f(t)} \mid f(t) \in \mathcal{S}\}.\ Q'[z]$ where $v_{f(t)}$ correspond to the cells in $X_z$ and $Q'[z]$ is $Q[z]$ with those cells replaced by the $v_{f(t)}$. Quantifier elimination techniques for LIA can produce witnesses or solving functions for the $v_{f(t)}$, which serve as the required propagators.  propagators can then be used in the recursive evaluation function $val$ defined in \cref{sec:certificate} to compute values of the function that a model assigns to an uninterpreted function symbol.
 
+The correctness of the result \textsc{Sat} of the algorithm is an immediate consequence of \cref{alg:interval-check-param-withBigvee}. The correctness of the result \textsc{Unsat} follows from the fact that the termination condition of the while loop is a logical consequence of the input formula. However, it might also happen that the algorithm returns forever. We can exclude this under certain conditions:
+
 \begin{theorem}[Relative Completeness]
 \label{thm:completeness-bigvee}
 If the input formula~$\phi$
