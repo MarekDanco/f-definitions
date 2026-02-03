@@ -686,9 +686,10 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \qedhere\end{proof}
 
-The formula in the premise of \cref{thm:interval-certificate-param} belongs to Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked.
-\todoSR{a concrete checkable certificate would be $I, B, \mathcal{S}, \mathcal{S}'$}
-Moreover, the theorem immediately yields an algorithm that searches for the parameters $B$, $\mathcal{S}$ and $\mathcal{S}$ of this theorem. This can be seen in \cref{alg:interval-check-param-withBigvee}.
+The formula in the premise of \cref{thm:interval-certificate-param} belongs to Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the model of this formula (which has a straightforward finite representation) and the sets $\mathcal{S}$, $\mathcal{S}'$.
+
+The theorem immediately yields an algorithm that checks satisfiability by searching for the interval~$[b_{\min},b_{\max}]$. This can be seen in \cref{alg:interval-check-param-withBigvee}. An extension of the algorithm that in the case of the return value \textsc{Sat} also returns a corresponding certificate, is straightforward.
+
 
 \begin{algorithm}
 \caption{Interval‑Based Satisfiability Check}
@@ -712,37 +713,36 @@ Moreover, the theorem immediately yields an algorithm that searches for the para
 \end{algorithmic}
 \end{algorithm}
 
-\begin{corollary}[Soundness]
-\label{cor:soundness-bigvee}
-If \cref{alg:interval-check-param-withBigvee} terminates, then it returns a correct result.
+% \begin{corollary}[Soundness]
+% \label{cor:soundness-bigvee}
+% If \cref{alg:interval-check-param-withBigvee} terminates, then it returns a correct result.
 
-\end{corollary}
+% \end{corollary}
 
-\begin{proof}
-  If the result is $\textsc{Unsat}$, then $F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is unsatisfiable. This formula is implied by the input formula, and hence the result is correct. 
+% \begin{proof}
+%   If the result is $\textsc{Unsat}$, then $F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is unsatisfiable. This formula is implied by the input formula, and hence the result is correct. 
 
-  If the result is $\textsc{Sat}$, then this happens during a certain iteration of the while loop. Then there exists:
-\begin{itemize}
-    \item An interval $B = [b_{\min}, b_{\max}]$,
-    \item An interpretation $I$ satisfying:
-    \[
-    I \models F \land \bigwedge_{x \in B} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}},
-    \]
-    where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are the disjunctions defined in lines 3--4 of the algorithm.
-\end{itemize}
+%   If the result is $\textsc{Sat}$, then this happens during a certain iteration of the while loop. Then there exists:
+% \begin{itemize}
+%     \item An interval $B = [b_{\min}, b_{\max}]$,
+%     \item An interpretation $I$ satisfying:
+%     \[
+%     I \models F \land \bigwedge_{x \in B} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}},
+%     \]
+%     where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are the disjunctions defined in lines 3--4 of the algorithm.
+% \end{itemize}
 
-Since $I \models \text{max}_{\text{up}}$, there exists some $\mathcal{S}\subseteq\mathcal{T}$ such that 
-$I \models \Psi_{\text{up}}(B,\mathcal{S})$. Similarly, $I \models \text{min}_{\text{down}}$ implies there exists 
-$\mathcal{S}'\subseteq\mathcal{T}$ such that $I \models \Psi_{\text{down}}(B,\mathcal{S}')$. Thus $I$ satisfies:
-\[
-F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Psi_{\text{down}}(B,\mathcal{S}').
-\]
+% Since $I \models \text{max}_{\text{up}}$, there exists some $\mathcal{S}\subseteq\mathcal{T}$ such that 
+% $I \models \Psi_{\text{up}}(B,\mathcal{S})$. Similarly, $I \models \text{min}_{\text{down}}$ implies there exists 
+% $\mathcal{S}'\subseteq\mathcal{T}$ such that $I \models \Psi_{\text{down}}(B,\mathcal{S}')$. Thus $I$ satisfies:
+% \[
+% F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Psi_{\text{down}}(B,\mathcal{S}').
+% \]
 
-By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a satisfiability certificate 
-for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiable.
-\qedhere\end{proof}
+% By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a satisfiability certificate 
+% for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiable.
+% \qedhere\end{proof}
 
-The proof of~\cref{thm:interval-certificate-param} also shows how the return value \textsc{Sat} results in a corresponding satisfiability certificate, and extending the algorithm to also return such a certificate is an easy exercise.
 
 The satisfiability propagators required by \cref{def:certificate} can often be obtained through quantifier elimination. For a given $z \in \mathbb{Z}$ and set of propagated cells $X_z$, the existence of values for $X_z$ that satisfy $Q[z]$ given values for the other cells is an existentially quantified formula $\exists \{v_{f(t)} \mid f(t) \in \mathcal{S}\}.\ Q'[z]$ where $v_{f(t)}$ correspond to the cells in $X_z$ and $Q'[z]$ is $Q[z]$ with those cells replaced by the $v_{f(t)}$. Quantifier elimination techniques for LIA can produce witnesses or solving functions for the $v_{f(t)}$, which serve as the required propagators.  propagators can then be used in the recursive evaluation function $val$ defined in \cref{sec:certificate} to compute values of the function that a model assigns to an uninterpreted function symbol.
 
