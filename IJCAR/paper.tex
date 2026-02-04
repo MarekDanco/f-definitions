@@ -919,23 +919,27 @@ where:
     
     \item Minimality encoding: $\Phi_\text{min}^\text{e}$ defined analogously with $s'_{f(t)}$ and $<$ instead of $>$.
     
-    \item Upward propagation encoding\todoSR{any idea for improving notation here, is welcome}:
+    \item Upward propagation encoding $\Phi_{\text{prop-up}}^e$:
+    \[
+    \bigwedge_{\mathcal{T}_{-}\subseteq\mathcal{T}}
+    \left(\bigwedge_{f(t)\in\mathcal{T}_{-}} \neg s_{f(t)} \;\wedge\; \bigwedge_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{-}} s_{f(t)}\;\Rightarrow\; \forall x\, \forall \bar{u}\, \exists \bar{v}\; Q^{\mathcal{T}_{-}}\right),
+    \]
+    where $\bar{u}=(u_{f(t)})_{f(t)\in\mathcal{T}_{-}}$ and $\bar{v}=(v_{f(t)})_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{-}}$, and where $Q^{\mathcal{T}_{-}}$ is obtained from $Q$ by simultaneously replacing each $f(t)\in\mathcal{T}_{-}$ by $u_{f(t)}$ and each $f(t)\in\mathcal{T}\setminus\mathcal{T}_{-}$ by $v_{f(t)}$.
 
-        \[\bigwedge_{\sigma_{f(t)}\in\{\neg,\cdot\},f(t)\in\mathcal{T}} \big(\bigwedge_{f(t)\in\mathcal{T}} \sigma_{f(t)}s_{f(t)}\Rightarrow\forall x \forall \bar{u} \exists \bar{v}.\ Q'\big)\]
-        where $\bar{u}$ corresponds to the variables $u_{f(t)}$ where $\sigma_{f(t)}$ is $\neg$ and $\bar{v}$ to the variables $v_{f(t)}$ where $\sigma_{f(t)}$ is $\cdot$, and $Q'$ is obtained from $Q$ by simultaneously replacing
-        \begin{itemize}
-            \item every $f(t)\in\mathcal{T}$ with $\sigma_{f(t)}=\neg$ by $u_{f(t)}$, and
-            \item every $f(t)\in\mathcal{T}$ with $\sigma_{f(t)}=\cdot$ by $v_{f(t)}$, 
-        \end{itemize}
-        and $\cdot$ is a dummy symbol, and hence for any propositional variable $p$, $\cdot p$ is the same as $p$.
-        
+    % \[\bigwedge_{\substack{f(t)\in\mathcal{T} \\ \sigma_{f(t)}\in\{\neg,\cdot\}}} \left(\bigwedge_{f(t)\in\mathcal{T}} \sigma_{f(t)}s_{f(t)}\Rightarrow\forall x \forall \bar{u} \exists \bar{v}.\ Q'\right)\]
 
-      \item Downward propagation encoding: symmetrical
-
-      \item Clash condition encoding:
+    % where $\bar{u}$ corresponds to the variables $u_{f(t)}$ where $\sigma_{f(t)}$ is $\neg$ and $\bar{v}$ to the variables $v_{f(t)}$ where $\sigma_{f(t)}$ is $\cdot$, and $Q'$ is obtained from $Q$ by simultaneously replacing
+    % \begin{itemize}
+    %     \item every $f(t)\in\mathcal{T}$ with $\sigma_{f(t)}=\neg$ by $u_{f(t)}$, and
+    %     \item every $f(t)\in\mathcal{T}$ with $\sigma_{f(t)}=\cdot$ by $v_{f(t)}$, 
+    % \end{itemize}
+    % and $\cdot$ is a dummy symbol, and hence for any propositional variable $p$, $\cdot p$ is the same as $p$.
+    
+    \item Downward propagation encoding: This is defined symmetrically.
+    
+    \item Clash condition encoding:
     \begin{align*}
-        \text{ClashUpEnc} &\equiv \bigwedge_{f(t)\in\mathcal
-        {T}}\bigwedge_{a \in \args(F,f_i)} \big(s_{f(t)} \Rightarrow (a \leq \subst{t}{x}{b_{\max}})\big) \\
+        \text{ClashUpEnc} &\equiv \bigwedge_{f(t)\in\mathcal {T}}\bigwedge_{a \in \args(F,f_i)} \big(s_{f(t)} \Rightarrow (a \leq \subst{t}{x}{b_{\max}})\big) \\
         \text{ClashDownEnc} &\equiv \bigwedge_{f(t)\in\mathcal
         {T}}\bigwedge_{a \in \args(F,f_i)} \big(s'_{f(t)} \Rightarrow (a \geq \subst{t}{x}{b_{\min}})\big)
     \end{align*}
