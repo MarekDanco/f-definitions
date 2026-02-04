@@ -242,13 +242,13 @@ We study formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall \bar{x}.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for detecting satisfiability under the following additional assumptions:
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables. We will define a way of certifying satisfiability of formulas in this class\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for detecting satisfiability under the following additional assumptions:
 \begin{itemize}
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
-    \item The number of universally quantified variables is $1$.
+\item The set of coefficient vectors of all argument terms of uninterpreted function symbols in $Q$ is collinear, and the non-zero coefficient vectors of the arguments of each individual uninterpreted function symbol are identical.
     \item All uninterpreted function symbols have maximal arity $1$.
-    \item For each function symbol $f_i$, all its arguments in $Q$ have the \emph{same} coefficient of $x$ and this coefficient is non-negative.
+    \item An additional semantic condition enabling induction (\cref{def:reqpivot-param})
 \end{itemize}
 
 \begin{example}
