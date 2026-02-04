@@ -1,6 +1,9 @@
 import subprocess as sp
 from enum import Enum
+import re
 import z3
+
+from small_utils import flatten
 
 
 class Res(Enum):
@@ -34,35 +37,112 @@ def run_cvc5(timeout, prob):
     except sp.TimeoutExpired:
         return Res.TIMEOUT
 
-def get_name_ix(occ):
+
+def format_offset(x, offset):
+    try:
+        val = int(offset)
+        if val == 0:
+            return f"{x} + 0"
+        if val < 0:
+            return f"{x} - {abs(val)}"
+        return f"{x} + {val}"
+    except (ValueError, TypeError):
+        return f"{x} + {offset}"
+
+
+def sygus2string(sygus, x, pvt_function, pvt_offset, u_vars_functions, u_vars_offsets):
+    match = re.search(r"Int\s+(.+)\)\s*$", sygus)
+    if not match:
+        return "Format error"
+    expr_str = match.group(1).strip()
+    mapping = {
+        f"arg{i}": f"{f}({format_offset(x, o)})"
+        for i, (f, o) in enumerate(zip(u_vars_functions, u_vars_offsets))
+    }
+    tokens = re.findall(r"\(|\)|[^\s()]+", expr_str)
+
+    def parse():
+        if not tokens:
+            return ""
+        token = tokens.pop(0)
+
+        if token == "(":
+            op = tokens.pop(0)
+            args = []
+            while tokens[0] != ")":
+                args.append(parse())
+            tokens.pop(0)
+
+            if op == "+":
+                return " + ".join(args)
+            elif op == "*":
+                if args[0] == "-1":
+                    return f"-{args[1]}"
+                return " * ".join(args)
+            elif op == "-":
+                if len(args) == 1:
+                    return f"-{args[0]}"
+                return " - ".join(args)
+            return f"{op}({', '.join(args)})"
+
+        if token == "-":
+            return "-"
+        return mapping.get(token, token)
+
+    try:
+        raw_math = parse()
+        assert raw_math is not None
+        clean_math = raw_math.replace("+ -", "- ").replace("  ", " ")
+        clean_math = clean_math.strip()
+        pvt_head = f"{pvt_function}({format_offset(x, pvt_offset)})"
+        return f"{pvt_head} = {clean_math}"
+    except Exception as e:
+        return f"Parsing Error: {e}"
+
+
+def get_name(occ):
     occ_str = occ.sexpr()
-    return occ_str[3], int(occ_str[4]) - 1
+    return occ_str[3]
 
-def get_row(name):
-    return ord(name) - ord("f")
 
-def process_formula(b, p, funcs, consts, model):
-    pivot = [bv for bv in p if model.eval(bv)]
+def compare(u_var, occ):
+    for os in occ:
+        print(u_var, os)
+        print(type(u_var), type(os))
+        print(f"{u_var}?={os}", u_var.eq(os))
+
+
+def get_offset(u_var, b):
+    occ = b.occ
+    for i in range(len(occ)):
+        for j in range(len(occ[i])):
+            if u_var.eq(occ[i][j]):
+                return b.offsets[i][j]
+
+
+def process_formula(b, p, model):
+    flat_p = flatten(p)
+    pivot = [bv for bv in flat_p if model.eval(bv, model_completion=True)]
     assert len(pivot) == 1
-    pivot_name, pivot_ix = get_name_ix(pivot[0])
-    pivot_row = get_row(pivot_name)
-    # print(b.offsets)
-    print(f"pivot: {pivot_name}({b.x} + {b.offsets[pivot_row][pivot_ix]})")
-    non_pivots = [bv for bv in p if not bv.eq(pivot[0])]
-    # print("non pivots:", non_pivots)
-    # print(b.Qp)
-    const_subs = [(c(), model.eval(c())) for c in consts]
-    clean_q = z3.substitute(b.Q, const_subs)
-
+    pvt = z3.Int(f"{str(pivot[0])[:-1]}")
+    pvt_offset = get_offset(pvt, b)
+    pvt_function = get_name(pvt)
+    non_pivots = [bv for bv in flat_p if not bv.eq(pivot[0])]
     u_vars = [z3.Int(f"{str(np)[:-1]}") for np in non_pivots]
-    f = z3.Function(f"{pivot_name}", *[z3.IntSort() for _ in non_pivots], z3.IntSort())
+    u_vars_offsets = [get_offset(v, b) for v in u_vars]
+    u_vars_functions = [get_name(v) for v in u_vars]
+    f = z3.Function(
+        f"{pvt_function}", *[z3.IntSort() for _ in non_pivots], z3.IntSort()
+    )
     pivot_var = z3.Int(str(pivot[0])[:-1])
     prob = z3.ForAll(u_vars, z3.substitute(b.Qp, (pivot_var, f(*u_vars))))
     s = z3.Solver()
     s.add(prob)
     prob_smt = s.to_smt2()
     res = run_cvc5(3, prob_smt)
-    return res
+    return sygus2string(
+        res, b.x, pvt_function, pvt_offset, u_vars_functions, u_vars_offsets
+    )
 
 
 def run_test():

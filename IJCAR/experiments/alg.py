@@ -17,21 +17,7 @@ from z3 import *
 from benchmarks import Incr, IncrConst, IncrConstArg, Incr2Functions, Test
 from smt2_loader import load_smt2
 from sygus import process_formula
-
-
-def get_func_interp(f, model, bmax, consts):
-    args = set(range(bmax + 1)) | set(model.eval(c()).as_long() for c in consts)
-    return {arg: model.eval(f(arg)) for arg in args}
-
-
-def print_func_interp(interp):
-    for arg, val in interp.items():
-        print(f"    {arg} -> {val}")
-
-
-def flatten(ls):  # flatten a list of lists
-    # return functools.reduce(operator.concat, l)
-    return [item for subls in ls for item in subls]
+from small_utils import flatten, Formula
 
 
 def maximality_i(i, b):
@@ -239,13 +225,13 @@ else:
             consts = [
                 c for c in model.decls() if c.arity() == 0 if c.range() == IntSort()
             ]
+            formula = Formula(b)
             for c in consts:
                 print(f"{c} -> {model.eval(c())}")
             for f in funcs:
                 print(f)
-                # print(model.get_interp(f))
-                print_func_interp(get_func_interp(f, model, bmax, consts))
-            cvc5_sygus = process_formula(b, flatten(p), funcs, consts, model)
+                formula.print_func_interp(f, model, bmax, consts)
+            cvc5_sygus = process_formula(b, p, model)
             print("otherwise defined recursively as:")
             print(f"    {cvc5_sygus}")
             break

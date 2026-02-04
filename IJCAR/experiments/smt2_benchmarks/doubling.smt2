@@ -3,6 +3,6 @@
 (set-logic UFLIA)
 (declare-fun f (Int) Int)
 (assert (= (f 0) 1))
-(assert (forall ((x Int)) (=> (>= x 0) (= (f (+ x 1)) (* 2 (f (+ x 0)))))))
+(assert (forall ((x Int)) (= (f (+ x 1)) (* 2 (f (+ x 0))))))
 (check-sat)
 ;(get-model)
