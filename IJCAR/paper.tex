@@ -872,7 +872,10 @@ This formula is unsatisfiable in standard integer arithmetic (applying induction
 %     \item May not terminate for formulas whose unsatisfiability requires induction over all integers or instantiations at unbounded offsets.
 % \end{itemize}
 
+\section{Multiple Quantified Variables}
 
+Now we return to the case with multiple quantified variables under the assumption of the problem statement: 
+The set of coefficient vectors of all argument terms of uninterpreted function symbols in $Q$ is collinear, and the non-zero coefficient vectors of the arguments of each individual uninterpreted function symbol are identical. Hence there is some vector $a$, constants $b_t$, $f(t)\in\mathcal{T}$ and multipliers $\lambda_{f}>0$, $f\in\mathcal{F}$ such that each argument of an  uninterpreted function symbol can be written in the form $\lambda_f a x + b_t$. Now we can do a change of variables $z=ax$, and get an equivalent formula of the form required by the algorithm in the previous section.
 
 \section{Handling Disjunction Using Auxiliary Propositional Variables}
 
