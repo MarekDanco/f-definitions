@@ -486,7 +486,6 @@ Throughout this section we assume that $\phi$ is a formula of the form $F \land 
 % Here, $\mathcal{T}_1 = \{ f(2x+c), f(2x+c-1)\}$ corresponds to variable $x$, since both terms contain $x$ with coefficient 2 and $y$ with coefficient 0. The term $g(x+y)$ is not in any $\mathcal{T}_p$ since both quantified variables have non-zero coefficient.
 % \end{example}
 
-
 We will now formalize the condition ensuring propagation outward from a base interval $B$ is possible. For upward propagation, we select a $\mathcal{S} \subseteq\mathcal{T}$ whose argument terms are \emph{maximal} (all equal and strictly greater than other argument terms of the same function symbol). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences in $\mathcal{S}$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
 
 \begin{definition}[\req Condition]
