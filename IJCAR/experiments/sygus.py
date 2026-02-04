@@ -34,14 +34,19 @@ def run_cvc5(timeout, prob):
     except sp.TimeoutExpired:
         return Res.TIMEOUT
 
+def get_name_ix(occ):
+    occ_str = occ.sexpr()
+    return occ_str[3], int(occ_str[4]) - 1
 
 def process_formula(b, p, funcs, consts, model):
     pivot = [bv for bv in p if model.eval(bv)]
     assert len(pivot) == 1
-    print("pivot:", pivot[0])
+    pivot_name, pivot_ix = get_name_ix(pivot[0])
+    # print(b.offsets)
+    print(f"pivot: {pivot_name}({b.x} + {b.offsets[0][pivot_ix]})")
     non_pivots = [bv for bv in p if not bv.eq(pivot[0])]
-    print("non pivots:", non_pivots)
-    print(b.Qp)
+    # print("non pivots:", non_pivots)
+    # print(b.Qp)
     const_subs = [(c(), model.eval(c())) for c in consts]
     clean_q = z3.substitute(b.Q, const_subs)
 
