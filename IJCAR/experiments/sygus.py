@@ -38,12 +38,16 @@ def get_name_ix(occ):
     occ_str = occ.sexpr()
     return occ_str[3], int(occ_str[4]) - 1
 
+def get_row(name):
+    return ord(name) - ord("f")
+
 def process_formula(b, p, funcs, consts, model):
     pivot = [bv for bv in p if model.eval(bv)]
     assert len(pivot) == 1
     pivot_name, pivot_ix = get_name_ix(pivot[0])
+    pivot_row = get_row(pivot_name)
     # print(b.offsets)
-    print(f"pivot: {pivot_name}({b.x} + {b.offsets[0][pivot_ix]})")
+    print(f"pivot: {pivot_name}({b.x} + {b.offsets[pivot_row][pivot_ix]})")
     non_pivots = [bv for bv in p if not bv.eq(pivot[0])]
     # print("non pivots:", non_pivots)
     # print(b.Qp)
@@ -51,7 +55,7 @@ def process_formula(b, p, funcs, consts, model):
     clean_q = z3.substitute(b.Q, const_subs)
 
     u_vars = [z3.Int(f"{str(np)[:-1]}") for np in non_pivots]
-    f = z3.Function("f", *[z3.IntSort() for _ in non_pivots], z3.IntSort())
+    f = z3.Function(f"{pivot_name}", *[z3.IntSort() for _ in non_pivots], z3.IntSort())
     pivot_var = z3.Int(str(pivot[0])[:-1])
     prob = z3.ForAll(u_vars, z3.substitute(b.Qp, (pivot_var, f(*u_vars))))
     s = z3.Solver()

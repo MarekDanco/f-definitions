@@ -210,8 +210,8 @@ if args.smtlib:
     print(solver.to_smt2())
 else:
     # p = list(map(lambda l: list(map(lambda v: Bool(f"{v}p"), l)), b.occ))
-    p = [[Bool(f"{offset}p") for offset in func] for func in b.occ]  # is a pivot
     # print(p)
+    p = [[Bool(f"{offset}p") for offset in func] for func in b.occ]  # is a pivot
 
     bmax = 0
     solver.add(b.F)
