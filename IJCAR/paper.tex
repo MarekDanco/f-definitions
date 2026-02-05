@@ -263,7 +263,10 @@ The algorithm is guaranteed to terminate under an additional semantic condition 
 
 Note that certain formulas with several quantified variables can be easily transformed to this class by a change of variables. For example, the formula
 \[f(0)=0 \wedge \forall y,z \,.\, f(2y-2z+3)=g(y-z)+f(2y-2z+c+1)-c,\]
-can be reduced to Example~\ref{ex:formula} by the change of variables $x=y-z$
+can be reduced to Example~\ref{ex:formula} by the change of variables $x=y-z$.
+
+We are not aware of any result showing the decidability of this class. However, we are also not aware of any result proving it to be undecidable. Indeed, our goal is not decidability classification, but an algorithm for showing satisfiability that allows straightforward implementation in SMT solvers, and that is efficient in practice.
+
 
 
 % \paragraph{Core Problem}
@@ -865,6 +868,7 @@ f(0) = 0 \land f(c) \neq 0 \land \forall x.\, f(x) = f(x+1)
 \]
 This formula is unsatisfiable in standard integer arithmetic (applying induction in both directions yields $\forall n.\, f(n) = 0$, contradicting $f(c) \neq 0$). However, any finite set of instantiations is satisfiable by choosing $c$ to be a sufficiently large integer. Thus, \cref{alg:interval-check-param-withBigvee} will expand the interval indefinitely without detecting unsatisfiability.
 \end{example}
+
 
 % \paragraph{Summary.}
 % In summary, our algorithm:
