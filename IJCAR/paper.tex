@@ -754,7 +754,7 @@ The theorem immediately yields an algorithm that checks satisfiability by search
 % \qedhere\end{proof}
 
 
-The correctness of the result \textsc{Sat} of the algorithm is an immediate consequence of \cref{alg:interval-check-param-withBigvee}. The correctness of the result \textsc{Unsat} follows from the fact that the termination condition of the while loop is a logical consequence of the input formula. However, it might also happen that the algorithm returns forever. We can exclude this under certain conditions:
+The correctness of the result \textsc{Sat} of the algorithm is an immediate consequence of \cref{alg:interval-check-param-withBigvee}. The correctness of the result \textsc{Unsat} follows from the fact that the termination condition of the while loop is a logical consequence of the input formula. However, it might also happen that the algorithm runs forever. We can exclude this under certain conditions:
 
 \begin{theorem}[Relative Completeness]
 \label{thm:completeness-bigvee}
