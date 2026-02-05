@@ -335,12 +335,10 @@ We will use the classical mathematical notion of a well-order. A well-order on a
 
 We use SMT terminology (which differs from classical logic by being typed, and defining notions such as satisfiability in a slightly different way).
 
-We use the notion of certificate in the following sense~\cite{McConnell:11}: Given a property~$P(x)$ that is typically difficult to check, a certificate for this property is an object $\Pi$ for which we have a property $P'(x,\Pi)$ and a proof that $P'(x,\Pi)$ implies $P(x)$, and for which $P'(x,\Pi)$ is easier to check than $\Pi(x)$\marek{Shouldn't this be $P(x)$?}. Here, we will not always insist on a precise meaning of the notion of being easy to check. However, the final goal is certificates $\Pi$, for which $P'(x,\Pi)$ can be checked more efficiently than the original property $P(x)$, using an algorithm that is in some sense simpler then an algorithm for checking $P(x)$. As a consequence, such a certificate will enable an efficient independent check of the correctness of the result of an algorithm for checking~$P(x)$.
-
+We use the notion of certificate in the following sense~\cite{McConnell:11}: Given a property~$P(x)$ that is typically difficult to check, a certificate for this property is an object $\Pi$ for which we have a property $P'(x,\Pi)$ and a proof that $P'(x,\Pi)$ implies $P(x)$, and for which $P'(x,\Pi)$ is easier to check than $P(x)$. Here, we will not always insist on a precise meaning of the notion of being easy to check. However, the final goal is a certificate $\Pi$, for which $P'(x,\Pi)$ can be checked more efficiently than the original property $P(x)$, using an algorithm that is in some sense simpler then an algorithm for checking $P(x)$. As a consequence, such a certificate will enable an efficient independent check of the correctness of the result of an algorithm for checking~$P(x)$.
 
 \section{Satisfiability Certificates}
 \label{sec:certificate}
-
 
 \todoSR{I intend to add a running example and a figure}
 
