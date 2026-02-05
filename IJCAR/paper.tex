@@ -235,12 +235,12 @@ These examples demonstrate the need for a method that handles arithmetic offsets
 \section{Problem Statement}
 \label{sec:problem-statement}
 
-\paragraph{Formula Class}
-We study formulas of the form
+%\paragraph{Formula Class}
+We introduce a method for certifying satisfiability of formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall \bar{x}.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables. We will define a way of certifying satisfiability of formulas in this class\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for detecting satisfiability under the following additional assumptions:
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables.  Based on this method, we will design an algorithm for detecting satisfiability under the following additional assumptions:
 \begin{itemize}
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
@@ -266,24 +266,24 @@ Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we addr
     \emph{Decide whether $\phi$ is satisfiable over the standard integers, and if so, construct a model (an interpretation of all uninterpreted function symbols) that satisfies $\phi$.}
 \end{quote}
 
-\paragraph{Why is this Hard?}\todoSN{Not sure about this part! I'm just trying to summarize it from what's written in the Intro and Related Work sections.}
-Although UFLIA is undecidable in general, formulas of the above form constitute a fragment that appears frequently in verification conditions (e.g.\ for programs with arrays or recursive functions). Yet, existing SMT techniques struggle:
-\begin{itemize}
-    \item \textbf{Finite instantiation} may not terminate because the universal quantifier ranges over the infinite domain $\mathbb{Z}$.
-    \item \textbf{Synthesis-based approaches} (SyGuS) rely on syntactic templates and fail when the required function does not match the template.
-    \item \textbf{Model-based quantifier instantiation} (MBQI) can sometimes find models but often produces large, uninterpretable assignments and scales poorly.
-    \item \textbf{Specialized array decision procedures} either forbid arithmetic on indices or are limited to difference‑bounded constraints.
-\end{itemize}
-The presence of both arithmetic constraints and uninterpreted functions, combined with the universal quantifier, makes this fragment challenging for current solvers.
+% \paragraph{Why is this Hard?}\todoSN{Not sure about this part! I'm just trying to summarize it from what's written in the Intro and Related Work sections.}
+% Although UFLIA is undecidable in general, formulas of the above form constitute a fragment that appears frequently in verification conditions (e.g.\ for programs with arrays or recursive functions). Yet, existing SMT techniques struggle:
+% \begin{itemize}
+%     \item \textbf{Finite instantiation} may not terminate because the universal quantifier ranges over the infinite domain $\mathbb{Z}$.
+%     \item \textbf{Synthesis-based approaches} (SyGuS) rely on syntactic templates and fail when the required function does not match the template.
+%     \item \textbf{Model-based quantifier instantiation} (MBQI) can sometimes find models but often produces large, uninterpretable assignments and scales poorly.
+%     \item \textbf{Specialized array decision procedures} either forbid arithmetic on indices or are limited to difference‑bounded constraints.
+% \end{itemize}
+% The presence of both arithmetic constraints and uninterpreted functions, combined with the universal quantifier, makes this fragment challenging for current solvers.
 
-\paragraph{Scope and Limitations}
-We make the following additional assumptions about the structure of the formulas:
-\begin{enumerate}
-    \item Each uninterpreted function symbol appears with only finitely many distinct argument terms in $Q$.
-    \item We do not allow nested applications of uninterpreted functions (e.g., $f(g(x))$ is excluded).
-    \item We do not consider multiple universal quantifiers over different variables or existential quantification over functions.
-\end{enumerate}
-These restrictions enable the inductive propagation reasoning that underlies our solution, while still covering many practical verification conditions. The technical details of our solution—how we detect satisfiability, what propagation conditions we require, and how we construct models—are presented in the following sections.
+% \paragraph{Scope and Limitations}
+% We make the following additional assumptions about the structure of the formulas:
+% \begin{enumerate}
+%     \item Each uninterpreted function symbol appears with only finitely many distinct argument terms in $Q$.
+%     \item We do not allow nested applications of uninterpreted functions (e.g., $f(g(x))$ is excluded).
+%     \item We do not consider multiple universal quantifiers over different variables or existential quantification over functions.
+% \end{enumerate}
+% These restrictions enable the inductive propagation reasoning that underlies our solution, while still covering many practical verification conditions. The technical details of our solution—how we detect satisfiability, what propagation conditions we require, and how we construct models—are presented in the following sections.
 
 % \paragraph{Expected Outcomes}
 % For formulas within this fragment, we aim to provide:
