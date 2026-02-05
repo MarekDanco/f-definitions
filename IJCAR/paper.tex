@@ -251,6 +251,7 @@ where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of 
 The algorithm is guaranteed to terminate under an additional semantic condition enabling induction (\cref{def:reqpivot-param}).
 
 \begin{example}
+  \label{ex:formula}
   \[f(0)=0 \wedge \forall x \,.\, f(2x+3)=g(x+y)+f(2x+c+1)-c,\]
   where $c$ is an uninterpreted constant, and the coefficient of the quantified variable~$x$ is $2$ for all arguments of $f$, and $1$ for all arguments of $g$.
 \end{example}
@@ -259,6 +260,11 @@ The algorithm is guaranteed to terminate under an additional semantic condition 
   \[\forall x \,.\, f(2x+3) = f(x+1)\]
   This formula is \emph{not} in our fragment because $f$ appears with arguments having different coefficients ($2$ and $1$).
 \end{example}
+
+Note that certain formulas with several quantified variables can be easily transformed to this class by a change of variables. For example, the formula
+\[f(0)=0 \wedge \forall y,z \,.\, f(2y-2z+3)=g(y-z)+f(2y-2z+c+1)-c,\]
+can be reduced to Example~\ref{ex:formula} by the change of variables $x=y-z$
+
 
 % \paragraph{Core Problem}
 % Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we address is:
@@ -868,11 +874,11 @@ This formula is unsatisfiable in standard integer arithmetic (applying induction
 %     \item May not terminate for formulas whose unsatisfiability requires induction over all integers or instantiations at unbounded offsets.
 % \end{itemize}
 
-\section{Multiple Quantified Variables}
+% \section{Multiple Quantified Variables}
 
-We now return to the case with multiple quantified variables $\bar{x}=\{x_1,\dots,x_k\}$. Under the assumptions stated in \cref{sec:problem-statement}, the coefficient vectors of all argument terms of uninterpreted function symbols in $Q$ are collinear, and the non-zero coefficient vectors of the arguments of each individual uninterpreted function symbol are identical. Formally, this means there exists a non-zero integer vector $a \in \mathbb{Z}^k$ and, for each function $f \in \mathcal{F}$, a positive integer multiplier $\lambda_f > 0$ such that every argument term $t$ of $f$ in $Q$ can be written as $t = \lambda_f (a \cdot \bar{x}) + b_t$, where $b_t$ is a ground term (independent of $\bar{x}$). 
-% Hence there is some vector $a$, constants $b_t$, $f(t)\in\mathcal{T}$ and multipliers $\lambda_{f}>0$, $f\in\mathcal{F}$ such that each argument of an  uninterpreted function symbol can be written in the form $\lambda_f a x + b_t$. 
-We can then perform a change of variables $z=a\cdot\bar{x}$, and get an equivalent formula that falls within the single‑variable fragment handled by \cref{alg:interval-check-param-withBigvee} in the previous section.
+% We now return to the case with multiple quantified variables $\bar{x}=\{x_1,\dots,x_k\}$. Under the assumptions stated in \cref{sec:problem-statement}, the coefficient vectors of all argument terms of uninterpreted function symbols in $Q$ are collinear, and the non-zero coefficient vectors of the arguments of each individual uninterpreted function symbol are identical. Formally, this means there exists a non-zero integer vector $a \in \mathbb{Z}^k$ and, for each function $f \in \mathcal{F}$, a positive integer multiplier $\lambda_f > 0$ such that every argument term $t$ of $f$ in $Q$ can be written as $t = \lambda_f (a \cdot \bar{x}) + b_t$, where $b_t$ is a ground term (independent of $\bar{x}$). 
+% % Hence there is some vector $a$, constants $b_t$, $f(t)\in\mathcal{T}$ and multipliers $\lambda_{f}>0$, $f\in\mathcal{F}$ such that each argument of an  uninterpreted function symbol can be written in the form $\lambda_f a x + b_t$. 
+% We can then perform a change of variables $z=a\cdot\bar{x}$, and get an equivalent formula that falls within the single‑variable fragment handled by \cref{alg:interval-check-param-withBigvee} in the previous section.
 
 \section{Handling Disjunction Using Auxiliary Propositional Variables}
 
