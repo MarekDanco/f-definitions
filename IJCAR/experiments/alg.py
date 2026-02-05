@@ -233,7 +233,8 @@ else:
                 formula.print_func_interp(f, model, bmax, consts)
             cvc5_sygus = process_formula(b, p, model)
             print("otherwise defined recursively as:")
-            print(f"    {cvc5_sygus}")
+            for synth in cvc5_sygus:
+                print(f"    {synth}")
             break
 
         bmax = bmax + 1

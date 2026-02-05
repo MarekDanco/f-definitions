@@ -29,9 +29,11 @@ def run_cvc5(timeout, prob):
         )
         lines = res.stdout.split("\n")
         filtered_lines = [
-            line for line in lines if line.strip() not in ["sat", "unsat", "(", ")"]
+            line.strip()
+            for line in lines
+            if line.strip() and line.strip() not in {"sat", "unsat", "(", ")"}
         ]
-        return "\n".join(filtered_lines)
+        return filtered_lines
     except sp.CalledProcessError:
         return Res.ERROR
     except sp.TimeoutExpired:
@@ -158,11 +160,17 @@ def process_formula(b, p, model):
     s.add(prob)
     prob_smt = s.to_smt2()
     res = run_cvc5(3, prob_smt)
-    # print(prob)
-    print(res)
-    return sygus2string(
-        res, b.x, pvt_functions, pvt_offsets, u_vars_functions, u_vars_offsets
-    )
+    # print(res)
+    if isinstance(res, Res):
+        return res
+    ret = []
+    for i, synth in enumerate(res):
+        ret.append(
+            sygus2string(
+                synth, b.x, pvt_functions[i], pvt_offsets[i], u_vars_functions, u_vars_offsets
+            )
+        )
+    return ret
 
 
 def run_test():
