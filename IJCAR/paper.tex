@@ -245,26 +245,26 @@ where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of 
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
     \item All uninterpreted function symbols have maximal arity $1$.  
-    \item The set of coefficient vectors of the quantified variables in all argument terms of uninterpreted function symbols in $Q$ is collinear, and the non-zero coefficient vectors of the arguments of each individual uninterpreted function symbol are identical.
-    \item An additional semantic condition enabling induction (\cref{def:reqpivot-param})
-\end{itemize}
+    \item The number of quantified variables is $1$.
+    \item The coefficient of the quantified variable is positive for all arguments of uninterpreted function symbols, and the same for all argument terms of the same uninterpreted function symbol.
+    \end{itemize}
+The algorithm is guaranteed to terminate under an additional semantic condition enabling induction (\cref{def:reqpivot-param}).
 
 \begin{example}
-  \[f(0)=0 \wedge \forall x,y \,.\, f(2x+2y+3)=g(x+y)+f(2x+2y+c+1),\]
-  where $f$ has coefficient vector $(2,2)$ in all its arguments, $g$ has coefficient vector~$(1,1)$, and $c$ is an uninterpreted constant. Both function symbols satisfy the same‑coefficient requirement.
+  \[f(0)=0 \wedge \forall x \,.\, f(2x+3)=g(x+y)+f(2x+c+1)-c,\]
+  where $c$ is an uninterpreted constant, and the coefficient of the quantified variable~$x$ is $2$ for all arguments of $f$, and $1$ for all arguments of $g$.
 \end{example}
-\todoSR{What about decidability of this restricted class? I am currently working with the assumption that it is unknown}
 
 \begin{example}[Invalid]
   \[\forall x \,.\, f(2x+3) = f(x+1)\]
   This formula is \emph{not} in our fragment because $f$ appears with arguments having different coefficients ($2$ and $1$).
 \end{example}
 
-\paragraph{Core Problem}
-Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we address is:
-\begin{quote}
-    \emph{Decide whether $\phi$ is satisfiable over the standard integers, and if so, construct a model (an interpretation of all uninterpreted function symbols) that satisfies $\phi$.}
-\end{quote}
+% \paragraph{Core Problem}
+% Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we address is:
+% \begin{quote}
+%     \emph{Decide whether $\phi$ is satisfiable over the standard integers, and if so, construct a model (an interpretation of all uninterpreted function symbols) that satisfies $\phi$.}
+% \end{quote}
 
 % \paragraph{Why is this Hard?}\todoSN{Not sure about this part! I'm just trying to summarize it from what's written in the Intro and Related Work sections.}
 % Although UFLIA is undecidable in general, formulas of the above form constitute a fragment that appears frequently in verification conditions (e.g.\ for programs with arrays or recursive functions). Yet, existing SMT techniques struggle:
