@@ -56,7 +56,11 @@ def sygus2string(sygus, x, pvt_function, pvt_offset, u_vars_functions, u_vars_of
         return "Format error"
     expr_str = match.group(1).strip()
     mapping = {
-        f"arg{i}": f"{f}({format_offset(x, o)})"
+        f"arg{i}": (
+            f"{x.sexpr()}"
+            if str(f) == str(x.sexpr())
+            else f"{f}({format_offset(x, o)})"
+        )
         for i, (f, o) in enumerate(zip(u_vars_functions, u_vars_offsets))
     }
     tokens = re.findall(r"\(|\)|[^\s()]+", expr_str)
@@ -100,8 +104,10 @@ def sygus2string(sygus, x, pvt_function, pvt_offset, u_vars_functions, u_vars_of
         return f"Parsing Error: {e}"
 
 
-def get_name(occ):
-    occ_str = occ.sexpr()
+def get_name(var, b):
+    if var.eq(b.x):
+        return var.sexpr()
+    occ_str = var.sexpr()
     return occ_str[3]
 
 
@@ -113,6 +119,8 @@ def compare(u_var, occ):
 
 
 def get_offset(u_var, b):
+    if u_var.eq(b.x):
+        return z3.IntVal(0)
     occ = b.occ
     for i in range(len(occ)):
         for j in range(len(occ[i])):
@@ -126,20 +134,21 @@ def process_formula(b, p, model):
     assert len(pivot) == 1
     pvt = z3.Int(f"{str(pivot[0])[:-1]}")
     pvt_offset = get_offset(pvt, b)
-    pvt_function = get_name(pvt)
+    pvt_function = get_name(pvt, b)
     non_pivots = [bv for bv in flat_p if not bv.eq(pivot[0])]
     u_vars = [z3.Int(f"{str(np)[:-1]}") for np in non_pivots]
+    u_vars.append(b.x)
     u_vars_offsets = [get_offset(v, b) for v in u_vars]
-    u_vars_functions = [get_name(v) for v in u_vars]
-    f = z3.Function(
-        f"{pvt_function}", *[z3.IntSort() for _ in non_pivots], z3.IntSort()
-    )
+    u_vars_functions = [get_name(v, b) for v in u_vars]
+    f = z3.Function(f"{pvt_function}", *[z3.IntSort() for _ in u_vars], z3.IntSort())
     pivot_var = z3.Int(str(pivot[0])[:-1])
     prob = z3.ForAll(u_vars, z3.substitute(b.Qp, (pivot_var, f(*u_vars))))
     s = z3.Solver()
     s.add(prob)
     prob_smt = s.to_smt2()
     res = run_cvc5(3, prob_smt)
+    # print(prob)
+    # print(res)
     return sygus2string(
         res, b.x, pvt_function, pvt_offset, u_vars_functions, u_vars_offsets
     )
