@@ -31,7 +31,7 @@ def run_cvc5(timeout, prob):
         filtered_lines = [
             line for line in lines if line.strip() not in ["sat", "unsat", "(", ")"]
         ]
-        return "".join(filtered_lines)
+        return "\n".join(filtered_lines)
     except sp.CalledProcessError:
         return Res.ERROR
     except sp.TimeoutExpired:
@@ -111,11 +111,11 @@ def get_name(var, b):
     return occ_str[3]
 
 
-def compare(u_var, occ):
-    for os in occ:
-        print(u_var, os)
-        print(type(u_var), type(os))
-        print(f"{u_var}?={os}", u_var.eq(os))
+# def compare(u_var, occ):
+#     for os in occ:
+#         print(u_var, os)
+#         print(type(u_var), type(os))
+#         print(f"{u_var}?={os}", u_var.eq(os))
 
 
 def get_offset(u_var, b):
@@ -128,29 +128,40 @@ def get_offset(u_var, b):
                 return b.offsets[i][j]
 
 
+def split(flat_p, model):
+    pivots, non_pivots = [], []
+    for bv in flat_p:
+        if model.eval(bv, model_completion=True):
+            pivots.append(bv)
+        else:
+            non_pivots.append(bv)
+    return pivots, non_pivots
+
+
 def process_formula(b, p, model):
     flat_p = flatten(p)
-    pivot = [bv for bv in flat_p if model.eval(bv, model_completion=True)]
-    assert len(pivot) == 1
-    pvt = z3.Int(f"{str(pivot[0])[:-1]}")
-    pvt_offset = get_offset(pvt, b)
-    pvt_function = get_name(pvt, b)
-    non_pivots = [bv for bv in flat_p if not bv.eq(pivot[0])]
+    pivots, non_pivots = split(flat_p, model)
+    pvt_vars = [z3.Int(f"{str(p)[:-1]}") for p in pivots]
+    pvt_offsets = [get_offset(p, b) for p in pvt_vars]
+    pvt_functions = [get_name(p, b) for p in pvt_vars]
     u_vars = [z3.Int(f"{str(np)[:-1]}") for np in non_pivots]
     u_vars.append(b.x)
     u_vars_offsets = [get_offset(v, b) for v in u_vars]
     u_vars_functions = [get_name(v, b) for v in u_vars]
-    f = z3.Function(f"{pvt_function}", *[z3.IntSort() for _ in u_vars], z3.IntSort())
-    pivot_var = z3.Int(str(pivot[0])[:-1])
-    prob = z3.ForAll(u_vars, z3.substitute(b.Qp, (pivot_var, f(*u_vars))))
+    fs = [
+        z3.Function(f"{pvt_f}", *[z3.IntSort() for _ in u_vars], z3.IntSort())
+        for pvt_f in pvt_functions
+    ]
+    subs = [(pvar, f(*u_vars)) for pvar, f in zip(pvt_vars, fs)]
+    prob = z3.ForAll(u_vars, z3.substitute(b.Qp, subs))
     s = z3.Solver()
     s.add(prob)
     prob_smt = s.to_smt2()
     res = run_cvc5(3, prob_smt)
     # print(prob)
-    # print(res)
+    print(res)
     return sygus2string(
-        res, b.x, pvt_function, pvt_offset, u_vars_functions, u_vars_offsets
+        res, b.x, pvt_functions, pvt_offsets, u_vars_functions, u_vars_offsets
     )
 
 
