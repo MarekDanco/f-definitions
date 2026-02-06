@@ -1,0 +1,132 @@
+\documentclass{llncs}
+\usepackage[textwidth=3cm,tickmarkheight=3pt]{todonotes}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb, amsmath}
+\usepackage{numprint}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{color}
+\definecolor{citeblue}{rgb}{0.1,0,.4}
+\usepackage[pdftex%
+,colorlinks=true%
+,bookmarks=true%
+,linkcolor=citeblue%
+,citecolor=citeblue%
+,urlcolor=blue%
+,plainpages=false]{hyperref}
+\hypersetup{colorlinks,citecolor=blue,linkcolor=blue,urlcolor=blue}
+\AtBeginDocument{\hypersetup{pdfborder={0 0 1}}}
+\usepackage[nameinlink,capitalize,noabbrev]{cleveref} % must come after hyperref
+\usepackage{commath}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{orcidlink}
+
+\newcommand{\sygus}{SyGuS\xspace}
+\newcommand{\qedhere}{$\blacksquare$}
+\newcommand{\numvar}[1]{|#1|}
+
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+%\newtheorem{definition}{Definition}
+%\newtheorem{property}{Property}
+%\newtheorem{example}{Example}
+
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{corollary}[theorem]{Corollary}
+%\theoremstyle{remark}
+%\newtheorem{claim}{Claim}
+\usepackage{etoolbox}
+%\AtEndEnvironment{proof}{\setcounter{claim}{0}}
+
+\npthousandsep{,}
+\newcommand{\gmodel}{\mathcal{M}}
+\newcommand{\smt}{\textsc{smt}}
+\newcommand{\args}{\text{args}}
+\usepackage{xspace}
+\newcommand{\req}{\emph{ReqPivot}\xspace}
+\newcommand{\subst}[3]{#1[#2\leftarrow #3]}
+\newcommand{\repr}[1]{\hat{#1}}
+
+\newcommand{\todoSR}[1]{\todo[color=blue!40]{#1}}
+\newcommand{\mj}[1]{\todo[color=green!30]{#1 -mik}}
+\newcommand{\marek}[1]{\todo[color=red!10]{#1 -MD}}
+\newcommand{\todoSN}[1]{\todo[color=orange!50]{#1 -SN}}
+
+
+\begin{document}
+
+
+
+The following derives the formulas used by the algorithm directly from the definition of satisfiability certificate and the definition of $\preceq$ and $X_z$ used by the algorithm. One might even start by only assuming $\preceq$ to be defined by a LIA expression and $X_z$ to be defined using finitely many cases, where the condition of each case is again defined using a LIA expression.
+
+The definitions of $\preceq$ and $X_z$ used by the algorithm are:
+\begin{itemize}
+  
+\item $x\preceq x'$ iff
+\[ |x|<|x'| \vee (|x|=|x'|\wedge sgn(x)>sgn(x')) \]
+\item 
+    \[
+    X_z = 
+    \begin{cases}
+    \emptyset & \text{if } z \in B, \\[4pt]
+    \bigl\{ f(I(\subst{t}{x}{z})) \mid f(t)\in\mathcal{S} \bigr\} & \text{if } z > b_{\max}, \\[4pt]
+    \bigl\{ f(I(\subst{t}{x}{z})) \mid f(t)\in\mathcal{S}' \bigr\} & \text{if } z < b_{\min}.
+    \end{cases}
+  \]
+\end{itemize}
+
+
+condition used by definition of satisfiability certificate
+  
+
+    \[X_z\cap (\mathit{def}(I)\cup\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi))=\emptyset,\]
+
+split into clash condition and propagation condition:    
+    \[X_z\cap \mathit{def}(I)=\emptyset, X_z\cap\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi)=\emptyset,\]   
+
+    clash condition:
+    \[
+      \forall z\;.\; z\not\in B \Rightarrow \bigwedge_{f(t)\in \mathcal{S}}\bigwedge_{a\in args(F,f) } a\neq t[x\leftarrow z] 
+  \]
+
+propagation condition:  
+    
+\[
+  \forall z', z\;.\; z'\prec z \wedge z\not\in B \Rightarrow \bigwedge_{f(t')\in \mathcal{T}, f(t)\in S} t'[x\leftarrow z'] \neq t[x\leftarrow z]
+  \]
+
+        \[\forall x \forall \bar{u} \;.\; congu\Rightarrow \exists \bar{v}.\ congv\wedge Q'(\mathcal{S}) \]
+        where $\bar{u}$ corresponds to the variables $u_{f(t)}$ with $f(t)\in\mathcal{T}\setminus\mathcal{S}$ and $\bar{v}$ to the variables $v_{f(t)}$ with $f(t)\in \mathcal{S}$, and $Q'$ is obtained from $Q$ by simultaneously replacing
+        \begin{itemize}
+            \item every $f(t)\in\mathcal{T}\setminus\mathcal{S}$ by $u_{f(t)}$, and
+            \item every $f(t)\in\mathcal{S}$ by $v_{f(t)}$.
+            \end{itemize}
+
+congu
+\[\bigwedge_{ f(t)\in \mathcal{T}\setminus\mathcal{S},f(t')\in \mathcal{T}\setminus\mathcal{S}} t=t'\Rightarrow u_{f(t)}=u_{f(t')}\]
+
+congv
+\[  \bigwedge_{ f(t)\in \mathcal{T},f(t')\in \mathcal{T}} t=t'\Rightarrow v_{f(t)}=v_{f(t')}\]
+
+
+
+%\bibliographystyle{abbrv}
+%\bibliography{refs}
+
+
+
+\appendix
+
+
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

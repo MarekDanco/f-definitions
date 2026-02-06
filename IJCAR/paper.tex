@@ -56,9 +56,8 @@
 \newcommand{\marek}[1]{\todo[color=red!10]{#1 -MD}}
 \newcommand{\todoSN}[1]{\todo[color=orange!50]{#1 -SN}}
 
-\title{Proving Satisfiability of\\Universally Quantified Integer Constraints with\\ Uninterpreted Function Symbols%
-  \todoSN{Title options seen in comments by mj.}
-    }
+\title{Certifying Satisfiability of\\Universally Quantified Integer Constraints with\\ Uninterpreted Function Symbols%
+}
 
 % === TITLE SUGGESTIONS ===
 %
@@ -120,25 +119,23 @@ The combination of integer arithmetic, uninterpreted function symbols, and unive
 
 Current SMT solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
 
-In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols over the integers. Such formulas belong to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current SMT solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite, but large.
+In this paper, we address this problem for formulas containing universal quantifiers, linear integer arithmetic, and uninterpreted function symbols. Such formulas belong to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current SMT solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite, but large.
 
 In this paper, we explore an alternative approach that avoids explicit model construction by proving satisfiability using inductive arguments, instead. More specifically, we
 \begin{itemize}
 \item introduce a notion of satisfiability certificate that represents inductive arguments for satisfiability of such formulas, we
 \item introduce an algorithm that proves satisfiability by synthesizing such a satisfiability certificate for a sub-class of UFLIA formulas, we
-\item proof soundness and relative\todoSR{I will make this more precise} completeness of this algorithm, we
+\item prove soundness of this algorithm and completeness under the assumption that the input formula satisfies a certain semantic condition that enables inductive reasoning, we
 \item introduce an SMT encoding of the formulas solved by this algorithm, and we 
 \item demonstrate using computational experiments that this approach is able to prove satisfiability of formulas for which this is out of reach for current SMT solvers.
 \end{itemize}
-
-The sub-class of UFLIA formulas that the algorithm can handle\todoSR{We will update this as soon as we have fixed all aspects of this class.} allows one universal quantifier, and arguments of uninterpreted functions within quantified subformulas are restricted to terms of the form $x + t$, where $x$ is the universally quantified variable and $t$ is a ground term. 
 
 % \paragraph{How We Solve It.} Our approach is based on \emph{inductive cell propagation}. We view each quantifier instantiation as imposing constraints on \emph{cells}—terms $f(n_1,\dots,n_k)$ with integer arguments. The key insight is that if we can: 1) Find a finite interval $[b_{\min}, b_{\max}]$ where all instantiations are simultaneously satisfiable, and 2) Ensure that from this base, solutions can be \emph{propagated} outward in both directions without conflicts, then the entire universally quantified formula is satisfiable. This reduces the infinite satisfiability problem to checking two finite conditions: base satisfiability and a propagation property formalized as the \emph{multi-ReqPivot condition}.
 
 % The key idea is to treat each quantifier instantiation as introducing infinitely many constraints on function calls, which we refer to as cells. A single cell may appear in multiple constraints, so we must ensure that it is assigned a consistent value throughout. To show satisfiability within our fragment, we impose an order on these constraints and construct a symbolic assignment to the cells such that, when processed in this order, no conflicting assignments arise.
 
 % \paragraph{Contributions.} 
-% This paper makes several contributions towards deciding satisfiability in our fragment. We formalize \emph{cell propagation certificates} (\cref{def:certificate}) that witness satisfiability through inductive extension of finite base assignments.  We introduce the \emph{multi-\req condition} (\cref{def:multi-reqpivot-param}), propagation conditions that allows multiple functions to serve as pivots simultaneously. Building on this, we present an interval‑based algorithm (\cref{alg:interval-check-param-withBigvee}) that searches for suitable base intervals and checks propagation conditions using satisfiability queries. We prove \emph{soundness} (\cref{cor:soundness-bigvee}) and \emph{relative completeness} (\cref{thm:completeness-bigvee}) for our algorithm. Finally\todoSN{Hopefully!}, we provide experimental evidence that our method handles problems beyond the reach of current SyGuS and MBQI approaches, often producing more interpretable models.
+% This paper makes several contributions towards deciding satisfiability in our fragment. We formalize \emph{cell propagation certificates} (\cref{def:certificate}) that witness satisfiability through inductive extension of finite base assignments.  We introduce the \emph{\req condition} (\cref{def:reqpivot-param}), propagation conditions that allows multiple functions to serve as pivots simultaneously. Building on this, we present an interval‑based algorithm (\cref{alg:interval-check-param-withBigvee}) that searches for suitable base intervals and checks propagation conditions using satisfiability queries. We prove \emph{soundness} (\cref{cor:soundness-bigvee}) and \emph{relative completeness} (\cref{thm:completeness-bigvee}) for our algorithm. Finally\todoSN{Hopefully!}, we provide experimental evidence that our method handles problems beyond the reach of current SyGuS and MBQI approaches, often producing more interpretable models.
 
 % \section{Related Work}\label{}
 % Synthesis of recursive functions by Hozzov\'a et al.~\cite{hozzova-ijcar24}.
@@ -237,55 +234,65 @@ These examples demonstrate the need for a method that handles arithmetic offsets
 \section{Problem Statement}
 \label{sec:problem-statement}
 
-\paragraph{Formula Class}
-We study formulas of the form
+%\paragraph{Formula Class}
+We introduce a method for certifying satisfiability of formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall \bar{x}.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables. We will define a way of certifying satisfiability of formulas in this class\todoSR{I am considering to generalize the certificate to the case of several universally quantified variables}\todoSR{We have no completeness result for such certificate}. Based on this, we will design an algorithm for detecting satisfiability under the following additional assumptions:
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables.  Based on this method, we will design an algorithm for detecting satisfiability under the following additional assumptions:
 \begin{itemize}
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
-    \item The number of universally quantified variables is $1$.
-    \item All uninterpreted function symbols have maximal arity $1$.
-    \item For each function symbol $f_i$, all its arguments in $Q$ have the \emph{same} coefficient of $x$ and this coefficient is non-negative.
-\end{itemize}
+    \item All uninterpreted function symbols have maximal arity $1$.  
+    \item The number of quantified variables is $1$.
+    \item The coefficient of the quantified variable is positive for all arguments of uninterpreted function symbols, and the same for all argument terms of the same uninterpreted function symbol.
+    \end{itemize}
+The algorithm is guaranteed to terminate under an additional semantic condition enabling induction (\cref{def:reqpivot-param}).
 
+We illustrate the class of formulas our algorithm can handle using two examples. 
 \begin{example}
-  \[f(0)=0 \wedge \forall x \,.\, f(2x+3)=g(x)+f(2x+c+1),\]
-  where $f$ has coefficient $2$ in all its arguments, $g$ has coefficient $1$, and $c$ is an uninterpreted constant. Both functions satisfy the same‑coefficient requirement.
+  \label{ex:formula}
+  \[f(0)=0 \wedge \forall x \,.\, f(2x+3)=g(x)+f(2x+c+1)-c,\]
+  where $c$ is an uninterpreted constant, and the coefficient of the quantified variable~$x$ is $2$ for all arguments of $f$, and $1$ for all arguments of $g$.
 \end{example}
-\todoSR{What about decidability of this restricted class? I am currently working with the assumption that it is unknown}
 
 \begin{example}[Invalid]
   \[\forall x \,.\, f(2x+3) = f(x+1)\]
   This formula is \emph{not} in our fragment because $f$ appears with arguments having different coefficients ($2$ and $1$).
 \end{example}
 
-\paragraph{Core Problem}
-Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we address is:
-\begin{quote}
-    \emph{Decide whether $\phi$ is satisfiable over the standard integers, and if so, construct a model (an interpretation of all uninterpreted function symbols) that satisfies $\phi$.}
-\end{quote}
+Note that certain formulas with several quantified variables can be easily transformed to this class by a change of variables. For example, the formula
+\[f(0)=0 \wedge \forall y,z \,.\, f(2y-2z+3)=g(y-z)+f(2y-2z+c+1)-c,\]
+can be reduced to Example~\ref{ex:formula} by the change of variables $x=y-z$.
 
-\paragraph{Why is this Hard?}\todoSN{Not sure about this part! I'm just trying to summarize it from what's written in the Intro and Related Work sections.}
-Although UFLIA is undecidable in general, formulas of the above form constitute a fragment that appears frequently in verification conditions (e.g.\ for programs with arrays or recursive functions). Yet, existing SMT techniques struggle:
-\begin{itemize}
-    \item \textbf{Finite instantiation} may not terminate because the universal quantifier ranges over the infinite domain $\mathbb{Z}$.
-    \item \textbf{Synthesis-based approaches} (SyGuS) rely on syntactic templates and fail when the required function does not match the template.
-    \item \textbf{Model-based quantifier instantiation} (MBQI) can sometimes find models but often produces large, uninterpretable assignments and scales poorly.
-    \item \textbf{Specialized array decision procedures} either forbid arithmetic on indices or are limited to difference‑bounded constraints.
-\end{itemize}
-The presence of both arithmetic constraints and uninterpreted functions, combined with the universal quantifier, makes this fragment challenging for current solvers.
+We are not aware of any result showing the decidability of this class. However, we are also not aware of any result proving it to be undecidable. Indeed, our goal is not decidability classification, but an algorithm for showing satisfiability that allows straightforward implementation in SMT solvers, and that is efficient in practice.
 
-\paragraph{Scope and Limitations}
-We make the following additional assumptions about the structure of the formulas:
-\begin{enumerate}
-    \item Each uninterpreted function symbol appears with only finitely many distinct argument terms in $Q$.
-    \item We do not allow nested applications of uninterpreted functions (e.g., $f(g(x))$ is excluded).
-    \item We do not consider multiple universal quantifiers over different variables or existential quantification over functions.
-\end{enumerate}
-These restrictions enable the inductive propagation reasoning that underlies our solution, while still covering many practical verification conditions. The technical details of our solution—how we detect satisfiability, what propagation conditions we require, and how we construct models—are presented in the following sections.
+
+
+% \paragraph{Core Problem}
+% Given a formula $\phi$ of the form~\eqref{eq:main-fragment}, the problem we address is:
+% \begin{quote}
+%     \emph{Decide whether $\phi$ is satisfiable over the standard integers, and if so, construct a model (an interpretation of all uninterpreted function symbols) that satisfies $\phi$.}
+% \end{quote}
+
+% \paragraph{Why is this Hard?}\todoSN{Not sure about this part! I'm just trying to summarize it from what's written in the Intro and Related Work sections.}
+% Although UFLIA is undecidable in general, formulas of the above form constitute a fragment that appears frequently in verification conditions (e.g.\ for programs with arrays or recursive functions). Yet, existing SMT techniques struggle:
+% \begin{itemize}
+%     \item \textbf{Finite instantiation} may not terminate because the universal quantifier ranges over the infinite domain $\mathbb{Z}$.
+%     \item \textbf{Synthesis-based approaches} (SyGuS) rely on syntactic templates and fail when the required function does not match the template.
+%     \item \textbf{Model-based quantifier instantiation} (MBQI) can sometimes find models but often produces large, uninterpretable assignments and scales poorly.
+%     \item \textbf{Specialized array decision procedures} either forbid arithmetic on indices or are limited to difference‑bounded constraints.
+% \end{itemize}
+% The presence of both arithmetic constraints and uninterpreted functions, combined with the universal quantifier, makes this fragment challenging for current solvers.
+
+% \paragraph{Scope and Limitations}
+% We make the following additional assumptions about the structure of the formulas:
+% \begin{enumerate}
+%     \item Each uninterpreted function symbol appears with only finitely many distinct argument terms in $Q$.
+%     \item We do not allow nested applications of uninterpreted functions (e.g., $f(g(x))$ is excluded).
+%     \item We do not consider multiple universal quantifiers over different variables or existential quantification over functions.
+% \end{enumerate}
+% These restrictions enable the inductive propagation reasoning that underlies our solution, while still covering many practical verification conditions. The technical details of our solution—how we detect satisfiability, what propagation conditions we require, and how we construct models—are presented in the following sections.
 
 % \paragraph{Expected Outcomes}
 % For formulas within this fragment, we aim to provide:
@@ -305,7 +312,7 @@ These restrictions enable the inductive propagation reasoning that underlies our
 %     \item \textbf{Propagation:} From a model of the base interval, we can extend the assignment to all integers $z \notin B$ without creating any conflicts. This requires that for each function $f_i$, certain occurrences in $Q$ can be treated as ``pivots'' whose values can be chosen after fixing all other occurrences.
 % \end{enumerate}
 
-% The second condition is formalized as the \emph{multi‑\req condition} in \cref{sec:alg}. Intuitively, it ensures that when moving outward from $B$ (to larger or smaller integers), we always have at least one cell in each instantiation whose value can be adjusted to satisfy $Q$, given the values already assigned to cells that appear in earlier instantiations.
+% The second condition is formalized as the \emph{\req condition} in \cref{sec:alg}. Intuitively, it ensures that when moving outward from $B$ (to larger or smaller integers), we always have at least one cell in each instantiation whose value can be adjusted to satisfy $Q$, given the values already assigned to cells that appear in earlier instantiations.
 
 % \paragraph{Challenges}\todoSN{Stefan R, could you please check whether I formulate this paragraph (and the next one) correctly?}
 % \begin{itemize}
@@ -318,31 +325,32 @@ These restrictions enable the inductive propagation reasoning that underlies our
 % We address these challenges through the following steps:
 % \begin{enumerate}
 %     \item We introduce \emph{cell propagation certificates} (Definition~\ref{def:certificate}) as a formal witness for satisfiability in our fragment.
-%     \item We define the \emph{multi‑\req condition} (Definition~\ref{def:multi-reqpivot-param}) that characterizes when propagation is possible.
-%     \item We prove that if a formula satisfies the multi‑\req condition and a suitable base interval exists, then the formula is satisfiable (Theorem~\ref{thm:interval-certificate-param}).
+%     \item We define the \emph{\req condition} (Definition~\ref{def:reqpivot-param}) that characterizes when propagation is possible.
+%     \item We prove that if a formula satisfies the \req condition and a suitable base interval exists, then the formula is satisfiable (Theorem~\ref{thm:interval-certificate-param}).
 %     \item We present an algorithm (Algorithm~\ref{alg:interval-check-param-withBigvee}) that enumerates candidate intervals and checks both base satisfiability and propagation conditions using an $\smt$ solver.
 %     \item We establish soundness and relative completeness theorems for our algorithm (Corollary~\ref{cor:soundness-bigvee} and Theorem~\ref{thm:completeness-bigvee}).
 % \end{enumerate}
 
 
-\section{Notation}\todoSR{We will see where to put this, in the end}
+\section{Notation}
 
-We already used the notation $\forall x$ as an abbreviation for universal quantification over several variables. In this case, we will write $\numvar{x}$ for the number of those variables. We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the term or formula~$s$. Here, $v$ may again represent several variables, in which case we require $t$ to represent a $\numvar{v}$-vector of terms, and assume substitution to be parallel. For an integer $z\in\mathbb{Z}$, we will denote the constant representing $z$ in a logical formula by $\repr{z}$\todoSR{Does there exist some standard notation for this?}.
+We use SMT terminology (which differs from classical logic by being typed, and defining notions such as satisfiability in a slightly different way). \todoSR{Mikoláš, are you aware of a standard way of describing those difference?}
+
+We already used the notation $\forall \bar{x}$ as an abbreviation for universal quantification over several variables. In this case, we will write $\numvar{x}$ for the number of those variables. We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the term or formula~$s$. Here, $v$ may again represent several variables, in which case we require $t$ to represent a $\numvar{v}$-vector of terms, and assume substitution to be parallel. For an integer $z\in\mathbb{Z}$, we will denote the constant representing $z$ in a logical formula by $\repr{z}$.
 
 For a formula $F$ and uninterpreted function symbol $f$, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
 
 We will use the classical mathematical notion of a well-order. A well-order on a set $S$ is a total ordering on $S$ such that every non-empty subset of $S$ has a least element. Any well-order allows well-founded induction: For a  proving that a property $P$ holds for all $x$, it suffices to prove that for every $x\in S$, if for all $y\prec x$, $P(y)$ then also $P(x)$.
 
-We use SMT terminology (which differs from classical logic by being typed, and defining notions such as satisfiability in a slightly different way).
 
+We use the notion of certificate in the following sense~\cite{McConnell:11}: Given a property~$P(x)$ that is typically difficult to check, a certificate for this property is an object $\Pi$ for which we have a property $P'(x,\Pi)$ and a proof that $P'(x,\Pi)$ implies $P(x)$, and for which $P'(x,\Pi)$ is easier to check than $P(x)$. Here, we will not always insist on a precise meaning of the notion of being easy to check. However, the final goal is a certificate $\Pi$, for which $P'(x,\Pi)$ can be checked more efficiently than the original property $P(x)$, using an algorithm that is in some sense simpler then an algorithm for checking $P(x)$. As a consequence, such a certificate will enable an efficient independent check of the correctness of the result of an algorithm for checking~$P(x)$.
 
 \section{Satisfiability Certificates}
 \label{sec:certificate}
 
-
 \todoSR{I intend to add a running example and a figure}
 
-In this section, we will define objects that certifies that a formula in the form defined in~\cref{sec:problem-statement} is satisfiable. In the next section, will then introduce an algorithm for compute such certificates.
+In this section, we will define objects that certifies that a formula in the form defined in~\cref{sec:problem-statement} is satisfiable. In the next section, we will then introduce an algorithm to compute such certificates.
 
 Traditionally, satisfiability of a logical formula is certified by an interpretation that assigns a value to each non-logical symbol in such way that the formula is true. However, the set of integers is infinite. Due to this,  the interpretation of an uninterpreted function symbol with integer domain is a function that assigns values to the infinitely many integers that form this domain. This opens the question of how to represent such a function using a finite object that can be represented on computers.
 
@@ -390,7 +398,7 @@ Given a pre-satisfiability certificate, we can now certify the advisability of f
 	\end{itemize}
 \end{definition}
 
-The notion of certificate defined here is abstract in the sense that it does not fix a concrete finite representation that allows for an independent check whether a given object is indeed a satisfiability certificate. For arriving at concrete class of independently checkable certificates, it suffices to fix a well-order and decide on a representation of propagated cells and satisfiability propagator that allows for such an independent check. We refer the reader to the next section for a concrete way of doing so.\todoSR{I will try to make the connection clearer.}
+The notion of certificate defined here is abstract in the sense that it does not fix a concrete finite representation that allows for an independent check whether a given object is indeed a satisfiability certificate. For arriving at concrete independently checkable certificates, it suffices to fix a well-order and decide on a representation of propagated cells and satisfiability propagator that allows for such an independent check. For example, all these definitions could be written in the language of Presburger arithmetic, which allows the independent check to be done using a decision procedure for Presburger arithmetic. We will illustrate this in the next section for the special class of formulas described in \cref{sec:problem-statement}.
 
 % For the sake of generality, the satisfiability propagator only shows existence of values for the propagated cells. At this point we do not require it to be constructive. Still, below we will work with algorithms computing actual values. In addition, the definition allows infinitely many different sets of propagated cells and satisfiability propagators. In practice, for allowing computer representation, we will only work with finitely many different ones.
 
@@ -462,23 +470,26 @@ The goal is now an algorithm that computes such satisfiability certificates and 
 % \[ F\wedge \forall x\;.\; Q(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\dots,f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})),\]
 % where $F$ is quantifier free, for every $i\in \{1,\dots,r\}$, and the  $t^{f_i}_{1},\dots,t^{f_i}_{l_i}$ are pairwise different LIA ground terms
 
-In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. \todoSN{Might need to change ``While..."}While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables ($\numvar{\bar{x}} \geq 1$), the algorithm presented here focuses on the case $\numvar{\bar{x}}=1$. This certificate will explicitly certify: (1) satisfiability of the quantifier-free part $F$, and (2) satisfiability over a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. For values outside $B$, it uses satisfiability propagators with an order that propagates upward from $b_{\max}+1$ and downward from $b_{\min}-1$.  We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
+In this section, we will introduce an algorithm that will check satisfiability of an input formula by computing a satisfiability certificate of a certain form. \todoSN{Might need to change ``While..."}While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables, the algorithm presented here focuses on the case of a single universally quantified variable. We also assume that the coefficient of this variable in argument terms is non-negative, and that all non-zero coefficients of this variables are the same for the same uninterpreted function symbol.
 
-Throughout this section we assume that $\phi$ is a formula of the form $F \land \forall x.\; Q$, as defined in ~\cref{sec:problem-statement}. Let $\mathcal{F}$ be the set of uninterpreted function symbols in $Q$, and $\mathcal{T}$ the set of terms of the form $f(t)$ in $Q$. 
+The computed certificate will explicitly certify: (1) satisfiability of the quantifier-free part $F$, and (2) satisfiability over a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. For values outside $B$, it uses satisfiability propagators with an order that propagates upward from $b_{\max}+1$ and downward from $b_{\min}-1$.  We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
+
+Throughout this section we assume that $\phi$ is a formula of the form $F \land \forall \bar{x}.\; Q$, as defined in ~\cref{sec:problem-statement}, but with $\bar{x}$ being a single variable $x$. Let $\mathcal{F}$ be the set of uninterpreted function symbols in $Q$, and $\mathcal{T}$ the set of terms of the form $f(t)$ in $Q$. 
 
 We will now formalize the condition ensuring propagation outward from a base interval $B$ is possible. For upward propagation, we select a $\mathcal{S} \subseteq\mathcal{T}$ whose argument terms are \emph{maximal} (all equal and strictly greater than other argument terms of the same function symbol). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences in $\mathcal{S}$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
 
-\begin{definition}[Multi-\req Condition]
-\label{def:multi-reqpivot-param}
+\begin{definition}[\req Condition]
+\label{def:reqpivot-param}
 
-For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$,\todoSR{I think we could weaken the ``same coefficient condition'' by requiring it only for the $f$ occurring in $\mathcal{S}$. In a similar way, we could allow several quantified variables, and restrict the coefficients of quantified variables in $\mathcal{S}$.}\todoSN{Ah, yes, I think it's doable as functions not in $\mathcal{S}$ don't need propagation and only propagating functions need strict ordering!} define:
+For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
 \begin{itemize}
-    \item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}\todoSR{I think this could be weakened if the coefficient of $x$ is $2$ or more, but this would lead too far for our submission.}
+    \item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}
     \[
         \subst{ \bigwedge_{f\in\mathcal{F}}\left(\bigwedge_{f(t),f(t') \in \mathcal{S}} t = t' \;\land\;
-        \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}, f(t')\not\in \mathcal{S}} t > t'
+        \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}\setminus\mathcal{S}} t > t'
         \right)}{x}{0}.
     \]
+    
     \item \textbf{Upward propagability condition $\Phi_{\text{prop-up}}(\mathcal{S})$:}
         \[\forall x \forall \bar{u} \exists \bar{v}.\ Q'(\mathcal{S})\]
         where $\bar{u}$ corresponds to the variables $u_{f(t)}$ with $f(t)\in\mathcal{T}\setminus\mathcal{S}$ and $\bar{v}$ to the variables $v_{f(t)}$ with $f(t)\in \mathcal{S}$, and $Q'$ is obtained from $Q$ by simultaneously replacing
@@ -487,20 +498,20 @@ For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$,\todoSR{I think we c
             \item every $f(t)\in\mathcal{S}$ by $v_{f(t)}$.
         \end{itemize}
 \end{itemize}
-
+ 
 Symmetrically, for downward propagation with a subset $\mathcal{S}'\subseteq\mathcal{T}$, define $\Phi_{\text{min}}(\mathcal{S}')$ (with $<$ instead of $>$) and $\Phi_{\text{prop-down}}(\mathcal{S}')$.
 
-We say that $Q$ satisfies the \emph{multi-\req condition for $(\mathcal{S}, \mathcal{S}')$} if
+We say that $Q$ satisfies the \emph{\req condition for $(\mathcal{S}, \mathcal{S}')$} if
 \begin{itemize}
     \item $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ hold,
     \item $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ hold.
 \end{itemize}
 
-We say $Q$ satisfies the \emph{multi-\req condition} if there exists \emph{some} pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the multi-\req condition for $(\mathcal{S}, \mathcal{S}')$.
+We say $Q$ satisfies the \emph{\req condition} if there exists \emph{some} pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the \req condition for $(\mathcal{S}, \mathcal{S}')$.
 \end{definition}
 
-\begin{example}[Multi-\req Illustration]
-\label{ex:multi-req-illustration}
+\begin{example}[\req Illustration]
+\label{ex:req-illustration}
 Consider the formula:
 \[
 \forall x.\ f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
@@ -579,15 +590,14 @@ Consider $\mathcal{S}' = \{f(x+1),h(x)\}$.
 \end{enumerate}
 
 \medskip\noindent\textbf{Putting it together:}
-$Q$ satisfies the multi-\req condition for the pair $(\mathcal{S},\mathcal{S}')$ whenever $c$ satisfies both $c < 1$ (from upward maximality) and $c > -2$ (from downward minimality). Hence for any $c \in (-2, 1)$, the specific choices $\mathcal{S} = \{f(x+4),g(x+2)\}$ and $\mathcal{S}' = \{f(x+1),h(x)\}$ witness the multi‑\req condition.
+$Q$ satisfies the \req condition for the pair $(\mathcal{S},\mathcal{S}')$ whenever $c$ satisfies both $c < 1$ (from upward maximality) and $c > -2$ (from downward minimality). Hence for any $c \in (-2, 1)$, the specific choices $\mathcal{S} = \{f(x+4),g(x+2)\}$ and $\mathcal{S}' = \{f(x+1),h(x)\}$ witness the \req condition.
 \end{example}
 
 Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the cells generated during propagation from clashing with the ground part $F$.
 
 \begin{definition}[Interval Extension Formulas]
 \label{def:interval-extension-formulas-param}
-For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}' \subseteq \mathcal{T}$, define: \todoSR{potential improvement (to be left for later): conjunction over only one element of $S_i$ (the maximality condition forces them to be equal)}
-
+For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}' \subseteq \mathcal{T}$, define: 
 \begin{enumerate}
     \item \textbf{Upward extension formula $\Psi_{\text{up}}(B,\mathcal{S})$}:
     \[
@@ -595,31 +605,33 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}'
     \Phi_{\text{prop-up}}(\mathcal{S}) \;\land
     \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a \leq \subst{t}{x}{b_{\max}}
     \]
-    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:multi-reqpivot-param}. 
+    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:reqpivot-param}. 
     
     \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
     \[
     \Phi_{\text{min}}(\mathcal{S}') \;\land\; 
     \Phi_{\text{prop-down}}(\mathcal{S}') \;\land
-    \bigwedge_{f(t) \in \mathcal{S}'} \bigwedge_{\substack{a \in \args(F,f_i)}} a \geq \subst{t}{x}{b_{\min}}
+    \bigwedge_{f(t) \in \mathcal{S}'} \bigwedge_{\substack{a \in \args(F,f)}} a \geq \subst{t}{x}{b_{\min}}
     \]
-    where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ are as defined in \cref{def:multi-reqpivot-param}.
+    where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ are as defined in \cref{def:reqpivot-param}.
 \end{enumerate}
 \end{definition}
 
-Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (resp. $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of multi‑\req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{b_{\max}}$ ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f_i(a)$; similarly for downward propagation.
+Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (resp. $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{b_{\max}}$ ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f_i(a)$; similarly for downward propagation.
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
-Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and let $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$ be subset of terms. If 
+Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and assume that
 \[
-\Biggl(F \land \bigwedge_{x \in B} Q[x]\Biggr) \;\land\; \Psi_{\text{up}}(B,\mathcal{S}) \;\land\; \Psi_{\text{down}}(B,\mathcal{S}')
+  \Biggl(F \land \bigwedge_{x \in B} Q[x]\Biggr) \;\land\;
+  \Biggl(\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})\Biggr)\;\land\;
+  \Biggl(\bigvee_{\mathcal{S}'\subseteq \mathcal{T}}\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S}')\Biggr)
 \]
-is satisfiable, then $\phi$ has a cell propagation certificate, and hence is satisfiable.\todoSR{a concrete checkable certificate would hence be $I, B, \mathcal{S}, \mathcal{S}'$}
+is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satisfiable.
 \end{theorem}
 
 \begin{proof}
-Suppose the conjunction is satisfiable, and let $I$ be an interpretation satisfying it. We construct a certificate as in \cref{def:certificate}:
+  Suppose the conjunction is satisfiable,   let $I$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I\models \Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$, and $\mathcal{S}'$ such that $I\models \Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S})$.  We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
     \item \textbf{Pre‑satisfiability assignment:} $I$ 
@@ -684,7 +696,17 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \qedhere\end{proof}
 
-The formula in the premise of \cref{thm:interval-certificate-param} belongs to Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Moreover, the theorem immediately yields an algorithm that searches for the parameters $B$, $\mathcal{S}$ and $\mathcal{S}$ of this theorem. This can be seen in \cref{alg:interval-check-param-withBigvee}.
+The formula in the premise of \cref{thm:interval-certificate-param} belongs to the language of Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the model of this formula (which has a straightforward finite representation) and the sets $\mathcal{S}$, $\mathcal{S}'$.
+
+Algorithmic implementations of the satisfiability propagators whose existence is ensured by the proof of \cref{thm:interval-certificate-param} can often be obtained from the witness functions that are 
+a side product of quantifier elimination on the
+propagability conditions~$\Phi_{\text{prop-up}}(\mathcal{S})$ and~$\Phi_{\text{prop-down}}(\mathcal{S})$. These propagators  can then be used in the recursive evaluation function $val$ defined in \cref{sec:certificate} to compute values of the function that a model assigns to an uninterpreted function symbol.
+
+
+
+
+The theorem immediately yields an algorithm that checks satisfiability by searching for the interval~$[b_{\min},b_{\max}]$. This can be seen in \cref{alg:interval-check-param-withBigvee}. An extension of the algorithm that in the case of the return value \textsc{Sat} also returns a corresponding certificate, is straightforward.
+
 
 \begin{algorithm}
 \caption{Interval‑Based Satisfiability Check}
@@ -697,7 +719,7 @@ The formula in the premise of \cref{thm:interval-certificate-param} belongs to P
 %\While{$I \neq \bot$}
 \While{$F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is satisfiable}
     \State $\text{max}_\text{up}\gets\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S}))$
-    \State $\text{min}_\text{down}\gets\bigvee_{{\mathcal{S}'\subseteq \mathcal{T}}}\Psi_{\text{down}}([b_{\min},b_{\max}],,\mathcal{S}))$ 
+    \State $\text{min}_\text{down}\gets\bigvee_{{\mathcal{S}'\subseteq \mathcal{T}}}\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S}))$ 
     \If{$\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right) \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}$ is satisfiable}
         \State \Return \textsc{Sat} 
     \EndIf
@@ -708,73 +730,80 @@ The formula in the premise of \cref{thm:interval-certificate-param} belongs to P
 \end{algorithmic}
 \end{algorithm}
 
-\begin{corollary}[Soundness]
-\label{cor:soundness-bigvee}
-If \cref{alg:interval-check-param-withBigvee} terminates, then it returns a correct result.
+% \begin{corollary}[Soundness]
+% \label{cor:soundness-bigvee}
+% If \cref{alg:interval-check-param-withBigvee} terminates, then it returns a correct result.
 
-\end{corollary}
+% \end{corollary}
 
-\begin{proof}
-  If the result is $\textsc{Unsat}$, then $F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is unsatisfiable. This formula is implied by the input formula, and hence the result is correct. 
+% \begin{proof}
+%   If the result is $\textsc{Unsat}$, then $F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is unsatisfiable. This formula is implied by the input formula, and hence the result is correct. 
 
-  If the result is $\textsc{Sat}$, then this happens during a certain iteration of the while loop. Then there exists:
-\begin{itemize}
-    \item An interval $B = [b_{\min}, b_{\max}]$,
-    \item An interpretation $I$ satisfying:
-    \[
-    I \models F \land \bigwedge_{x \in B} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}},
-    \]
-    where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are the disjunctions defined in lines 3--4 of the algorithm.
-\end{itemize}
+%   If the result is $\textsc{Sat}$, then this happens during a certain iteration of the while loop. Then there exists:
+% \begin{itemize}
+%     \item An interval $B = [b_{\min}, b_{\max}]$,
+%     \item An interpretation $I$ satisfying:
+%     \[
+%     I \models F \land \bigwedge_{x \in B} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}},
+%     \]
+%     where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are the disjunctions defined in lines 3--4 of the algorithm.
+% \end{itemize}
 
-Since $I \models \text{max}_{\text{up}}$, there exists some $\mathcal{S}\subseteq\mathcal{T}$ such that 
-$I \models \Psi_{\text{up}}(B,\mathcal{S})$. Similarly, $I \models \text{min}_{\text{down}}$ implies there exists 
-$\mathcal{S}'\subseteq\mathcal{T}$ such that $I \models \Psi_{\text{down}}(B,\mathcal{S}')$. Thus $I$ satisfies:
-\[
-F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Psi_{\text{down}}(B,\mathcal{S}').
-\]
+% Since $I \models \text{max}_{\text{up}}$, there exists some $\mathcal{S}\subseteq\mathcal{T}$ such that 
+% $I \models \Psi_{\text{up}}(B,\mathcal{S})$. Similarly, $I \models \text{min}_{\text{down}}$ implies there exists 
+% $\mathcal{S}'\subseteq\mathcal{T}$ such that $I \models \Psi_{\text{down}}(B,\mathcal{S}')$. Thus $I$ satisfies:
+% \[
+% F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Psi_{\text{down}}(B,\mathcal{S}').
+% \]
 
-By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a satisfiability certificate 
-for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiable.
-\qedhere\end{proof}
+% By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a satisfiability certificate 
+% for the pair $(\mathcal{S},\mathcal{S}')$, and consequently $\phi$ is satisfiable.
+% \qedhere\end{proof}
 
-The proof of~\cref{thm:interval-certificate-param} also shows how the return value \textsc{Sat} results in a corresponding satisfiability certificate, and extending the algorithm to also return such a certificate is an easy exercise.
 
-The satisfiability propagators required by \cref{def:certificate} can often be obtained through quantifier elimination. For a given $z \in \mathbb{Z}$ and set of propagated cells $X_z$, the existence of values for $X_z$ that satisfy $Q[z]$ given values for the other cells is an existentially quantified formula $\exists \{v_{f(t)} \mid f(t) \in \mathcal{S}\}.\ Q'[z]$ where $v_{f(t)}$ correspond to the cells in $X_z$ and $Q'[z]$ is $Q[z]$ with those cells replaced by the $v_{f(t)}$. Quantifier elimination techniques for LIA can produce witnesses or solving functions for the $v_{f(t)}$, which serve as the required propagators.  propagators can then be used in the recursive evaluation function $val$ defined in \cref{sec:certificate} to compute values of the function that a model assigns to an uninterpreted function symbol.
+The correctness of the result \textsc{Sat} of the algorithm is an immediate consequence of \cref{alg:interval-check-param-withBigvee}. The correctness of the result \textsc{Unsat} follows from the fact that the termination condition of the while loop is a logical consequence of the input formula. However, it might also happen that the algorithm runs forever. We can exclude this under certain conditions:
 
 \begin{theorem}[Relative Completeness]
 \label{thm:completeness-bigvee}
 If the input formula~$\phi$
 \begin{enumerate}
     \item is satisfiable, and
-    \item satisfies the multi‑\req condition for some pair $(\mathcal{S}^*,\mathcal{S}'^*)$ 
-          as defined in \cref{def:multi-reqpivot-param},
+    \item satisfies the \req condition for some pair $(\mathcal{S}^*,\mathcal{S}'^*)$ 
+          as defined in \cref{def:reqpivot-param},
 \end{enumerate}
 then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{Sat}.
 \end{theorem}
 
 \begin{proof}
-Assume $\phi$ is satisfiable and satisfies multi‑\req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
-Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$.
+Assume $\phi$ is satisfiable and satisfies \req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
+Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments.
 
-For each $f\in\mathcal{F}$, define:
+For each $f(t)\in\mathcal{F}$, define:
 \[
-v_{\max}^f = \max\{\, I^*(t) \mid f(t) \in \mathcal{T}\,\}, \qquad
-v_{\min}^f = \min\{\, I^*(t) \mid f(t) \in \mathcal{T} \,\}.
+v_{\max}^f = \max\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
+v_{\min}^f = \min\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
 \]
-
+% where $t_0=\subst{t}{x}{0}$ for each $f(t)\in\mathcal{T}$.
 The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathcal{S}'^*)$ ensure that:
 \begin{itemize}
-    \item For all $f(t) \in \mathcal{S}^*$: $I^*(t) = v_{\max}^f$,
-    \item For all $f(t) \in \mathcal{S}'^*$: $I^*(t) = v_{\min}^f$.
+    \item For all $f(t) \in \mathcal{S}^*$: $I^*(\subst{t}{x}{0}) = v_{\max}^f$,
+    \item For all $f(t) \in \mathcal{S}'^*$: $I^*(\subst{t}{x}{0}) = v_{\min}^f$.
 \end{itemize}
+
+% Now choose
+% \[
+% b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}
+% \]
+% \[
+% b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}.
+% \]
 
 Now choose
 \[
-b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}
+b_{\max} = \max\left\{\, \left\lceil \frac{I^*(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}
 \]
 \[
-b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}.
+b_{\min} = \min\left\{\, \left\lfloor \frac{I^*(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}.
 \]
 
 Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
@@ -786,12 +815,15 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     For the specific $\mathcal{S}^*$, we have:
     \begin{itemize}
         \item $\Phi_{\text{max}}(\mathcal{S}^*)$ holds by definition,
-        \item $\Phi_{\text{prop-up}}(\mathcal{S}^*)$ holds by the multi-\req condition,
-        \item For each $f(t)\in\mathcal{S}^*$ and $t_g \in \args(F,f)$ with $f(t) \in \mathcal{S}$:
+        \item $\Phi_{\text{prop-up}}(\mathcal{S}^*)$ holds by the \req condition,
+        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:
+        % \[
+        % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
+        % \]
         \[
-        I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
+        I^*(a) \leq c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{b_{\max}})
         \]
-        by construction of $b_{\max}$.
+        by construction of $b_{\max}$, which is exactly the clash condition.
     \end{itemize}
     Thus $I^* \models \Psi_{\text{up}}(B,\mathcal{S}^*)$, and consequently $I^* \models \text{max}_{\text{up}}$.
     
@@ -800,9 +832,12 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     \begin{itemize}
         \item $\Phi_{\text{min}}(\mathcal{S}'^*)$ holds,
         \item $\Phi_{\text{prop-down}}(\mathcal{S}'^*)$ holds,
-        \item For each $f(t)\in\mathcal{S}'^{*}$ and $t_g \in \args(F,f)$:
+        \item For each $f(t)\in\mathcal{S}'^{*}$ and $a \in \args(F,f)$:
+        % \[
+        % I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
+        % \]
         \[
-        I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
+        I^*(a) \geq c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{b_{\min}})
         \]
         by construction of $b_{\min}$.
     \end{itemize}
@@ -834,15 +869,20 @@ f(0) = 0 \land f(c) \neq 0 \land \forall x.\, f(x) = f(x+1)
 This formula is unsatisfiable in standard integer arithmetic (applying induction in both directions yields $\forall n.\, f(n) = 0$, contradicting $f(c) \neq 0$). However, any finite set of instantiations is satisfiable by choosing $c$ to be a sufficiently large integer. Thus, \cref{alg:interval-check-param-withBigvee} will expand the interval indefinitely without detecting unsatisfiability.
 \end{example}
 
+
 % \paragraph{Summary.}
 % In summary, our algorithm:
 % \begin{itemize}
-%     \item Terminates with \textsc{Sat} for all satisfiable formulas within the fragment that satisfy the multi-\req condition (\cref{thm:completeness-bigvee}).
+%     \item Terminates with \textsc{Sat} for all satisfiable formulas within the fragment that satisfy the \req condition (\cref{thm:completeness-bigvee}).
 %     \item Terminates with \textsc{Unsat} for formulas whose unsatisfiability can be detected through finite instantiation alone (\cref{thm:finiteunsatThenUNSAT}).
 %     \item May not terminate for formulas whose unsatisfiability requires induction over all integers or instantiations at unbounded offsets.
 % \end{itemize}
 
+% \section{Multiple Quantified Variables}
 
+% We now return to the case with multiple quantified variables $\bar{x}=\{x_1,\dots,x_k\}$. Under the assumptions stated in \cref{sec:problem-statement}, the coefficient vectors of all argument terms of uninterpreted function symbols in $Q$ are collinear, and the non-zero coefficient vectors of the arguments of each individual uninterpreted function symbol are identical. Formally, this means there exists a non-zero integer vector $a \in \mathbb{Z}^k$ and, for each function $f \in \mathcal{F}$, a positive integer multiplier $\lambda_f > 0$ such that every argument term $t$ of $f$ in $Q$ can be written as $t = \lambda_f (a \cdot \bar{x}) + b_t$, where $b_t$ is a ground term (independent of $\bar{x}$). 
+% % Hence there is some vector $a$, constants $b_t$, $f(t)\in\mathcal{T}$ and multipliers $\lambda_{f}>0$, $f\in\mathcal{F}$ such that each argument of an  uninterpreted function symbol can be written in the form $\lambda_f a x + b_t$. 
+% We can then perform a change of variables $z=a\cdot\bar{x}$, and get an equivalent formula that falls within the single‑variable fragment handled by \cref{alg:interval-check-param-withBigvee} in the previous section.
 
 \section{Handling Disjunction Using Auxiliary Propositional Variables}
 
@@ -874,30 +914,27 @@ where:
     
     \item Minimality encoding: $\Phi_\text{min}^\text{e}$ defined analogously with $s'_{f(t)}$ and $<$ instead of $>$.
     
-    \item Upward propagation encoding: Given Boolean variables $\{s_{f(t)}\}$ representing the choice $\mathcal{S} = \{f(t)\mid s_{f(t)} \text{ is true}\}$, we define:
-    \begin{align*}
-        \Phi_{\text{prop-up}}^\text{e}(\{s_{f(t)}\}) &\equiv \forall x \forall \{u_{f(t)} \mid f(t) \in \mathcal{T}, \neg s_{f(t)}\} \exists \{v_{f(t)} \mid f(t) \in \mathcal{T}, s_{f(t)}\}.\ Q' 
-    \end{align*}
-    where the formula $Q'$ is obtained from $Q$ by simultaneously substituting:
-    \begin{itemize}
-        \item $f(t)$ by $v_{f(t)}$ whenever $s_{f(t)}$ is true,
-        \item $f(t)$ by $u_{f(t)}$ whenever $s_{f(t)}$ is false.
-    \end{itemize}
-      
-    % \item Upward propagation encoding: For the given Boolean variables $\{s_{f(t)}\}$, define $\Phi_{\text{prop-up}}^\text{e}(\{s_{f(t)}\})$ as:
-    % \[
-    %     \forall x \forall \bar{u} \exists \bar{v}.\ 
-    %     \bigwedge_{f(t) \in \mathcal{T}} \Big((s_{f(t)} \Rightarrow (f(t) = v_{f(t)})) \land (\neg s_{f(t)} \Rightarrow (f(t) = u_{f(t)}))\Big) \Rightarrow Q
-    % \]
-    % where $\bar{u} = \{u_{f(t)} \mid f(t) \in \mathcal{T}\}$ and $\bar{v} = \{v_{f(t)} \mid f(t) \in \mathcal{T}\}$.
+    \item Upward propagation encoding $\Phi_{\text{prop-up}}^e$:
+    \[
+    \bigwedge_{\mathcal{T}_{\!-}\subseteq\mathcal{T}}
+    \left(\bigwedge_{f(t)\in\mathcal{T}_{\!-}} \neg s_{f(t)} \;\wedge\; \bigwedge_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}} s_{f(t)}\;\Rightarrow\; \forall x\, \forall \bar{u}\, \exists \bar{v}\; Q^{\mathcal{T}_{\!-}}\right),
+    \]
+    where $\bar{u}=(u_{f(t)})_{f(t)\in\mathcal{T}_{\!-}}$ and $\bar{v}=(v_{f(t)})_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}}$, and $Q^{\mathcal{T}_{\!-}}$ is obtained from $Q$ by simultaneously replacing each $f(t)\in\mathcal{T}_{\!-}$ by $u_{f(t)}$ and each $f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}$ by $v_{f(t)}$.
 
+    % \[\bigwedge_{\substack{f(t)\in\mathcal{T} \\ \sigma_{f(t)}\in\{\neg,\cdot\}}} \left(\bigwedge_{f(t)\in\mathcal{T}} \sigma_{f(t)}s_{f(t)}\Rightarrow\forall x \forall \bar{u} \exists \bar{v}.\ Q'\right)\]
 
-    \item Downward propagation encoding: Symmetrically, for downward propagation with variables $\{s'_{f(t)}\}$ representing $\mathcal{S}'$, define $\Phi_{\text{prop-down}}^\text{e}(\{s'_{f(t)}\})$.
+    % where $\bar{u}$ corresponds to the variables $u_{f(t)}$ where $\sigma_{f(t)}$ is $\neg$ and $\bar{v}$ to the variables $v_{f(t)}$ where $\sigma_{f(t)}$ is $\cdot$, and $Q'$ is obtained from $Q$ by simultaneously replacing
+    % \begin{itemize}
+    %     \item every $f(t)\in\mathcal{T}$ with $\sigma_{f(t)}=\neg$ by $u_{f(t)}$, and
+    %     \item every $f(t)\in\mathcal{T}$ with $\sigma_{f(t)}=\cdot$ by $v_{f(t)}$, 
+    % \end{itemize}
+    % and $\cdot$ is a dummy symbol, and hence for any propositional variable $p$, $\cdot p$ is the same as $p$.
+    
+    \item Downward propagation encoding: This is defined symmetrically.
     
     \item Clash condition encoding:
     \begin{align*}
-        \text{ClashUpEnc} &\equiv \bigwedge_{f(t)\in\mathcal
-        {T}}\bigwedge_{a \in \args(F,f_i)} \big(s_{f(t)} \Rightarrow (a \leq \subst{t}{x}{b_{\max}})\big) \\
+        \text{ClashUpEnc} &\equiv \bigwedge_{f(t)\in\mathcal {T}}\bigwedge_{a \in \args(F,f_i)} \big(s_{f(t)} \Rightarrow (a \leq \subst{t}{x}{b_{\max}})\big) \\
         \text{ClashDownEnc} &\equiv \bigwedge_{f(t)\in\mathcal
         {T}}\bigwedge_{a \in \args(F,f_i)} \big(s'_{f(t)} \Rightarrow (a \geq \subst{t}{x}{b_{\min}})\big)
     \end{align*}
@@ -924,7 +961,7 @@ For any interval $B = [b_{\min}, b_{\max}]$:
 
 \paragraph{Practical Considerations.}
 The exponential disjunctions in \cref{alg:interval-check-param-withBigvee} 
-(lines 3--4) can be replaced by the CNF encodings $\Psi_\text{up}^\text{e}$ and $\Psi_\text{down}^\text{e}$ as defined above, which are equi-satisfiable by \cref{lem:encoding-correctness}. This yields a practical implementation while preserving all theoretical guarantees. Thus, the CNF encoding approach provides a practical bridge between the theoretical multi‑\req framework and implementable algorithm, while avoiding exponential formula size.
+(lines 3--4) can be replaced by the CNF encodings $\Psi_\text{up}^\text{e}$ and $\Psi_\text{down}^\text{e}$ as defined above, which are equi-satisfiable by \cref{lem:encoding-correctness}. This yields a practical implementation while preserving all theoretical guarantees. Thus, the CNF encoding approach provides a practical bridge between the theoretical \req framework and implementable algorithm, while avoiding exponential formula size.
 
 \section{Experiments}
 

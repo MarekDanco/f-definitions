@@ -7,6 +7,7 @@
 
 
 import argparse
+
 # import functools
 # import operator
 import itertools
@@ -15,20 +16,8 @@ from z3 import *
 
 from benchmarks import Incr, IncrConst, IncrConstArg, Incr2Functions, Test
 from smt2_loader import load_smt2
-
-
-def get_func_interp(f, model, bmax, consts):
-    args = set(range(bmax + 1)) | set(consts)
-    return {arg: model.eval(f(arg)) for arg in args}
-
-def print_func_interp(interp):
-    for arg, val in interp.items():
-        print(f"    {arg} -> {val}")
-
-
-def flatten(ls):  # flatten a list of lists
-    # return functools.reduce(operator.concat, l)
-    return [item for subls in ls for item in subls]
+from sygus import process_formula
+from small_utils import flatten, Formula
 
 
 def maximality_i(i, b):
@@ -70,6 +59,10 @@ def reqpivot_case(bl, b):
 
 def reqpivot(b):
     return list(map(lambda t: reqpivot_case(t, b), get_bitvectors(len(flatten(p)))))
+    # res = list(map(lambda t: reqpivot_case(t, b), get_bitvectors(len(flatten(p)))))
+    # for r in res:
+    #     print(r)
+    # return res
 
 
 def reqpivot_2(b):  # old implementation of special case
@@ -203,8 +196,8 @@ if args.smtlib:
     print(solver.to_smt2())
 else:
     # p = list(map(lambda l: list(map(lambda v: Bool(f"{v}p"), l)), b.occ))
-    p = [[Bool(f"{offset}p") for offset in func] for func in b.occ]  # is a pivot
     # print(p)
+    p = [[Bool(f"{offset}p") for offset in func] for func in b.occ]  # is a pivot
 
     bmax = 0
     solver.add(b.F)
@@ -225,17 +218,23 @@ else:
         res = solver.check()
         if res == sat:
             # print(solver)
-            print(solver.model())
+            # print(solver.model())
             print("model:")
             model = solver.model()
             funcs = [f for f in model.decls() if f.arity() > 0]
-            consts = [model.eval(c()) for c in model.decls() if c.arity() == 0 if c.range() == IntSort()]
+            consts = [
+                c for c in model.decls() if c.arity() == 0 if c.range() == IntSort()
+            ]
+            formula = Formula(b)
+            for c in consts:
+                print(f"{c} -> {model.eval(c())}")
             for f in funcs:
                 print(f)
-                # print(model.get_interp(f))
-                print_func_interp(get_func_interp(f, model, bmax, consts))
+                formula.print_func_interp(f, model, bmax, consts)
+            cvc5_sygus = process_formula(b, p, model)
             print("otherwise defined recursively as:")
-            print(f"    {b.Q}")
+            for synth in cvc5_sygus:
+                print(f"    {synth}")
             break
 
         bmax = bmax + 1
@@ -248,3 +247,5 @@ else:
 
         # solver.add(F)
         # print(solver.to_smt2())
+    else:
+        print("final: unsat")
