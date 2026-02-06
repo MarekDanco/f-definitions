@@ -976,9 +976,9 @@ There are two basic reasons why verification conditions may fail to hold: (1) a 
         \item run-time of MBQI increases with the size of the model
         \end{itemize}
 
-        For example, on my brand-new notebook, CVC5 with MBQI needs roughly 15sec to show the formula
+        For example, on my brand-new notebook, cvc5 with MBQI needs roughly 15sec to show the formula
         \[ f(0)=0 \wedge \forall x \;.\; x<0\vee x>1000\vee f(x+1)=f(x)+1 \]
-        to be satisfiable, and then produces an unreadable model of size 25K. After changing the upper bound to 10000, CVC5 does not terminate in 10 minutes, so apparently, the growth is super-linear.
+        to be satisfiable, and then produces an unreadable model of size 25K. After changing the upper bound to 10000, cvc5 does not terminate in 10 minutes, so apparently, the growth is super-linear.
 
 
 \section{Conclusion}
