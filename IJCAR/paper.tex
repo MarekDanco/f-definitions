@@ -186,9 +186,14 @@ In this paper, we explore an alternative approach that avoids explicit model con
 
 Our work intersects several areas of automated reasoning: synthesis, decision procedures for arrays, and model-based quantifier instantiation.
 
+\paragraph{Recursion.}
+\cite{Farzan2021}
+\cite{Kneuss2013}
+
 \paragraph{Synthesis approaches.}
 Syntax-Guided Synthesis (SyGuS)~\cite{cvc5} enumerates candidate functions from a grammar. Hence its performance depends crucially on the chosen grammar. Moreover, it synthesizes functions in an explicit representation, disallowing recursion\todoSR{right?}. Our method does beyond that, using inductive reasoning.
 Kunčak et al.~\cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation synthesis. Hozzová et al.~\cite{hozzova-ijcar24} synthesize recursive programs from constraints.\todoSR{Do we want to keep these references? If yes, we need a better description. Do we want to add our CADE paper as a template based approach?}
+
 
 
 
