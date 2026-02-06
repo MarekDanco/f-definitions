@@ -334,13 +334,14 @@ We are not aware of any result showing the decidability of this class. However, 
 
 \section{Notation}
 
+We use SMT terminology (which differs from classical logic by being typed, and defining notions such as satisfiability in a slightly different way). \todoSR{Mikoláš, are you aware of a standard way of describing those difference?}
+
 We already used the notation $\forall \bar{x}$ as an abbreviation for universal quantification over several variables. In this case, we will write $\numvar{x}$ for the number of those variables. We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the term or formula~$s$. Here, $v$ may again represent several variables, in which case we require $t$ to represent a $\numvar{v}$-vector of terms, and assume substitution to be parallel. For an integer $z\in\mathbb{Z}$, we will denote the constant representing $z$ in a logical formula by $\repr{z}$.
 
 For a formula $F$ and uninterpreted function symbol $f$, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
 
 We will use the classical mathematical notion of a well-order. A well-order on a set $S$ is a total ordering on $S$ such that every non-empty subset of $S$ has a least element. Any well-order allows well-founded induction: For a  proving that a property $P$ holds for all $x$, it suffices to prove that for every $x\in S$, if for all $y\prec x$, $P(y)$ then also $P(x)$.
 
-We use SMT terminology (which differs from classical logic by being typed, and defining notions such as satisfiability in a slightly different way).
 
 We use the notion of certificate in the following sense~\cite{McConnell:11}: Given a property~$P(x)$ that is typically difficult to check, a certificate for this property is an object $\Pi$ for which we have a property $P'(x,\Pi)$ and a proof that $P'(x,\Pi)$ implies $P(x)$, and for which $P'(x,\Pi)$ is easier to check than $P(x)$. Here, we will not always insist on a precise meaning of the notion of being easy to check. However, the final goal is a certificate $\Pi$, for which $P'(x,\Pi)$ can be checked more efficiently than the original property $P(x)$, using an algorithm that is in some sense simpler then an algorithm for checking $P(x)$. As a consequence, such a certificate will enable an efficient independent check of the correctness of the result of an algorithm for checking~$P(x)$.
 
