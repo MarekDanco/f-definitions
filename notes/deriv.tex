@@ -61,50 +61,34 @@
 
 
 
-The following derives the formulas used by the algorithm directly from the definition of satisfiability certificate and the definition of $\preceq$ and $X_z$ used by the algorithm. One might even start by only assuming $\preceq$ to be defined by a LIA expression and $X_z$ to be defined using finitely many cases, where the condition of each case is again defined using a LIA expression.
-
+The following derives the formulas used by the algorithm directly from the definition of satisfiability certificate and the definition of $\preceq$ and $X_z$ used by the algorithm. Assume a predicate $\preceq$ defined using LIA. In our current approach $x\preceq x'$ iff
+\[ |x|<|x'| \vee (|x|=|x'|\wedge sgn(x)>sgn(x')). \]
 The conditions used by definition of satisfiability certificate (split into clash condition and propagation condition) are:
 \[X_z\cap \mathit{def}(I)=\emptyset, X_z\cap\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi)=\emptyset.\]
-Now assume that for every $z$, $X_z$ is given by a subset $S_z$ of the argument terms~$\mathcal{T}$ s.t. \[X_z=\{ f(I(\subst{t}{x}{z}))\mid f(t)\in S_z\}\]
-Then the 
-clash condition becomes   
+Now assume a partitioning of the quantification space using predicates $cond_1,\dots, cond_n$ such that $\models\bigvee_{i\in \{1,\dots,n\}} cond_i$ and for all $i,j\in \{1,\dots, n\}$ with $i\neq j$, $cond_i\wedge cond_j$ is unsatisfiable. In our current approach we use an interval $B=[b_{\min}, b_{\max}]$ and $cond_1\equiv z\in B$, $cond_2\equiv z>b_{\max}$, $cond_3\equiv z<b_{\min}$.
+
+
+Assume $\mathcal{S}_1,\dots,\mathcal{S}_n\subseteq \mathcal{T}$ such that \[\bigwedge_{i\in\{1,\dots, n\}} cond_i\Rightarrow X_z=\{ f(I(\subst{t}{x}{z}))\mid f(t)\in S_i\}.\] In our current approach $\mathcal{S}_1=\emptyset$ and $\mathcal{S}_2$ and $\mathcal{S}_3$ are named $\mathcal{S}$ and $\mathcal{S}'$, and we do not used fixed sets, but solve for them.
+
+Then the clash condition becomes   
     \[
-      \forall z\;.\; \bigwedge_{f(t)\in \mathcal{S}_z}\bigwedge_{a\in args(F,f) } a\neq t[x\leftarrow z] 
+      \forall z\;.\; \bigwedge_{i\in \{1,\dots, n\}} cond_i(z)\Rightarrow \bigwedge_{f(t)\in \mathcal{S}_i}\bigwedge_{a\in args(F,f) } a\neq t[x\leftarrow z] 
   \]
 and the propagation condition
 \[
-  \forall z', z\;.\; z'\prec z \Rightarrow \bigwedge_{f(t')\in \mathcal{T}, f(t)\in S_z} t'[x\leftarrow z'] \neq t[x\leftarrow z]
+  \forall z', z\;.\; z'\prec z \Rightarrow \bigwedge_{i\in \{1,\dots, n\}} cond_i(z) \Rightarrow\bigwedge_{f(t')\in \mathcal{T}, f(t)\in S_i} t'[x\leftarrow z'] \neq t[x\leftarrow z]
 \]
 Based on this, we can use a more precise ReqPivot that takes into account the information whether two arguments are the same (and hence refer to the same cell) or not:
-\[\forall x \forall \bar{u} \;.\; congu\Rightarrow \exists \bar{v}.\ congv\wedge Q' \]
-where congu is
-\[\bigwedge_{ f(t)\in \mathcal{T}\setminus\mathcal{S},f(t')\in \mathcal{T}\setminus\mathcal{S}} t=t'\Rightarrow u_{f(t)}=u_{f(t')},\]
-congv is
-\[  \bigwedge_{ f(t)\in \mathcal{T},f(t')\in \mathcal{T}} t=t'\Rightarrow v_{f(t)}=v_{f(t')}\]
-and where $\bar{u}$ corresponds to the variables $u_{f(t)}$ with $f(t)\in\mathcal{T}\setminus\mathcal{S}$ and $\bar{v}$ to the variables $v_{f(t)}$ with $f(t)\in \mathcal{S}$, and $Q'$ is obtained from $Q$ by simultaneously replacing
+\[\forall z\bigwedge_{i\in \{1,\dots, n\}}  cond_i(z)\Rightarrow\forall \bar{u} \;.\; congu_i\Rightarrow \exists \bar{v}.\ congv_i\wedge Q'(S_i) \]
+where $congu_i$ is
+\[\bigwedge_{ f(t)\in \mathcal{T}\setminus\mathcal{S}_i,f(t')\in \mathcal{T}\setminus\mathcal{S}_i} t=t'\Rightarrow u_{f(t)}=u_{f(t')},\]
+$congv_i$ is
+\[  \bigwedge_{ f(t)\in \mathcal{S}_i,f(t')\in \mathcal{S}_i} t=t'\Rightarrow v_{f(t)}=v_{f(t')}\]
+and where $\bar{u}$ corresponds to the variables $u_{f(t)}$ with $f(t)\in\mathcal{T}\setminus\mathcal{S}_i$ and $\bar{v}$ to the variables $v_{f(t)}$ with $f(t)\in \mathcal{S}_i$, and $Q'(S_i)$ is obtained from $Q$ by simultaneously replacing
         \begin{itemize}
-            \item every $f(t)\in\mathcal{T}\setminus\mathcal{S}$ by $u_{f(t)}$, and
-            \item every $f(t)\in\mathcal{S}$ by $v_{f(t)}$.
+            \item every $f(t)\in\mathcal{T}\setminus\mathcal{S}_i$ by $u_{f(t)}$, and
+            \item every $f(t)\in\mathcal{S}_i$ by $v_{f(t)}$.
             \end{itemize}
-
-The definitions of $\preceq$ and $X_z$ used by the algorithm are:
-\begin{itemize}
-  
-\item $x\preceq x'$ iff
-\[ |x|<|x'| \vee (|x|=|x'|\wedge sgn(x)>sgn(x')) \]
-\item 
-    \[
-    S_z = 
-    \begin{cases}
-    \emptyset & \text{if } z \in B, \\[4pt]
-    \mathcal{S} & \text{if } z > b_{\max}, \\[4pt]
-    \mathcal{S}' & \text{if } z < b_{\min}.
-    \end{cases}
-  \]
-\end{itemize}
-
-
-Plugging this into the constraints above, we get
 
 %\bibliographystyle{abbrv}
 %\bibliography{refs}
