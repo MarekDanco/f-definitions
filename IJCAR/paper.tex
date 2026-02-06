@@ -339,9 +339,7 @@ We are not aware of any result showing the decidability of this class. However, 
 
 \section{Notation}
 
-We use SMT terminology (which differs from classical logic by being typed, and defining notions such as satisfiability in a slightly different way). \todoSR{Mikoláš, are you aware of a standard way of describing those difference?}
-
-We already used the notation $\forall \bar{x}$ as an abbreviation for universal quantification over several variables. In this case, we will write $\numvar{x}$ for the number of those variables. We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the term or formula~$s$. Here, $v$ may again represent several variables, in which case we require $t$ to represent a $\numvar{v}$-vector of terms, and assume substitution to be parallel. For an integer $z\in\mathbb{Z}$, we will denote the constant representing $z$ in a logical formula by $\repr{z}$.
+As usual in an SMT context, we will work with a first-order language that is sorted. We also assume variables to only occur in positions where they are bounded by a quantifier. We already used the notation $\forall \bar{x}$ as an abbreviation for universal quantification over several variables. In this case, we will write $\numvar{x}$ for the number of those variables. We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the term or formula~$s$. Here, $v$ may again represent several variables, in which case we require $t$ to represent a $\numvar{v}$-vector of terms, and assume substitution to be parallel. For an integer $z\in\mathbb{Z}$, we will denote the constant representing $z$ in a logical formula by $\repr{z}$.
 
 For a formula $F$ and uninterpreted function symbol $f$, $args(F, f)$ will denote the set of argument terms of $f$ in $F$.
 
