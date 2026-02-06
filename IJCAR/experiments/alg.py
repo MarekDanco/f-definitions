@@ -19,6 +19,7 @@ from smt2_loader import load_smt2
 from sygus import process_formula
 from small_utils import flatten, Formula
 
+z3.set_param("smt.random_seed", 7)
 
 def maximality_i(i, b):
     if len(b.offsets[i]) == 2:
