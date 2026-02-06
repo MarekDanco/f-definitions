@@ -1,9 +1,9 @@
 import subprocess as sp
-from enum import Enum
 import re
 import z3
-
+import shutil
 from small_utils import flatten
+from enum import Enum
 
 
 class Res(Enum):
@@ -12,15 +12,21 @@ class Res(Enum):
 
 
 class Cmd(Enum):
-    SYGUS = ["/usr/local/bin/cvc5", "--sygus-inference=on"]
+    SYGUS = ("cvc5", "--sygus-inference=on")
+
+    def resolve(self):
+        exe = shutil.which(self.value[0])
+        if exe is None:
+            raise FileNotFoundError(f"{self.value[0]} not found in PATH")
+        return [exe, *self.value[1:]]
 
 
 def run_cvc5(timeout, prob):
     prob += "(get-model)\n"
-    external_command = Cmd.SYGUS
+    external_command = Cmd.SYGUS.resolve()
     try:
         res = sp.run(
-            external_command.value,
+            external_command,
             input=prob,
             text=True,
             capture_output=True,
@@ -167,7 +173,12 @@ def process_formula(b, p, model):
     for i, synth in enumerate(res):
         ret.append(
             sygus2string(
-                synth, b.x, pvt_functions[i], pvt_offsets[i], u_vars_functions, u_vars_offsets
+                synth,
+                b.x,
+                pvt_functions[i],
+                pvt_offsets[i],
+                u_vars_functions,
+                u_vars_offsets,
             )
         )
     return ret
