@@ -390,7 +390,7 @@ Given a pre-satisfiability certificate, we can now certify the advisability of f
 		\item a well-order $\preceq$ on $\mathbb{Z}^{\numvar{\bar{x}}}$,%\footnote{A well-order total order for which every non-empty subset has a least element. This enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}
 		\item for every $z\in\mathbb{Z}^{\numvar{\bar{x}}}$
                   \begin{itemize}
-                  \item a set $X_z\subseteq \Gamma_{I,z}(\phi)$  (the \emph{propagated cells}) such that \[X_z\cap (\mathit{def}(I)\cup\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi))=\emptyset,\] and
+                  \item a set $X_z\subseteq \Gamma_{I,z}(\phi)$  (the \emph{propagated cells}) such that \[X_z\cap \mathit{def}(I)=\emptyset, X_z\cap\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi)=\emptyset,\] and
                     %that are neither assigned a value by $I$, nor occur in any $\Gamma_{I,z'}(\phi)$ for any $z'\prec z$
                   \item a certificate (the \emph{satisfiability propagator}) showing that for all values of cells in $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ there exist values for the cells in $X_z$ such that for the cell interpretation $I_{X_z}$ assigning these values to $X_z$, $I\cup I_{X_z}\models \subst{Q}{\bar{x}}{\repr{z}}$.
                   \end{itemize}
