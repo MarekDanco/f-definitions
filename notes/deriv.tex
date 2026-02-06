@@ -79,38 +79,28 @@ The definitions of $\preceq$ and $X_z$ used by the algorithm are:
   \]
 \end{itemize}
 
-
-condition used by definition of satisfiability certificate
-  
-
-    \[X_z\cap (\mathit{def}(I)\cup\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi))=\emptyset,\]
-
-split into clash condition and propagation condition:    
+The conditions used by definition of satisfiability certificate (split into clash condition and propagation condition) are:
     \[X_z\cap \mathit{def}(I)=\emptyset, X_z\cap\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi)=\emptyset,\]   
-
-    clash condition:
+Using the definitions from above, the clash condition becomes   
     \[
       \forall z\;.\; z\not\in B \Rightarrow \bigwedge_{f(t)\in \mathcal{S}}\bigwedge_{a\in args(F,f) } a\neq t[x\leftarrow z] 
   \]
-
-propagation condition:  
-    
+and the propagation condition
 \[
   \forall z', z\;.\; z'\prec z \wedge z\not\in B \Rightarrow \bigwedge_{f(t')\in \mathcal{T}, f(t)\in S} t'[x\leftarrow z'] \neq t[x\leftarrow z]
-  \]
-
-        \[\forall x \forall \bar{u} \;.\; congu\Rightarrow \exists \bar{v}.\ congv\wedge Q'(\mathcal{S}) \]
-        where $\bar{u}$ corresponds to the variables $u_{f(t)}$ with $f(t)\in\mathcal{T}\setminus\mathcal{S}$ and $\bar{v}$ to the variables $v_{f(t)}$ with $f(t)\in \mathcal{S}$, and $Q'$ is obtained from $Q$ by simultaneously replacing
+\]
+Based on this, we can use a more precise ReqPivot that takes into account the information whether two arguments are the same (and hence refer to the same cell) or not:
+\[\forall x \forall \bar{u} \;.\; congu\Rightarrow \exists \bar{v}.\ congv\wedge Q'(\mathcal{S}) \]
+where congu is
+\[\bigwedge_{ f(t)\in \mathcal{T}\setminus\mathcal{S},f(t')\in \mathcal{T}\setminus\mathcal{S}} t=t'\Rightarrow u_{f(t)}=u_{f(t')},\]
+congv is
+\[  \bigwedge_{ f(t)\in \mathcal{T},f(t')\in \mathcal{T}} t=t'\Rightarrow v_{f(t)}=v_{f(t')}\]
+and where $\bar{u}$ corresponds to the variables $u_{f(t)}$ with $f(t)\in\mathcal{T}\setminus\mathcal{S}$ and $\bar{v}$ to the variables $v_{f(t)}$ with $f(t)\in \mathcal{S}$, and $Q'$ is obtained from $Q$ by simultaneously replacing
         \begin{itemize}
             \item every $f(t)\in\mathcal{T}\setminus\mathcal{S}$ by $u_{f(t)}$, and
             \item every $f(t)\in\mathcal{S}$ by $v_{f(t)}$.
             \end{itemize}
 
-congu
-\[\bigwedge_{ f(t)\in \mathcal{T}\setminus\mathcal{S},f(t')\in \mathcal{T}\setminus\mathcal{S}} t=t'\Rightarrow u_{f(t)}=u_{f(t')}\]
-
-congv
-\[  \bigwedge_{ f(t)\in \mathcal{T},f(t')\in \mathcal{T}} t=t'\Rightarrow v_{f(t)}=v_{f(t')}\]
 
 
 
