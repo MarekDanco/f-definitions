@@ -1,5 +1,6 @@
 import pandas as pd
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 C_MAP = {
     "bench_600_40000": 1,
@@ -52,4 +53,15 @@ for folder, c in C_MAP.items():
         rows.extend(parse_tab(tab_file, solver, c))
 
 df = pd.DataFrame(rows)
-print(df[df["c"] == 5])
+# print(df[df["c"] == 5])
+
+# solved = df[df['status'] == 'sat'].groupby(['c', 'solver']).size().unstack(fill_value=0)
+#
+# solved.plot(marker='o', linestyle='-')
+# plt.xlabel('c')
+# plt.ylabel('Number of benchmarks solved')
+# plt.grid(True)
+# plt.xticks(sorted(df['c'].unique()))
+# plt.tight_layout()
+# plt.savefig("scaling_plot.png", dpi=300, bbox_inches='tight')
+# plt.close()
