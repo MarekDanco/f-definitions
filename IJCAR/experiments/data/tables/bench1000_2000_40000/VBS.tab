@@ -1,0 +1,16 @@
+/local/home/dancomar/ijcar26/bench1000/decrement.smt2 ; 24 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/diff_depends_g.smt2 ; 0 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/doubling.smt2 ; 26 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/doubling1.smt2 ; 35 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/incr.smt2 ; 23 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/incr_2functions.smt2 ; 0 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/incr_2functions1.smt2 ; 2000 (sec); n
+/local/home/dancomar/ijcar26/bench1000/incr_2functions2.smt2 ; 0 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/incr_2functions_const.smt2 ; 478 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/incr_by3.smt2 ; 27 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/incr_const.smt2 ; 25 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/incr_const_arg.smt2 ; 0 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/step2.smt2 ; 33 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/test.smt2 ; 51 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/test1.smt2 ; 0 (sec); s sat
+/local/home/dancomar/ijcar26/bench1000/two_base_cases.smt2 ; 24 (sec); s sat
