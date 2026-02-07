@@ -990,11 +990,12 @@ such that the equality holds. It suffices to consider the interval $[0,\, 4]$.
 Another problem in our set is
 \begin{align}\label{eq:exp2}
 	F       & = (d > 1)\;\land\; f(0)=0 \;\land\; g(2) > f(d+1)             \notag \\
-	Q(x)    & = (0 \le x \le 10^c \;\Rightarrow\; f(x-1)=f(x)+g(x)+g(x+d)) \notag  \\
+	Q(x)    & = (0 \le x \le 10^c \;\Rightarrow\; f(x-1)=f(x)+g(x)+g(x+d))  \notag \\
 	\varphi & = F \;\land\; \forall x.\; Q(x)
 \end{align}
 Here, our algorithm terminates right after ensuring that \req holds for the interval $[0,\, 3]$.
 
+We ran our experiments on (\textit{server specs}) with a 30-minute time limit.
 When setting $c = 1$, the state of the art \textsc{smt} solvers terminate on our
 problems immediately. On problem~\eqref{eq:exp1} with $c = 3$, \textsc{cvc5} takes
 23 seconds to return \textsc{sat}, and for $c \geq 4$, the solver times out. With
