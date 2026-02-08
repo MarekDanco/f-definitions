@@ -102,7 +102,7 @@ def reqpivot_2(b):  # old implementation of special case
 
 def clash(b):
     return [
-        Or(Not(p[i][j]), b.argF[0][arg] <= bmax + b.offsets[i][j])
+        Or(Not(p[i][j]), b.argF[i][arg] <= bmax + b.offsets[i][j])
         for i in range(0, num_f)
         for arg in range(0, len(b.argF[i]))
         for j in range(0, len(b.offsets[i]))
