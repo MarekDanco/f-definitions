@@ -21,7 +21,8 @@
 \usepackage[most]{tcolorbox}
 \usepackage{enumitem}
 \usepackage{orcidlink}
-
+\usepackage{graphicx}
+\usepackage{caption, subcaption}
 \newcommand{\sygus}{SyGuS\xspace}
 \newcommand{\qedhere}{$\blacksquare$}
 \newcommand{\numvar}[1]{|#1|}
@@ -977,12 +978,12 @@ There are two basic reasons why verification conditions may fail to hold: (1) a 
 % \[ f(0)=0 \wedge \forall x \;.\; x<0\vee x>1000\vee f(x+1)=f(x)+1 \]
 % to be satisfiable, and then produces an unreadable model of size 25K. After changing the upper bound to 10000, cvc5 does not terminate in 10 minutes, so apparently, the growth is super-linear.
 
-We have prepared a short test suite consisting of small problems such as
+We have prepared a short test suite consisting of 16 small problems such as
 \begin{align}\label{eq:exp1}
 	f(4)=7 \;\land\; \forall x.\; (0 \le x \le 10^c \;\Rightarrow\; f(x+1)=f(x)+1),
 \end{align}
-where we tested how well do the state of the art \textsc{smt} solvers \textsc{z3} and \textsc{cvc5}
-(ran with the argument \texttt{--mbqi})
+where we tested how well do the state of the art \textsc{smt} solvers \textsc{z3} and 
+\textsc{cvc5}\footnote{ran with the argument \texttt{--mbqi}}
 scale on such problems with increasing positive $c$. Note that on this particular example,
 our algorithm has to check just that for all values of $f(x)$, there exists a value of $f(x+1)$
 such that the equality holds. It suffices to consider the interval $[0,\, 4]$.
@@ -1003,6 +1004,25 @@ $c \geq 2$, \textsc{z3} returns \textsc{unknown} after 11 seconds. On problem~\e
 \textsc{cvc5} times out with $c \geq 3$ and \textsc{z3} returns \textsc{unknown} starting
 from $c = 2$.
 
+\begin{figure}[ht]
+    \centering
+    % First subfigure
+    \begin{subfigure}{0.48\linewidth}
+        \centering
+        \includegraphics[width=1\linewidth]{experiments/data/scaling_plot.png}
+        \caption{Benchmarks solved}
+        \label{fig:scaling}
+    \end{subfigure}
+    \hfill
+    % Second subfigure
+    \begin{subfigure}{0.5\linewidth}
+        \centering
+        \includegraphics[width=1\linewidth]{experiments/data/scatter_runtime.png}
+        \caption{Solver runtime}
+        \label{fig:scatter}
+    \end{subfigure}
+    \caption{Summary of solver performance as a function of parameter $c$.}
+\end{figure}
 
 \section{Conclusion}
 
