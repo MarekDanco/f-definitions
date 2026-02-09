@@ -610,7 +610,7 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}'
 \end{enumerate}
 \end{definition}
 
-Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (resp. $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f_i(a)$; similarly for downward propagation.
+Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (resp. $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f(a)$; similarly for downward propagation.
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
