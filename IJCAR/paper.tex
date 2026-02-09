@@ -401,6 +401,29 @@ Given a pre-satisfiability certificate, we can now certify the advisability of f
 	\end{itemize}
 \end{definition}
 
+\begin{example}[A Satisfiability Certificate]\label{ex:certificate-example}
+For $\phi = f(3, a) \geq 4 + g(b) \wedge \forall x, y . (f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b)$:
+\begin{itemize}
+    \item Pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$
+    \item Order $\preceq$: $(3,0) \prec (3,1) \prec (3,2) \prec \cdots \prec (3,-1) \prec \cdots \prec \text{others}$
+
+    For $(3,i)$, $\Gamma_{I,(3,i)} = 
+    \begin{cases}
+        \{g(0)\} & i=0,\\
+        \{f(3,1), g(2)\} & i=1,\\
+        \{f(3,i), g(i), g(i+1)\} & i\neq 0,1.
+    \end{cases}$
+    
+    \item Propagated cells $X_{(3,i)} = 
+        \begin{cases}
+            \{g(0)\} & i=0,\\
+            \{f(3,i), g(i+1)\} & i>0,\\
+            \{f(3,i), g(i)\} & i<0.
+        \end{cases}$
+    \item Propagators: $g(0)\mapsto5$; for $i>0$: $f(3,i)=i+g(i)-1$, $g(i+1)=g(i)-2$.
+\end{itemize}
+\end{example}
+
 The notion of certificate defined here is abstract in the sense that it does not fix a concrete finite representation that allows for an independent check whether a given object is indeed a satisfiability certificate. For arriving at concrete independently checkable certificates, it suffices to fix a well-order and decide on a representation of propagated cells and satisfiability propagator that allows for such an independent check. For example, all these definitions could be written in the language of Presburger arithmetic, which allows the independent check to be done using a decision procedure for Presburger arithmetic. We will illustrate this in the next section for the special class of formulas described in \cref{sec:problem-statement}.
 
 % For the sake of generality, the satisfiability propagator only shows existence of values for the propagated cells. At this point we do not require it to be constructive. Still, below we will work with algorithms computing actual values. In addition, the definition allows infinitely many different sets of propagated cells and satisfiability propagators. In practice, for allowing computer representation, we will only work with finitely many different ones.
@@ -697,7 +720,7 @@ Hence $I(\subst{t'}{x}{\repr{z}})< I(\subst{t}{x}{\repr{z}}))$, which implies th
     %         \]
     %         since $t$ is maximal and $z' < z$.
     %     \end{itemize}        
-    % \end{itemize}
+    \end{itemize}
 
     \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition $a \geq \subst{t}{x}{b_{\min}}$.
 \end{itemize}
