@@ -627,8 +627,13 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
   Suppose the conjunction is satisfiable,   let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S})$.  We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
-    \item \textbf{Pre‑satisfiability assignment:} the cell interpretation~$I$ such that
+    \item \textbf{Pre‑satisfiability assignment:} Define the cell interpretation~$I$ as follows:
+    \begin{itemize}
+        \item For each cell $f(n)$ where $f$ is an uninterprtted function symbol, if there exists a ground term $a$ in $F$ such that $I^*(a)=(n)$, then set $I(f(n))=I^*(f(a))$.
+        \item 
+    \end{itemize}
     
+       
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
     \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
     
