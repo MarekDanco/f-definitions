@@ -631,18 +631,17 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
       \begin{itemize}
         \item For every uninterpreted constant $c$ in $\phi$, set $I(c)=I^*(c)$.
         \item For every cell $f(n)$ where $f$ is an uninterpreted function symbol, if there exists a ground term $a$ in $F$ such that $I^*(a)=n$, then set $I(f(n))=I^*(f(a))$.
-        \item For each cell $f(I^*(\subst{t}{x}{\repr{z}}))$ with $z\in B$ and $f(t)$ occurs in $Q$, set its value to $I^*(f(\subst{t}{x}{\repr{z}}))$.
     \end{itemize}
     By construction, $I$ is finite and satisfies $F\land\bigwedge_{z\in B}Q[z] $, because $I^*$ satisfies that formula and $I$ agrees with $I^*$ on all relevant cells.
        
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
     \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
     
-    \item \textbf{Propagated cells $X_z$ for $z \in \mathbb{Z}$:}
+  \item \textbf{Propagated cells $X_z$ for $z \in \mathbb{Z}$:}
     \[
     X_z = 
     \begin{cases}
-    \emptyset & \text{if } z \in B, \\[4pt]
+    \Gamma_{I,z}(\phi)\setminus \mathit{def}(I) & \text{if } z \in B, \\[4pt]
     \bigl\{ f(I(\subst{t}{x}{z})) \mid f(t)\in\mathcal{S} \bigr\} & \text{if } z > b_{\max}, \\[4pt]
     \bigl\{ f(I(\subst{t}{x}{z})) \mid f(t)\in\mathcal{S}' \bigr\} & \text{if } z < b_{\min}.
     \end{cases}
@@ -651,7 +650,7 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
 
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
-        \item For $z \in B$: since $X_z$ is empty, $I\models\subst{Q}{x}{\repr{z}}$ suffices.
+    \item For $z \in B$: In this case, $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ is empty. The satisfiability propagator simply sets the values of $X_z$, which is $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)$ to the values given by $I^*$.
         \item For $z > b_{\max}$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$ values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
         \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop}}(\mathcal{S}')$ to assign values to propagated cells.
     \end{itemize}
@@ -685,20 +684,20 @@ The clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ in $\Psi_{\text{up}}(
         \]
 Hence $I(\subst{t'}{x}{\repr{z}})< I(\subst{t}{x}{\repr{z}}))$, which implies that the two sides of the inequality cannot be the same.
 
-        \begin{itemize}
-            \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
-            \[
-            I\models\subst{t'}{x}{z'} \leq \subst{t'}{x}{\repr{b}_{\max}} < \subst{t}{x}{\repr{z}},
-            \]
-            since $t$ is maximal among terms of $f$ in $\mathcal{T}$ by $\Phi_{\text{max}}(\mathcal{S})$ and $z > b_{\max}$.
+    %     \begin{itemize}
+    %         \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
+    %         \[
+    %         I\models\subst{t'}{x}{z'} \leq \subst{t'}{x}{\repr{b}_{\max}} < \subst{t}{x}{\repr{z}},
+    %         \]
+    %         since $t$ is maximal among terms of $f$ in $\mathcal{T}$ by $\Phi_{\text{max}}(\mathcal{S})$ and $z > b_{\max}$.
             
-            \item If $b_{\max} < z' < z$: Then 
-            \[
-            I(\subst{t'}{x}{z'}) \leq \max_{f(t'') \in \mathcal{T} \text{ with same } f} I(\subst{t''}{x}{z'}) < I(\subst{t}{x}{\repr{z}})
-            \]
-            since $t$ is maximal and $z' < z$.
-        \end{itemize}        
-    \end{itemize}
+    %         \item If $b_{\max} < z' < z$: Then 
+    %         \[
+    %         I(\subst{t'}{x}{z'}) \leq \max_{f(t'') \in \mathcal{T} \text{ with same } f} I(\subst{t''}{x}{z'}) < I(\subst{t}{x}{\repr{z}})
+    %         \]
+    %         since $t$ is maximal and $z' < z$.
+    %     \end{itemize}        
+    % \end{itemize}
 
     \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition $a \geq \subst{t}{x}{b_{\min}}$.
 \end{itemize}
