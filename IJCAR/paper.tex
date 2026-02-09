@@ -629,7 +629,7 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
 \begin{enumerate}
     \item \textbf{Pre‑satisfiability assignment:} Define the cell interpretation~$I$ as follows:
     \begin{itemize}
-        \item For each cell $f(n)$ where $f$ is an uninterpreted function symbol, if there exists a ground term $a$ in $F$ such that $I^*(a)=(n)$, then set $I(f(n))=I^*(f(a))$.
+        \item For each cell $f(n)$ where $f$ is an uninterpreted function symbol, if there exists a ground term $a$ in $F$ such that $I^*(a)=n$, then set $I(f(n))=I^*(f(a))$.
         \item For each cell $f(I^*(\subst{t}{x}{\repr{z}}))$ with $z\in B$ and $f(t)$ occurs in $Q$, set its value to $I^*(f(\subst{t}{x}{\repr{z}}))$.
     \end{itemize}
     By construction, $I$ is finite and satisfies $F\land\bigwedge_{z\in B}Q[z] $, because $I^*$ satisfies that formula and $I$ agrees with $I^*$ on all relevant cells.
