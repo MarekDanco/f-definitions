@@ -687,7 +687,7 @@ It remains to verify the disjointness conditions of \cref{def:certificate}:
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \qedhere\end{proof}
 
-The formula in the premise of \cref{thm:interval-certificate-param} belongs to the language of Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the model of this formula (which has a straightforward finite representation) and the sets $\mathcal{S}$, $\mathcal{S}'$.
+The formula in the premise of \cref{thm:interval-certificate-param} belongs to the language of Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the model of this formula (which has a straightforward finite representation) and the sets $\mathcal{S}$ and $\mathcal{S}'$.
 
 Algorithmic implementations of the satisfiability propagators whose existence is ensured by the proof of \cref{thm:interval-certificate-param} can often be obtained from the witness functions that are 
 a side product of quantifier elimination on the
