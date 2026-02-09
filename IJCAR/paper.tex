@@ -1014,7 +1014,7 @@ from $c = 2$.
     \caption{Summary of solver performance as a function of parameter $c$.}
 \end{figure}
 
-\section{Conclusion (DRAFT)}
+\section{Conclusion}
 \label{sec:conclusion}
 
 We have presented a novel method for certifying satisfiability of universally quantified integer arithmetic formulas with uninterpreted function symbols—a fragment of UFLIA that arises naturally in verification tasks involving arrays and recursive constraints. Unlike traditional SMT solvers that rely on explicit model construction, our approach uses inductive propagation arguments to avoid the need for large or infinite models. By introducing \emph{satisfiability certificates} based on finite base intervals and propagation conditions, we reduce the problem of infinite-domain satisfiability to the verification of finite $\smt$ queries.
@@ -1024,7 +1024,6 @@ Our approach unfolds in two complementary layers. First, we introduced a general
 
 Second, we instantiated this framework with a concrete algorithm (\cref{sec:alg}) where the core of our approach is the \req condition (\cref{def:reqpivot-param}), which captures when solutions can be extended outward from a finite base interval $B$. We have shown that if $B$ satisfies base satisfiability and the propagation conditions hold for some $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, then the entire formula is satisfiable (\cref{thm:interval-certificate-param}). The algorithm derived from this insight (\cref{alg:interval-check-param-withBigvee}) is both sound and relatively complete: every \textsc{Sat} answer is correct, and it terminates with \textsc{Sat} for all satisfiable formulas satisfying the \req condition (\cref{thm:completeness-bigvee}). Moreover, by employing a compact CNF encoding of the propagation conditions, we avoid exponential blow-up and make the approach implementable within modern $\smt$ solvers.
 
- 
 \paragraph{Empirical Relevance.}
 Something from Experiments section.
 
