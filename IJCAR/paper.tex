@@ -475,21 +475,23 @@ We will now proceed from the  general certification framework to concrete comput
 The computed certificate will explicitly certify: (1) satisfiability of the quantifier-free part $F$, and (2) satisfiability over a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. For values outside $B$, it uses satisfiability propagators with an order that propagates upward from $b_{\max}+1$ and downward from $b_{\min}-1$.  We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
 
 We will now formalize the condition ensuring that  propagation outward from a base interval $B$ is possible. 
-For this, let $\mathcal{F}$ be the set of uninterpreted function symbols in the quantified part~$Q$ of $\phi$, and let~$\mathcal{T}$ be the set of terms of the form $f(t)$ in $Q$, with $f\in \mathcal{F}$. For upward propagation, we select a $\mathcal{S} \subseteq\mathcal{T}$ whose argument terms are \emph{maximal} (all equal and strictly greater than other argument terms of the same function symbol). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences in $\mathcal{S}$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
+For this, let $\mathcal{F}$ be the set of uninterpreted function symbols in the quantified part~$Q$ of $\phi$, and let~$\mathcal{T}$ be the set of terms of the form $f(t)$ in $Q$. For upward propagation, we select a subset of these terms $\mathcal{S} \subseteq\mathcal{T}$ whose argument terms are \emph{maximal} (all equal and strictly greater than other argument terms of the same function symbol). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences in $\mathcal{S}$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
 
 \begin{definition}[\req Condition]
 \label{def:reqpivot-param}
 
 For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
 \begin{itemize}
-    \item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}
-    \[
+\item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}
+  \vspace*{-0.2cm}
+  \[
         \subst{ \bigwedge_{f\in\mathcal{F}}\left(\bigwedge_{f(t),f(t') \in \mathcal{S}} t = t' \;\land\;
         \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}\setminus\mathcal{S}} t > t'
         \right)}{x}{0}.
     \]
+Symmetrically, for downward propagation, define the minimality condition $\Phi_{\text{min}}$ with $<$ instead of $>$.
     
-    \item \textbf{Upward propagability condition $\Phi_{\text{prop-up}}(\mathcal{S})$:}
+    \item \textbf{Propagability condition $\Phi_{\text{prop}}(\mathcal{S})$:}
         \[\forall x \forall \bar{u} \exists \bar{v}.\ Q'(\mathcal{S})\]
         where $\bar{u}$ corresponds to the variables $u_{f(t)}$ with $f(t)\in\mathcal{T}\setminus\mathcal{S}$ and $\bar{v}$ to the variables $v_{f(t)}$ with $f(t)\in \mathcal{S}$, and $Q'$ is obtained from $Q$ by simultaneously replacing
         \begin{itemize}
@@ -497,16 +499,8 @@ For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
             \item every $f(t)\in\mathcal{S}$ by $v_{f(t)}$.
         \end{itemize}
 \end{itemize}
- 
-Symmetrically, for downward propagation with a subset $\mathcal{S}'\subseteq\mathcal{T}$, define $\Phi_{\text{min}}(\mathcal{S}')$ (with $<$ instead of $>$) and $\Phi_{\text{prop-down}}(\mathcal{S}')$.
-
-We say that $Q$ satisfies the \emph{\req condition for $(\mathcal{S}, \mathcal{S}')$} if
-\begin{itemize}
-    \item $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ hold,
-    \item $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ hold.
-\end{itemize}
-
-We say $Q$ satisfies the \emph{\req condition} if there exists \emph{some} pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the \req condition for $(\mathcal{S}, \mathcal{S}')$.
+We say that $Q$ satisfies the \emph{\req condition} for subsets $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$ iff $\Phi_{\text{max}}(\mathcal{S})$, $\Phi_{\text{prop}}(\mathcal{S})$,
+$\Phi_{\text{min}}(\mathcal{S}')$, and $\Phi_{\text{prop}}(\mathcal{S}')$ hold. Moreover we say that $Q$ satisfies the \emph{\req condition} iff there exists a pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the \req condition for $(\mathcal{S}, \mathcal{S}')$.
 \end{definition}
 
 \begin{example}[\req Illustration]
@@ -532,7 +526,7 @@ Consider $\mathcal{S} = \{f(x+4),g(x+2)\}$.
         \end{itemize}
         Substituting $x=0$ gives: $(4 > c+3) \land (4 > 1)$, which simplifies to $c < 1$.
         
-    \item \textbf{Propagability $\Phi_{\text{prop-up}}(\mathcal{S})$:}
+    \item \textbf{Propagability $\Phi_{\text{prop}}(\mathcal{S})$:}
         In $Q$, replace:
         \begin{itemize}
             \item $f(x+4)$ by a fresh variable $v_{f(x+4)}$,
@@ -566,7 +560,7 @@ Consider $\mathcal{S}' = \{f(x+1),h(x)\}$.
         \end{itemize}
         Substituting $x=0$ gives: $(1 < c+3) \land (1 < 4)$, which simplifies to $c > -2$.
         
-    \item \textbf{Propagability $\Phi_{\text{prop-down}}(\mathcal{S}')$:}
+    \item \textbf{Propagability $\Phi_{\text{prop}}(\mathcal{S}')$:}
         In $Q$, replace:
         \begin{itemize}
             \item $f(x+1)$ by $v'_{f(x+1)}$,
@@ -601,18 +595,18 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}'
     \item \textbf{Upward extension formula $\Psi_{\text{up}}(B,\mathcal{S})$}:
     \[
     \Phi_{\text{max}}(\mathcal{S})\;\land\; 
-    \Phi_{\text{prop-up}}(\mathcal{S}) \;\land
+    \Phi_{\text{prop}}(\mathcal{S}) \;\land
     \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a \leq \subst{t}{x}{b_{\max}}
     \]
-    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop-up}}(\mathcal{S})$ are as defined in \cref{def:reqpivot-param}. 
+    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop}}(\mathcal{S})$ are as defined in \cref{def:reqpivot-param}. 
     
     \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
     \[
     \Phi_{\text{min}}(\mathcal{S}') \;\land\; 
-    \Phi_{\text{prop-down}}(\mathcal{S}') \;\land
+    \Phi_{\text{prop}}(\mathcal{S}') \;\land
     \bigwedge_{f(t) \in \mathcal{S}'} \bigwedge_{\substack{a \in \args(F,f)}} a \geq \subst{t}{x}{b_{\min}}
     \]
-    where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop-down}}(\mathcal{S}')$ are as defined in \cref{def:reqpivot-param}.
+    where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop}}(\mathcal{S}')$ are as defined in \cref{def:reqpivot-param}.
 \end{enumerate}
 \end{definition}
 
@@ -652,8 +646,8 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
         \item For $z \in B$: $I$ itself satisfies $Q[z]$.
-        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop-up}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$, values $v_{f(t)}$ for each $f(t)\in\mathcal{S}$ such that assigning these values to each corresponding cells in $X_z$ satisfies $Q[z]$.
-        \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop-down}}(\mathcal{S}')$ to assign values to propagated cells.
+        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$, values $v_{f(t)}$ for each $f(t)\in\mathcal{S}$ such that assigning these values to each corresponding cells in $X_z$ satisfies $Q[z]$.
+        \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop}}(\mathcal{S}')$ to assign values to propagated cells.
     \end{itemize}
 \end{enumerate}
 
@@ -699,7 +693,7 @@ The formula in the premise of \cref{thm:interval-certificate-param} belongs to t
 
 Algorithmic implementations of the satisfiability propagators whose existence is ensured by the proof of \cref{thm:interval-certificate-param} can often be obtained from the witness functions that are 
 a side product of quantifier elimination on the
-propagability conditions~$\Phi_{\text{prop-up}}(\mathcal{S})$ and~$\Phi_{\text{prop-down}}(\mathcal{S})$. These propagators  can then be used in the recursive evaluation function $val$ defined in \cref{sec:certificate} to compute values of the function that a model assigns to an uninterpreted function symbol.
+propagability conditions~$\Phi_{\text{prop}}(\mathcal{S})$ and~$\Phi_{\text{prop}}(\mathcal{S}')$. These propagators  can then be used in the recursive evaluation function $val$ defined in \cref{sec:certificate} to compute values of the function that a model assigns to an uninterpreted function symbol.
 
 
 
@@ -814,7 +808,7 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     For the specific $\mathcal{S}^*$, we have:
     \begin{itemize}
         \item $\Phi_{\text{max}}(\mathcal{S}^*)$ holds by definition,
-        \item $\Phi_{\text{prop-up}}(\mathcal{S}^*)$ holds by the \req condition,
+        \item $\Phi_{\text{prop}}(\mathcal{S}^*)$ holds by the \req condition,
         \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:
         % \[
         % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
@@ -830,7 +824,7 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     Similarly, for $\mathcal{S}'^*$ we have:
     \begin{itemize}
         \item $\Phi_{\text{min}}(\mathcal{S}'^*)$ holds,
-        \item $\Phi_{\text{prop-down}}(\mathcal{S}'^*)$ holds,
+        \item $\Phi_{\text{prop}}(\mathcal{S}'^*)$ holds,
         \item For each $f(t)\in\mathcal{S}'^{*}$ and $a \in \args(F,f)$:
         % \[
         % I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
@@ -899,8 +893,8 @@ We then encode the conditions $\Phi_{\text{max}}$, $\Phi_{\text{min}}$, $\Psi_\t
 \label{def:interval-extension-formulas-CNF}
 For an interval $B = [b_{\min}, b_{\max}]$, define the encoded formulas:
 \begin{align*}
-\Psi_{\text{up}}^\text{e}(B) &\equiv \Phi_\text{max}^\text{e} \land \Phi_\text{prop-up}^\text{e} \land \text{ClashUpEnc} \\
-\Psi_{\text{down}}^\text{e}(B) &\equiv \Phi_\text{min}^\text{e} \land \Phi_\text{prop-down}^\text{e} \land \text{ClashDownEnc}
+\Psi_{\text{up}}^\text{e}(B) &\equiv \Phi_\text{max}^\text{e} \land \Phi_\text{prop}^\text{e} \land \text{ClashUpEnc} \\
+\Psi_{\text{down}}^\text{e}(B) &\equiv \Phi_\text{min}^\text{e} \land \Phi_\text{prop}^\text{e} \land \text{ClashDownEnc}
 \end{align*}
 where:
 \begin{itemize}
@@ -913,7 +907,7 @@ where:
     
     \item Minimality encoding: $\Phi_\text{min}^\text{e}$ defined analogously with $s'_{f(t)}$ and $<$ instead of $>$.
     
-    \item Upward propagation encoding $\Phi_{\text{prop-up}}^e$:
+    \item Upward propagation encoding $\Phi_{\text{prop}}^e$:
     \[
     \bigwedge_{\mathcal{T}_{\!-}\subseteq\mathcal{T}}
     \left(\bigwedge_{f(t)\in\mathcal{T}_{\!-}} \neg s_{f(t)} \;\wedge\; \bigwedge_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}} s_{f(t)}\;\Rightarrow\; \forall x\, \forall \bar{u}\, \exists \bar{v}\; Q^{\mathcal{T}_{\!-}}\right),
@@ -951,9 +945,9 @@ For any interval $B = [b_{\min}, b_{\max}]$:
 \end{enumerate}
 \end{lemma}
 \begin{proof}
-    ($\Rightarrow$) Suppose $\Psi_\text{up}^\text{e}(B)$ is satisfiable by an assignment $I$. Define $\mathcal{S} = \{f(t) \mid I(s_{f(t)}) = \text{true}\}$. By $\Phi_{\text{max}}^\text{e}$, for each function $f$, all $f(t) \in \mathcal{S}$ have equal ground parts under $I$, and they are strictly greater than those of any $f(t') \in \mathcal{T} \setminus \mathcal{S}$ with the same $f$. Since all terms have the same coefficient of $x$, this implies $\Phi_{\text{max}}(\mathcal{S})$ holds. By $\Phi_{\text{prop-up}}^\text{e}$, all $f(t) \in \mathcal{S}$ are equal to $v_{f(t)}$, satisfying the substitution in $\Phi_{\text{prop-up}}(\mathcal{S})$. Finally, $\text{ClashUpEnc}$ ensures the clash condition $a \leq \subst{t}{x}{b_{\max}}$ for all $f(t) \in \mathcal{S}$. Hence $\Psi_{\text{up}}(B,\mathcal{S})$ holds.
+    ($\Rightarrow$) Suppose $\Psi_\text{up}^\text{e}(B)$ is satisfiable by an assignment $I$. Define $\mathcal{S} = \{f(t) \mid I(s_{f(t)}) = \text{true}\}$. By $\Phi_{\text{max}}^\text{e}$, for each function $f$, all $f(t) \in \mathcal{S}$ have equal ground parts under $I$, and they are strictly greater than those of any $f(t') \in \mathcal{T} \setminus \mathcal{S}$ with the same $f$. Since all terms have the same coefficient of $x$, this implies $\Phi_{\text{max}}(\mathcal{S})$ holds. By $\Phi_{\text{prop}}^\text{e}$, all $f(t) \in \mathcal{S}$ are equal to $v_{f(t)}$, satisfying the substitution in $\Phi_{\text{prop}}(\mathcal{S})$. Finally, $\text{ClashUpEnc}$ ensures the clash condition $a \leq \subst{t}{x}{b_{\max}}$ for all $f(t) \in \mathcal{S}$. Hence $\Psi_{\text{up}}(B,\mathcal{S})$ holds.
 
-    ($\Leftarrow$) Suppose $\Psi_{\text{up}}(B,\mathcal{S})$ holds for some $\mathcal{S} \subseteq \mathcal{T}$. Set $s_{f(t)}$ true iff $f(t) \in \mathcal{S}$. By $\Phi_{\text{max}}(\mathcal{S})$, for each function $f$, all selected terms have equal ground parts (after $x=0$ substitution) and these are greater than non-selected ones, so $\Phi_{\text{max}}^\text{e}$ holds. Let $v_{f(t)}$ be the common value for $f(t) \in \mathcal{S}$ (guaranteed by $\Phi_{\text{prop-up}}(\mathcal{S})$), then $\Phi_{\text{prop-up}}^\text{e}$ holds. The clash condition from $\Psi_{\text{up}}(B,\mathcal{S})$ ensures $\text{ClashUpEnc}$. Thus $\Psi_\text{up}^\text{e}(B)$ is satisfiable.
+    ($\Leftarrow$) Suppose $\Psi_{\text{up}}(B,\mathcal{S})$ holds for some $\mathcal{S} \subseteq \mathcal{T}$. Set $s_{f(t)}$ true iff $f(t) \in \mathcal{S}$. By $\Phi_{\text{max}}(\mathcal{S})$, for each function $f$, all selected terms have equal ground parts (after $x=0$ substitution) and these are greater than non-selected ones, so $\Phi_{\text{max}}^\text{e}$ holds. Let $v_{f(t)}$ be the common value for $f(t) \in \mathcal{S}$ (guaranteed by $\Phi_{\text{prop}}(\mathcal{S})$), then $\Phi_{\text{prop}}^\text{e}$ holds. The clash condition from $\Psi_{\text{up}}(B,\mathcal{S})$ ensures $\text{ClashUpEnc}$. Thus $\Psi_\text{up}^\text{e}(B)$ is satisfiable.
     
     The proof for $\Psi_\text{down}^\text{e}(B)$ is symmetric.
 \qedhere\end{proof}
