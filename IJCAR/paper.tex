@@ -1014,7 +1014,22 @@ from $c = 2$.
     \caption{Summary of solver performance as a function of parameter $c$.}
 \end{figure}
 
-\section{Conclusion}
+\section{Conclusion (DRAFT)}
+\label{sec:conclusion}
+
+We have presented a novel method for certifying satisfiability of universally quantified integer arithmetic formulas with uninterpreted function symbols—a fragment of UFLIA that arises naturally in verification tasks involving arrays and recursive constraints. Unlike traditional SMT solvers that rely on explicit model construction, our approach uses inductive propagation arguments to avoid the need for large or infinite models. By introducing \emph{satisfiability certificates} based on finite base intervals and propagation conditions, we reduce the problem of infinite-domain satisfiability to the verification of finite $\smt$ queries.
+
+\paragraph{Technical Contributions.}
+The core of our approach is the \req condition (\cref{def:reqpivot-param}), which captures when solutions can be extended outward from a finite base interval $B$. We have shown that if $B$ satisfies base satisfiability and the propagation conditions hold for some $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, then the entire formula is satisfiable (\cref{thm:interval-certificate-param}). The algorithm derived from this insight (\cref{alg:interval-check-param-withBigvee}) is both sound and relatively complete: every \textsc{Sat} answer is correct, and it terminates with \textsc{Sat} for all satisfiable formulas satisfying the \req condition (\cref{thm:completeness-bigvee}). Moreover, by employing a compact CNF encoding of the propagation conditions, we avoid exponential blow-up and make the approach implementable within modern $\smt$ solvers.
+ 
+\paragraph{Empirical Relevance.}
+From Experiments section.
+
+\paragraph{Limitations and Future Work.}
+The current implementation assumes a single quantified variable with uniform coefficients per function. While some multi-variable formulas can be reduced via change of variables, generalizing the propagation conditions to arbitrary linear combinations remains open. Other natural extensions include handling multiple quantified variables, nested function applications, and more general arithmetic constraints.
+
+\paragraph{Concluding Remarks.}
+By shifting from model construction to inductive propagation, we have expanded the class of UFLIA formulas that can be decided practically. Our work bridges a gap between decidable fragments and heuristically solved cases, offering a certificate-based method for satisfiability in the presence of universal quantification, arithmetic, and uninterpreted functions. We believe this approach opens new avenues for verification tools that require both scalability and verifiable correctness.
 
 \bibliographystyle{abbrv}
 \bibliography{refs}
