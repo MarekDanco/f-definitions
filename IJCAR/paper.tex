@@ -795,23 +795,15 @@ The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathca
     \item For all $f(t) \in \mathcal{S}^*$: $I^*(\subst{t}{x}{0}) = v_{\max}^f$,
     \item For all $f(t) \in \mathcal{S}'^*$: $I^*(\subst{t}{x}{0}) = v_{\min}^f$.
 \end{itemize}
-% Now choose
-% \[
-% b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}
-% \]
-% \[
-% b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}.
-% \]
 Now choose
-\[
-b_{\max} = \max\left\{\, \left\lceil \frac{I^*(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}
-\]
-\[
-b_{\min} = \min\left\{\, \left\lfloor \frac{I^*(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}.
-\]
-
-Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
-
+\begin{minipage}{\linewidth-2cm}
+\vspace*{-0.5cm}  
+\begin{align*}
+  b_{\max} &= \max\left\{\, \left\lceil \frac{I^*(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}\\
+b_{\min} &= \min\left\{\, \left\lfloor \frac{I^*(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\},
+\end{align*}
+\end{minipage}
+and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
 \begin{enumerate}
     \item \textbf{Base formula}: $I^* \models F \land \bigwedge_{x \in B} Q[x]$ (since $\mathcal{M} \models \phi$).
     
@@ -820,12 +812,11 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     \begin{itemize}
         \item $\Phi_{\text{max}}(\mathcal{S}^*)$ holds by definition,
         \item $\Phi_{\text{prop}}(\mathcal{S}^*)$ holds by the \req condition,
-        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:
-        % \[
+        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
         % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
         % \]
         \[
-        I^*(a) \leq c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{b_{\max}})
+        I^*(a) \leq c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\hat{b}_{\max}})
         \]
         by construction of $b_{\max}$, which is exactly the clash condition.
     \end{itemize}
