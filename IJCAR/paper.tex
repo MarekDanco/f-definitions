@@ -756,13 +756,8 @@ The correctness of the result \textsc{Sat} of the algorithm is an immediate cons
 
 \begin{theorem}[Relative Completeness]
 \label{thm:completeness-bigvee}
-If the input formula~$\phi$
-\begin{enumerate}
-    \item is satisfiable, and
-    \item satisfies the \req condition for some pair $(\mathcal{S}^*,\mathcal{S}'^*)$ 
-          as defined in \cref{def:reqpivot-param},
-\end{enumerate}
-then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{Sat}.
+If the input formula~$\phi$ is satisfiable, and
+ satisfies the \req condition  then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{Sat}.
 \end{theorem}
 
 \begin{proof}
