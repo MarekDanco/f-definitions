@@ -616,7 +616,7 @@ Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, 
 \label{thm:interval-certificate-param}
 Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and assume that
 \[
-  \Biggl(F \land \bigwedge_{x \in B} Q[x]\Biggr) \;\land\;
+  \Biggl(F \land \bigwedge_{x \in B} \subst{Q}{z}{\repr{x}}\Biggr) \;\land\;
   \Biggl(\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})\Biggr)\;\land\;
   \Biggl(\bigvee_{\mathcal{S}'\subseteq \mathcal{T}}\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S}')\Biggr)
 \]
