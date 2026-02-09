@@ -610,7 +610,7 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}'
 \end{enumerate}
 \end{definition}
 
-Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (resp. $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{b_{\max}}$ ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f_i(a)$; similarly for downward propagation.
+Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (resp. $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f_i(a)$; similarly for downward propagation.
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
@@ -645,25 +645,23 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
 
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
-        \item For $z \in B$: $I$ itself satisfies $Q[z]$.
-        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$, values $v_{f(t)}$ for each $f(t)\in\mathcal{S}$ such that assigning these values to each corresponding cells in $X_z$ satisfies $Q[z]$.
+        \item For $z \in B$: since $X_z$ is empty, $I\models\subst{Q}{x}{\repr{z}}$ suffices.
+        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$ values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
         \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop}}(\mathcal{S}')$ to assign values to propagated cells.
     \end{itemize}
 \end{enumerate}
 
-It remains to verify the disjointness condition of \cref{def:certificate}:
-\[
-X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \emptyset.
-\]
+It remains to verify the disjointness conditions of \cref{def:certificate}:
+\[X_z\cap \mathit{def}(I)=\emptyset \text{ and } X_z\cap\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi)=\emptyset.\]
 
 \begin{itemize}
-    \item For $z \in B$, $X_z = \emptyset$ holds trivially.
+    \item For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.
     
-    \item For $z > b_{\max}$, consider any $f(I(\subst{t}{x}{z}))$ with $f(t) \in \mathcal{S}$:
+    \item For $z > b_{\max}$, any element of $X_z$ has the form $f(I(\subst{t}{x}{\repr{z}}))$ with $f(t) \in \mathcal{S}$.
     \begin{itemize}
-        \item It cannot belong to $\mathit{def}(I)$ because the clash condition $a \leq \subst{t}{x}{b_{\max}}$ in $\Psi_{\text{up}}(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:
+        \item It cannot belong to $\mathit{def}(I)$ because the clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ in $\Psi_{\text{up}}(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:
         \[
-        I(a) \leq I(\subst{t}{x}{b_{\max}}) < I(\subst{t}{x}{z}),
+        I(a) \leq I(\subst{t}{x}{\repr{b}_{\max}}) < I(\subst{t}{x}{\repr{z}}),
         \]
         where the strict inequality follows because $t$ contains $x$ with positive coefficient and $z > b_{\max}$.
         
@@ -671,13 +669,13 @@ X_z \cap (\mathit{def}(I) \cup \bigcup_{z' \prec z} \Gamma_{I,z'}(\phi)) = \empt
         \begin{enumerate}
             \item If $z' \leq b_{\max}$: For any $f(t') \in \mathcal{T}$ with the same $f$, 
             \[
-            I(\subst{t'}{x}{z'}) \leq I(\subst{t'}{x}{b_{\max}}) < I(\subst{t}{x}{z}),
+            I(\subst{t'}{x}{z'}) \leq I(\subst{t'}{x}{\repr{b}_{\max}}) < I(\subst{t}{x}{\repr{z}}),
             \]
             since $t$ is maximal among terms of $f$ in $\mathcal{T}$ by $\Phi_{\text{max}}(\mathcal{S})$ and $z > b_{\max}$.
             
             \item If $b_{\max} < z' < z$: Then 
             \[
-            I(\subst{t'}{x}{z'}) \leq \max_{f(t'') \in \mathcal{T} \text{ with same } f} I(\subst{t''}{x}{z'}) < I(\subst{t}{x}{z})
+            I(\subst{t'}{x}{z'}) \leq \max_{f(t'') \in \mathcal{T} \text{ with same } f} I(\subst{t''}{x}{z'}) < I(\subst{t}{x}{\repr{z}})
             \]
             since $t$ is maximal and $z' < z$.
         \end{enumerate}        
