@@ -1,0 +1,6 @@
+; Inconsistent: forall x. f(cons(1,x))=f(x) AND f(x)>f(cons(1,x))
+; Expected: UNSAT (requires a > a)
+(declare-datatypes ((MyList 0)) (((nil) (cons (head Int) (tail MyList)))))
+(declare-fun f (MyList) Int)
+(assert (forall ((x MyList)) (and (= (f (cons 1 x)) (f x)) (> (f x) (f (cons 1 x))))))
+(check-sat)

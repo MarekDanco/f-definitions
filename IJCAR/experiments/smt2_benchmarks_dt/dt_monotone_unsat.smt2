@@ -1,0 +1,8 @@
+; Monotone but pinned: f(nil)=10, f(cons(0,nil))=5, forall x. f(cons(0,x))>=f(x)
+; Expected: UNSAT (monotone says f(cons(0,nil))>=f(nil)=10, but pinned to 5)
+(declare-datatypes ((MyList 0)) (((nil) (cons (head Int) (tail MyList)))))
+(declare-fun f (MyList) Int)
+(assert (= (f nil) 10))
+(assert (= (f (cons 0 nil)) 5))
+(assert (forall ((x MyList)) (>= (f (cons 0 x)) (f x))))
+(check-sat)

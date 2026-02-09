@@ -1,0 +1,7 @@
+; Triple: f(nil)=1, forall x. f(cons(0,x))=3*f(x)
+; Expected: SAT (f(x) = 3^|x|)
+(declare-datatypes ((MyList 0)) (((nil) (cons (head Int) (tail MyList)))))
+(declare-fun f (MyList) Int)
+(assert (= (f nil) 1))
+(assert (forall ((x MyList)) (= (f (cons 0 x)) (* 3 (f x)))))
+(check-sat)
