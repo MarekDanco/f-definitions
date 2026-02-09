@@ -402,10 +402,10 @@ Given a pre-satisfiability certificate, we can now certify the advisability of f
 \end{definition}
 
 \begin{example}[A Satisfiability Certificate]\label{ex:certificate-example}
-For $\phi = f(3, a) \geq 4 + g(b) \wedge \forall x, y . (f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b)$:
+A satisfiability certificate for formula $\phi=f(3, a) \geq 4 + g(b) \wedge \forall x, y . (f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b)$ is:
 \begin{itemize}
-    \item Pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$
-    \item Order $\preceq$: $(3,0) \prec (3,1) \prec (3,2) \prec \cdots \prec (3,-1) \prec \cdots \prec \text{others}$
+    \item pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$
+    \item order $\preceq$: $(3,0) \prec (3,1) \prec (3,2) \prec \cdots \prec (3,-1) \prec \cdots \prec \text{others}$
 
     For $(3,i)$, $\Gamma_{I,(3,i)} = 
     \begin{cases}
@@ -414,13 +414,13 @@ For $\phi = f(3, a) \geq 4 + g(b) \wedge \forall x, y . (f(x, y) < x + g(y) \wed
         \{f(3,i), g(i), g(i+1)\} & i\neq 0,1.
     \end{cases}$
     
-    \item Propagated cells $X_{(3,i)} = 
+    \item propagated cells $X_{(3,i)} = 
         \begin{cases}
             \{g(0)\} & i=0,\\
             \{f(3,i), g(i+1)\} & i>0,\\
             \{f(3,i), g(i)\} & i<0.
         \end{cases}$
-    \item Propagators: $g(0)\mapsto5$; for $i>0$: $f(3,i)=i+g(i)-1$, $g(i+1)=g(i)-2$.
+    \item propagators: $g(0)\mapsto5$; for $i>0$: $f(3,i)=i+g(i)-1$, $g(i+1)=g(i)-2$.
 \end{itemize}
 \end{example}
 
