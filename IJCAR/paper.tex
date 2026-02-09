@@ -245,7 +245,7 @@ We introduce a method for certifying satisfiability of formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall \bar{x}.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic and $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables.  Based on this method, we will design an algorithm for detecting satisfiability under the following additional assumptions:
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic, where $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables, and where the arguments of all uninterpreted function symbols do not contain any uninterpreted function symbols with non-zero arity (i.e., the arguments may only contain uninterpreted constants).  Based on this method, we will design an algorithm for detecting satisfiability under the following additional assumptions:
 \begin{itemize}
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
@@ -624,10 +624,10 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
 \end{theorem}
 
 \begin{proof}
-  Suppose the conjunction is satisfiable,   let $I$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I\models \Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$, and $\mathcal{S}'$ such that $I\models \Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S})$.  We construct a certificate as in \cref{def:certificate}:
+  Suppose the conjunction is satisfiable,   let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S})$.  We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
-    \item \textbf{Pre‑satisfiability assignment:} $I$ 
+    \item \textbf{Pre‑satisfiability assignment:} the cell interpretation~$I$ such that
     
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
     \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
@@ -661,15 +661,15 @@ It remains to verify the disjointness conditions of \cref{def:certificate}:
     \begin{itemize}
         \item It cannot belong to $\mathit{def}(I)$ because the clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ in $\Psi_{\text{up}}(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:
         \[
-        I(a) \leq I(\subst{t}{x}{\repr{b}_{\max}}) < I(\subst{t}{x}{\repr{z}}),
+        I\models a \leq \subst{t}{x}{\repr{b}_{\max}} < \subst{t}{x}{\repr{z}},
         \]
-        where the strict inequality follows because $t$ contains $x$ with positive coefficient and $z > b_{\max}$.
+        where the strict inequality follows because $t$ is linear, contains $x$ with positive coefficient and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$
         
         \item It cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$ because:
-        \begin{enumerate}
-            \item If $z' \leq b_{\max}$: For any $f(t') \in \mathcal{T}$ with the same $f$, 
+        \begin{itemize}
+            \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
             \[
-            I(\subst{t'}{x}{z'}) \leq I(\subst{t'}{x}{\repr{b}_{\max}}) < I(\subst{t}{x}{\repr{z}}),
+            I\models\subst{t'}{x}{z'} \leq \subst{t'}{x}{\repr{b}_{\max}} < \subst{t}{x}{\repr{z}},
             \]
             since $t$ is maximal among terms of $f$ in $\mathcal{T}$ by $\Phi_{\text{max}}(\mathcal{S})$ and $z > b_{\max}$.
             
@@ -678,7 +678,7 @@ It remains to verify the disjointness conditions of \cref{def:certificate}:
             I(\subst{t'}{x}{z'}) \leq \max_{f(t'') \in \mathcal{T} \text{ with same } f} I(\subst{t''}{x}{z'}) < I(\subst{t}{x}{\repr{z}})
             \]
             since $t$ is maximal and $z' < z$.
-        \end{enumerate}        
+        \end{itemize}        
     \end{itemize}
 
     \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition $a \geq \subst{t}{x}{b_{\min}}$.
