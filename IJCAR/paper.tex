@@ -959,23 +959,23 @@ The exponential disjunctions in \cref{alg:interval-check-param-withBigvee}
 
 \section{Experiments}
 
-There are two basic reasons why verification conditions may fail to hold: (1) a bug, (2) underlying assertions not being inductive. In the first case, the counter-model will typically be finite, since program executions only modify finite memory. In the second case, the counter-model may be infinite. However, even in the first case our method may improve upon methods such as MBQI, due to two reasons:
-\begin{itemize}
-	\item the models produced by MBQI are very difficult to read
-	\item run-time of MBQI increases with the size of the model
-\end{itemize}
+Two common reasons for verification conditions to fail are (1) a bug in the program, (2) underlying
+assertions are not inductive. In the first case, the counter-model will typically be finite, since
+program executions modify finite memory. In the second case, the counter-model may be infinite.
+The workings of our method clearly solve the second case.
+However, even in the first case our method may improve upon methods such as MBQI, due to two reasons.
+First, the models produced by MBQI may be particularly difficult to read. Next, the run-time
+of MBQI increases with the size of the model.
 
-% For example, on my brand-new notebook, cvc5 with MBQI needs roughly 15sec to show the formula
-% \[ f(0)=0 \wedge \forall x \;.\; x<0\vee x>1000\vee f(x+1)=f(x)+1 \]
-% to be satisfiable, and then produces an unreadable model of size 25K. After changing the upper bound to 10000, cvc5 does not terminate in 10 minutes, so apparently, the growth is super-linear.
-
-We have prepared a short test suite consisting of 16 small problems such as
+We have prepared a short test suite consisting of 16\marek{It would be better if I generated more
+	problems where the algorithm succeeds but I don't know if it is necessary. The graphs do look
+	a bit sparse though.} small problems such as
 \begin{align}\label{eq:exp1}
 	f(4)=7 \;\land\; \forall x.\; (0 \le x \le 10^c \;\Rightarrow\; f(x+1)=f(x)+1),
 \end{align}
-where we tested how well do the state of the art \textsc{smt} solvers \textsc{z3} and 
+where we tested how well the state of the art \textsc{smt} solvers \textsc{z3} and
 \textsc{cvc5}\footnote{ran with the argument \texttt{--mbqi}}
-scale on such problems with increasing positive $c$. Note that on this particular example,
+scale with increasing positive $c$. On this example,
 our algorithm has to check just that for all values of $f(x)$, there exists a value of $f(x+1)$
 such that the equality holds. It suffices to consider the interval $[0,\, 4]$.
 
@@ -987,33 +987,44 @@ Another problem in our set is
 \end{align}
 Here, our algorithm terminates right after ensuring that \req holds for the interval $[0,\, 3]$.
 
-We ran our experiments on (\textit{server specs}) with a 30-minute time limit.
+We ran our experiments with a 30-minute time limit.
 When setting $c = 1$, the state of the art \textsc{smt} solvers terminate on our
 problems immediately. On problem~\eqref{eq:exp1} with $c = 3$, \textsc{cvc5} takes
 23 seconds to return \textsc{sat}, and for $c \geq 4$, the solver times out. With
 $c \geq 2$, \textsc{z3} returns \textsc{unknown} after 11 seconds. On problem~\eqref{eq:exp2},
 \textsc{cvc5} times out with $c \geq 3$ and \textsc{z3} returns \textsc{unknown} starting
-from $c = 2$.
+from $c = 2$. Figure~\ref{fig:scaling} further depicts how the two solvers perform on our problems
+with increasing $c$. \textsc{z3} returns \textsc{unknown} for all but 4 problems starting
+from $c = 2$. \textsc{cvc5} on the other hand fals back to solving just one problem
+with $c \geq 4$. \textsc{z3} solved the 4 problems immediately regardless of $c$.
+The cactus plots in Figure~\ref{fig:cactus} show the number of problems solved by \textsc{cvc5}
+within a time limit for $c \in \{2, 3\}$. We can observe most of the problems get solved
+in the 10 to 100 seconds limit when setting $c = 3$. With $c \geq 4$, \textsc{cvc5} times out
+on all but one problem, which gets solved immediately.
 
 \begin{figure}[ht]
-    \centering
-    % First subfigure
-    \begin{subfigure}{0.48\linewidth}
-        \centering
-        \includegraphics[width=1\linewidth]{experiments/data/scaling_plot.png}
-        \caption{Benchmarks solved}
-        \label{fig:scaling}
-    \end{subfigure}
-    \hfill
-    % Second subfigure
-    \begin{subfigure}{0.5\linewidth}
-        \centering
-        \includegraphics[width=1\linewidth]{experiments/data/scatter_runtime.png}
-        \caption{Solver runtime}
-        \label{fig:scatter}
-    \end{subfigure}
-    \caption{Summary of solver performance as a function of parameter $c$.}
+	\centering
+	\includegraphics[width=0.6\linewidth]{experiments/data/scaling_plot.png}
+	\caption{Problems solved with increasing $c$}
+	\label{fig:scaling}
 \end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=1\linewidth]{experiments/data/cactus_plot.png}
+	\caption{Runtime of \textsc{cvc5} for solved problems with $c \in \{2, 3\}$}
+	\label{fig:cactus}
+\end{figure}
+
+Note that our algorithm proves the satisfiability of these problems promptly. Only a few
+LIA calls are needed to prove the \req condition. However, our algorithm struggles on
+problems such as
+\begin{align}
+	f(10000)>0 \;\land \;\forall x. \;f(x+1) = f(x)+1
+\end{align}
+The clash condition\marek{add ref} requires $10000 \leq b_{\max} + 1$, therefore
+forcing 10000 expansions of the interval in \cref{alg:interval-check-param-withBigvee}.
+Improving the algorithm on cases similar to this one is a subject of future work.
 
 \section{Conclusion}
 \label{sec:conclusion}
