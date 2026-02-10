@@ -1,6 +1,7 @@
-import pandas as pd
 from pathlib import Path
+import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 C_MAP = {
     "bench_600_40000": 1,
@@ -67,52 +68,40 @@ for solver in solved.columns:
     ax.plot(solved.index, solved[solver], marker=marker, linestyle='-', label=solver)
 ax.legend(title=None)
 plt.xlabel("c")
-plt.ylabel("Number of benchmarks solved")
+plt.ylabel("Number of problems solved")
 plt.xticks(sorted(df["c"].unique()))
 plt.tight_layout()
 plt.savefig("scaling_plot.png", dpi=300, bbox_inches="tight")
 plt.close()
 
-TIMEOUT = 1800  # seconds
+TIMEOUT = 1800
 
-fig, ax = plt.subplots(figsize=(6, 4))
+fig, axes = plt.subplots(1, 2, figsize=(8, 3), sharey=True)
 
-for solver, marker in [("cvc5", "^"), ("z3", "o")]:
-    sub = df[df["solver"] == solver]
+cs = sorted(df[df["c"].isin([2, 3])]["c"].unique())
 
-    sat = sub[sub["status"] == "sat"]
-    unk = sub[sub["status"] == "unknown"]
-    to = sub[sub["status"] == "timeout"]
+for ax, c in zip(axes, cs):
+    sub = df[(df["c"] == c) & (df["solver"] == "cvc5")]
 
-    # SAT: filled
-    ax.scatter(sat["c"], sat["time_s"], marker=marker, label=solver)
+    solved = sub[sub["status"] == "sat"]["time_s"]
+    times = np.sort(solved.values)
+    x = np.arange(1, len(times) + 1)
 
-    # UNKNOWN: hollow
-    ax.scatter(
-        unk["c"],
-        unk["time_s"],
-        marker=marker,
-        facecolors="none",
-        edgecolors="black",
+    ax.plot(
+        x,
+        times,
+        marker="^",
+        markersize=4,
+        linewidth=1.5,
     )
 
-    # TIMEOUT: red
-    ax.scatter(
-        to["c"],
-        to["time_s"],
-        marker=marker,
-        color="red",
-    )
+    ax.set_title(f"c = {c}")
+    ax.set_xlabel("Number of problems solved")
+    ax.set_yscale("symlog", linthresh=0.1)
+    ax.set_ylim(0, TIMEOUT)
 
-ax.set_xlabel("c")
-ax.set_ylabel("Runtime (s)")
-ax.set_yscale("symlog", linthresh=0.1)
-ax.set_xticks(sorted(df["c"].unique()))
-
-handles, labels = ax.get_legend_handles_labels()
-by_label = dict(zip(labels, handles))
-ax.legend(by_label.values(), by_label.keys())
+axes[0].set_ylabel("Runtime (s)")
 
 plt.tight_layout()
-plt.savefig("scatter_runtime.png", dpi=300)
+plt.savefig("cactus_plot.png", dpi=300)
 plt.close()

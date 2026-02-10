@@ -6,11 +6,16 @@
 (assert (= (f 0) 0))
 (assert (> (g 2) (f (+ c 1))))
 (assert (forall ((x Int))
-  (and
-    (= (f (- x 1))
-    (- (f (+ x 0)) (g (- x c))))
-    (= (g (+ x 1))
-    (+ (g (- x c)) (f (+ x 0))))
+  (=>
+    (<=
+      0 x 10
+    )
+    (and
+      (= (f (- x 1))
+      (- (f (+ x 0)) (g (- x c))))
+      (= (g (+ x 1))
+      (+ (g (- x c)) (f (+ x 0))))
+    )
   )
 ))
 (check-sat)

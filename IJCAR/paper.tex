@@ -387,7 +387,7 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 
 Given a pre-satisfiability certificate, we can now certify the advisability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
 \begin{definition}
 	\label{def:certificate}
-	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate} is
+	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate for $\phi$} is
 	\begin{itemize}
         \item a pre-satisfiability certificate $I$ of $\phi$,
 		\item a well-order $\preceq$ on $\mathbb{Z}^{\numvar{\bar{x}}}$,%\footnote{A well-order total order for which every non-empty subset has a least element. This enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}
@@ -400,6 +400,29 @@ Given a pre-satisfiability certificate, we can now certify the advisability of f
 
 	\end{itemize}
 \end{definition}
+
+\begin{example}[A Satisfiability Certificate]\label{ex:certificate-example}
+A satisfiability certificate for the formula $f(3, a) \geq 4 + g(b) \wedge \forall x, y . f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b$ is:
+\begin{itemize}
+    \item pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$
+    \item order $\preceq$: $(3,0) \prec (3,1) \prec (3,2) \prec \cdots \prec (3,-1) \prec \cdots \prec \text{others}$
+
+    For $(3,i)$, $\Gamma_{I,(3,i)} = 
+    \begin{cases}
+        \{g(0)\} & i=0,\\
+        \{f(3,1), g(2)\} & i=1,\\
+        \{f(3,i), g(i), g(i+1)\} & i\neq 0,1.
+    \end{cases}$
+    
+    \item propagated cells $X_{(3,i)} = 
+        \begin{cases}
+            \{g(0)\} & i=0,\\
+            \{f(3,i), g(i+1)\} & i>0,\\
+            \{f(3,i), g(i)\} & i<0.
+        \end{cases}$
+    \item propagators: $g(0)\mapsto5$; for $i>0$: $f(3,i)=i+g(i)-1$, $g(i+1)=g(i)-2$.
+\end{itemize}
+\end{example}
 
 The notion of certificate defined here is abstract in the sense that it does not fix a concrete finite representation that allows for an independent check whether a given object is indeed a satisfiability certificate. For arriving at concrete independently checkable certificates, it suffices to fix a well-order and decide on a representation of propagated cells and satisfiability propagator that allows for such an independent check. For example, all these definitions could be written in the language of Presburger arithmetic, which allows the independent check to be done using a decision procedure for Presburger arithmetic. We will illustrate this in the next section for the special class of formulas described in \cref{sec:problem-statement}.
 
@@ -596,7 +619,7 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}'
     \[
     \Phi_{\text{max}}(\mathcal{S})\;\land\; 
     \Phi_{\text{prop}}(\mathcal{S}) \;\land
-    \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a \leq \subst{t}{x}{b_{\max}}
+    \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a \leq \subst{t}{x}{b_{\max}} 
     \]
     where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop}}(\mathcal{S})$ are as defined in \cref{def:reqpivot-param}. 
     
@@ -628,20 +651,20 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
 
 \begin{enumerate}
     \item \textbf{Pre‑satisfiability assignment:} Define the cell interpretation~$I$ as follows:
-    \begin{itemize}
-        \item For each cell $f(n)$ where $f$ is an uninterpreted function symbol, if there exists a ground term $a$ in $F$ such that $I^*(a)=n$, then set $I(f(n))=I^*(f(a))$.
-        \item For each cell $f(I^*(\subst{t}{x}{\repr{z}}))$ with $z\in B$ and $f(t)$ occurs in $Q$, set its value to $I^*(f(\subst{t}{x}{\repr{z}}))$.
+      \begin{itemize}
+        \item For every uninterpreted constant $c$ in $\phi$, set $I(c)=I^*(c)$.
+        \item For every cell $f(n)$ where $f$ is an uninterpreted function symbol, if there exists a ground term $a$ in $F$ such that $I^*(a)=n$, then set $I(f(n))=I^*(f(a))$.
     \end{itemize}
     By construction, $I$ is finite and satisfies $F\land\bigwedge_{z\in B}Q[z] $, because $I^*$ satisfies that formula and $I$ agrees with $I^*$ on all relevant cells.
        
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
     \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
     
-    \item \textbf{Propagated cells $X_z$ for $z \in \mathbb{Z}$:}
+  \item \textbf{Propagated cells $X_z$ for $z \in \mathbb{Z}$:}
     \[
     X_z = 
     \begin{cases}
-    \emptyset & \text{if } z \in B, \\[4pt]
+    \Gamma_{I,z}(\phi)\setminus \mathit{def}(I) & \text{if } z \in B, \\[4pt]
     \bigl\{ f(I(\subst{t}{x}{z})) \mid f(t)\in\mathcal{S} \bigr\} & \text{if } z > b_{\max}, \\[4pt]
     \bigl\{ f(I(\subst{t}{x}{z})) \mid f(t)\in\mathcal{S}' \bigr\} & \text{if } z < b_{\min}.
     \end{cases}
@@ -650,7 +673,7 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
 
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
-        \item For $z \in B$: since $X_z$ is empty, $I\models\subst{Q}{x}{\repr{z}}$ suffices.
+    \item For $z \in B$: In this case, $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ is empty. The satisfiability propagator simply sets the values of $X_z$, which is $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)$ to the values given by $I^*$.
         \item For $z > b_{\max}$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$ values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
         \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop}}(\mathcal{S}')$ to assign values to propagated cells.
     \end{itemize}
@@ -674,8 +697,7 @@ The clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ in $\Psi_{\text{up}}(
         where the strict inequality follows because $t$ is linear, contains $x$ with positive coefficient and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$
         
       \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let   $f'(t')$ be an arbitrary, but fixed element of $\Gamma_{I,z'}(\phi)$ and prove that $f'(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
-      $I(\subst{t'}{x}{\repr{z}}))\neq I(\subst{t}{x}{\repr{z}})$.
-Since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Hence 
+      $I(\subst{t'}{x}{\repr{z}}))\neq I(\subst{t}{x}{\repr{z}})$. Since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Hence 
         \[
           I\models \subst{t'}{x}{z'}< \subst{t'}{x}{z}
         \]
@@ -683,21 +705,21 @@ Since $t'$ and $t$ are arguments of the same function symbol, the respective coe
                 \[
           I\models \subst{t'}{x}{z}< \subst{t}{x}{z}.
         \]
-Hence $I(\subst{t'}{x}{\repr{z}})< I(\subst{t}{x}{\repr{z}}))$ and hence cannot be the same.
+Hence $I(\subst{t'}{x}{\repr{z}})< I(\subst{t}{x}{\repr{z}}))$, which implies that the two sides of the inequality cannot be the same.
 
-        \begin{itemize}
-            \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
-            \[
-            I\models\subst{t'}{x}{z'} \leq \subst{t'}{x}{\repr{b}_{\max}} < \subst{t}{x}{\repr{z}},
-            \]
-            since $t$ is maximal among terms of $f$ in $\mathcal{T}$ by $\Phi_{\text{max}}(\mathcal{S})$ and $z > b_{\max}$.
+    %     \begin{itemize}
+    %         \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
+    %         \[
+    %         I\models\subst{t'}{x}{z'} \leq \subst{t'}{x}{\repr{b}_{\max}} < \subst{t}{x}{\repr{z}},
+    %         \]
+    %         since $t$ is maximal among terms of $f$ in $\mathcal{T}$ by $\Phi_{\text{max}}(\mathcal{S})$ and $z > b_{\max}$.
             
-            \item If $b_{\max} < z' < z$: Then 
-            \[
-            I(\subst{t'}{x}{z'}) \leq \max_{f(t'') \in \mathcal{T} \text{ with same } f} I(\subst{t''}{x}{z'}) < I(\subst{t}{x}{\repr{z}})
-            \]
-            since $t$ is maximal and $z' < z$.
-        \end{itemize}        
+    %         \item If $b_{\max} < z' < z$: Then 
+    %         \[
+    %         I(\subst{t'}{x}{z'}) \leq \max_{f(t'') \in \mathcal{T} \text{ with same } f} I(\subst{t''}{x}{z'}) < I(\subst{t}{x}{\repr{z}})
+    %         \]
+    %         since $t$ is maximal and $z' < z$.
+    %     \end{itemize}        
     \end{itemize}
 
     \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition $a \geq \subst{t}{x}{b_{\min}}$.
@@ -794,25 +816,15 @@ The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathca
     \item For all $f(t) \in \mathcal{S}^*$: $I^*(\subst{t}{x}{0}) = v_{\max}^f$,
     \item For all $f(t) \in \mathcal{S}'^*$: $I^*(\subst{t}{x}{0}) = v_{\min}^f$.
 \end{itemize}
-
-% Now choose
-% \[
-% b_{\max} = \max\{\, I^*(t_g) - v_{\max}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}
-% \]
-% \[
-% b_{\min} = \min\{\, I^*(t_g) - v_{\min}^i \mid t_g \in \args(F,f),\; f\in\mathcal{F}\}.
-% \]
-
 Now choose
-\[
-b_{\max} = \max\left\{\, \left\lceil \frac{I^*(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}
-\]
-\[
-b_{\min} = \min\left\{\, \left\lfloor \frac{I^*(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}.
-\]
-
-Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
-
+\begin{minipage}{\linewidth-2cm}
+\vspace*{-0.5cm}  
+\begin{align*}
+  b_{\max} &= \max\left\{\, \left\lceil \frac{I^*(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}\\
+b_{\min} &= \min\left\{\, \left\lfloor \frac{I^*(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\},
+\end{align*}
+\end{minipage}
+and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
 \begin{enumerate}
     \item \textbf{Base formula}: $I^* \models F \land \bigwedge_{x \in B} Q[x]$ (since $\mathcal{M} \models \phi$).
     
@@ -821,12 +833,11 @@ Set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     \begin{itemize}
         \item $\Phi_{\text{max}}(\mathcal{S}^*)$ holds by definition,
         \item $\Phi_{\text{prop}}(\mathcal{S}^*)$ holds by the \req condition,
-        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:
-        % \[
+        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
         % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
         % \]
         \[
-        I^*(a) \leq c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{b_{\max}})
+        I^*(a) \leq c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\hat{b}_{\max}})
         \]
         by construction of $b_{\max}$, which is exactly the clash condition.
     \end{itemize}
@@ -970,23 +981,23 @@ The exponential disjunctions in \cref{alg:interval-check-param-withBigvee}
 
 \section{Experiments}
 
-There are two basic reasons why verification conditions may fail to hold: (1) a bug, (2) underlying assertions not being inductive. In the first case, the counter-model will typically be finite, since program executions only modify finite memory. In the second case, the counter-model may be infinite. However, even in the first case our method may improve upon methods such as MBQI, due to two reasons:
-\begin{itemize}
-	\item the models produced by MBQI are very difficult to read
-	\item run-time of MBQI increases with the size of the model
-\end{itemize}
+Two common reasons for verification conditions to fail are (1) a bug in the program, (2) underlying
+assertions are not inductive. In the first case, the counter-model will typically be finite, since
+program executions modify finite memory. In the second case, the counter-model may be infinite.
+The workings of our method clearly solve the second case.
+However, even in the first case our method may improve upon methods such as MBQI, due to two reasons.
+First, the models produced by MBQI may be particularly difficult to read. Next, the run-time
+of MBQI increases with the size of the model.
 
-% For example, on my brand-new notebook, cvc5 with MBQI needs roughly 15sec to show the formula
-% \[ f(0)=0 \wedge \forall x \;.\; x<0\vee x>1000\vee f(x+1)=f(x)+1 \]
-% to be satisfiable, and then produces an unreadable model of size 25K. After changing the upper bound to 10000, cvc5 does not terminate in 10 minutes, so apparently, the growth is super-linear.
-
-We have prepared a short test suite consisting of 16 small problems such as
+We have prepared a short test suite consisting of 16\marek{It would be better if I generated more
+	problems where the algorithm succeeds but I don't know if it is necessary. The graphs do look
+	a bit sparse though.} small problems such as
 \begin{align}\label{eq:exp1}
 	f(4)=7 \;\land\; \forall x.\; (0 \le x \le 10^c \;\Rightarrow\; f(x+1)=f(x)+1),
 \end{align}
-where we tested how well do the state of the art \textsc{smt} solvers \textsc{z3} and 
+where we tested how well the state of the art \textsc{smt} solvers \textsc{z3} and
 \textsc{cvc5}\footnote{ran with the argument \texttt{--mbqi}}
-scale on such problems with increasing positive $c$. Note that on this particular example,
+scale with increasing positive $c$. On this example,
 our algorithm has to check just that for all values of $f(x)$, there exists a value of $f(x+1)$
 such that the equality holds. It suffices to consider the interval $[0,\, 4]$.
 
@@ -998,33 +1009,44 @@ Another problem in our set is
 \end{align}
 Here, our algorithm terminates right after ensuring that \req holds for the interval $[0,\, 3]$.
 
-We ran our experiments on (\textit{server specs}) with a 30-minute time limit.
+We ran our experiments with a 30-minute time limit.
 When setting $c = 1$, the state of the art \textsc{smt} solvers terminate on our
 problems immediately. On problem~\eqref{eq:exp1} with $c = 3$, \textsc{cvc5} takes
 23 seconds to return \textsc{sat}, and for $c \geq 4$, the solver times out. With
 $c \geq 2$, \textsc{z3} returns \textsc{unknown} after 11 seconds. On problem~\eqref{eq:exp2},
 \textsc{cvc5} times out with $c \geq 3$ and \textsc{z3} returns \textsc{unknown} starting
-from $c = 2$.
+from $c = 2$. Figure~\ref{fig:scaling} further depicts how the two solvers perform on our problems
+with increasing $c$. \textsc{z3} returns \textsc{unknown} for all but 4 problems starting
+from $c = 2$. \textsc{cvc5} on the other hand fals back to solving just one problem
+with $c \geq 4$. \textsc{z3} solved the 4 problems immediately regardless of $c$.
+The cactus plots in Figure~\ref{fig:cactus} show the number of problems solved by \textsc{cvc5}
+within a time limit for $c \in \{2, 3\}$. We can observe most of the problems get solved
+in the 10 to 100 seconds limit when setting $c = 3$. With $c \geq 4$, \textsc{cvc5} times out
+on all but one problem, which gets solved immediately.
 
 \begin{figure}[ht]
-    \centering
-    % First subfigure
-    \begin{subfigure}{0.48\linewidth}
-        \centering
-        \includegraphics[width=1\linewidth]{experiments/data/scaling_plot.png}
-        \caption{Benchmarks solved}
-        \label{fig:scaling}
-    \end{subfigure}
-    \hfill
-    % Second subfigure
-    \begin{subfigure}{0.5\linewidth}
-        \centering
-        \includegraphics[width=1\linewidth]{experiments/data/scatter_runtime.png}
-        \caption{Solver runtime}
-        \label{fig:scatter}
-    \end{subfigure}
-    \caption{Summary of solver performance as a function of parameter $c$.}
+	\centering
+	\includegraphics[width=0.6\linewidth]{experiments/data/scaling_plot.png}
+	\caption{Problems solved with increasing $c$}
+	\label{fig:scaling}
 \end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=1\linewidth]{experiments/data/cactus_plot.png}
+	\caption{Runtime of \textsc{cvc5} for solved problems with $c \in \{2, 3\}$}
+	\label{fig:cactus}
+\end{figure}
+
+Note that our algorithm proves the satisfiability of these problems promptly. Only a few
+LIA calls are needed to prove the \req condition. However, our algorithm struggles on
+problems such as
+\begin{align}
+	f(10000)>0 \;\land \;\forall x. \;f(x+1) = f(x)+1
+\end{align}
+The clash condition\marek{add ref} requires $10000 \leq b_{\max} + 1$, therefore
+forcing 10000 expansions of the interval in \cref{alg:interval-check-param-withBigvee}.
+Improving the algorithm on cases similar to this one is a subject of future work.
 
 \section{Conclusion}
 \label{sec:conclusion}
