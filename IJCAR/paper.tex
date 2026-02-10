@@ -421,7 +421,7 @@ A satisfiability certificate for the formula $f(3, a) \geq 4 + g(b) \wedge \fora
 %         \end{cases}$
 %     \item propagators: $g(0)\mapsto5$; for $y>0$: $f(3,y)=y+g(y)-1$, $g(y+1)=g(y)-2$.
 %     \end{itemize}
-given by the following table, where the first column indicates the order $\preceq$:
+given by the pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$ and the following table, where the first column indicates the order $\preceq$:
     \[\small
     \begin{array}{|l|l|l|l|}\hline
       & X_{(x,y)} & propagators\\ \hline
@@ -630,10 +630,10 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}'
     \Phi_{\text{prop}}(\mathcal{S}) \;\land
     \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a \leq \subst{t}{x}{b_{\max}} 
     \]
-    \vspace*{-0.2cm}
-    \[\land 
-    \bigwedge_{f(t') \in \mathcal{T}\setminus\mathcal{S}} 
-    \subst{t'}{x}{b_{\max}+1} \geq b_{\min}\]
+    % \vspace*{-0.2cm}
+    % \[\land 
+    % \bigwedge_{f(t') \in \mathcal{T}\setminus\mathcal{S}} 
+    % \subst{t'}{x}{b_{\max}+1} \geq b_{\min}\]
     where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop}}(\mathcal{S})$ are as defined in \cref{def:reqpivot-param}. 
     
     \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
@@ -694,7 +694,9 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
     \begin{itemize}
     \item For $z \in B$: In this case, $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ is empty. The satisfiability propagator simply sets the values of the cells in $X_z$ to the values given by $I^*$.
         \item For $z > b_{\max}$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$ values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
-        \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop}}(\mathcal{S}')$ to assign values to propagated cells.
+        \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop}}(\mathcal{S}')$ to assign values to propagated cells. 
+
+          
     \end{itemize}
 \end{enumerate}
 
@@ -715,18 +717,16 @@ The clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ in $\Psi_{\text{up}}(
         \]
         where the strict inequality follows because $t$ is linear, contains $x$ with positive coefficient and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$
         
-      \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let   $f'(t')$ be an arbitrary, but fixed element of $\Gamma_{I,z'}(\phi)$ and prove that $f'(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
-      $I(\subst{t'}{x}{\repr{z}}))\neq I(\subst{t}{x}{\repr{z}})$. 
-      Since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Hence 
+      \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
+        $I(\subst{t'}{x}{\repr{z}'}))\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
         \[
-          I\models \subst{t'}{x}{z'}< \subst{t'}{x}{z}
+          I\models \subst{t'}{x}{z'}< \subst{t'}{x}{z}.
         \]
         Moreover, $\Phi_{\text{max}}(\mathcal{S})$ ensures that $t$ is maximal among the terms of $f$ in $\mathcal{T}$, and hence
                 \[
           I\models \subst{t'}{x}{z}< \subst{t}{x}{z}.
         \]
-Hence $I(\subst{t'}{x}{\repr{z}})< I(\subst{t}{x}{\repr{z}}))$, which implies that the two sides of the inequality cannot be the same.
-
+Hence $I(\subst{t'}{x}{\repr{z}'})< I(\subst{t}{x}{\repr{z}}))$, which implies that the two sides of the inequality cannot be the same.
     %     \begin{itemize}
     %         \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
     %         \[
@@ -742,10 +742,26 @@ Hence $I(\subst{t'}{x}{\repr{z}})< I(\subst{t}{x}{\repr{z}}))$, which implies th
     %     \end{itemize}        
     \end{itemize}
 
-    \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition $a \geq \subst{t}{x}{b_{\min}}$.
-\end{itemize}
+  \item The case $z < b_{\min}$ is symmetric, using the downward clash condition $a \geq \subst{t}{x}{b_{\min}}$ and $\Phi_{\text{min}}(\mathcal{S}')$. Here, we prove that for all $z'\preceq z$, $I(\subst{t'}{x}{\repr{z}'})> I(\subst{t}{x}{\repr{z}}))$.
+    Note that the fact that the upward propagation block of elements greater than $b_{\max}$ occurs before the downward propagation block of elements less than $b_{\min}$ in the order $\preceq$ does not create a problem with overlapping propagation, since $z'\preceq z$ with $z'>b_{\max}$ implies $z'>b_{\max}>b_{\min}>z$, which allows symmetric application of the argument of the case where $z>b_{\max}$.
+    
 
-Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
+\end{itemize}
+% Finally, we must ensure that the \textbf{satisfiability propagators} can be applied inductively along $\preceq$.  
+% For $z > b_{\max}$, the propagator $\Phi_{\text{prop}}(\mathcal{S})$ requires values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$.  
+% Let $f(t') \in \mathcal{T}\setminus\mathcal{S}$ be such a non‑propagated term. Its corresponding cell is $f(I(\subst{t'}{x}{\repr{z}}))$.  
+% By the last conjunct in $\Psi_{\text{up}}(B,\mathcal{S})$, we have $I \models \subst{t'}{x}{z} \geq b_{\min}$.  
+% Thus $I(\subst{t'}{x}{\repr{z}})$ is either in $B$ (if $\leq b_{\max}$) or satisfies $I(\subst{t'}{x}{\repr{z}}) > b_{\max}$.  
+
+% In the well‑order $\preceq$, all indices $w$ with $w > b_{\max}$ appear \emph{before} any $w < b_{\min}$.  
+% Hence $f(I(\subst{t'}{x}{\repr{z}}))$ has already been assigned when processing $z$:
+% \begin{itemize}
+%     \item If $I(\subst{t'}{x}{\repr{z}}) \in B$, the cell is defined in the base assignment $I$.
+%     \item If $I(\subst{t'}{x}{\repr{z}}) > b_{\max}$, it is a propagated cell from some earlier $z' < z$ (since $t'$ has the same coefficient of $x$ as $t$, and $I(\subst{t'}{x}{\repr{z}}) < I(\subst{t}{x}{\repr{z}})$ by maximality).
+% \end{itemize}
+% Therefore all non‑propagated cells needed for the propagator at $z$ are already defined, and the propagator can assign values to $X_z$ without circularity. A symmetric argument (without extra constraints) applies to $z < b_{\min}$, because those instantiations occur \emph{after} all $z > b_{\max}$ in $\preceq$, and hence may safely use cells assigned during upward propagation.
+
+% Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \qedhere\end{proof}
 
 The formula in the premise of \cref{thm:interval-certificate-param} belongs to the language of Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the cell interpretation necessary for showing $F \land \bigwedge_{x \in B} \subst{Q}{z}{\repr{x}}$ to be satisfiable, and the sets $\mathcal{S}$ and $\mathcal{S}'$.
