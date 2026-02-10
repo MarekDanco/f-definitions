@@ -686,7 +686,7 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
 
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
-    \item For $z \in B$: In this case, $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ is empty. The satisfiability propagator simply sets the values of $X_z$, which is $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)$ to the values given by $I^*$.
+    \item For $z \in B$: In this case, $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ is empty. The satisfiability propagator simply sets the values of the cells in $X_z$ to the values given by $I^*$.
         \item For $z > b_{\max}$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$ values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
         \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop}}(\mathcal{S}')$ to assign values to propagated cells.
     \end{itemize}
