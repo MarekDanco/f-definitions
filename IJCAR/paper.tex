@@ -648,8 +648,11 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}'
 
 Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (resp. $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f(a)$; similarly for downward propagation. 
 
-The additional constraint $\bigwedge_{f(t') \in \mathcal{T}\setminus\mathcal{S}} (\subst{t'}{x}{\repr{b_{\max}+1}} \geq b_{\min})$ ensures that during upward propagation, every non‑propagated cell's argument lies at or to the right of $b_{\min}$. Since in the well‑order used in Theorem~\ref{thm:interval-certificate-param} all indices 
-$z > b_{\max}$ are processed \emph{before} any $z < b_{\min}$, this guarantees that upward propagation never depends on cells that would be assigned later by downward propagation. Consequently, the inductive construction of the certificate remains well‑founded. No symmetric constraint is needed for $\Psi_{\text{down}}$ because downward propagation occurs later in the order and may safely use cells already assigned during upward propagation.
+The last conjunct in $\Psi_{\text{up}}(B,\mathcal{S})$\todoSN{Is this explanation needed?} ensures that during upward propagation, every 
+non‑propagated cell's argument lies at or to the right of $b_{\min}$. This prevents upward propagation 
+from depending on cells that would be assigned later by downward propagation, since in the well‑order 
+of \cref{thm:interval-certificate-param} all $z > b_{\max}$ are processed before any $z < b_{\min}$. No symmetric constraint is needed for 
+$\Psi_{\text{down}}$ because downward propagation occurs later and may use already‑assigned upward cells.
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
@@ -713,7 +716,8 @@ The clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ in $\Psi_{\text{up}}(
         where the strict inequality follows because $t$ is linear, contains $x$ with positive coefficient and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$
         
       \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let   $f'(t')$ be an arbitrary, but fixed element of $\Gamma_{I,z'}(\phi)$ and prove that $f'(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
-      $I(\subst{t'}{x}{\repr{z}}))\neq I(\subst{t}{x}{\repr{z}})$. Since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Hence 
+      $I(\subst{t'}{x}{\repr{z}}))\neq I(\subst{t}{x}{\repr{z}})$. 
+      Since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Hence 
         \[
           I\models \subst{t'}{x}{z'}< \subst{t'}{x}{z}
         \]
@@ -740,19 +744,6 @@ Hence $I(\subst{t'}{x}{\repr{z}})< I(\subst{t}{x}{\repr{z}}))$, which implies th
 
     \item The case $z < b_{\min}$ is symmetric, using $\Phi_{\text{min}}(\mathcal{S}')$ and the downward clash condition $a \geq \subst{t}{x}{b_{\min}}$.
 \end{itemize}
-Finally, we must ensure that the \textbf{satisfiability propagators} can be applied inductively along $\preceq$.  
-For $z > b_{\max}$, the propagator $\Phi_{\text{prop}}(\mathcal{S})$ requires values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$.  
-Let $f(t') \in \mathcal{T}\setminus\mathcal{S}$ be such a non‑propagated term. Its corresponding cell is $f(I(\subst{t'}{x}{\repr{z}}))$.  
-By the last conjunct in $\Psi_{\text{up}}(B,\mathcal{S})$, we have $I \models \subst{t'}{x}{z} \geq b_{\min}$.  
-Thus $I(\subst{t'}{x}{\repr{z}})$ is either in $B$ (if $\leq b_{\max}$) or satisfies $I(\subst{t'}{x}{\repr{z}}) > b_{\max}$.  
-
-In the well‑order $\preceq$, all indices $w$ with $w > b_{\max}$ appear \emph{before} any $w < b_{\min}$.  
-Hence $f(I(\subst{t'}{x}{\repr{z}}))$ has already been assigned when processing $z$:
-\begin{itemize}
-    \item If $I(\subst{t'}{x}{\repr{z}}) \in B$, the cell is defined in the base assignment $I$.
-    \item If $I(\subst{t'}{x}{\repr{z}}) > b_{\max}$, it is a propagated cell from some earlier $z' < z$ (since $t'$ has the same coefficient of $x$ as $t$, and $I(\subst{t'}{x}{\repr{z}}) < I(\subst{t}{x}{\repr{z}})$ by maximality).
-\end{itemize}
-Therefore all non‑propagated cells needed for the propagator at $z$ are already defined, and the propagator can assign values to $X_z$ without circularity. A symmetric argument (without extra constraints) applies to $z < b_{\min}$, because those instantiations occur \emph{after} all $z > b_{\max}$ in $\preceq$, and hence may safely use cells assigned during upward propagation.
 
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \qedhere\end{proof}
