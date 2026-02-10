@@ -663,7 +663,7 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
 \end{theorem}
 
 \begin{proof}
-  Suppose the conjunction is satisfiable,   let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S})$.  We construct a certificate as in \cref{def:certificate}:
+  Suppose the conjunction is satisfiable, let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S})$.  We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
     \item \textbf{Pre‑satisfiability certificate:} Define the cell interpretation~$I$ as follows:
@@ -739,7 +739,7 @@ Hence $I(\subst{t'}{x}{\repr{z}'})< I(\subst{t}{x}{\repr{z}}))$, which implies t
     %     \end{itemize}        
     \end{itemize}
 
-  \item The case $z < b_{\min}$ is symmetric, using the downward clash condition $a \geq \subst{t}{x}{b_{\min}}$ and $\Phi_{\text{min}}(\mathcal{S}')$. Here, we prove that for all $z'\preceq z$, $I(\subst{t'}{x}{\repr{z}'})> I(\subst{t}{x}{\repr{z}}))$.
+  \item The case $z < b_{\min}$ is symmetric, using the downward clash condition $a \geq \subst{t}{x}{\repr{b}_{\min}}$ and $\Phi_{\text{min}}(\mathcal{S}')$. Here, we prove that for all $z'\preceq z$, $I(\subst{t'}{x}{\repr{z}'})> I(\subst{t}{x}{\repr{z}}))$.
     Note that the fact that the upward propagation block of elements greater than $b_{\max}$ occurs before the downward propagation block of elements less than $b_{\min}$ in the order $\preceq$ does not create a problem with overlapping propagation, since $z'\preceq z$ with $z'>b_{\max}$ implies $z'>b_{\max}>b_{\min}>z$, which allows symmetric application of the argument of the case where $z>b_{\max}$.
     
 
