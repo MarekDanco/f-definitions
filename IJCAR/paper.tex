@@ -399,19 +399,17 @@ Given a pre-satisfiability certificate, we can now certify the advisability of f
 	\end{itemize}
 \end{definition}
 
-\begin{example}[A Satisfiability Certificate]\label{ex:certificate-example}
-A satisfiability certificate for the formula $f(3, a) \geq 4 + g(b) \wedge \forall x, y . f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b$ is 
+\begin{example}\label{ex:certificate-example}
+A satisfiability certificate for the formula \[f(3, a) \geq 4 + g(b) \wedge \forall x, y . f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b\] is 
 % \begin{itemize}
 %     \item pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$
 %     \item order $\preceq$: $(3,0) \prec (3,1) \prec (3,2) \prec \cdots \prec (3,-1) \prec \cdots \prec \text{others}$
-
 %     $\Gamma_{I,(x,y)} = 
 %     \begin{cases}
 %         \{g(0)\} & x=3,y=0,\\
 %         \{f(x,1), g(2)\} & x=3, y=1,\\
 %         \{f(x,y), g(y), g(y+1)\} & x\neq 3 \text{ or } y\neq 0,1.
-%     \end{cases}$
-    
+%     \end{cases}$   
 %     \item propagated cells $X_{(x,y)} = 
 %         \begin{cases}
 %           \{g(0)\} & y=0,\\
@@ -421,17 +419,16 @@ A satisfiability certificate for the formula $f(3, a) \geq 4 + g(b) \wedge \fora
 %         \end{cases}$
 %     \item propagators: $g(0)\mapsto5$; for $y>0$: $f(3,y)=y+g(y)-1$, $g(y+1)=g(y)-2$.
 %     \end{itemize}
-given by the pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$ and the following table, where the first column indicates the order $\preceq$:
+given by the pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$ and the following table, where the first column indicates the order~$\preceq$:
     \[\small
     \begin{array}{|l|l|l|l|}\hline
       & X_{(x,y)} & propagators\\ \hline
         x=3, y=0  & \{g(0)\} & g(0)\mapsto 5\\
-        x=3,y=1,2,\dots & \{f(3,y), g(y+1)\} & f(x,y)\mapsto y+g(y)-1, g(y+1)=g(y)-2\\
-        x=3, y=-1,-2,\dots &  \{f(3,y), g(y)\} & f(x,y)\mapsto y+g(y)-1, g(y)=g(y+1)+2\\
+        x=3,y=1,2,\dots & \{f(3,y), g(y+1)\} & g(y+1)\mapsto g(y)-2, f(x,y)\mapsto y+g(y)-1\\
+        x=3, y=-1,-2,\dots &  \{f(3,y), g(y)\} & g(y)\mapsto g(y+1)+2, f(x,y)\mapsto y+g(y)-1, \\
        x\neq 3, y \text{ arbitrary}  &   \{f(x,y) \} & f(x,y)\mapsto y+g(y)-1\\ \hline
     \end{array}
   \]
-
 \end{example}
 
 The notion of certificate defined here is abstract in the sense that it does not fix a concrete finite representation that allows for an independent check whether a given object is indeed a satisfiability certificate. For arriving at concrete independently checkable certificates, it suffices to fix a well-order and decide on a representation of propagated cells and satisfiability propagator that allows for such an independent check. For example, all these definitions could be written in the language of Presburger arithmetic, which allows the independent check to be done using a decision procedure for Presburger arithmetic. We will illustrate this in the next section for the special class of formulas described in \cref{sec:problem-statement}.
