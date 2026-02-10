@@ -425,7 +425,7 @@ given by the pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(
       & X_{(x,y)} & propagators\\ \hline
         x=3, y=0  & \{g(0)\} & g(0)\mapsto 5\\
         x=3,y=1,2,\dots & \{f(3,y), g(y+1)\} & g(y+1)\mapsto g(y)-2, f(x,y)\mapsto y+g(y)-1\\
-        x=3, y=-1,-2,\dots &  \{f(3,y), g(y)\} & g(y)\mapsto g(y+1)+2, f(x,y)\mapsto y+g(y)-1, \\
+        x=3, y=-1,-2,\dots &  \{f(3,y), g(y)\} & g(y)\mapsto g(y+1)+2, f(x,y)\mapsto y+g(y+1)+1 \\
        x\neq 3, y \text{ arbitrary}  &   \{f(x,y) \} & f(x,y)\mapsto y+g(y)-1\\ \hline
     \end{array}
   \]
