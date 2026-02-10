@@ -1071,31 +1071,22 @@ Improving the algorithm on cases similar to this one is a subject of future work
 \section{Conclusion}
 \label{sec:conclusion}
 
-We have presented a novel method for certifying satisfiability of universally quantified integer arithmetic formulas with uninterpreted function symbols—a fragment of UFLIA that arises naturally in verification tasks involving arrays and recursive constraints. Unlike traditional SMT solvers that rely on explicit model construction, our approach uses inductive propagation arguments to avoid the need for large or infinite models. By introducing \emph{satisfiability certificates} based on finite base intervals and propagation conditions, we reduce the problem of infinite-domain satisfiability to the verification of finite $\smt$ queries.
+We have presented a novel approach to certifying satisfiability for universally quantified integer arithmetic formulas with uninterpreted functions—a fragment of UFLIA that appears naturally in verification of arrays and recursive programs. Unlike traditional $\smt$ methods that construct explicit models, our technique replaces infinite models with finite inductive certificates based on propagation arguments.
 
-\paragraph{From Framework to Algorithm.}
-Our approach unfolds in two complementary layers. First, we introduced a general \emph{certificate framework} (\cref{sec:certificate}) that captures the essence of inductive propagation: a certificate consists of a finite base assignment, a well-order on quantifier instantiations, and propagators that extend solutions step-by-step along that order. This framework is intentionally abstract—it works for an arbitrary number of quantified variables and any well-founded ordering, making it applicable beyond the fragment studied here. Its soundness (Property \ref{prop:certThenSat}) is established once and for all, independent of how certificates are found.
+At the foundation lies a general certificate framework that decouples the logical structure of satisfiability proofs from algorithmic details. A certificate consists of a finite base assignment, a well‑order, and propagators that extend the assignment stepwise along that order. This framework is sound for any well‑founded order and any number of quantified variables, providing a flexible basis for future extensions.
 
-Second, we instantiated this framework with a concrete algorithm (\cref{sec:alg}) where the core of our approach is the \req condition (\cref{def:reqpivot-param}), which captures when solutions can be extended outward from a finite base interval $B$. We have shown that if $B$ satisfies base satisfiability and the propagation conditions hold, then the entire formula is satisfiable (\cref{thm:interval-certificate-param}). The algorithm derived from this insight (\cref{alg:interval-check-param-withBigvee}) is both sound and relatively complete: every \textsc{Sat} answer is correct, and it terminates with \textsc{Sat} for all satisfiable formulas satisfying the \req condition (\cref{thm:completeness-bigvee}). Moreover, by employing a compact CNF encoding of the propagation conditions, we avoid exponential blow-up and make the approach implementable within modern $\smt$ solvers.
+For the single‑variable fragment we instantiate the framework with a concrete, implementable algorithm. The algorithm searches for a base interval~$B$ and term subsets~$\mathcal{S},\mathcal{S}'$ satisfying the \req condition—a propagation property that ensures the assignment on~$B$ can be extended outward without conflict. By encoding the search as ordinary $\smt$ queries, and employing a compact CNF encoding to avoid exponential blow‑up, we obtain a procedure that is sound, relatively complete for formulas satisfying \req, and directly executable on existing $\smt$ solvers.
 
-\paragraph{Empirical Relevance.}
-Something from Experiments section.
+Our experiments...
 
-\paragraph{Limitations and Future Work.}
-The current implementation assumes a single quantified variable with uniform coefficients per function. While some multi-variable formulas can be reduced via change of variables, generalizing the propagation conditions to arbitrary linear combinations remains open. Other natural extensions include developing algorithms that search for certificates with more complex propagation orders (e.g., lexicographic order) for multiple variables, generalizing the \req condition to handle non-collinear coefficients, nested functions, or more general arithmetic constraints.
+The main limitations of the current algorithm—its restriction to one quantified variable and to uniform coefficients per function—point to natural directions for future work. Generalizing the propagation condition to handle multiple variables, non‑collinear coefficients, or nested function calls would significantly widen its applicability.
 
-\paragraph{Concluding Remarks.}
-By shifting from model construction to inductive propagation, we have expanded the class of UFLIA formulas that can be decided practically. Our work bridges a gap between decidable fragments and heuristically solved cases, offering a certificate-based method for satisfiability in the presence of universal quantification, arithmetic, and uninterpreted functions. We believe this approach opens new avenues for verification tools that require both scalability and verifiable correctness.
+In summary, by shifting from explicit model construction to inductive propagation we offer a viable, certificate‑based alternative for deciding satisfiability in a practically relevant fragment of UFLIA. The approach bridges the gap between decidable special cases and purely heuristic methods, opening new avenues for verification tools that require both scalability and verifiable correctness.
 
 \bibliographystyle{abbrv}
 \bibliography{refs}
 
-
-
 \appendix
-
-
-
 
 \end{document}
 
