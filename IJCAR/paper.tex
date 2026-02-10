@@ -653,17 +653,17 @@ Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, 
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
-Let $B = [b_{\min}, b_{\max}]$ be a non‑empty integer interval, and assume that
+Let $B$ be a non‑empty integer interval, and assume that
 \[
   \Biggl(F \land \bigwedge_{x \in B} \subst{Q}{z}{\repr{x}}\Biggr) \;\land\;
-  \Biggl(\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})\Biggr)\;\land\;
-  \Biggl(\bigvee_{\mathcal{S}'\subseteq \mathcal{T}}\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S}')\Biggr)
+  \Biggl(\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}(B,\mathcal{S})\Biggr)\;\land\;
+  \Biggl(\bigvee_{\mathcal{S}'\subseteq \mathcal{T}}\Psi_{\text{down}}(B,\mathcal{S}')\Biggr)
 \]
 is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satisfiable.
 \end{theorem}
 
 \begin{proof}
-  Suppose the conjunction is satisfiable, let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S})$.  We construct a certificate as in \cref{def:certificate}:
+  Suppose the conjunction is satisfiable, let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi_{\text{up}}(B,\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi_{\text{down}}(B,\mathcal{S})$. Assume that  $B = [b_{\min}, b_{\max}]$. We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
     \item \textbf{Pre‑satisfiability certificate:} Define the cell interpretation~$I$ as follows:
