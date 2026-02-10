@@ -663,12 +663,12 @@ is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satis
   Suppose the conjunction is satisfiable,   let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S})$.  We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
-    \item \textbf{Pre‑satisfiability assignment:} Define the cell interpretation~$I$ as follows:
+    \item \textbf{Pre‑satisfiability certificate:} Define the cell interpretation~$I$ as follows:
       \begin{itemize}
         \item For every uninterpreted constant $c$ in $\phi$, set $I(c)=I^*(c)$.
-        \item For every cell $f(n)$ where $f$ is an uninterpreted function symbol, if there exists a ground term $a$ in $F$ such that $I^*(a)=n$, then set $I(f(n))=I^*(f(a))$.
+        \item For every $a\in args(F, f)$,  where $f$ is an uninterpreted function symbol, $I(f(I^*(a)))=I^*(f)(I^{*}(a))$
     \end{itemize}
-    By construction, $I$ is finite and satisfies $F\land\bigwedge_{z\in B}Q[z] $, because $I^*$ satisfies that formula and $I$ agrees with $I^*$ on all relevant cells.
+    By construction, $I$ is finite and satisfies $F$, because $I^*$ satisfies that formula and $I$ agrees with $I^*$ on all relevant cells.
        
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
     \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
