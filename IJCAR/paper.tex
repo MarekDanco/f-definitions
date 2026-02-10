@@ -387,7 +387,7 @@ For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 
 Given a pre-satisfiability certificate, we can now certify the advisability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
 \begin{definition}
 	\label{def:certificate}
-	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate} is
+	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate for $\phi$} is
 	\begin{itemize}
         \item a pre-satisfiability certificate $I$ of $\phi$,
 		\item a well-order $\preceq$ on $\mathbb{Z}^{\numvar{\bar{x}}}$,%\footnote{A well-order total order for which every non-empty subset has a least element. This enables induction. If we want to allow sub-formulas to be at the same place in the order, we either need to combine them into equivalence classes, or relax anti-symmetry (i.e., work with a pre-wellorder).}
@@ -402,7 +402,7 @@ Given a pre-satisfiability certificate, we can now certify the advisability of f
 \end{definition}
 
 \begin{example}[A Satisfiability Certificate]\label{ex:certificate-example}
-A satisfiability certificate for formula $\phi=f(3, a) \geq 4 + g(b) \wedge \forall x, y . (f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b)$ is:
+A satisfiability certificate for the formula $f(3, a) \geq 4 + g(b) \wedge \forall x, y . f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b$ is:
 \begin{itemize}
     \item pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$
     \item order $\preceq$: $(3,0) \prec (3,1) \prec (3,2) \prec \cdots \prec (3,-1) \prec \cdots \prec \text{others}$
