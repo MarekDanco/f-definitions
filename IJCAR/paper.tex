@@ -510,7 +510,7 @@ added notation:\todoSR{I will move this to the notation section.}
 \item $\coeffsign{f}$: the sign of the common coefficients of $x$ in $\phi$
 \item for any two signs $s$ and $s'$, $ss'$ is $+$ iff $s=s'$, and $-$, otherwise
   
-\item for two integers $z, z'$, $z\cmpsignstrict{+} z'$ iff $z>z$ and $z\cmpsignstrict{-} z'$ iff $z<z'$
+\item for two integers $z, z'$, $z\cmpsignstrict{+} z'$ iff $z<z'$ and $z\cmpsignstrict{-} z'$ iff $z>z'$
 \item for an interval $B=[b_{\min}, b_{\max}]$, $\ivbound{B}{-}= b_{\min}$, $\ivbound{B}{+}= b_{\max}$
 \end{itemize}
 
@@ -534,6 +534,7 @@ For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$ and signs $s\in\{ -,
         \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}\setminus\mathcal{S}} t' \cmpsignstrict{\coeffsign{f}s} t
         \right)}{x}{0}.
     \]
+    
     \item \textbf{Propagability condition $\Phi_{\text{prop}}(\mathcal{S})$:}
         \[\forall x \forall \bar{u} \exists \bar{v}.\ Q'(\mathcal{S})\]
         where $\bar{u}$ corresponds to the variables $u_{f(t)}$ with $f(t)\in\mathcal{T}\setminus\mathcal{S}$ and $\bar{v}$ to the variables $v_{f(t)}$ with $f(t)\in \mathcal{S}$, and $Q'$ is obtained from $Q$ by simultaneously replacing
