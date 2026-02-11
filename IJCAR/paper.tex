@@ -27,6 +27,11 @@
 \newcommand{\qedhere}{$\blacksquare$}
 \newcommand{\numvar}[1]{|#1|}
 \newcommand{\domain}{\mathbb{D}}
+\newcommand{\cmpsign}[1]{\lesseqgtr^{#1}}
+\newcommand{\cmpsignstrict}[1]{\lessgtr^{#1}}
+\newcommand{\coeffsign}[1]{\sigma(#1)}
+\newcommand{\ivbound}[2]{\text{sel}(#1,#2)}
+
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
@@ -342,6 +347,8 @@ We are not aware of any result showing the decidability of this class. However, 
 
 As usual in an SMT context, we will work with a first-order language that is sorted. We also assume variables to only occur in positions where they are bounded by a quantifier. We already used the notation $\forall \bar{x}$ as an abbreviation for universal quantification over several variables. In this case, we will write $\numvar{x}$ for the number of those variables. For a formula $F$ and uninterpreted function symbol $f$, $args(F, f)$ will denote the set of argument terms of $f$ in $F$. We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the term or formula~$s$. Here, $v$ may again represent several variables, in which case we require $t$ to represent a $\numvar{v}$-vector of terms, and assume substitution to be parallel. For an integer $z\in\mathbb{Z}$, we will denote the constant representing $z$ in a logical formula by $\repr{z}$.
 
+We will sometimes work with the signs from the set $\{+,-\}$, where
+for any two signs $s$ and $s'$, $ss'$ is $+$ iff $s=s'$, and $-$, otherwise. We will use such signs to switch between greater and less than relations in the way that for two integers~$z$ and $z'$, $z\cmpsignstrict{+} z'$ iff $z<z'$ and $z\cmpsignstrict{-} z'$ iff $z>z'$. For an interval $B=[b_{\min}, b_{\max}]$, we define $\ivbound{B}{-}= b_{\min}$, and $\ivbound{B}{+}= b_{\max}$.
 
 We will use the classical mathematical notion of a well-order. A well-order on a set $S$ is a total ordering on $S$ such that every non-empty subset of $S$ has a least element. Any well-order allows well-founded induction: For a  proving that a property $P$ holds for all $x$, it suffices to prove that for every $x\in S$, if for all $y\prec x$, $P(y)$ then also $P(x)$.
 
@@ -498,25 +505,9 @@ The goal is now an algorithm that computes such satisfiability certificates and 
 
 \section{Algorithm}\label{sec:alg}
 
-\newcommand{\cmpsign}[1]{\lesseqgtr^{#1}}
-\newcommand{\cmpsignstrict}[1]{\lessgtr^{#1}}
-\newcommand{\coeffsign}[1]{\sigma(#1)}
-\newcommand{\ivbound}[2]{\text{sel}(#1,#2)}
+We will now proceed from the  general certification framework to concrete computation. Throughout this section we assume a formula $\phi$ of the form~$F \land \forall \bar{x}.\; Q$, but with the additional restrictions described in the problem statement (\cref{sec:problem-statement}). In particular, we will allow only one quantified variables~$x$. The restrictions also require all arguments of any uninterpreted function symbol $f$ in $Q$ to have the same coefficient, and we denote the sign of this coefficient by $\coeffsign{f}$.
 
-added notation:\todoSR{I will move this to the notation section.}
-\begin{itemize}
-  
-\item signs $+,-$
-\item $\coeffsign{f}$: the sign of the common coefficients of $x$ in $\phi$
-\item for any two signs $s$ and $s'$, $ss'$ is $+$ iff $s=s'$, and $-$, otherwise
-  
-\item for two integers $z, z'$, $z\cmpsignstrict{+} z'$ iff $z<z'$ and $z\cmpsignstrict{-} z'$ iff $z>z'$
-\item for an interval $B=[b_{\min}, b_{\max}]$, $\ivbound{B}{-}= b_{\min}$, $\ivbound{B}{+}= b_{\max}$
-\end{itemize}
-
-
-
-We will now proceed from the  general certification framework to concrete computation. Throughout this section we assume a formula $\phi$ of the form~$F \land \forall \bar{x}.\; Q$, but with the additional restrictions described in the problem statement (\cref{sec:problem-statement}). We will introduce an algorithm that checks satisfiability of $\phi$  by computing a satisfiability certificate of a certain form. 
+We will introduce an algorithm that checks satisfiability of $\phi$  by computing a satisfiability certificate of a certain form. 
 % While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables, the algorithm presented here focuses on the case of a single universally quantified variable. We also assume that the coefficient of this variable in argument terms is non-negative, and that all non-zero coefficients of this variables are the same for the same uninterpreted function symbol.
 The computed certificate will explicitly certify: (1) satisfiability of the quantifier-free part $F$, and (2) satisfiability over a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. For values outside $B$, it uses satisfiability propagators with an order that propagates upward from $b_{\max}+1$ and downward from $b_{\min}-1$.  We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
 
