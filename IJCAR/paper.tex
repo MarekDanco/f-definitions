@@ -912,6 +912,7 @@ where:
     \item Clash condition encoding $\text{ClashEnc}^s$:
       % \begin{align*}
 \[  \bigwedge_{f(t)\in\mathcal {T}}\bigwedge_{a \in \args(F,f_i)} \big(s_{f(t)} \Rightarrow \bigwedge_{\substack{a \in \args(F,f)}} a\cmpsignstrict{\coeffsign{f}s}  \subst{t}{x}{\ivbound{B}{s}}\big)    \]
+
 %        \text{ClashDownEnc} &\equiv \bigwedge_{f(t)\in\mathcal
 %        {T}}\bigwedge_{a \in \args(F,f_i)} \big(s'_{f(t)} \Rightarrow (a \geq \subst{t}{x}{b_{\min}})\big)
 %    \end{align*}
@@ -923,8 +924,9 @@ Note that if for some $f\in\mathcal{{F}}$ the ground parts of its argument terms
 \begin{lemma}[Encoding Correctness]
 \label{lem:encoding-correctness}
 For any interval $B = [b_{\min}, b_{\max}]$,  and sign~$s\in\{+, -\}$, 
- $\Psi_\text{up}^{s,\text{e}}(B)$ is satisfiable iff there exists $\mathcal{S}\subseteq\mathcal{T}$ such that $\Psi_{\text{up}}(B,\mathcal{S})$ holds.
+ $\Psi^{s,\text{e}}(B)$ is satisfiable iff there exists $\mathcal{S}\subseteq\mathcal{T}$ such that $\Psi^{s}(B,\mathcal{S})$ holds.
 \end{lemma}
+
 % \begin{proof}
 %     ($\Rightarrow$) Suppose $\Psi_\text{up}^\text{e}(B)$ is satisfiable by an assignment $I$. Define $\mathcal{S} = \{f(t) \mid I(s_{f(t)}) = \text{true}\}$. By $\Phi_{\text{max}}^\text{e}$, for each function $f$, all $f(t) \in \mathcal{S}$ have equal ground parts under $I$, and they are strictly greater than those of any $f(t') \in \mathcal{T} \setminus \mathcal{S}$ with the same $f$. Since all terms have the same coefficient of $x$, this implies $\Phi_{\text{max}}(\mathcal{S})$ holds. By $\Phi_{\text{prop}}^\text{e}$, all $f(t) \in \mathcal{S}$ are equal to $v_{f(t)}$, satisfying the substitution in $\Phi_{\text{prop}}(\mathcal{S})$. Finally, $\text{ClashUpEnc}$ ensures the clash condition $a \leq \subst{t}{x}{b_{\max}}$ for all $f(t) \in \mathcal{S}$. Hence $\Psi_{\text{up}}(B,\mathcal{S})$ holds.
 
