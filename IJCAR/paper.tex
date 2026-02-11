@@ -872,26 +872,27 @@ The algorithm presented so far relies on large disjunctions over all possible su
 
 \paragraph{Encoding Idea.} Instead of enumerating all subset choices we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. For each term $f(t)\in\mathcal{T}$, we create:
 \begin{itemize}
-    \item $s_{f(t)}$: true iff $f(t) \in \mathcal{S}$ (for upward propagation)
-    \item $s'_{f(t)}$: true iff $f(t) \in \mathcal{S}'$ (for downward propagation)
+    \item $s_{f(t)}$: true iff $f(t) \in \mathcal{S}$ (for propagation with $s=+$)
+    \item $s'_{f(t)}$: true iff $f(t) \in \mathcal{S}'$ (for propagation with $s=-$)
 \end{itemize}
 
-We then encode the conditions $\Phi_{\text{max}}$, $\Phi_{\text{min}}$, $\Psi_\text{up}$, $\Psi_\text{down}$, and the clash conditions using these variables.
+We then encode the extremal conditions $\Phi^s_{\text{ext}}$, the propagability condition $\Phi_{\text{prop}}$, and the clash conditions using these variables, yielding a compact representation of $\Psi^{s,\text{e}}(B)$ for each sign $s$.
 
 \begin{definition}[CNF Encoding of Interval Extension Formulas]
 \label{def:interval-extension-formulas-CNF}
 For an interval $B = [b_{\min}, b_{\max}]$, define the encoded formulas:
-\[\Psi^{s,\text{e}}(B) \equiv \Phi^{s,\text{e}}_\text{max} \land \Phi_\text{prop}^\text{e} \land \text{ClashEnc}^s\]
+\[\Psi^{s,\text{e}}(B) \;\equiv\; \Phi^{s,\text{e}}_{\text{ext}} \;\land\; \Phi_{\text{prop}}^{\text{e}} \;\land\; \text{ClashEnc}^s\]
 %\Psi_{\text{down}}^\text{e}(B) &\equiv \Phi_\text{min}^\text{e} \land \Phi_\text{prop}^\text{e} \land 
 where:
 \begin{itemize}
-    \item Maximality encoding $\Phi_\text{max}^{s,\text{e}}$:
+    \item Extremal condition encoding $\Phi^{s,\text{e}}_{\text{ext}}$:
     \begin{align*}
         \subst{
         \bigwedge_{f \in \mathcal{F}}\ \bigwedge_{\substack{f(t),\, f(t') \in \mathcal{T}}}
-        \left((s_{f(t)} \land s_{f(t')}) \Rightarrow t = t' \;\land\; (s_{f(t)} \land \neg s_{f(t')}) \Rightarrow t' \cmpsign{s\coeffsign{f}} t\right)}{x}{0}
+        \Bigl( (s_{f(t)} \land s_{f(t')}) \Rightarrow t = t' \;\land\; 
+        (s_{f(t)} \land \neg s_{f(t')}) \Rightarrow t' \;\cmpsignstrict{\coeffsign{f}s}\; t \Bigr)}{x}{0}
     \end{align*}
-    
+   
     \item Propagation encoding $\Phi_{\text{prop}}^{\text{e}}$:%
     \[
     \bigwedge_{\mathcal{T}_{\!-}\subseteq\mathcal{T}}
@@ -917,7 +918,7 @@ where:
 \end{itemize}
 \end{definition}
 
-Note that if for some $f\in\mathcal{{F}}$ the ground parts of the argument terms (obtained by substituting $x=0$) are pairwise different, then at most one $s_{f(t)}$ can be true in any satisfying assignment of $\Psi^{+,\text{e}}(B)$ or $\Psi^{-,\text{e}}(B)$. This is because the maximality condition would require two different ground parts to be  equal, which is impossible in this case. 
+Note that if for some $f\in\mathcal{{F}}$ the ground parts of its argument terms (obtained by substituting $x=0$) are pairwise different, then at most one $s_{f(t)}$ can be true in any satisfying assignment of $\Psi^{s,\text{e}}(B)$. This follows from the extremal condition, which would otherwise require two distinct ground terms to be equal.
 
 \begin{lemma}[Encoding Correctness]
 \label{lem:encoding-correctness}
