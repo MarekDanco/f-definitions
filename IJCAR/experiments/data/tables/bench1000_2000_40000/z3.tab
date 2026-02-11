@@ -1,7 +1,7 @@
 /local/home/dancomar/ijcar26/bench1000/test.smt2  ; 12 12 (s) ; n 
 /local/home/dancomar/ijcar26/bench1000/step2.smt2  ; 11 11 (s) ; n 
-/local/home/dancomar/ijcar26/bench1000/incr.smt2  ; 11 11 (s) ; n 
 /local/home/dancomar/ijcar26/bench1000/incr_by3.smt2  ; 11 11 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/incr.smt2  ; 12 12 (s) ; n 
 /local/home/dancomar/ijcar26/bench1000/doubling.smt2  ; 8 8 (s) ; n 
 /local/home/dancomar/ijcar26/bench1000/decrement.smt2  ; 11 11 (s) ; n 
 /local/home/dancomar/ijcar26/bench1000/doubling1.smt2  ; 8 8 (s) ; n 
@@ -12,5 +12,156 @@
 /local/home/dancomar/ijcar26/bench1000/incr_const_arg.smt2  ; 0 0 (s) ; s sat 
 /local/home/dancomar/ijcar26/bench1000/diff_depends_g.smt2  ; 0 0 (s) ; s sat 
 /local/home/dancomar/ijcar26/bench1000/incr_2functions_const.smt2  ; 9 9 (s) ; n 
-/local/home/dancomar/ijcar26/bench1000/incr_2functions1.smt2  ; 43 43 (s) ; n 
-/local/home/dancomar/ijcar26/bench1000/incr_2functions2.smt2  ; 224 224 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/incr_2functions1.smt2  ; 44 44 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000f2244194.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000b9aa1da3.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/incr_2functions2.smt2  ; 230 230 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000cb96669c.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000a4cc39dd.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000009ddca87d.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000009d8ef541.smt2  ; 5 5 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_000000000bf7747d.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000e7959236.smt2  ; 10 10 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000cfced849.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000094b03731.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000cf175ca2.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000028dabbfe.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000e57f233f.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000d337cb0a.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000bdb4d395.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000cf36a961.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000e7bb4125.smt2  ; 7 7 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_000000005147727c.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000072f9038a.smt2  ; 11 11 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000cb6c56ef.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000006134e577.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000009ef8e6a0.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000ecc8a514.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000832e4218.smt2  ; 4 4 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_000000007ba1a89a.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000f379e53d.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000118ecbce.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000522fff42.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000003f3bdd85.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000003b1f4531.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000cfffd02a.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000d083367e.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000009a6d2a67.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000079d5c8fd.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000a8738287.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000de114a96.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000042a2cfe7.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000cf15acae.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000008231cc70.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000659072aa.smt2  ; 8 7 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_000000002e9e6a37.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000092731be9.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000d57db17f.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000003377cbe0.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000007a09f93d.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000e3941b71.smt2  ; 7 7 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000203efe40.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000317a6da6.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000ea31f93c.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000001aaaceb0.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000008041a559.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000009916154f.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000311fb22c.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000000e4f8958.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000b96325b2.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000079a93138.smt2  ; 14 13 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000013e42498.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000c73c0264.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000008d79effa.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000030d8f158.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000f7a493f4.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000073b1b34d.smt2  ; 8 7 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000038716dd4.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000d62786fe.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000049860f96.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000fb43c0cd.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000007e44bd0f.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000002d0eda86.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000001ac05274.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000003ad6c6.smt2  ; 21 21 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000e9b21333.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000a085b140.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000000eda4a78.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000003931e455.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000b9ceaa84.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000006d1a450c.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000002e97165b.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000008c2c7cac.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000004ebc4541.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000008cdf860.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000fd38d254.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000c50c3b76.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000002a966539.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000e97e25d6.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000cd25c707.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000ab249e6f.smt2  ; 3 3 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000046946b8d.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000035c715fb.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000008b6d9416.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000092f4b5d3.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000001f16d0e4.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000beba1910.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000005196aaa9.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000000800bc1c.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000e11c8ecd.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000001f18a8ea.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000b47fbdb2.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000183da82b.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000027979739.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000001d0eeffb.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000068ac5147.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000001ccdd821.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000009b8b296.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000018c3f10e.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000090df81b9.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000046d4b048.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000003e3fd2d7.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000df560f06.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000005b95c748.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000002058646d.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000000dd21663.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000047baff48.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000aa3c9376.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000001d3dbed3.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000094c996c9.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000003d10b3e6.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000044207a33.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000f5f296ef.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000006cba4425.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000005f9cd999.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000628726ca.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000865cd91e.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000a1fbe2f0.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000034a3f823.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000067b9a409.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000ef93cd51.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000009f7cfbfd.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000099c33000.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000771f0334.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000008895361.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000e1dc5a8a.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000d8e31a43.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000d6c114ae.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000f14a5bfb.smt2  ; 7 7 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000a00f0e69.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000ab75b282.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000005c793c99.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000107421b6.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000bde40b5b.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000002ad2d5c9.smt2  ; 15 15 (s) ; n 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000031fff614.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000b79dbbc7.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000003318c8f4.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000c70582b5.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_0000000094c1a21f.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000c6bae1df.smt2  ; 0 0 (s) ; s unsat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000008c989e13.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000c3b3a3a9.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_000000008ae75f26.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000be26230e.smt2  ; 0 0 (s) ; s sat 
+/local/home/dancomar/ijcar26/bench1000/formula_00000000a2b26bbb.smt2  ; 0 0 (s) ; s sat 
