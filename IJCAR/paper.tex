@@ -639,7 +639,7 @@ For an interval $B\subseteq\mathbb{Z}$  a sign~$s\in\{-,+\}$, and a subset $\mat
     \[
     \Phi^{s}_{\text{max}}(\mathcal{S})\;\land\; 
     \Phi_{\text{prop}}(\mathcal{S}) \;\land
-    \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a\cmpsignstrict{\coeffsign{f} s}  \subst{t}{x}{\ivbound{B}{s}} 
+    \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a\cmpsignstrict{s\coeffsign{f}}  \subst{t}{x}{\ivbound{B}{s}} 
     \]
     % \vspace*{-0.2cm}
     % \[\land 
@@ -938,7 +938,7 @@ We then encode the conditions $\Phi_{\text{max}}$, $\Phi_{\text{min}}$, $\Psi_\t
 \begin{definition}[CNF Encoding of Interval Extension Formulas]
 \label{def:interval-extension-formulas-CNF}
 For an interval $B = [b_{\min}, b_{\max}]$, define the encoded formulas:
-\[\Psi^{s,\text{e}}(B) \equiv \Phi^{s,\text{e}}_\text{max} \land \Phi_\text{prop}^\text{e} \land \text{ClashEnc}\]
+\[\Psi^{s,\text{e}}(B) \equiv \Phi^{s,\text{e}}_\text{max} \land \Phi_\text{prop}^\text{e} \land \text{ClashEnc}^s\]
 %\Psi_{\text{down}}^\text{e}(B) &\equiv \Phi_\text{min}^\text{e} \land \Phi_\text{prop}^\text{e} \land 
 where:
 \begin{itemize}
@@ -949,7 +949,7 @@ where:
         \left((s_{f(t)} \land s_{f(t')}) \Rightarrow t = t' \;\land\; (s_{f(t)} \land \neg s_{f(t')}) \Rightarrow t' \cmpsign{s\coeffsign{f}} t\right)}{x}{0}
     \end{align*}
     
-    \item Propagation encoding $\Phi_{\text{prop}}^e$:
+    \item Propagation encoding $\Phi_{\text{prop}}^{\text{e}}$:%
     \[
     \bigwedge_{\mathcal{T}_{\!-}\subseteq\mathcal{T}}
     \left(\bigwedge_{f(t)\in\mathcal{T}_{\!-}} \neg s_{f(t)} \;\wedge\; \bigwedge_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}} s_{f(t)}\;\Rightarrow\; \forall x\, \forall \bar{u}\, \exists \bar{v}\; Q^{\mathcal{T}_{\!-}}\right),
@@ -965,9 +965,9 @@ where:
     % \end{itemize}
     % and $\cdot$ is a dummy symbol, and hence for any propositional variable $p$, $\cdot p$ is the same as $p$.
         
-    \item Clash condition encoding:
-%    \begin{align*}
-\[        \text{ClashEnc} \equiv \bigwedge_{f(t)\in\mathcal {T}}\bigwedge_{a \in \args(F,f_i)} \big(s_{f(t)} \Rightarrow (a \leq \subst{t}{x}{b_{\max}})\big)    \]
+    \item Clash condition encoding $\text{ClashEnc}^s$:
+      % \begin{align*}
+\[  \bigwedge_{f(t)\in\mathcal {T}}\bigwedge_{a \in \args(F,f_i)} \big(s_{f(t)} \Rightarrow \bigwedge_{\substack{a \in \args(F,f)}} a\cmpsignstrict{s\coeffsign{f}}  \subst{t}{x}{\ivbound{B}{s}}\big)    \]
 %        \text{ClashDownEnc} &\equiv \bigwedge_{f(t)\in\mathcal
 %        {T}}\bigwedge_{a \in \args(F,f_i)} \big(s'_{f(t)} \Rightarrow (a \geq \subst{t}{x}{b_{\min}})\big)
 %    \end{align*}
