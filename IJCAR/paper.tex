@@ -949,9 +949,7 @@ However, even in the first case our method may improve upon methods such as MBQI
 First, the models produced by MBQI may be particularly difficult to read. Next, the run-time
 of MBQI increases with the size of the model.
 
-We have prepared a short test suite consisting of 16\marek{It would be better if I generated more
-	problems where the algorithm succeeds but I don't know if it is necessary. The graphs do look
-	a bit sparse though.} small problems such as
+We have prepared a short test suite consisting of 28 small problems such as
 \begin{align}\label{eq:exp1}
 	f(4)=7 \;\land\; \forall x.\; (0 \le x \le 10^c \;\Rightarrow\; f(x+1)=f(x)+1),
 \end{align}
@@ -972,39 +970,43 @@ Here, our algorithm terminates right after ensuring that \req holds for the inte
 We ran our experiments with a 30-minute time limit.
 When setting $c = 1$, the state of the art \textsc{smt} solvers terminate on our
 problems immediately. On problem~\eqref{eq:exp1} with $c = 3$, \textsc{cvc5} takes
-23 seconds to return \textsc{sat}, and for $c \geq 4$, the solver times out. With
-$c \geq 2$, \textsc{z3} returns \textsc{unknown} after 11 seconds. On problem~\eqref{eq:exp2},
+64 seconds to return \textsc{sat}, and for $c \geq 4$, the solver times out. With
+$c \geq 2$, \textsc{z3} returns \textsc{unknown} after 12 seconds. On problem~\eqref{eq:exp2},
 \textsc{cvc5} times out with $c \geq 3$ and \textsc{z3} returns \textsc{unknown} starting
 from $c = 2$. Figure~\ref{fig:scaling} further depicts how the two solvers perform on our problems
-with increasing $c$. \textsc{z3} returns \textsc{unknown} for all but 4 problems starting
-from $c = 2$. \textsc{cvc5} on the other hand fals back to solving just one problem
-with $c \geq 4$. \textsc{z3} solved the 4 problems immediately regardless of $c$.
+with increasing $c$.
+Between $c=2$ and $c=5$, \textsc{cvc5} shows a sharp performance drop, decreasing from 28 solved instances at
+$c=1$ to 5 at $c=4$, and remaining at that level at $c=5$. In contrast, z3 remains relatively stable
+over this range, solving 6 to 7 instances.
+We also tested the performance of the two solvers on unbounded problems, that is with the
+bound $0 \le x \le 10^c$ removed. \textsc{z3} solved 5 of those problems while \textsc{cvc5}
+solved 2.
 The cactus plots in Figure~\ref{fig:cactus} show the number of problems solved by \textsc{cvc5}
 within a time limit for $c \in \{2, 3\}$. We can observe most of the problems get solved
 in the 10 to 100 seconds limit when setting $c = 3$. With $c \geq 4$, \textsc{cvc5} times out
-on all but one problem, which gets solved immediately.
+on all but 5 problems, which get solved immediately.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.6\linewidth]{experiments/data/scaling_plot.png}
-	\caption{Problems solved with increasing $c$}
+	\caption{Problems solved with increasing $c$. Asterisk coordinate denotes unbounded problems.}
 	\label{fig:scaling}
 \end{figure}
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=1\linewidth]{experiments/data/cactus_plot.png}
-	\caption{Runtime of \textsc{cvc5} for solved problems with $c \in \{2, 3\}$}
+	\caption{Runtime of \textsc{cvc5} for solved problems with $c \in \{2, 3\}$.}
 	\label{fig:cactus}
 \end{figure}
 
 Note that our algorithm proves the satisfiability of these problems promptly. Only a few
 LIA calls are needed to prove the \req condition. However, our algorithm struggles on
 problems such as
-\begin{align}
+\begin{align*}
 	f(10000)>0 \;\land \;\forall x. \;f(x+1) = f(x)+1
-\end{align}
-The clash condition\marek{add ref} requires $10000 \leq b_{\max} + 1$, therefore
+\end{align*}
+The clash condition requires $10000 \leq b_{\max} + 1$, therefore
 forcing 10000 expansions of the interval in \cref{alg:interval-check-param-withBigvee}.
 Improving the algorithm on cases similar to this one is a subject of future work.
 

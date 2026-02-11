@@ -9,7 +9,7 @@ C_MAP = {
     "bench1000_2000_40000": 3,
     "bench10000_2000_40000": 4,
     "bench100000_2000_40000": 5,
-    "bench_2000_40000": "*",
+    "bench_2000_40000": "✱",
 }
 
 with open("good.txt") as f:
@@ -61,7 +61,7 @@ for folder, c in C_MAP.items():
 
 df = pd.DataFrame(rows)
 # Create a numeric mapping for plotting
-c_to_numeric = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, "*": 6}
+c_to_numeric = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, "✱": 6}
 df["c_numeric"] = df["c"].map(c_to_numeric)
 
 solved = df[df["status"] == "sat"].groupby(["c", "solver"]).size().unstack(fill_value=0)
