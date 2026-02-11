@@ -938,22 +938,18 @@ We then encode the conditions $\Phi_{\text{max}}$, $\Phi_{\text{min}}$, $\Psi_\t
 \begin{definition}[CNF Encoding of Interval Extension Formulas]
 \label{def:interval-extension-formulas-CNF}
 For an interval $B = [b_{\min}, b_{\max}]$, define the encoded formulas:
-\begin{align*}
-\Psi_{\text{up}}^\text{e}(B) &\equiv \Phi_\text{max}^\text{e} \land \Phi_\text{prop}^\text{e} \land \text{ClashUpEnc} \\
-\Psi_{\text{down}}^\text{e}(B) &\equiv \Phi_\text{min}^\text{e} \land \Phi_\text{prop}^\text{e} \land \text{ClashDownEnc}
-\end{align*}
+\[\Psi^{s,\text{e}}(B) \equiv \Phi^{s,\text{e}}_\text{max} \land \Phi_\text{prop}^\text{e} \land \text{ClashEnc}\]
+%\Psi_{\text{down}}^\text{e}(B) &\equiv \Phi_\text{min}^\text{e} \land \Phi_\text{prop}^\text{e} \land 
 where:
 \begin{itemize}
-    \item Maximality encoding $\Phi_\text{max}^\text{e}$:
+    \item Maximality encoding $\Phi_\text{max}^{s,\text{e}}$:
     \begin{align*}
         \subst{
         \bigwedge_{f \in \mathcal{F}}\ \bigwedge_{\substack{f(t),\, f(t') \in \mathcal{T}}}
-        \left((s_{f(t)} \land s_{f(t')}) \Rightarrow t = t' \;\land\; (s_{f(t)} \land \neg s_{f(t')}) \Rightarrow t > t'\right)}{x}{0}
+        \left((s_{f(t)} \land s_{f(t')}) \Rightarrow t = t' \;\land\; (s_{f(t)} \land \neg s_{f(t')}) \Rightarrow t' \cmpsign{s\coeffsign{f}} t\right)}{x}{0}
     \end{align*}
     
-    \item Minimality encoding: $\Phi_\text{min}^\text{e}$ defined analogously with $s'_{f(t)}$ and $<$ instead of $>$.
-    
-    \item Upward propagation encoding $\Phi_{\text{prop}}^e$:
+    \item Propagation encoding $\Phi_{\text{prop}}^e$:
     \[
     \bigwedge_{\mathcal{T}_{\!-}\subseteq\mathcal{T}}
     \left(\bigwedge_{f(t)\in\mathcal{T}_{\!-}} \neg s_{f(t)} \;\wedge\; \bigwedge_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}} s_{f(t)}\;\Rightarrow\; \forall x\, \forall \bar{u}\, \exists \bar{v}\; Q^{\mathcal{T}_{\!-}}\right),
@@ -968,15 +964,13 @@ where:
     %     \item every $f(t)\in\mathcal{T}$ with $\sigma_{f(t)}=\cdot$ by $v_{f(t)}$, 
     % \end{itemize}
     % and $\cdot$ is a dummy symbol, and hence for any propositional variable $p$, $\cdot p$ is the same as $p$.
-    
-    \item Downward propagation encoding: This is defined symmetrically.
-    
+        
     \item Clash condition encoding:
-    \begin{align*}
-        \text{ClashUpEnc} &\equiv \bigwedge_{f(t)\in\mathcal {T}}\bigwedge_{a \in \args(F,f_i)} \big(s_{f(t)} \Rightarrow (a \leq \subst{t}{x}{b_{\max}})\big) \\
-        \text{ClashDownEnc} &\equiv \bigwedge_{f(t)\in\mathcal
-        {T}}\bigwedge_{a \in \args(F,f_i)} \big(s'_{f(t)} \Rightarrow (a \geq \subst{t}{x}{b_{\min}})\big)
-    \end{align*}
+%    \begin{align*}
+\[        \text{ClashEnc} \equiv \bigwedge_{f(t)\in\mathcal {T}}\bigwedge_{a \in \args(F,f_i)} \big(s_{f(t)} \Rightarrow (a \leq \subst{t}{x}{b_{\max}})\big)    \]
+%        \text{ClashDownEnc} &\equiv \bigwedge_{f(t)\in\mathcal
+%        {T}}\bigwedge_{a \in \args(F,f_i)} \big(s'_{f(t)} \Rightarrow (a \geq \subst{t}{x}{b_{\min}})\big)
+%    \end{align*}
 \end{itemize}
 \end{definition}
 
