@@ -498,6 +498,23 @@ The goal is now an algorithm that computes such satisfiability certificates and 
 
 \section{Algorithm}\label{sec:alg}
 
+\newcommand{\cmpsign}[1]{\lesseqgtr^{#1}}
+\newcommand{\cmpsignstrict}[1]{\lessgtr^{#1}}
+\newcommand{\coeffsign}[1]{\sigma(#1)}
+\newcommand{\ivbound}[2]{\text{sel}(#1,#2)}
+
+added notation:\todoSR{I will move this to the notation section.}
+\begin{itemize}
+  
+\item signs $+,-$
+\item $\coeffsign{f}$: the sign of the common coefficients of $x$ in $\phi$
+\item for any two signs $s$ and $s'$, $ss'$ is $+$ iff $s=s'$, and $-$, otherwise
+  
+\item for two integers $z, z'$, $z\cmpsignstrict{+} z'$ iff $z>z$ and $z\cmpsignstrict{-} z'$ iff $z<z'$
+\item for an interval $B=[b_{\min}, b_{\max}]$, $\ivbound{B}{-}= b_{\min}$, $\ivbound{B}{+}= b_{\min}$
+\end{itemize}
+
+
 
 We will now proceed from the  general certification framework to concrete computation. Throughout this section we assume a formula $\phi$ of the form~$F \land \forall \bar{x}.\; Q$, but with the additional restrictions described in the problem statement (\cref{sec:problem-statement}). We will introduce an algorithm that checks satisfiability of $\phi$  by computing a satisfiability certificate of a certain form. 
 % While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables, the algorithm presented here focuses on the case of a single universally quantified variable. We also assume that the coefficient of this variable in argument terms is non-negative, and that all non-zero coefficients of this variables are the same for the same uninterpreted function symbol.
@@ -508,18 +525,15 @@ For this, let $\mathcal{F}$ be the set of uninterpreted function symbols in the 
 
 \begin{definition}[\req Condition]
 \label{def:reqpivot-param}
-
-For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$, define:
+For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$ and signs $s\in\{ -, +\}$, define:
 \begin{itemize}
-\item \textbf{Maximality condition $\Phi_{\text{max}}(\mathcal{S})$:}
+\item \textbf{Maximality condition $\Phi^s_{\text{max}}(\mathcal{S})$:}
   \vspace*{-0.2cm}
   \[
         \subst{ \bigwedge_{f\in\mathcal{F}}\left(\bigwedge_{f(t),f(t') \in \mathcal{S}} t = t' \;\land\;
-        \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}\setminus\mathcal{S}} t > t'
+        \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}\setminus\mathcal{S}} t' \cmpsignstrict{\coeffsign{f}s} t
         \right)}{x}{0}.
     \]
-Symmetrically, for downward propagation, define the minimality condition $\Phi_{\text{min}}$ with $<$ instead of $>$.
-    
     \item \textbf{Propagability condition $\Phi_{\text{prop}}(\mathcal{S})$:}
         \[\forall x \forall \bar{u} \exists \bar{v}.\ Q'(\mathcal{S})\]
         where $\bar{u}$ corresponds to the variables $u_{f(t)}$ with $f(t)\in\mathcal{T}\setminus\mathcal{S}$ and $\bar{v}$ to the variables $v_{f(t)}$ with $f(t)\in \mathcal{S}$, and $Q'$ is obtained from $Q$ by simultaneously replacing
@@ -528,82 +542,9 @@ Symmetrically, for downward propagation, define the minimality condition $\Phi_{
             \item every $f(t)\in\mathcal{S}$ by $v_{f(t)}$.
         \end{itemize}
 \end{itemize}
-We say $Q$ satisfies the \emph{\req condition} for $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$ iff $\Phi_{\text{max}}(\mathcal{S})$, $\Phi_{\text{prop}}(\mathcal{S})$,
-$\Phi_{\text{min}}(\mathcal{S}')$, and $\Phi_{\text{prop}}(\mathcal{S}')$ all hold. Moreover, $Q$ satisfies the \emph{\req condition} iff such a pair~$(\mathcal{S}, \mathcal{S}')$ exists.
+We say that $Q$ satisfies the \emph{\req condition} for subsets $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$ iff $\Phi^+_{\text{max}}(\mathcal{S})$, $\Phi_{\text{prop}}(\mathcal{S})$,
+$\Phi^{-}_{\text{max}}(\mathcal{S}')$, and $\Phi_{\text{prop}}(\mathcal{S}')$ hold. Moreover we say that $Q$ satisfies the \emph{\req condition} iff there exists a pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the \req condition for $(\mathcal{S}, \mathcal{S}')$.
 \end{definition}
-
-% \begin{example}[\req Illustration]
-% \label{ex:req-illustration}
-% Consider the formula:
-% \[
-% \forall x.\ f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
-% \]
-% where $c$ is a ground constant. All function arguments have the form $x + \tau$ where $\tau$ is ground. We extract the set of terms:
-% \begin{align*}
-% \mathcal{T} &= \{f(x+c+3), f(x+4), f(x+1), g(x+2), h(x)\}.
-% \end{align*}
-
-% \medskip\noindent\textbf{Upward propagation:}
-% Consider $\mathcal{S} = \{f(x+4),g(x+2)\}$.
-% \begin{enumerate}
-%     \item \textbf{Maximality $\Phi_{\text{max}}(\mathcal{S})$:}
-%         We need to check for each function:
-%         \begin{itemize}
-%             \item For $f$: $f(x+4) \in \mathcal{S}$, $f(x+c+3) \notin \mathcal{S}$, $f(x+1) \notin \mathcal{S}$, so we require $(x+4) > (x+c+3)$ and $(x+4) > (x+1)$.
-%             \item For $g$: only $g(x+2) \in \mathcal{S}$, so the equality condition is trivial, and there are no non-$\mathcal{S}$ terms to compare with.
-%             \item For $h$: no terms in $\mathcal{S}$, so no conditions.
-%         \end{itemize}
-%         Substituting $x=0$ gives: $(4 > c+3) \land (4 > 1)$, which simplifies to $c < 1$.
-        
-%     \item \textbf{Propagability $\Phi_{\text{prop}}(\mathcal{S})$:}
-%         In $Q$, replace:
-%         \begin{itemize}
-%             \item $f(x+4)$ by a fresh variable $v_{f(x+4)}$,
-%             \item $g(x+2)$ by $v_{g(x+2)}$,
-%             \item $f(x+c+3)$ by $u_{f(x+c+3)}$,
-%             \item $f(x+1)$ by $u_{f(x+1)}$,
-%             \item $h(x)$ by $u_{h(x)}$.
-%         \end{itemize}
-%         The resulting formula is:
-%         \[
-%         \forall x \, \forall\bar{u}\, \exists \bar{v}\;. 
-%         \bigl( u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)} \bigr),
-%         \]
-        
-%         where $\bar{u} = \big(u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}\big)$ and $\bar{v} = \big(v_{f(x+4)}, v_{g(x+2)}\big)$. This universally quantified formula is valid: for any values of $u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}$, we can choose $v_{g(x+2)} = 0$ and $v_{f(x+4)} = u_{h(x)} - u_{f(x+c+3)} - u_{f(x+1)}$.
-% \end{enumerate}
-
-% \medskip\noindent\textbf{Downward propagation:}
-% Consider $\mathcal{S}' = \{f(x+1),h(x)\}$.
-% \begin{enumerate}
-%     \item \textbf{Minimality $\Phi_{\text{min}}(\mathcal{S}')$:}
-%         We need to check for each function:
-%         \begin{itemize}
-%             \item For $f$: $f(x+1) \in \mathcal{S}'$, $f(x+c+3) \notin \mathcal{S}'$, $f(x+4) \notin \mathcal{S}'$, so we require $(x+1) < (x+c+3)$ and $(x+1) < (x+4)$.
-%             \item For $h$: only $h(x) \in \mathcal{S}'$, so the equality condition is trivial.
-%         \end{itemize}
-%         Substituting $x=0$ gives: $(1 < c+3) \land (1 < 4)$, which simplifies to $c > -2$.
-        
-%     \item \textbf{Propagability $\Phi_{\text{prop}}(\mathcal{S}')$:}
-%         In $Q$, replace:
-%         \begin{itemize}
-%             \item $f(x+1)$ by $v'_{f(x+1)}$,
-%             \item $h(x)$ by $v'_{h(x)}$,
-%             \item $f(x+c+3)$ by $u_{f(x+c+3)}$,
-%             \item $f(x+4)$ by $u_{f(x+4)}$,
-%             \item $g(x+2)$ by $u_{g(x+2)}$.
-%         \end{itemize}
-%         The resulting formula is:
-%         \[
-%         \forall x \, \forall\bar{u} \, \exists \bar{v}'. 
-%         \bigl( u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)} \bigr),
-%         \]
-%         where $\bar{u} = \bigl(u_{f(x+c+3)}, u_{f(x+4)}, u_{g(x+2)}\bigr)$ and  $\bar{v}' = \bigl(v'_{f(x+1)}, v'_{h(x)}\bigr)$. This is also valid: choose $v'_{h(x)} = 0$ and $v'_{f(x+1)} = u_{g(x+2)} - u_{f(x+c+3)} - u_{f(x+4)}$.
-% \end{enumerate}
-
-% \medskip\noindent\textbf{Putting it together:}
-% $Q$ satisfies the \req condition for the pair $(\mathcal{S},\mathcal{S}')$ whenever $c$ satisfies both $c < 1$ (from upward maximality) and $c > -2$ (from downward minimality). Hence for any $c \in (-2, 1)$, the specific choices $\mathcal{S} = \{f(x+4),g(x+2)\}$ and $\mathcal{S}' = \{f(x+1),h(x)\}$ witness the \req condition.
-% \end{example}
 
 \begin{example}[\req Illustration]
 \label{ex:req-illustration}
@@ -611,49 +552,93 @@ Consider the formula:
 \[
 \forall x.\ f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
 \]
-where $c$ is a ground constant. Let $\mathcal{T} = \{f(x+c+3), f(x+4), f(x+1), g(x+2), h(x)\}$.
+where $c$ is a ground constant. All function arguments have the form $x + \tau$ where $\tau$ is ground. We extract the set of terms:
+\begin{align*}
+\mathcal{T} &= \{f(x+c+3), f(x+4), f(x+1), g(x+2), h(x)\}.
+\end{align*}
 
-\medskip\noindent\textbf{Upward propagation with $\mathcal{S} = \{f(x+4),g(x+2)\}$:}
-\begin{itemize}
-    \item \textbf{Maximality}: For $f$, we require $(x+4) > (x+c+3)$ and $(x+4) > (x+1)$; for $g$, no constraints. With $x=0$: $4 > c+3$ and $4 > 1$, i.e., $c < 1$.
-    \item \textbf{Propagability}: After substitution, we get:
-    \[
-    \begin{aligned}
-        \forall x\;\forall u_{f(x+c+3)},\, u_{f(x+1)},\, u_{h(x)}\;\exists v_{f(x+4)},\, v_{g(x+2)}\; \text{such that}\\[4pt]
-        u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)}.
-    \end{aligned}
-    \]
-    This holds by taking $v_{g(x+2)} = 0$ and $v_{f(x+4)} = u_{h(x)} - u_{f(x+c+3)} - u_{f(x+1)}$.
-\end{itemize}
+\medskip\noindent\textbf{Upward propagation:}
+Consider $\mathcal{S} = \{f(x+4),g(x+2)\}$.
+\begin{enumerate}
+    \item \textbf{Maximality $\Phi_{\text{max}}(\mathcal{S})$:}
+        We need to check for each function:
+        \begin{itemize}
+            \item For $f$: $f(x+4) \in \mathcal{S}$, $f(x+c+3) \notin \mathcal{S}$, $f(x+1) \notin \mathcal{S}$, so we require $(x+4) > (x+c+3)$ and $(x+4) > (x+1)$.
+            \item For $g$: only $g(x+2) \in \mathcal{S}$, so the equality condition is trivial, and there are no non-$\mathcal{S}$ terms to compare with.
+            \item For $h$: no terms in $\mathcal{S}$, so no conditions.
+        \end{itemize}
+        Substituting $x=0$ gives: $(4 > c+3) \land (4 > 1)$, which simplifies to $c < 1$.
+        
+    \item \textbf{Propagability $\Phi_{\text{prop}}(\mathcal{S})$:}
+        In $Q$, replace:
+        \begin{itemize}
+            \item $f(x+4)$ by a fresh variable $v_{f(x+4)}$,
+            \item $g(x+2)$ by $v_{g(x+2)}$,
+            \item $f(x+c+3)$ by $u_{f(x+c+3)}$,
+            \item $f(x+1)$ by $u_{f(x+1)}$,
+            \item $h(x)$ by $u_{h(x)}$.
+        \end{itemize}
+        The resulting formula is:
+        % \[
+        % \forall x \forall u_{f(x+c+3)} \forall u_{f(x+1)} \forall u_{h(x)} \exists v_{f(x+4)} \exists v_{g(x+2)}.\ 
+        % u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)}.
+        % \]
 
-\medskip\noindent\textbf{Downward propagation with $\mathcal{S}' = \{f(x+1),h(x)\}$:}
-\begin{itemize}
-    \item \textbf{Minimality}: For $f$, we require $(x+1) < (x+c+3)$ and $(x+1) < (x+4)$; for $h$, no constraints. With $x=0$: $1 < c+3$ and $1 < 4$, i.e., $c > -2$.
-    \item \textbf{Propagability}: After substitution:
-    \[
-    \begin{aligned}
-        \forall x\;\forall u_{f(x+c+3)},\, u_{f(x+4)},\, u_{g(x+2)}\;\exists v'_{f(x+1)},\, v'_{h(x)}\; \text{such that}\\[4pt]
-        u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)}.
-    \end{aligned}
-    \]
-    This holds by taking $v'_{h(x)} = 0$ and $v'_{f(x+1)} = u_{g(x+2)} - u_{f(x+c+3)} - u_{f(x+4)}$.
-\end{itemize}
+        \[
+        \forall x \, \forall\bar{u}\, \exists \bar{v}\;. 
+        \bigl( u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)} \bigr),
+        \]
+        
+        where $\bar{u} = \big(u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}\big)$ and $\bar{v} = \big(v_{f(x+4)}, v_{g(x+2)}\big)$. This universally quantified formula is valid: for any values of $u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}$, we can choose $v_{g(x+2)} = 0$ and $v_{f(x+4)} = u_{h(x)} - u_{f(x+c+3)} - u_{f(x+1)}$.
+\end{enumerate}
 
-\medskip\noindent\textbf{Conclusion:}
-For any $c \in (-2, 1)$, the pair $(\mathcal{S},\mathcal{S}')$ witnesses the \req condition.
+\medskip\noindent\textbf{Downward propagation:}
+Consider $\mathcal{S}' = \{f(x+1),h(x)\}$.
+\begin{enumerate}
+    \item \textbf{Minimality $\Phi_{\text{min}}(\mathcal{S}')$:}
+        We need to check for each function:
+        \begin{itemize}
+            \item For $f$: $f(x+1) \in \mathcal{S}'$, $f(x+c+3) \notin \mathcal{S}'$, $f(x+4) \notin \mathcal{S}'$, so we require $(x+1) < (x+c+3)$ and $(x+1) < (x+4)$.
+            \item For $h$: only $h(x) \in \mathcal{S}'$, so the equality condition is trivial.
+        \end{itemize}
+        Substituting $x=0$ gives: $(1 < c+3) \land (1 < 4)$, which simplifies to $c > -2$.
+        
+    \item \textbf{Propagability $\Phi_{\text{prop}}(\mathcal{S}')$:}
+        In $Q$, replace:
+        \begin{itemize}
+            \item $f(x+1)$ by $v'_{f(x+1)}$,
+            \item $h(x)$ by $v'_{h(x)}$,
+            \item $f(x+c+3)$ by $u_{f(x+c+3)}$,
+            \item $f(x+4)$ by $u_{f(x+4)}$,
+            \item $g(x+2)$ by $u_{g(x+2)}$.
+        \end{itemize}
+        The resulting formula is:
+        % \[
+        % \forall x \forall u_{f(x+c+3)} \forall u_{f(x+4)} \forall u_{g(x+2)} \exists v'_{f(x+1)} \exists v'_{h(x)}.\ 
+        % u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)}.
+        % \]
+
+        \[
+        \forall x \, \forall\bar{u} \, \exists \bar{v}'. 
+        \bigl( u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)} \bigr),
+        \]
+        where $\bar{u} = \bigl(u_{f(x+c+3)}, u_{f(x+4)}, u_{g(x+2)}\bigr)$ and  $\bar{v}' = \bigl(v'_{f(x+1)}, v'_{h(x)}\bigr)$. This is also valid: choose $v'_{h(x)} = 0$ and $v'_{f(x+1)} = u_{g(x+2)} - u_{f(x+c+3)} - u_{f(x+4)}$.
+\end{enumerate}
+
+\medskip\noindent\textbf{Putting it together:}
+$Q$ satisfies the \req condition for the pair $(\mathcal{S},\mathcal{S}')$ whenever $c$ satisfies both $c < 1$ (from upward maximality) and $c > -2$ (from downward minimality). Hence for any $c \in (-2, 1)$, the specific choices $\mathcal{S} = \{f(x+4),g(x+2)\}$ and $\mathcal{S}' = \{f(x+1),h(x)\}$ witness the \req condition.
 \end{example}
 
 Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the cells generated during propagation from clashing with the ground part $F$.
 
 \begin{definition}[Interval Extension Formulas]
 \label{def:interval-extension-formulas-param}
-For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}' \subseteq \mathcal{T}$, define: 
-\begin{enumerate}
-    \item \textbf{Upward extension formula $\Psi_{\text{up}}(B,\mathcal{S})$}:
+For an interval $B\subseteq\mathbb{Z}$  a sign~$s\in\{-,+\}$, and a subset $\mathcal{S} \subseteq \mathcal{T}$, define
+ $\Psi^{s}(B,\mathcal{S})$:=
     \[
-    \Phi_{\text{max}}(\mathcal{S})\;\land\; 
+    \Phi^{s}_{\text{max}}(\mathcal{S})\;\land\; 
     \Phi_{\text{prop}}(\mathcal{S}) \;\land
-    \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a \leq \subst{t}{x}{b_{\max}} 
+    \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a\cmpsignstrict{\coeffsign{f} s}  \subst{t}{x}{\ivbound{B}{s}} 
     \]
     % \vspace*{-0.2cm}
     % \[\land 
@@ -661,17 +646,16 @@ For an interval $B = [b_{\min}, b_{\max}]$ and subsets $\mathcal{S},\mathcal{S}'
     % \subst{t'}{x}{b_{\max}+1} \geq b_{\min}\]
     where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop}}(\mathcal{S})$ are as defined in \cref{def:reqpivot-param}. 
     
-    \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
-    \[
-    \Phi_{\text{min}}(\mathcal{S}') \;\land\; 
-    \Phi_{\text{prop}}(\mathcal{S}') \;\land
-    \bigwedge_{f(t) \in \mathcal{S}'} \bigwedge_{\substack{a \in \args(F,f)}} a \geq \subst{t}{x}{b_{\min}}
-    \]
-    where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop}}(\mathcal{S}')$ are as defined in \cref{def:reqpivot-param}.
-\end{enumerate}
+    % \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
+    % \[
+    % \Phi_{\text{min}}(\mathcal{S}') \;\land\; 
+    % \Phi_{\text{prop}}(\mathcal{S}') \;\land
+    % \bigwedge_{f(t) \in \mathcal{S}'} \bigwedge_{\substack{a \in \args(F,f)}} a \geq \subst{t}{x}{b_{\min}}
+    % \]
+    % where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop}}(\mathcal{S}')$ are as defined in \cref{def:reqpivot-param}.
 \end{definition}
 
-Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi_{\text{up}}(B,\mathcal{S})$ (resp. $\Psi_{\text{down}}(B,\mathcal{S}')$) asserts that $\mathcal{S}$ satisfies the upward (resp.\ $\mathcal{S}'$ satisfies the downward) conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ with $z > b_{\max}$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f(a)$; similarly for downward propagation. 
+Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi^s(B,\mathcal{S})$  asserts that $\mathcal{S}$ satisfies the conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The additional clash condition ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f(a)$.
 
 % The last conjunct in $\Psi_{\text{up}}(B,\mathcal{S})$\todoSN{Is this explanation needed?} ensures that during upward propagation, every 
 % non‑propagated cell's argument lies at or to the right of $b_{\min}$. This prevents upward propagation 
@@ -679,30 +663,20 @@ Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, 
 % of \cref{thm:interval-certificate-param} all $z > b_{\max}$ are processed before any $z < b_{\min}$. No symmetric constraint is needed for 
 % $\Psi_{\text{down}}$ because downward propagation occurs later and may use already‑assigned upward cells.
 
-\begin{theorem}[Interval Satisfiability]
-\label{thm:interval-certificate-param}
-Let $B$ be a non‑empty integer interval, and assume that
-\[
-  \Biggl(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\Biggr) \;\land\;
-  \Biggl(\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}(B,\mathcal{S})\Biggr)\;\land\;
-  \Biggl(\bigvee_{\mathcal{S}'\subseteq \mathcal{T}}\Psi_{\text{down}}(B,\mathcal{S}')\Biggr)
-\]
-is satisfiable, then $\phi$ has a satisfiability certificate, and hence is satisfiable.
-\end{theorem}
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
 Let $B$ be a non‑empty integer interval, and assume that
 \[
   \Biggl(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\Biggr) \;\land\;
-  \Biggl(\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}(B,\mathcal{S})\Biggr)\;\land\;
-  \Biggl(\bigvee_{\mathcal{S}'\subseteq \mathcal{T}}\Psi_{\text{down}}(B,\mathcal{S}')\Biggr)
+  \Biggl(\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi^+(B,\mathcal{S})\Biggr)\;\land\;
+  \Biggl(\bigvee_{\mathcal{S}'\subseteq \mathcal{T}}\Psi^-(B,\mathcal{S}')\Biggr)
 \]
 is satisfiable, then  $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\wedge \forall x\;.\; x\not\in B \Rightarrow Q$ has a satisfiability certificate, and hence $\phi$ is satisfiable.
 \end{theorem}
 
 \begin{proof}
-  Suppose the conjunction is satisfiable, let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi_{\text{up}}(B,\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi_{\text{down}}(B,\mathcal{S}')$. Assume that  $B = [b_{\min}, b_{\max}]$. We construct a certificate as in \cref{def:certificate}:
+  Suppose the conjunction is satisfiable, let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi^+(B,\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi^-(B,\mathcal{S}')$. Assume that  $B = [b_{\min}, b_{\max}]$. We construct a certificate as in \cref{def:certificate}:
 
 \begin{enumerate}
     \item \textbf{Pre‑satisfiability certificate:} Define the cell interpretation~$I$ as follows:
@@ -710,7 +684,7 @@ is satisfiable, then  $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\wedge 
         \item For every uninterpreted constant $c$ in $\phi$, set $I(c)=I^*(c)$.
         \item For every $a\in args(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}, f)$,  where $f$ is an uninterpreted function symbol, $I(f(I^*(a)))=I^*(f)(I^{*}(a))$
     \end{itemize}
-    By construction, $I$ is finite and satisfies $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}, f)$, because $I^*$ satisfies that formula and $I$ agrees with $I^*$ on all relevant cells.
+    By construction, $I$ is finite and satisfies $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}$ because $I^*$ satisfies that formula and $I$ agrees with $I^*$ on all relevant cells.
        
     \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
     \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
@@ -729,40 +703,34 @@ is satisfiable, then  $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\wedge 
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
     \item For $z \in B$: In this case, $\subst{(x\not\in B \Rightarrow Q)}{x}{\hat{z}}$ is a tautology and the propagator is trivial.
-        \item For $z > b_{\max}$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$ values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
-        \item For $z < b_{\min}$: Symmetrically, use $\Phi_{\text{prop}}(\mathcal{S}')$ to assign values to propagated cells. 
-
-          
+        \item For $z\not\in B$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$ values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
     \end{itemize}
 \end{enumerate}
-
 It remains to verify the disjointness conditions of \cref{def:certificate}:
 \[X_z\cap \mathit{def}(I)=\emptyset \text{ and } X_z\cap\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi)=\emptyset.\]
-
 \begin{itemize}
-    \item For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.
-    
+    \item For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.    
     \item For $z > b_{\max}$, any element of $X_z$ has the form $f(I(\subst{t}{x}{\repr{z}}))$ with $f(t) \in \mathcal{S}$.
     \begin{itemize}
     \item To prove that this element of $X_z$ cannot be in $\mathit{def}(I)$, let $f'(t')$ be an arbitrary, but fixed element of $\mathit{def}(I)$. We prove that $f'(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}}))$. If $f$ is a different function symbol than $f'$ this is certainly the case, and hence it suffices to prove
       $f(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}})$, which makes it necessary to prove
       $I(\subst{t'}{x}{\repr{z}}))\neq I(\subst{t}{x}{\repr{z}})$.
-The clash condition $a \leq \subst{t}{x}{\repr{b}_{\max}}$ in $\Psi_{\text{up}}(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:
+      The clash condition $a\cmpsignstrict{\coeffsign{f}}\subst{t}{x}{\ivbound{B}{s}}$ in $\Psi^+(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:\todoSR{missing: $a\in \text{def}(I)$ but $a\not\in args(F,f)$}
         \[
-        I\models a \leq \subst{t}{x}{\repr{b}_{\max}} < \subst{t}{x}{\repr{z}},
+        I\models a\cmpsign{\coeffsign{f}}  \subst{t}{x}{\repr{b}_{\max}} \cmpsignstrict{\coeffsign{f}} \subst{t}{x}{\repr{z}},
         \]
-        where the strict inequality follows because $t$ is linear, contains $x$ with positive coefficient and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$
+        where the strict inequality follows because $t$ is linear, and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$
         
       \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
         $I(\subst{t'}{x}{\repr{z}'}))\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
         \[
-          I\models \subst{t'}{x}{\hat{z}'}< \subst{t'}{x}{\hat{z}}.
+          I\models \subst{t'}{x}{\hat{z}'}\cmpsignstrict{\coeffsign{f}} \subst{t'}{x}{\hat{z}}.
         \]
-        Moreover, $\Phi_{\text{max}}(\mathcal{S})$ ensures that $t$ is maximal among the terms of $f$ in $\mathcal{T}$, and hence
+        Moreover, $\Phi_{\text{max}}(\mathcal{S})$ ensures 
                 \[
-          I\models \subst{t'}{x}{\hat{z}}< \subst{t}{x}{\hat{z}}.
+          I\models \subst{t'}{x}{\hat{z}}\cmpsignstrict{\coeffsign{f}}\subst{t}{x}{\hat{z}}.
         \]
-Hence $I(\subst{t'}{x}{\repr{z}'})< I(\subst{t}{x}{\repr{z}}))$, which implies that the two sides of the inequality cannot be the same.
+Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\repr{z}}))$, which implies that the two sides of the inequality cannot be the same.
     %     \begin{itemize}
     %         \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
     %         \[
@@ -778,14 +746,13 @@ Hence $I(\subst{t'}{x}{\repr{z}'})< I(\subst{t}{x}{\repr{z}}))$, which implies t
     %     \end{itemize}        
     \end{itemize}
 
-  \item The case $z < b_{\min}$ is symmetric, using the downward clash condition $a \geq \subst{t}{x}{\repr{b}_{\min}}$ and $\Phi_{\text{min}}(\mathcal{S}')$. Here, we prove that for all $z'\preceq z$, $I(\subst{t'}{x}{\repr{z}'})> I(\subst{t}{x}{\repr{z}}))$.
-    Note that the fact that the upward propagation block of elements greater than $b_{\max}$ occurs before the downward propagation block of elements less than $b_{\min}$ in the order $\preceq$ does not create a problem, since  propagation is still restricted to cells not occurring before. Formally, for
-    $z'\preceq z$ with $z'>b_{\max}$ we have $z'>b_{\max}>b_{\min}>z$, which allows symmetric application of the argument of the case of upward propagation.    
+  \item The case $z < b_{\min}$ is symmetric, using $\Psi^-(B,\mathcal{S}')$.
+    Note that the fact that the upward propagation block of elements greater than $b_{\max}$ occurs before the downward propagation block of elements less than $b_{\min}$ in the order $\preceq$ does not create a problem, since  propagation is still restricted to cells not occurring before.
 \end{itemize}
 % Finally, we must ensure that the \textbf{satisfiability propagators} can be applied inductively along $\preceq$.  
 % For $z > b_{\max}$, the propagator $\Phi_{\text{prop}}(\mathcal{S})$ requires values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$.  
 % Let $f(t') \in \mathcal{T}\setminus\mathcal{S}$ be such a non‑propagated term. Its corresponding cell is $f(I(\subst{t'}{x}{\repr{z}}))$.  
-% By the last conjunct in $\Psi_{\text{up}}(B,\mathcal{S})$, we have $I \models \subst{t'}{x}{z} \geq b_{\min}$.  
+% By the last conjunct in $\Psi^+(B,\mathcal{S})$, we have $I \models \subst{t'}{x}{z} \geq b_{\min}$.  
 % Thus $I(\subst{t'}{x}{\repr{z}})$ is either in $B$ (if $\leq b_{\max}$) or satisfies $I(\subst{t'}{x}{\repr{z}}) > b_{\max}$.  
 
 % In the well‑order $\preceq$, all indices $w$ with $w > b_{\max}$ appear \emph{before} any $w < b_{\min}$.  
@@ -821,9 +788,9 @@ The theorem immediately yields an algorithm that checks satisfiability by search
 % \State $I \gets \smt\!\left(F \land Q[0]\right)$
 %\While{$I \neq \bot$}
 \While{$F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is satisfiable}
-    \State $\text{max}_\text{up}\gets\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi_{\text{up}}([b_{\min},b_{\max}],\mathcal{S}))$
-    \State $\text{min}_\text{down}\gets\bigvee_{{\mathcal{S}'\subseteq \mathcal{T}}}\Psi_{\text{down}}([b_{\min},b_{\max}],\mathcal{S}))$ 
-    \If{$\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right) \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}$ is satisfiable}
+    \State $\text{max}_\text{up}\gets\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi^+([b_{\min},b_{\max}],\mathcal{S}))$
+    \State $\text{min}_\text{down}\gets\bigvee_{{\mathcal{S}'\subseteq \mathcal{T}}}\Psi^-([b_{\min},b_{\max}],\mathcal{S}))$ 
+    \If{$\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right) \land \text{max}^+ \land \text{min}_{\text{down}}$ is satisfiable}
         \State \Return \textsc{Sat} 
     \EndIf
     \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
@@ -847,16 +814,16 @@ The theorem immediately yields an algorithm that checks satisfiability by search
 %     \item An interval $B = [b_{\min}, b_{\max}]$,
 %     \item An interpretation $I$ satisfying:
 %     \[
-%     I \models F \land \bigwedge_{x \in B} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}},
+%     I \models F \land \bigwedge_{x \in B} Q[x] \land \text{max}^+ \land \text{min}_{\text{down}},
 %     \]
-%     where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are the disjunctions defined in lines 3--4 of the algorithm.
+%     where $\text{max}^+$ and $\text{min}_{\text{down}}$ are the disjunctions defined in lines 3--4 of the algorithm.
 % \end{itemize}
 
-% Since $I \models \text{max}_{\text{up}}$, there exists some $\mathcal{S}\subseteq\mathcal{T}$ such that 
-% $I \models \Psi_{\text{up}}(B,\mathcal{S})$. Similarly, $I \models \text{min}_{\text{down}}$ implies there exists 
+% Since $I \models \text{max}^+$, there exists some $\mathcal{S}\subseteq\mathcal{T}$ such that 
+% $I \models \Psi^+(B,\mathcal{S})$. Similarly, $I \models \text{min}_{\text{down}}$ implies there exists 
 % $\mathcal{S}'\subseteq\mathcal{T}$ such that $I \models \Psi_{\text{down}}(B,\mathcal{S}')$. Thus $I$ satisfies:
 % \[
-% F \land \bigwedge_{x \in B} Q[x] \land \Psi_{\text{up}}(B,\mathcal{S}) \land \Psi_{\text{down}}(B,\mathcal{S}').
+% F \land \bigwedge_{x \in B} Q[x] \land \Psi^+(B,\mathcal{S}) \land \Psi_{\text{down}}(B,\mathcal{S}').
 % \]
 
 % By \cref{thm:interval-certificate-param}, this implies that $\phi$ has a satisfiability certificate 
@@ -874,9 +841,7 @@ If the input formula~$\phi$ is satisfiable, and
 
 \begin{proof}
 Assume $\phi$ is satisfiable and satisfies \req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
-Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments.
-
-For each $f(t)\in\mathcal{F}$, define:
+Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$\todoSR{Why not work directly with $I$?}. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments. For each $f(t)\in\mathcal{F}$, define:
 \[
 v_{\max}^f = \max\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
 v_{\min}^f = \min\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
@@ -887,7 +852,7 @@ The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathca
     \item For all $f(t) \in \mathcal{S}^*$: $I^*(\subst{t}{x}{0}) = v_{\max}^f$,
     \item For all $f(t) \in \mathcal{S}'^*$: $I^*(\subst{t}{x}{0}) = v_{\min}^f$.
 \end{itemize}
-Now choose
+Now choose\todoSR{what if $c_f$ is negative?}
 \begin{minipage}{\linewidth-2cm}
 \vspace*{-0.5cm}  
 \begin{align*}
@@ -895,7 +860,6 @@ Now choose
 b_{\min} &= \min\left\{\, \left\lfloor \frac{I^*(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\},
 \end{align*}
 \end{minipage}
-
 and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
 \begin{enumerate}
     \item \textbf{Base formula}: $I^* \models F \land \bigwedge_{x \in B} Q[x]$ (since $\mathcal{M} \models \phi$).
@@ -903,29 +867,29 @@ and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     \item \textbf{Upward disjunction $\text{max}_{\text{up}}$}: 
     For the specific $\mathcal{S}^*$, we have:
     \begin{itemize}
-        \item $\Phi_{\text{max}}(\mathcal{S}^*)$ holds by definition,
+        \item $\Phi_{\text{max}}^+(\mathcal{S}^*)$ holds by definition,
         \item $\Phi_{\text{prop}}(\mathcal{S}^*)$ holds by the \req condition,
         \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
         % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
         % \]
         \[
-        I^*(a) \leq c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\hat{b}_{\max}})
+        I^*(a) \cmpsign{\coeffsign{f}} c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\hat{b}_{\max}})
         \]
         by construction of $b_{\max}$, which is exactly the clash condition.
     \end{itemize}
-    Thus $I^* \models \Psi_{\text{up}}(B,\mathcal{S}^*)$, and consequently $I^* \models \text{max}_{\text{up}}$.
+    Thus $I^* \models \Psi^+(B,\mathcal{S}^*)$, and consequently $I^* \models \text{max}_{\text{up}}$.
     
     \item \textbf{Downward disjunction $\text{min}_{\text{down}}$}: 
     Similarly, for $\mathcal{S}'^*$ we have:
     \begin{itemize}
-        \item $\Phi_{\text{min}}(\mathcal{S}'^*)$ holds,
+        \item $\Phi_{\text{max}}^+(\mathcal{S}'^*)$ holds,
         \item $\Phi_{\text{prop}}(\mathcal{S}'^*)$ holds,
         \item For each $f(t)\in\mathcal{S}'^{*}$ and $a \in \args(F,f)$:
         % \[
         % I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
         % \]
         \[
-        I^*(a) \geq c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{b_{\min}})
+        I^*(a)\cmpsign{-\coeffsign{f}}  c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{b_{\min}})
         \]
         by construction of $b_{\min}$.
     \end{itemize}
@@ -934,9 +898,9 @@ and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
 
 Let $N = \max(|b_{\min}|, |b_{\max}|)$. \cref{alg:interval-check-param-withBigvee} expands the interval symmetrically from $[0,0]$. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$. At this iteration, line 5 will check the satisfiability of:
 \[
-F \land \bigwedge_{x=-N}^{N} Q[x] \land \text{max}_{\text{up}} \land \text{min}_{\text{down}}
+F \land \bigwedge_{x=-N}^{N} Q[x] \land \text{max}^+ \land \text{min}_{\text{down}}
 \]
-where $\text{max}_{\text{up}}$ and $\text{min}_{\text{down}}$ are constructed for the interval $[-N, N]$. Since $[-N, N]$ contains $B$, and $I^*$ satisfies all three conditions as shown above, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
+where $\text{max}^+$ and $\text{min}_{\text{down}}$ are constructed for the interval $[-N, N]$. Since $[-N, N]$ contains $B$, and $I^*$ satisfies all three conditions as shown above, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
 \qedhere\end{proof}
 
 While proofs of unsatisfiability are not the main goal of this paper, \Cref{alg:interval-check-param-withBigvee} can also detect unsatisfiability, in some cases.
@@ -957,20 +921,6 @@ f(0) = 0 \land f(c) \neq 0 \land \forall x.\, f(x) = f(x+1)
 This formula is unsatisfiable in standard integer arithmetic (applying induction in both directions yields $\forall n.\, f(n) = 0$, contradicting $f(c) \neq 0$). However, any finite set of instantiations is satisfiable by choosing $c$ to be a sufficiently large integer. Thus, \cref{alg:interval-check-param-withBigvee} will expand the interval indefinitely without detecting unsatisfiability.
 \end{example}
 
-
-% \paragraph{Summary.}
-% In summary, our algorithm:
-% \begin{itemize}
-%     \item Terminates with \textsc{Sat} for all satisfiable formulas within the fragment that satisfy the \req condition (\cref{thm:completeness-bigvee}).
-%     \item Terminates with \textsc{Unsat} for formulas whose unsatisfiability can be detected through finite instantiation alone (\cref{thm:finiteunsatThenUNSAT}).
-%     \item May not terminate for formulas whose unsatisfiability requires induction over all integers or instantiations at unbounded offsets.
-% \end{itemize}
-
-% \section{Multiple Quantified Variables}
-
-% We now return to the case with multiple quantified variables $\bar{x}=\{x_1,\dots,x_k\}$. Under the assumptions stated in \cref{sec:problem-statement}, the coefficient vectors of all argument terms of uninterpreted function symbols in $Q$ are collinear, and the non-zero coefficient vectors of the arguments of each individual uninterpreted function symbol are identical. Formally, this means there exists a non-zero integer vector $a \in \mathbb{Z}^k$ and, for each function $f \in \mathcal{F}$, a positive integer multiplier $\lambda_f > 0$ such that every argument term $t$ of $f$ in $Q$ can be written as $t = \lambda_f (a \cdot \bar{x}) + b_t$, where $b_t$ is a ground term (independent of $\bar{x}$). 
-% % Hence there is some vector $a$, constants $b_t$, $f(t)\in\mathcal{T}$ and multipliers $\lambda_{f}>0$, $f\in\mathcal{F}$ such that each argument of an  uninterpreted function symbol can be written in the form $\lambda_f a x + b_t$. 
-% We can then perform a change of variables $z=a\cdot\bar{x}$, and get an equivalent formula that falls within the single‑variable fragment handled by \cref{alg:interval-check-param-withBigvee} in the previous section.
 
 \section{Handling Disjunction Using Auxiliary Propositional Variables}
 
