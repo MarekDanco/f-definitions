@@ -505,7 +505,7 @@ The goal is now an algorithm that computes such satisfiability certificates and 
 
 \section{Algorithm}\label{sec:alg}
 
-We will now proceed from the  general certification framework to concrete computation. Throughout this section we assume a formula $\phi$ of the form~$F \land \forall \bar{x}.\; Q$, but with the additional restrictions described in the problem statement (\cref{sec:problem-statement}). In particular, we will allow only one quantified variables~$x$. The restrictions also require all arguments of any uninterpreted function symbol $f$ in $Q$ to have the same coefficient, and we denote the sign of this coefficient by $\coeffsign{f}$.
+We will now proceed from the  general certification framework to concrete computation. Throughout this section we assume a formula $\phi$ of the form~$F \land \forall \bar{x}.\; Q$, but with the additional restrictions described in the problem statement (\cref{sec:problem-statement}). In particular, we will allow only one quantified variables~$x$. The restrictions also require all arguments of any uninterpreted function symbol $f$ in $Q$ to have the same coefficient, and we will denote the sign of this coefficient by $\coeffsign{f}$.
 
 We will introduce an algorithm that checks satisfiability of $\phi$  by computing a satisfiability certificate of a certain form. 
 % While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables, the algorithm presented here focuses on the case of a single universally quantified variable. We also assume that the coefficient of this variable in argument terms is non-negative, and that all non-zero coefficients of this variables are the same for the same uninterpreted function symbol.
