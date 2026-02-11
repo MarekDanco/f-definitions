@@ -554,11 +554,11 @@ The set of terms is
 \smallskip
 \noindent\textbf{Upward propagation ($s=+$).}
 Let $\mathcal{S}=\{f(x+4),\,g(x+2)\}$.
-For $f$, since $\coeffsign{f}s=+$ and $\cmpsignstrict{+}$ is $<$,
+For $f$, since $\coeffsign{f}s=+$ and $\cmpsignstrict{+}$ is $<$, the part of the extremal conditions under the parentheses reads
 \[
-(x+c+3)<(x+4)\;\land\;(x+1)<(x+4),
+x+c+3<x+4\;\land\;x+1<x+4,
 \]
-which yields $c<1$ (substituting $x=0$). For $g$ and $h$, no non-$\mathcal{S}$ terms, so trivial.
+which, after substituting $0$ for $x$, yields $c<1$. For $g$ and $h$, $\mathcal{T}\setminus\mathcal{S}$ does not contain corresponding terms, so the condition is trivial.
 
 Propagability becomes
 \[
@@ -572,11 +572,11 @@ This holds, e.g.\ by choosing $v_{g(x+2)}=0$ and $v_{f(x+4)}=u_{h(x)}-u_{f(x+c+3
 
 \smallskip
 \noindent\textbf{Downward propagation ($s=-$).}
-Let $\mathcal{S}'=\{f(x+1),\,h(x)\}$. Since $\coeffsign{f}s=-$ and $\cmpsignstrict{-}$ is $>$,
+Let $\mathcal{S}'=\{f(x+1),\,h(x)\}$. Since $\coeffsign{f}s=-$ and $\cmpsignstrict{-}$ is $>$,  the part of the extremal conditions under the parentheses reads
 \[
-(x+c+3)>(x+1)\;\land\;(x+4)>(x+1),
+x+c+3>x+1\;\land\;x+4>x+1,
 \]
-which yields $c>-2$. The condition for $h$ is trivial.
+which, after substituting $0$ for $x$, yields $c>-2$. The condition for $h$ is trivial.
 
 Propagability becomes
 \[
