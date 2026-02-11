@@ -520,8 +520,7 @@ We will now proceed from the  general certification framework to concrete comput
 % While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables, the algorithm presented here focuses on the case of a single universally quantified variable. We also assume that the coefficient of this variable in argument terms is non-negative, and that all non-zero coefficients of this variables are the same for the same uninterpreted function symbol.
 The computed certificate will explicitly certify: (1) satisfiability of the quantifier-free part $F$, and (2) satisfiability over a finite interval $B = [b_{\min}, b_{\max}]$ of instantiations of the quantified part $Q$. For values outside $B$, it uses satisfiability propagators with an order that propagates upward from $b_{\max}+1$ and downward from $b_{\min}-1$.  We will show soundness of the algorithm and completeness relative to conditions that ensure that such propagation outward from a base interval $B$ is possible.
 
-We will now formalize the condition ensuring that  propagation outward from a base interval $B$ is possible. 
-For this, let $\mathcal{F}$ be the set of uninterpreted function symbols in the quantified part~$Q$ of $\phi$, and let~$\mathcal{T}$ be the set of terms of the form $f(t)$ in $Q$. For upward propagation, we select a subset of these terms $\mathcal{S} \subseteq\mathcal{T}$ whose argument terms are \emph{maximal} (all equal and strictly greater than other argument terms of the same function symbol). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences in $\mathcal{S}$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
+We will now formalize the condition ensuring that  propagation outward from a base interval $B$ is possible. For this, let $\mathcal{F}$ be the set of uninterpreted function symbols in the quantified part~$Q$ of $\phi$, and let~$\mathcal{T}$ be the set of terms of the form $f(t)$ in $Q$. For upward propagation, we select a subset of these terms $\mathcal{S} \subseteq\mathcal{T}$ whose argument terms are \emph{maximal} (all equal and strictly greater than other argument terms of the same function symbol). The \emph{propagability condition} then guarantees that, no matter what values are assigned to the non‑maximal occurrences, we can find values $v_1,\dots,v_r$ such that assigning $v_i$ to all occurrences in $\mathcal{S}$ makes $Q$ true. Different functions may receive different values. The downward condition is symmetric, selecting \emph{minimal} terms.
 
 \begin{definition}[\req Condition]
 \label{def:reqpivot-param}
@@ -544,7 +543,7 @@ For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$ and signs $s\in\{ -,
         \end{itemize}
 \end{itemize}
 We say that $Q$ satisfies the \emph{\req condition} for subsets $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$ iff $\Phi^+_{\text{max}}(\mathcal{S})$, $\Phi_{\text{prop}}(\mathcal{S})$,
-$\Phi^{-}_{\text{max}}(\mathcal{S}')$, and $\Phi_{\text{prop}}(\mathcal{S}')$ hold. Moreover we say that $Q$ satisfies the \emph{\req condition} iff there exists a pair~$(\mathcal{S}, \mathcal{S}')$ such that $Q$ satisfies the \req condition for $(\mathcal{S}, \mathcal{S}')$.
+$\Phi^{-}_{\text{max}}(\mathcal{S}')$, and $\Phi_{\text{prop}}(\mathcal{S}')$ all hold. Moreover, $Q$ satisfies the \emph{\req condition} iff such a pair~$(\mathcal{S}, \mathcal{S}')$ exists.
 \end{definition}
 
 \begin{example}[\req Illustration]
