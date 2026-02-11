@@ -601,33 +601,16 @@ Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``
 For an interval $B\subseteq\mathbb{Z}$  a sign~$s\in\{-,+\}$, and a subset $\mathcal{S} \subseteq \mathcal{T}$, define
  $\Psi^{s}(B,\mathcal{S})$:=
     \[
-    \Phi^{s}_{\text{max}}(\mathcal{S})\;\land\; 
+    \Phi^{s}_{\text{ext}}(\mathcal{S})\;\land\; 
     \Phi_{\text{prop}}(\mathcal{S}) \;\land
-    \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a\cmpsignstrict{s\coeffsign{f}}  \subst{t}{x}{\ivbound{B}{s}} 
+    \bigwedge_{f(t) \in \mathcal{S}} \bigwedge_{\substack{a \in \args(F,f)}} a\cmpsignstrict{\coeffsign{f}s}  \subst{t}{x}{\ivbound{B}{s}} 
     \]
-    % \vspace*{-0.2cm}
-    % \[\land 
-    % \bigwedge_{f(t') \in \mathcal{T}\setminus\mathcal{S}} 
-    % \subst{t'}{x}{b_{\max}+1} \geq b_{\min}\]
-    where $\Phi_{\text{max}}(\mathcal{S})$ and $\Phi_{\text{prop}}(\mathcal{S})$ are as defined in \cref{def:reqpivot-param}. 
-    
-    % \item \textbf{Downward extension formula $\Psi_{\text{down}}(B,\mathcal{S}')$}:
-    % \[
-    % \Phi_{\text{min}}(\mathcal{S}') \;\land\; 
-    % \Phi_{\text{prop}}(\mathcal{S}') \;\land
-    % \bigwedge_{f(t) \in \mathcal{S}'} \bigwedge_{\substack{a \in \args(F,f)}} a \geq \subst{t}{x}{b_{\min}}
-    % \]
-    % where $\Phi_{\text{min}}(\mathcal{S}')$ and $\Phi_{\text{prop}}(\mathcal{S}')$ are as defined in \cref{def:reqpivot-param}.
+    where $\Phi^{s}_{\text{ext}}(\mathcal{S})$ and $\Phi_{\text{prop}}(\mathcal{S})$ are as defined in \cref{def:reqpivot-param}.
 \end{definition}
 
-Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi^s(B,\mathcal{S})$  asserts that $\mathcal{S}$ satisfies the conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The additional clash condition ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f(a)$.
+% Thus, for any choice of subsets $\mathcal{S},\mathcal{S}'\subseteq\mathcal{T}$, $\Psi^s(B,\mathcal{S})$  asserts that $\mathcal{S}$ satisfies the conditions of \req \emph{and additionally} satisfies the clash condition for interval $B$. The additional clash condition ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\repr{z}})$ and $f(t)\in\mathcal{S}$ is different from the ground cell $f(a)$.
 
-% The last conjunct in $\Psi_{\text{up}}(B,\mathcal{S})$\todoSN{Is this explanation needed?} ensures that during upward propagation, every 
-% non‑propagated cell's argument lies at or to the right of $b_{\min}$. This prevents upward propagation 
-% from depending on cells that would be assigned later by downward propagation, since in the well‑order 
-% of \cref{thm:interval-certificate-param} all $z > b_{\max}$ are processed before any $z < b_{\min}$. No symmetric constraint is needed for 
-% $\Psi_{\text{down}}$ because downward propagation occurs later and may use already‑assigned upward cells.
-
+Thus, for any sign $s\in\{-,+\}$ and subset $\mathcal{S}\subseteq\mathcal{T}$, $\Psi^s(B,\mathcal{S})$ asserts that $\mathcal{S}$ satisfies the \req\ conditions for direction $s$ and \emph{additionally} satisfies the clash condition for interval $B$. This clash condition ensures that for every ground argument $a$ of $f$ appearing in $F$, the propagated cell $f(\subst{t}{x}{\ivbound{B}{s}})$ (with $f(t)\in\mathcal{S}$) is different from the ground cell $f(a)$.
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
@@ -737,11 +720,7 @@ Algorithmic implementations of the satisfiability propagators whose existence is
 a side product of quantifier elimination on the
 propagability conditions~$\Phi_{\text{prop}}(\mathcal{S})$ and~$\Phi_{\text{prop}}(\mathcal{S}')$. These propagators  can then be used in the recursive evaluation function $val$ defined in \cref{sec:certificate} to compute values of the function that a model assigns to an uninterpreted function symbol.
 
-
-
-
 The theorem immediately yields an algorithm that checks satisfiability by searching for the interval~$[b_{\min},b_{\max}]$. This can be seen in \cref{alg:interval-check-param-withBigvee}. An extension of the algorithm that in the case of the return value \textsc{Sat} also returns a corresponding certificate, is straightforward.
-
 
 \begin{algorithm}
 \caption{Interval‑Based Satisfiability Check}
@@ -753,9 +732,9 @@ The theorem immediately yields an algorithm that checks satisfiability by search
 % \State $I \gets \smt\!\left(F \land Q[0]\right)$
 %\While{$I \neq \bot$}
 \While{$F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]$ is satisfiable}
-    \State $\text{max}_\text{up}\gets\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi^+([b_{\min},b_{\max}],\mathcal{S}))$
-    \State $\text{min}_\text{down}\gets\bigvee_{{\mathcal{S}'\subseteq \mathcal{T}}}\Psi^-([b_{\min},b_{\max}],\mathcal{S}))$ 
-    \If{$\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right) \land \text{max}^+ \land \text{min}_{\text{down}}$ is satisfiable}
+    \State $\text{up}\gets\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi^+([b_{\min},b_{\max}],\mathcal{S})$
+    \State $\text{down}\gets\bigvee_{{\mathcal{S}'\subseteq \mathcal{T}}}\Psi^-([b_{\min},b_{\max}],\mathcal{S}')$ 
+    \If{$\left(F \land \bigwedge_{x=b_{\min}}^{b_{\max}} Q[x]\right) \land \text{up} \land \text{down}$ is satisfiable}
         \State \Return \textsc{Sat} 
     \EndIf
     \State $b_{\min} \gets b_{\min} - 1$, $b_{\max} \gets b_{\max} + 1$ \Comment{Expand interval symmetrically}
