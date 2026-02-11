@@ -532,87 +532,115 @@ We say $Q$ satisfies the \emph{\req condition} for $\mathcal{S}\subseteq\mathcal
 $\Phi_{\text{min}}(\mathcal{S}')$, and $\Phi_{\text{prop}}(\mathcal{S}')$ all hold. Moreover, $Q$ satisfies the \emph{\req condition} iff such a pair~$(\mathcal{S}, \mathcal{S}')$ exists.
 \end{definition}
 
+% \begin{example}[\req Illustration]
+% \label{ex:req-illustration}
+% Consider the formula:
+% \[
+% \forall x.\ f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
+% \]
+% where $c$ is a ground constant. All function arguments have the form $x + \tau$ where $\tau$ is ground. We extract the set of terms:
+% \begin{align*}
+% \mathcal{T} &= \{f(x+c+3), f(x+4), f(x+1), g(x+2), h(x)\}.
+% \end{align*}
+
+% \medskip\noindent\textbf{Upward propagation:}
+% Consider $\mathcal{S} = \{f(x+4),g(x+2)\}$.
+% \begin{enumerate}
+%     \item \textbf{Maximality $\Phi_{\text{max}}(\mathcal{S})$:}
+%         We need to check for each function:
+%         \begin{itemize}
+%             \item For $f$: $f(x+4) \in \mathcal{S}$, $f(x+c+3) \notin \mathcal{S}$, $f(x+1) \notin \mathcal{S}$, so we require $(x+4) > (x+c+3)$ and $(x+4) > (x+1)$.
+%             \item For $g$: only $g(x+2) \in \mathcal{S}$, so the equality condition is trivial, and there are no non-$\mathcal{S}$ terms to compare with.
+%             \item For $h$: no terms in $\mathcal{S}$, so no conditions.
+%         \end{itemize}
+%         Substituting $x=0$ gives: $(4 > c+3) \land (4 > 1)$, which simplifies to $c < 1$.
+        
+%     \item \textbf{Propagability $\Phi_{\text{prop}}(\mathcal{S})$:}
+%         In $Q$, replace:
+%         \begin{itemize}
+%             \item $f(x+4)$ by a fresh variable $v_{f(x+4)}$,
+%             \item $g(x+2)$ by $v_{g(x+2)}$,
+%             \item $f(x+c+3)$ by $u_{f(x+c+3)}$,
+%             \item $f(x+1)$ by $u_{f(x+1)}$,
+%             \item $h(x)$ by $u_{h(x)}$.
+%         \end{itemize}
+%         The resulting formula is:
+%         \[
+%         \forall x \, \forall\bar{u}\, \exists \bar{v}\;. 
+%         \bigl( u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)} \bigr),
+%         \]
+        
+%         where $\bar{u} = \big(u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}\big)$ and $\bar{v} = \big(v_{f(x+4)}, v_{g(x+2)}\big)$. This universally quantified formula is valid: for any values of $u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}$, we can choose $v_{g(x+2)} = 0$ and $v_{f(x+4)} = u_{h(x)} - u_{f(x+c+3)} - u_{f(x+1)}$.
+% \end{enumerate}
+
+% \medskip\noindent\textbf{Downward propagation:}
+% Consider $\mathcal{S}' = \{f(x+1),h(x)\}$.
+% \begin{enumerate}
+%     \item \textbf{Minimality $\Phi_{\text{min}}(\mathcal{S}')$:}
+%         We need to check for each function:
+%         \begin{itemize}
+%             \item For $f$: $f(x+1) \in \mathcal{S}'$, $f(x+c+3) \notin \mathcal{S}'$, $f(x+4) \notin \mathcal{S}'$, so we require $(x+1) < (x+c+3)$ and $(x+1) < (x+4)$.
+%             \item For $h$: only $h(x) \in \mathcal{S}'$, so the equality condition is trivial.
+%         \end{itemize}
+%         Substituting $x=0$ gives: $(1 < c+3) \land (1 < 4)$, which simplifies to $c > -2$.
+        
+%     \item \textbf{Propagability $\Phi_{\text{prop}}(\mathcal{S}')$:}
+%         In $Q$, replace:
+%         \begin{itemize}
+%             \item $f(x+1)$ by $v'_{f(x+1)}$,
+%             \item $h(x)$ by $v'_{h(x)}$,
+%             \item $f(x+c+3)$ by $u_{f(x+c+3)}$,
+%             \item $f(x+4)$ by $u_{f(x+4)}$,
+%             \item $g(x+2)$ by $u_{g(x+2)}$.
+%         \end{itemize}
+%         The resulting formula is:
+%         \[
+%         \forall x \, \forall\bar{u} \, \exists \bar{v}'. 
+%         \bigl( u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)} \bigr),
+%         \]
+%         where $\bar{u} = \bigl(u_{f(x+c+3)}, u_{f(x+4)}, u_{g(x+2)}\bigr)$ and  $\bar{v}' = \bigl(v'_{f(x+1)}, v'_{h(x)}\bigr)$. This is also valid: choose $v'_{h(x)} = 0$ and $v'_{f(x+1)} = u_{g(x+2)} - u_{f(x+c+3)} - u_{f(x+4)}$.
+% \end{enumerate}
+
+% \medskip\noindent\textbf{Putting it together:}
+% $Q$ satisfies the \req condition for the pair $(\mathcal{S},\mathcal{S}')$ whenever $c$ satisfies both $c < 1$ (from upward maximality) and $c > -2$ (from downward minimality). Hence for any $c \in (-2, 1)$, the specific choices $\mathcal{S} = \{f(x+4),g(x+2)\}$ and $\mathcal{S}' = \{f(x+1),h(x)\}$ witness the \req condition.
+% \end{example}
+
 \begin{example}[\req Illustration]
 \label{ex:req-illustration}
 Consider the formula:
 \[
 \forall x.\ f(x+c+3) + f(x+4) + f(x+1) = g(x+2) + h(x)
 \]
-where $c$ is a ground constant. All function arguments have the form $x + \tau$ where $\tau$ is ground. We extract the set of terms:
-\begin{align*}
-\mathcal{T} &= \{f(x+c+3), f(x+4), f(x+1), g(x+2), h(x)\}.
-\end{align*}
+where $c$ is a ground constant. Let $\mathcal{T} = \{f(x+c+3), f(x+4), f(x+1), g(x+2), h(x)\}$.
 
-\medskip\noindent\textbf{Upward propagation:}
-Consider $\mathcal{S} = \{f(x+4),g(x+2)\}$.
-\begin{enumerate}
-    \item \textbf{Maximality $\Phi_{\text{max}}(\mathcal{S})$:}
-        We need to check for each function:
-        \begin{itemize}
-            \item For $f$: $f(x+4) \in \mathcal{S}$, $f(x+c+3) \notin \mathcal{S}$, $f(x+1) \notin \mathcal{S}$, so we require $(x+4) > (x+c+3)$ and $(x+4) > (x+1)$.
-            \item For $g$: only $g(x+2) \in \mathcal{S}$, so the equality condition is trivial, and there are no non-$\mathcal{S}$ terms to compare with.
-            \item For $h$: no terms in $\mathcal{S}$, so no conditions.
-        \end{itemize}
-        Substituting $x=0$ gives: $(4 > c+3) \land (4 > 1)$, which simplifies to $c < 1$.
-        
-    \item \textbf{Propagability $\Phi_{\text{prop}}(\mathcal{S})$:}
-        In $Q$, replace:
-        \begin{itemize}
-            \item $f(x+4)$ by a fresh variable $v_{f(x+4)}$,
-            \item $g(x+2)$ by $v_{g(x+2)}$,
-            \item $f(x+c+3)$ by $u_{f(x+c+3)}$,
-            \item $f(x+1)$ by $u_{f(x+1)}$,
-            \item $h(x)$ by $u_{h(x)}$.
-        \end{itemize}
-        The resulting formula is:
-        % \[
-        % \forall x \forall u_{f(x+c+3)} \forall u_{f(x+1)} \forall u_{h(x)} \exists v_{f(x+4)} \exists v_{g(x+2)}.\ 
-        % u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)}.
-        % \]
+\medskip\noindent\textbf{Upward propagation with $\mathcal{S} = \{f(x+4),g(x+2)\}$:}
+\begin{itemize}
+    \item \textbf{Maximality}: For $f$, we require $(x+4) > (x+c+3)$ and $(x+4) > (x+1)$; for $g$, no constraints. With $x=0$: $4 > c+3$ and $4 > 1$, i.e., $c < 1$.
+    \item \textbf{Propagability}: After substitution, we get:
+    \[
+    \begin{aligned}
+        \forall x\;\forall u_{f(x+c+3)},\, u_{f(x+1)},\, u_{h(x)}\;\exists v_{f(x+4)},\, v_{g(x+2)}\; \text{such that}\\[4pt]
+        u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)}.
+    \end{aligned}
+    \]
+    This holds by taking $v_{g(x+2)} = 0$ and $v_{f(x+4)} = u_{h(x)} - u_{f(x+c+3)} - u_{f(x+1)}$.
+\end{itemize}
 
-        \[
-        \forall x \, \forall\bar{u}\, \exists \bar{v}\;. 
-        \bigl( u_{f(x+c+3)} + v_{f(x+4)} + u_{f(x+1)} = v_{g(x+2)} + u_{h(x)} \bigr),
-        \]
-        
-        where $\bar{u} = \big(u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}\big)$ and $\bar{v} = \big(v_{f(x+4)}, v_{g(x+2)}\big)$. This universally quantified formula is valid: for any values of $u_{f(x+c+3)}, u_{f(x+1)}, u_{h(x)}$, we can choose $v_{g(x+2)} = 0$ and $v_{f(x+4)} = u_{h(x)} - u_{f(x+c+3)} - u_{f(x+1)}$.
-\end{enumerate}
+\medskip\noindent\textbf{Downward propagation with $\mathcal{S}' = \{f(x+1),h(x)\}$:}
+\begin{itemize}
+    \item \textbf{Minimality}: For $f$, we require $(x+1) < (x+c+3)$ and $(x+1) < (x+4)$; for $h$, no constraints. With $x=0$: $1 < c+3$ and $1 < 4$, i.e., $c > -2$.
+    \item \textbf{Propagability}: After substitution:
+    \[
+    \begin{aligned}
+        \forall x\;\forall u_{f(x+c+3)},\, u_{f(x+4)},\, u_{g(x+2)}\;\exists v'_{f(x+1)},\, v'_{h(x)}\; \text{such that}\\[4pt]
+        u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)}.
+    \end{aligned}
+    \]
+    This holds by taking $v'_{h(x)} = 0$ and $v'_{f(x+1)} = u_{g(x+2)} - u_{f(x+c+3)} - u_{f(x+4)}$.
+\end{itemize}
 
-\medskip\noindent\textbf{Downward propagation:}
-Consider $\mathcal{S}' = \{f(x+1),h(x)\}$.
-\begin{enumerate}
-    \item \textbf{Minimality $\Phi_{\text{min}}(\mathcal{S}')$:}
-        We need to check for each function:
-        \begin{itemize}
-            \item For $f$: $f(x+1) \in \mathcal{S}'$, $f(x+c+3) \notin \mathcal{S}'$, $f(x+4) \notin \mathcal{S}'$, so we require $(x+1) < (x+c+3)$ and $(x+1) < (x+4)$.
-            \item For $h$: only $h(x) \in \mathcal{S}'$, so the equality condition is trivial.
-        \end{itemize}
-        Substituting $x=0$ gives: $(1 < c+3) \land (1 < 4)$, which simplifies to $c > -2$.
-        
-    \item \textbf{Propagability $\Phi_{\text{prop}}(\mathcal{S}')$:}
-        In $Q$, replace:
-        \begin{itemize}
-            \item $f(x+1)$ by $v'_{f(x+1)}$,
-            \item $h(x)$ by $v'_{h(x)}$,
-            \item $f(x+c+3)$ by $u_{f(x+c+3)}$,
-            \item $f(x+4)$ by $u_{f(x+4)}$,
-            \item $g(x+2)$ by $u_{g(x+2)}$.
-        \end{itemize}
-        The resulting formula is:
-        % \[
-        % \forall x \forall u_{f(x+c+3)} \forall u_{f(x+4)} \forall u_{g(x+2)} \exists v'_{f(x+1)} \exists v'_{h(x)}.\ 
-        % u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)}.
-        % \]
-
-        \[
-        \forall x \, \forall\bar{u} \, \exists \bar{v}'. 
-        \bigl( u_{f(x+c+3)} + u_{f(x+4)} + v'_{f(x+1)} = u_{g(x+2)} + v'_{h(x)} \bigr),
-        \]
-        where $\bar{u} = \bigl(u_{f(x+c+3)}, u_{f(x+4)}, u_{g(x+2)}\bigr)$ and  $\bar{v}' = \bigl(v'_{f(x+1)}, v'_{h(x)}\bigr)$. This is also valid: choose $v'_{h(x)} = 0$ and $v'_{f(x+1)} = u_{g(x+2)} - u_{f(x+c+3)} - u_{f(x+4)}$.
-\end{enumerate}
-
-\medskip\noindent\textbf{Putting it together:}
-$Q$ satisfies the \req condition for the pair $(\mathcal{S},\mathcal{S}')$ whenever $c$ satisfies both $c < 1$ (from upward maximality) and $c > -2$ (from downward minimality). Hence for any $c \in (-2, 1)$, the specific choices $\mathcal{S} = \{f(x+4),g(x+2)\}$ and $\mathcal{S}' = \{f(x+1),h(x)\}$ witness the \req condition.
+\medskip\noindent\textbf{Conclusion:}
+For any $c \in (-2, 1)$, the pair $(\mathcal{S},\mathcal{S}')$ witnesses the \req condition.
 \end{example}
 
 Now, given a concrete interval $B = [b_{\min}, b_{\max}]$, we need additional ``clash conditions'' that prevent the cells generated during propagation from clashing with the ground part $F$.
