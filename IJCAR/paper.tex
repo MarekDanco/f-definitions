@@ -969,7 +969,7 @@ or
 \end{equation}
 For each problem, we also used bounded versions of the form $F\wedge \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$, with $c\in \{1,\dots,5\}$.
 
-We implemented our algorithms in the language Python, using the SMT solver \textsc{z3}\todoSR{correct?} for all satisfiability checks. We also studied the capabilities of the \textsc{smt} solvers \textsc{z3} and
+We implemented our algorithm using the \textsc{z3} Python API. We also studied the capabilities of the \textsc{smt} solvers \textsc{z3} and
 \textsc{cvc5}---with model based quantifier instantiation~\cite{ge-cav09} explicitly turned on---to directly solve the example.
 
 Here, our algorithm terminates right after ensuring that \req holds for the interval $[0,\, 3]$.
