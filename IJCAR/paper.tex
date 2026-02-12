@@ -806,7 +806,7 @@ v_{\max}^f = \max\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
 v_{\min}^f = \min\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
 \]
 % where $t_0=\subst{t}{x}{0}$ for each $f(t)\in\mathcal{T}$.
-The conditions $\Phi_{\text{max}}(\mathcal{S}^*)$ and $\Phi_{\text{min}}(\mathcal{S}'^*)$ ensure that:
+The extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S}^*)$ and $\Phi^-_{\text{ext}}(\mathcal{S}'^*)$ ensure that:
 \begin{itemize}
     \item For all $f(t) \in \mathcal{S}^*$: $I^*(\subst{t}{x}{0}) = v_{\max}^f$,
     \item For all $f(t) \in \mathcal{S}'^*$: $I^*(\subst{t}{x}{0}) = v_{\min}^f$.
@@ -824,22 +824,22 @@ and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
 \begin{enumerate}
     \item \textbf{Base formula}: $I^* \models F \land \bigwedge_{x \in B} Q[x]$ (since $\mathcal{M} \models \phi$).
     
-    \item \textbf{Upward disjunction $\text{max}_{\text{up}}$}: 
+    \item \textbf{Upward propagation condition}: 
     For the specific $\mathcal{S}^*$, we have:
     \begin{itemize}
         \item $\Phi_{\text{max}}^+(\mathcal{S}^*)$ holds by definition,
         \item $\Phi_{\text{prop}}(\mathcal{S}^*)$ holds by the \req condition,
-        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ Since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
+        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ By construction of $b_{\max}$ and since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
         % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
         % \]
         \[
         I^*(a) \cmpsign{\coeffsign{f}} c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\hat{b}_{\max}})
-        \]
-        by construction of $b_{\max}$, which is exactly the clash condition.
+        \],
+        which is exactly the clash condition in $\Psi^+(B,\mathcal{S}^*)$..
     \end{itemize}
-    Thus $I^* \models \Psi^+(B,\mathcal{S}^*)$, and consequently $I^* \models \text{max}_{\text{up}}$.
+    Hence $I^* \models \Psi^+(B,\mathcal{S}^*)$.
     
-    \item \textbf{Downward disjunction $\text{min}_{\text{down}}$}: 
+    \item \textbf{Downward propagation condition}: 
     Similarly, for $\mathcal{S}'^*$ we have:
     \begin{itemize}
         \item $\Phi_{\text{max}}^+(\mathcal{S}'^*)$ holds,
@@ -853,14 +853,20 @@ and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
         \]
         by construction of $b_{\min}$.
     \end{itemize}
-    Thus $I^* \models \Psi_{\text{down}}(B,\mathcal{S}'^*)$, and consequently $I^* \models \text{min}_{\text{down}}$.
+    Thus $I^* \models \Psi^-(B,\mathcal{S}'^*)$.
 \end{enumerate}
+
+Therefore, $I^*$ satisfies
+\[
+F \land \bigwedge_{x \in B} Q[x] \;\land\; \Psi^+(B,\mathcal{S}^*) \;\land\; \Psi^-(B,\mathcal{S}'^*),
+\]
+and consequently also satisfies the disjunctions $\bigvee_{\mathcal{S}}\Psi^+(B,\mathcal{S})$ and $\bigvee_{\mathcal{S}'}\Psi^-(B,\mathcal{S}')$.
 
 Let $N = \max(|b_{\min}|, |b_{\max}|)$. \cref{alg:interval-check-param-withBigvee} expands the interval symmetrically from $[0,0]$. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$. At this iteration, line 5 will check the satisfiability of:
 \[
-F \land \bigwedge_{x=-N}^{N} Q[x] \land \text{max}^+ \land \text{min}_{\text{down}}
+F \land \bigwedge_{x=-N}^{N} Q[x] \;\land\; \bigvee_{\mathcal{S}}\Psi^+([-N,N],\mathcal{S}) \;\land\; \bigvee_{\mathcal{S}'}\Psi^-([-N,N],\mathcal{S}').
 \]
-where $\text{max}^+$ and $\text{min}_{\text{down}}$ are constructed for the interval $[-N, N]$. Since $[-N, N]$ contains $B$, and $I^*$ satisfies all three conditions as shown above, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
+Since $[-N, N]\supseteq B$ and $I^*$ satisfies all three conditions as shown above, this formula is also satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
 \qedhere\end{proof}}
 
 While proofs of unsatisfiability are not the main goal of this paper, \Cref{alg:interval-check-param-withBigvee} can also detect unsatisfiability, in some cases.
