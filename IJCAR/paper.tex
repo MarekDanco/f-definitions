@@ -961,24 +961,21 @@ Our experiments will test the conjecture that the algorithm introduced in the pr
 We prepared a test suite consisting of 29 problems\footnote{All the data for our experiments can be found at our public repository \\\url{https://github.com/MarekDanco/f-definitions}}
 such as
 \begin{equation}\label{eq:exp1}
-	f(4)=7 \:\land\: \forall x.\: (0 \le x \le 10^c \:\Rightarrow\: f(x+1)=f(x)+1)
-\end{equation}
-or
+  f(4)=7 \:\land\: \forall x.\: (0 \le x \le 10^c \:\Rightarrow\: f(x+1)=f(x)+1)
+\end{equation}  %Here, our algorithm terminates right after ensuring that \req holds for the interval $[0,\, 3]$.
+and
 \begin{equation}\label{eq:exp2}
 	d > 1\:\land\: f(0)=0 \:\land\: g(2) > f(d+1) \land\forall x \:.\: f(x-1)=f(x)+g(x)+g(x+d).
 \end{equation}
 For each problem, we also used bounded versions of the form $F\wedge \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$, with $c\in \{1,\dots,5\}$.
 
-We implemented our algorithm using the \textsc{z3} Python API. We also studied the capabilities of the \textsc{smt} solvers \textsc{z3} and
-\textsc{cvc5}---with model based quantifier instantiation~\cite{ge-cav09} explicitly turned on---to directly solve the example.
+We implemented our algorithm using the \textsc{z3} Python API. We also applied the \textsc{smt} solvers \textsc{z3} and
+\textsc{cvc5} directly to our problems, explicitly turning on model based quantifier instantiation~\cite{ge-cav09}.
 
-Here, our algorithm terminates right after ensuring that \req holds for the interval $[0,\, 3]$.
+It turned out that our algorithm terminates on all problems in negligible time. Moreover,  the value of the parameter~$c$ does not have a noticeable influence on runtime for the bounded versions of the test problems. We found the former observation surprising, while the latter was to be expected, due to the use of induction.
 
-On this example,
-our algorithm has to check just that for all values of $f(x)$, there exists a value of $f(x+1)$
-such that the equality holds. It suffices to consider the interval $[0,\, 4]$.
-
-We ran our experiments with a 30-minute time limit.
+\todoSR{Maybe we should partially replace some of the text by two more lines in Figure~\ref{fig:scaling} corresponding to a timeout of 1 minute?}
+For studying the behavior of direct application of SMT solvers to our problems, and the influence of the parameter~$c$ on their runtime we ran our experiments with a 30-minute time limit.
 When setting $c = 1$, the state of the art \textsc{smt} solvers terminate on our
 problems immediately. On problem~\eqref{eq:exp1} with $c = 3$, \textsc{cvc5} takes
 64 seconds to return \textsc{sat}, and for $c \geq 4$, the solver times out. With
@@ -986,24 +983,23 @@ $c \geq 2$, \textsc{z3} returns \textsc{unknown} after 12 seconds. On problem~\e
 \textsc{cvc5} times out with $c \geq 3$ and \textsc{z3} returns \textsc{unknown} starting
 from $c = 2$. Figure~\ref{fig:scaling} further depicts how the two solvers perform on our problems
 with increasing $c$.
-Between $c=2$ and $c=5$, \textsc{cvc5} shows a sharp performance drop, decreasing from 28 solved instances at
-$c=1$ to 5 at $c=4$, and remaining at that level at $c=5$. In contrast, z3 remains relatively stable
-over this range, solving 6 to 7 instances.
+%Between $c=2$ and $c=5$, \textsc{cvc5} shows a sharp performance drop, decreasing from 28 solved instances at
+%$c=1$ to 5 at $c=4$, and remaining at that level at $c=5$. In contrast, z3 remains relatively stable
+%over this range, solving 6 to 7 instances.
 We also tested the performance of the two solvers on unbounded problems, that is with the
 bound $0 \le x \le 10^c$ removed. \textsc{z3} solved 5 of those problems while \textsc{cvc5}
 solved 2.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.6\linewidth]{experiments/data/scaling_plot.png}
+	\caption{Problems solved with increasing $c$, with $*$ referring to unbounded problems.}
+	\label{fig:scaling}
+\end{figure}
+
 The cactus plots in Figure~\ref{fig:cactus} show the number of problems solved by \textsc{cvc5}
 within a time limit for $c \in \{2, 3\}$. We can observe most of the problems get solved
 in the 10 to 100 seconds limit when setting $c = 3$. With $c \geq 4$, \textsc{cvc5} times out
 on all but 5 problems, which get solved immediately.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=0.6\linewidth]{experiments/data/scaling_plot.png}
-	\caption{Problems solved with increasing $c$. Asterisk coordinate denotes unbounded problems.}
-	\label{fig:scaling}
-\end{figure}
-
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=1\linewidth]{experiments/data/cactus_plot.png}
@@ -1011,15 +1007,16 @@ on all but 5 problems, which get solved immediately.
 	\label{fig:cactus}
 \end{figure}
 
-Note that our algorithm proves the satisfiability of these problems promptly. Only a few
-LIA calls are needed to prove the \req condition. However, our algorithm struggles on
-problems such as
+%Note that our algorithm proves the satisfiability of these problems promptly. Only a few LIA calls are needed to prove the \req condition.
+However, our algorithm struggles on
+problems such as\todoSR{can we quantify what ``struggles'' roughly means?}
 \begin{align*}
 	f(10000)>0 \;\land \;\forall x. \;f(x+1) = f(x)+1
 \end{align*}
 The clash condition requires $10000 \leq b_{\max} + 1$, therefore
 forcing 10000 expansions of the interval in \cref{alg:interval-check-param-withBigvee}.
 Improving the algorithm on cases similar to this one is a subject of future work.
+
 
 \section{Conclusion}
 \label{sec:conclusion}
