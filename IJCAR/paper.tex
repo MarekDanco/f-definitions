@@ -616,7 +616,7 @@ Thus, for any sign $s\in\{-,+\}$ and subset $\mathcal{S}\subseteq\mathcal{T}$, $
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
-Let $\phi = F \land \forall x.\, Q$ and let $B$ be a non‑empty integer interval. Assume that
+Let $B$ be a non‑empty integer interval and assume that
 \[
   \Biggl(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\Biggr) \;\land\;
   \Biggl(\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi^+(B,\mathcal{S})\Biggr)\;\land\;
@@ -800,8 +800,7 @@ If the input formula~$\phi$ is satisfiable and it satisfies the \req condition, 
 
 \testlength{
 \begin{proof}
-Assume $\phi$ is satisfiable and satisfies \req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
-Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$\todoSR{Why not work directly with $I$?}. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments. For each $f(t)\in\mathcal{F}$, define:
+Assume $\phi$ is satisfiable and satisfies \req condition for $(\mathcal{S}^*,\mathcal{S}'^*)$. Let $\mathcal{M}$ be a model of $\phi$. Define an  interpretation $I^*$\todoSR{Why not work directly with $I$?}. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments. For each $f(t)\in\mathcal{F}$, define:
 \[
 v_{\max}^f = \max\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
 v_{\min}^f = \min\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
@@ -812,7 +811,7 @@ The extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S}^*)$ and $\Phi^-_{\text{
     \item For all $f(t) \in \mathcal{S}^*$: $I^*(\subst{t}{x}{0}) = v_{\max}^f$,
     \item For all $f(t) \in \mathcal{S}'^*$: $I^*(\subst{t}{x}{0}) = v_{\min}^f$.
 \end{itemize}
-Now choose\todoSR{what if $c_f$ is negative?}
+Now choose\todoSR{what if $c_f$ is negative?}\todoSN{Nothing will change.}
 \begin{minipage}{\linewidth-2cm}
 \vspace*{-0.5cm}  
 \begin{align*}
@@ -834,9 +833,9 @@ and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
         % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
         % \]
         \[
-        I^*(a) \cmpsign{\coeffsign{f}} c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\hat{b}_{\max}})
-        \],
-        which is exactly the clash condition in $\Psi^+(B,\mathcal{S}^*)$..
+        I^*(a) \cmpsign{\coeffsign{f}+} c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\hat{b}_{\max}}),
+        \]
+        which is exactly the clash condition in $\Psi^+(B,\mathcal{S}^*)$.
     \end{itemize}
     Hence $I^* \models \Psi^+(B,\mathcal{S}^*)$.
     
@@ -844,15 +843,17 @@ and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
     Similarly, for $\mathcal{S}'^*$ we have:
     \begin{itemize}
         \item $\Phi_{\text{max}}^+(\mathcal{S}'^*)$ holds,
-        \item $\Phi_{\text{prop}}(\mathcal{S}'^*)$ holds,
+        \item $\Phi_{\text{prop}}(\mathcal{S}'^*)$ holds by the \req condition,
         \item For each $f(t)\in\mathcal{S}'^{*}$ and $a \in \args(F,f)$:
         % \[
         % I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
         % \]
+        by construction of $b_{\min}$,
         \[
-        I^*(a)\cmpsign{-\coeffsign{f}}  c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{b_{\min}})
+        I^*(a)\cmpsign{\coeffsign{f}-}  c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\repr{b}_{\min}}),
         \]
-        by construction of $b_{\min}$.
+        which is the clash condition in $\Psi^-(B,\mathcal{S}'^*)$.
+        
     \end{itemize}
     Thus $I^* \models \Psi^-(B,\mathcal{S}'^*)$.
 \end{enumerate}
