@@ -958,13 +958,14 @@ Our experiments will test the conjecture that the algorithm introduced in the pr
 % However, even in the first case our method may improve upon methods such as MBQI, due to two reasons.
 % First, the models produced by MBQI may be particularly difficult to read. Next, the run-time
 % of MBQI increases with the size of the model.
-We prepared a test suite consisting of 29 problems such as\todoSR{CFP:``executables of systems, and input data of experiments should be made available'' e.g., via a reference to a website}
+We prepared a test suite consisting of 29 problems\footnote{All the data for our experiments can be found at our public repository \\\url{https://github.com/MarekDanco/f-definitions}}
+such as
 \begin{equation}\label{eq:exp1}
-  f(4)=7 \:\land\: \forall x.\: (0 \le x \le 10^c \:\Rightarrow\: f(x+1)=f(x)+1)
-\end{equation}  
+	f(4)=7 \:\land\: \forall x.\: (0 \le x \le 10^c \:\Rightarrow\: f(x+1)=f(x)+1)
+\end{equation}
 or
 \begin{equation}\label{eq:exp2}
- d > 1\:\land\: f(0)=0 \:\land\: g(2) > f(d+1) \land\forall x \:.\: f(x-1)=f(x)+g(x)+g(x+d). 
+	d > 1\:\land\: f(0)=0 \:\land\: g(2) > f(d+1) \land\forall x \:.\: f(x-1)=f(x)+g(x)+g(x+d).
 \end{equation}
 For each problem, we also used bounded versions of the form $F\wedge \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$, with $c\in \{1,\dots,5\}$.
 
