@@ -675,7 +675,8 @@ It remains to verify the disjointness conditions of \cref{def:certificate}:
 
         \[
         I\models \subst{t_0}{x}{\repr{z_0}}\cmpsign{\coeffsign{f}+}  \subst{t_0}{x}{\repr{b}_{\max}} \cmpsignstrict{\coeffsign{f}+} \subst{t}{x}{\repr{b}_{max}+1}\cmpsign{\coeffsign{f}+}\subst{t}{x}{\repr{z}},
-        \]      
+        \]
+        
         and thus $I(\subst{t_0}{x}{\repr{z_0}}) \neq I(\subst{t}{x}{\repr{z}})$.
         
       \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
@@ -704,8 +705,8 @@ Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\
     \end{itemize}
 
   \item The case $z < b_{\min}$ is symmetric, using $\Psi^-(B,\mathcal{S}')$.
-    Note that the fact that the upward propagation block of elements greater than $b_{\max}$ occurs before the downward propagation block of elements less than $b_{\min}$ in the order $\preceq$ does not create a problem, since  propagation is still restricted to cells not occurring before.
 \end{itemize}
+Note that the fact that the upward propagation block of elements greater than $b_{\max}$ occurs before the downward propagation block of elements less than $b_{\min}$ in the order $\preceq$ does not create a problem, since  propagation is still restricted to cells not occurring before.
 % Finally, we must ensure that the \textbf{satisfiability propagators} can be applied inductively along $\preceq$.  
 % For $z > b_{\max}$, the propagator $\Phi_{\text{prop}}(\mathcal{S})$ requires values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$.  
 % Let $f(t') \in \mathcal{T}\setminus\mathcal{S}$ be such a non‑propagated term. Its corresponding cell is $f(I(\subst{t'}{x}{\repr{z}}))$.  
