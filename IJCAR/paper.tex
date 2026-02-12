@@ -27,6 +27,7 @@
 \newcommand{\qedhere}{$\blacksquare$}
 \newcommand{\numvar}[1]{|#1|}
 \newcommand{\domain}{\mathbb{D}}
+\newcommand{\codomain}{\mathbb{D}'}
 \newcommand{\cmpsign}[1]{\lesseqgtr^{#1}}
 \newcommand{\cmpsignstrict}[1]{\lessgtr^{#1}}
 \newcommand{\coeffsign}[1]{\sigma(#1)}
@@ -356,7 +357,7 @@ We will use the classical mathematical notion of a well-order. A well-order on a
 We use the notion of certificate in the following sense~\cite{McConnell:11}: Given a property~$P(x)$ that is typically difficult to check, a certificate for this property is an object $\Pi$ for which we have a property $P'(x,\Pi)$ and a proof that $P'(x,\Pi)$ implies $P(x)$, and for which $P'(x,\Pi)$ is easier to check than $P(x)$. Here, we will not always insist on a precise meaning of the notion of being easy to check. However, the final goal is a certificate $\Pi$, for which $P'(x,\Pi)$ can be checked more efficiently than the original property $P(x)$, using an algorithm that is in some sense simpler then an algorithm for checking $P(x)$. As a consequence, such a certificate will enable an efficient independent check of the correctness of the result of an algorithm for checking~$P(x)$.
 
 \section{Satisfiability Certificates}
-\label{sec:certificate}\todoSR{The domain is now defined using a macro. It can be changed back to $\mathbb{Z}$ at any time.}
+\label{sec:certificate}
 
 In this section, we will define objects that certifies that a formula in the form defined in~\cref{sec:problem-statement} is satisfiable. In the next section, we will then introduce an algorithm to compute such certificates.
 
@@ -364,12 +365,12 @@ Traditionally, satisfiability of a logical formula is certified by an interpreta
 
 Our approach will not assign values to the whole infinite domain of uninterpreted function symbols in one step, but to each individual element of this domain:
 \begin{definition}[Cell]\label{def:cell}
-	A \emph{cell} is a term of the form $f(n_1,\dots, n_k)$ where $f$ is an uninterpreted function symbol and $n_1,\dots, n_k$ are integers.
-\end{definition}
-Examples of cells are $c$, and $f(7)$. The term $f(c+7)$ is not a cell.
+	A \emph{cell} is a term of the form $f(n_1,\dots, n_k)$ where $f$ is an uninterpreted function symbol and $n_1,\dots, n_k\in \domain$.
+      \end{definition}
+      We denote the set of cells by $C(\domain)$. Examples of cells are $c$, and $f(7)$. The term $f(c+7)$ is not a cell.
 
 \begin{definition}[Cell Interpretation]
-	A \emph{cell interpretation} is a partial function whose domain is the set of cells. A cell interpretation $I$ is \emph{compatible} with an interpretation $\mathcal{I}$ iff $I$ and $\mathcal{I}$ agree on all cells where $I$ is defined.
+	A \emph{cell interpretation} is a partial function in $C(\domain)\rightharpoonup\codomain$. A cell interpretation $I$ is \emph{compatible} with an interpretation $\mathcal{I}$ iff $I$ and $\mathcal{I}$ agree on all cells where $I$ is defined.
 \end{definition}
 
 Given a cell interpretation $I$, we denote by $\mathit{def}(I)$ the set of cells for which $I$ is defined. Given a term $t$ and a cell interpretation $I$  we define $I(t):=\mathcal{I}(t)$, if  $\mathcal{I}(t)$ is unique for every interpretation $\mathcal{I}$ compatible with $I$, and otherwise $I(t):=\bot$.
@@ -389,7 +390,7 @@ In order to allow a computer representation of cell interpretations, we will alw
 \end{definition}
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
-Given a pre-satisfiability certificate, we can now certify the advisability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
+Given a pre-satisfiability certificate, we can now certify the satisfiability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
 \begin{definition}
 	\label{def:certificate}
 	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate for $\phi$} is
@@ -407,7 +408,7 @@ Given a pre-satisfiability certificate, we can now certify the advisability of f
 \end{definition}
 
 \begin{example}\label{ex:certificate-example}
-A satisfiability certificate for the formula \[f(3, a) \geq 4 + g(b) \wedge \forall x, y . f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b\] is 
+A satisfiability certificate for the formula \[f(3, a) \geq 4 + g(b) \wedge \forall x, y \:.\: f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b\] is 
 % \begin{itemize}
 %     \item pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$
 %     \item order $\preceq$: $(3,0) \prec (3,1) \prec (3,2) \prec \cdots \prec (3,-1) \prec \cdots \prec \text{others}$
@@ -430,7 +431,7 @@ given by the pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(
     \[\small
     \begin{array}{|l|l|l|l|}\hline
       & X_{(x,y)} & propagators\\ \hline
-        x=3, y=0  & \{g(0)\} & g(0)\mapsto 5\\
+        x=3, y=0  & \{g(0)\} & g(0)\mapsto 2\\
         x=3,y=1,2,\dots & \{f(3,y), g(y+1)\} & g(y+1)\mapsto g(y)-2, f(x,y)\mapsto y+g(y)-1\\
         x=3, y=-1,-2,\dots &  \{f(3,y), g(y)\} & g(y)\mapsto g(y+1)+2, f(x,y)\mapsto y+g(y+1)+1 \\
        x\neq 3, y \text{ arbitrary}  &   \{f(x,y) \} & f(x,y)\mapsto y+g(y)-1\\ \hline
@@ -457,7 +458,7 @@ Also note that for $z\in\domain^{\numvar{\bar{x}}}$ such that $\Gamma_{I,z}(\phi
 	Now denote for every $z\in\domain^{\numvar{\bar{x}}}$ the cell interpretation  satisfying $\subst{Q}{\bar{x}}{\repr{z}}$ as constructed in the previous paragraph by $I_z$.
 	% From the well-order $\prec$ we get a corresponding well-order on these cell interpretations.
 	% Let $I_{\phi}$ be the cell interpretation that, for any cell $u$, assigns the value to $u$ that $I_{z}$ assigns to it for the smallest $z$ (wrt. $\prec$) that assigns a value to $u$. This smallest $z$ exists, since $\prec$ is a well-order. The cell interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
-    Observe that for every cell~$u$, and for all~$z, z'\in \domain^{\numvar{\bar{x}}}$ with $I_z(u)\neq \bot$ and $I_{z'}(u)\neq \bot$, $I_z(u)=I_{z'}(u)$.      Let $I_\phi$ be the assignment that, for any cell $u$, if there is a $z$ such that $I_z(u)\neq \bot$, then $I_\phi(u)=I_z(u)$, and otherwise $I_\phi(u)=0$. Certainly $I_\phi\models F$. Moreover, for every $z\in\domain$,  $I_\phi\models  \subst{Q}{\bar{x}}{\repr{z}}$, since $I_\phi$ coincides with $I_z$ for all elements, where it is defined. Hence  $I_\phi\models \phi$.
+    Observe that for every cell~$u$, and for all~$z, z'\in \domain^{\numvar{\bar{x}}}$ with $I_z(u)\neq \bot$ and $I_{z'}(u)\neq \bot$, $I_z(u)=I_{z'}(u)$.      Let $I_\phi$ be the (classical) interpretation that, for any cell $u$, if there is a $z$ such that $I_z(u)\neq \bot$, then $I_\phi(u)=I_z(u)$, and otherwise $I_\phi(u)=0$. Certainly $I_\phi\models F$. Moreover, for every $z\in\domain$,  $I_\phi\models  \subst{Q}{\bar{x}}{\repr{z}}$, since $I_\phi$ coincides with $I_z$ for all elements, where it is defined. Hence  $I_\phi\models \phi$.
 \qedhere\end{proof}
 
 A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\domain^{|x|}$ and for each $u\in X_z$ we assume a function $prop_{u,z}$ such that for
