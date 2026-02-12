@@ -258,7 +258,7 @@ where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of 
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
     \item All uninterpreted function symbols have maximal arity $1$.  
     \item The number of quantified variables is $1$.
-    \item The coefficient of the quantified variable is uniform across all argument terms of any given uninterpreted function symbol in the quantified part~$Q$.\todoSR{I removed the restriction on the sign of the coefficient}
+    \item The coefficient of the quantified variable is uniform across all argument terms of any given uninterpreted function symbol in the quantified part~$Q$.
     \end{itemize}
 
 The algorithm is guaranteed to terminate under an additional semantic condition that enables induction (\cref{def:reqpivot-param}). We illustrate the class of formulas our algorithm can handle using two examples. 
