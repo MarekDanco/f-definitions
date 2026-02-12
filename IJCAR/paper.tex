@@ -800,44 +800,44 @@ If the input formula~$\phi$ is satisfiable and it satisfies the \req condition, 
 
 \testlength{
 \begin{proof}
-Assume $\phi$ is satisfiable and satisfies \req condition for $(\mathcal{S}^*,\mathcal{S}'^*)$. Let $\mathcal{M}$ be a model of $\phi$. Define an  interpretation $I^*$\todoSR{Why not work directly with $I$?}. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments. For each $f(t)\in\mathcal{F}$, define:
+Assume $\phi$ is satisfiable and satisfies \req condition for $(\mathcal{S}^*,\mathcal{S}'^*)$. Let $\mathcal{M}$ be a model of $\phi$. Define an  interpretation $J$ that agrees with $\mathcal{M}$ on all cells.\todoSR{Why not work directly with $I$?}\todoSN{Done.} For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments. For each $f(t)\in\mathcal{F}$, define:
 \[
-v_{\max}^f = \max\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
-v_{\min}^f = \min\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
+v_{\max}^f = \max\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
+v_{\min}^f = \min\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
 \]
 % where $t_0=\subst{t}{x}{0}$ for each $f(t)\in\mathcal{T}$.
 The extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S}^*)$ and $\Phi^-_{\text{ext}}(\mathcal{S}'^*)$ ensure that:
 \begin{itemize}
-    \item For all $f(t) \in \mathcal{S}^*$: $I^*(\subst{t}{x}{0}) = v_{\max}^f$,
-    \item For all $f(t) \in \mathcal{S}'^*$: $I^*(\subst{t}{x}{0}) = v_{\min}^f$.
+    \item For all $f(t) \in \mathcal{S}^*$: $J(\subst{t}{x}{0}) = v_{\max}^f$,
+    \item For all $f(t) \in \mathcal{S}'^*$: $J(\subst{t}{x}{0}) = v_{\min}^f$.
 \end{itemize}
 Now choose\todoSR{what if $c_f$ is negative?}\todoSN{Nothing will change.}
 \begin{minipage}{\linewidth-2cm}
 \vspace*{-0.5cm}  
 \begin{align*}
-  b_{\max} &= \max\left\{\, \left\lceil \frac{I^*(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}\\
-b_{\min} &= \min\left\{\, \left\lfloor \frac{I^*(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\},
+  b_{\max} &= \max\left\{\, \left\lceil \frac{J(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}\\
+b_{\min} &= \min\left\{\, \left\lfloor \frac{J(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\},
 \end{align*}
 \end{minipage}
 
-and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
+and set $B = [b_{\min}, b_{\max}]$. We verify that $J$ satisfies:
 \begin{enumerate}
-    \item \textbf{Base formula}: $I^* \models F \land \bigwedge_{x \in B} Q[x]$ (since $\mathcal{M} \models \phi$).
+    \item \textbf{Base formula}: $J \models F \land \bigwedge_{x \in B} Q[x]$, since $\mathcal{M} \models \phi$ and $J$ agrees with $\mathcal{M}$ on all relevant cells.
     
     \item \textbf{Upward propagation condition}: 
     For the specific $\mathcal{S}^*$, we have:
     \begin{itemize}
         \item $\Phi_{\text{max}}^+(\mathcal{S}^*)$ holds by definition,
         \item $\Phi_{\text{prop}}(\mathcal{S}^*)$ holds by the \req condition,
-        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ By construction of $b_{\max}$ and since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
+        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ By construction of $b_{\max}$ and since $J(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
         % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
         % \]
         \[
-        I^*(a) \cmpsign{\coeffsign{f}+} c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\hat{b}_{\max}}),
+        J(a) \cmpsign{\coeffsign{f}+} c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + J(\subst{t}{x}{0}) = J(\subst{t}{x}{\hat{b}_{\max}}),
         \]
         which is exactly the clash condition in $\Psi^+(B,\mathcal{S}^*)$.
     \end{itemize}
-    Hence $I^* \models \Psi^+(B,\mathcal{S}^*)$.
+    Hence $J \models \Psi^+(B,\mathcal{S}^*)$.
     
     \item \textbf{Downward propagation condition}: 
     Similarly, for $\mathcal{S}'^*$ we have:
@@ -850,15 +850,15 @@ and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
         % \]
         by construction of $b_{\min}$,
         \[
-        I^*(a)\cmpsign{\coeffsign{f}-}  c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\repr{b}_{\min}}),
+        J(a)\cmpsign{\coeffsign{f}-}  c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + J(\subst{t}{x}{0}) = J(\subst{t}{x}{\repr{b}_{\min}}),
         \]
         which is the clash condition in $\Psi^-(B,\mathcal{S}'^*)$.
         
     \end{itemize}
-    Thus $I^* \models \Psi^-(B,\mathcal{S}'^*)$.
+    Thus $J \models \Psi^-(B,\mathcal{S}'^*)$.
 \end{enumerate}
 
-Therefore, $I^*$ satisfies
+Therefore, $J$ satisfies
 \[
 F \land \bigwedge_{x \in B} Q[x] \;\land\; \Psi^+(B,\mathcal{S}^*) \;\land\; \Psi^-(B,\mathcal{S}'^*),
 \]
@@ -868,7 +868,7 @@ Let $N = \max(|b_{\min}|, |b_{\max}|)$. \cref{alg:interval-check-param-withBigve
 \[
 F \land \bigwedge_{x=-N}^{N} Q[x] \;\land\; \bigvee_{\mathcal{S}}\Psi^+([-N,N],\mathcal{S}) \;\land\; \bigvee_{\mathcal{S}'}\Psi^-([-N,N],\mathcal{S}').
 \]
-Since $[-N, N]\supseteq B$ and $I^*$ satisfies all three conditions as shown above, this formula is also satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
+Since $[-N, N]\supseteq B$, $J$ also satisfies this formula. Hence, the algorithm terminates with \textsc{Sat}.
 \qedhere\end{proof}}
 
 While proofs of unsatisfiability are not the main goal of this paper, \Cref{alg:interval-check-param-withBigvee} can also detect unsatisfiability, in some cases.
