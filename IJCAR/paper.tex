@@ -32,6 +32,7 @@
 \newcommand{\coeffsign}[1]{\sigma(#1)}
 \newcommand{\ivbound}[2]{\text{sel}(#1,#2)}
 
+\newcommand{\testlength}[1]{#1}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
@@ -483,12 +484,13 @@ Here, the recursive calls go down the order $\prec$ in the following sense:
 	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any other cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, $\mathit{inst}(v)\prec \mathit{inst}(u)$.
 \end{property}
 
+\testlength{
 \begin{proof}
   Assume a cell $u$ with $\mathit{inst}(u)\neq\bot$, a  cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, and assume that $\mathit{inst}(v)\succeq \mathit{inst}(u)$. Then both $v\in X_{\mathit{inst}(v)}$ and $v \in \Gamma_{I,\mathit{inst}(u)}(\phi)$, and hence $X_{\mathit{inst}(v)}\cap \Gamma_{I,\mathit{inst}(u)}(\phi)\neq\emptyset$. 
 %  Then $u\in X_{\mathit{inst}(u)}\subseteq \Gamma_{I,\mathit{inst}(u)}$ and $v\in X_{\mathit{inst}(v)}$.
   This contradicts the requirement that $X_{inst(v)}\cap (\mathit{def}(I)\cup\bigcup_{z'\prec inst(v)} \Gamma_{I,z'}(\phi))=\emptyset$.
   \qedhere
-\end{proof}
+\end{proof}}
 
 So each recursive call of the program $val$ either results in $\mathit{inst}(u)$ either decreasing or being $\bot$. In the latter case, the program terminates immediately, and the former case cannot happen infinitely often, since the used order is well-founded. So we have:
 \begin{property}
@@ -622,6 +624,7 @@ Let $\phi = F \land \forall x.\, Q$ and let $B$ be a non‑empty integer interva
 is satisfiable. Then  $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\wedge \forall x\;.\; x\not\in B \Rightarrow Q$ has a satisfiability certificate, and hence $\phi$ is satisfiable.
 \end{theorem}
 
+\testlength{
 \begin{proof}
   Suppose the conjunction is satisfiable, let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi^+(B,\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi^-(B,\mathcal{S}')$. Assume that  $B = [b_{\min}, b_{\max}]$. We construct a certificate as in \cref{def:certificate}:
 
@@ -721,7 +724,7 @@ Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\
 % Therefore all non‑propagated cells needed for the propagator at $z$ are already defined, and the propagator can assign values to $X_z$ without circularity. A symmetric argument (without extra constraints) applies to $z < b_{\min}$, because those instantiations occur \emph{after} all $z > b_{\max}$ in $\preceq$, and hence may safely use cells assigned during upward propagation.
 
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
-\qedhere\end{proof}
+\qedhere\end{proof}}
 
 The formula in the premise of \cref{thm:interval-certificate-param} belongs to the language of Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the cell interpretation necessary for showing $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}$ to be satisfiable, and the sets $\mathcal{S}$ and $\mathcal{S}'$.
 
@@ -792,6 +795,7 @@ If the input formula~$\phi$ is satisfiable, and
  satisfies the \req condition  then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{Sat}.
 \end{theorem}
 
+\testlength{
 \begin{proof}
 Assume $\phi$ is satisfiable and satisfies \req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
 Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$\todoSR{Why not work directly with $I$?}. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments. For each $f(t)\in\mathcal{F}$, define:
@@ -855,7 +859,7 @@ Let $N = \max(|b_{\min}|, |b_{\max}|)$. \cref{alg:interval-check-param-withBigve
 F \land \bigwedge_{x=-N}^{N} Q[x] \land \text{max}^+ \land \text{min}_{\text{down}}
 \]
 where $\text{max}^+$ and $\text{min}_{\text{down}}$ are constructed for the interval $[-N, N]$. Since $[-N, N]$ contains $B$, and $I^*$ satisfies all three conditions as shown above, this formula is satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
-\qedhere\end{proof}
+\qedhere\end{proof}}
 
 While proofs of unsatisfiability are not the main goal of this paper, \Cref{alg:interval-check-param-withBigvee} can also detect unsatisfiability, in some cases.
 
@@ -996,6 +1000,7 @@ solved 2.
 	\label{fig:scaling}
 \end{figure}
 
+\testlength{
 The cactus plots in Figure~\ref{fig:cactus} show the number of problems solved by \textsc{cvc5}
 within a time limit for $c \in \{2, 3\}$. We can observe most of the problems get solved
 in the 10 to 100 seconds limit when setting $c = 3$. With $c \geq 4$, \textsc{cvc5} times out
@@ -1005,7 +1010,7 @@ on all but 5 problems, which get solved immediately.
 	\includegraphics[width=1\linewidth]{experiments/data/cactus_plot.png}
 	\caption{Runtime of \textsc{cvc5} for solved problems with $c \in \{2, 3\}$.}
 	\label{fig:cactus}
-\end{figure}
+\end{figure}}
 
 %Note that our algorithm proves the satisfiability of these problems promptly. Only a few LIA calls are needed to prove the \req condition.
 However, our algorithm struggles on
@@ -1021,6 +1026,7 @@ Improving the algorithm on cases similar to this one is a subject of future work
 \section{Conclusion}
 \label{sec:conclusion}
 
+\testlength{
 We have presented a novel approach to certifying satisfiability for universally quantified integer arithmetic formulas with uninterpreted functions—a fragment of UFLIA that appears naturally in verification of arrays and recursive programs. Unlike traditional $\smt$ methods that construct explicit models, our technique replaces infinite models with finite inductive certificates based on propagation arguments.
 
 At the foundation lies a general certificate framework that decouples the logical structure of satisfiability proofs from algorithmic details. A certificate consists of a finite base assignment, a well‑order, and propagators that extend the assignment stepwise along that order. This framework is sound for any well‑founded order and any number of quantified variables, providing a flexible basis for future extensions.
@@ -1031,7 +1037,7 @@ Our experiments...
 
 The main limitations of the current algorithm—its restriction to one quantified variable and to uniform coefficients per function—point to natural directions for future work. Generalizing the propagation condition to handle multiple variables, non‑collinear coefficients, or nested function calls would significantly widen its applicability.
 
-In summary, by shifting from explicit model construction to inductive propagation we offer a viable, certificate‑based alternative for deciding satisfiability in a practically relevant fragment of UFLIA. The approach bridges the gap between decidable special cases and purely heuristic methods, opening new avenues for verification tools that require both scalability and verifiable correctness.
+In summary, by shifting from explicit model construction to inductive propagation we offer a viable, certificate‑based alternative for deciding satisfiability in a practically relevant fragment of UFLIA. The approach bridges the gap between decidable special cases and purely heuristic methods, opening new avenues for verification tools that require both scalability and verifiable correctness.}
 
 \bibliographystyle{abbrv}
 \bibliography{refs}
