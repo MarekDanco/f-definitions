@@ -682,11 +682,11 @@ It remains to verify the disjointness conditions of \cref{def:certificate}:
       \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
         $I(\subst{t'}{x}{\repr{z}'}))\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
         \[
-          I\models \subst{t'}{x}{\hat{z}'}\cmpsignstrict{\coeffsign{f}} \subst{t'}{x}{\hat{z}}.
+          I\models \subst{t'}{x}{\hat{z}'}\cmpsignstrict{\coeffsign{f}+} \subst{t'}{x}{\hat{z}}.
         \]
-        Moreover, $\Phi_{\text{max}}(\mathcal{S})$ ensures 
+        Moreover, $\Phi^{+}_{\text{ext}}(\mathcal{S})$ ensures 
                 \[
-          I\models \subst{t'}{x}{\hat{z}}\cmpsignstrict{\coeffsign{f}}\subst{t}{x}{\hat{z}}.
+          I\models \subst{t'}{x}{\hat{z}}\cmpsignstrict{\coeffsign{f}+}\subst{t}{x}{\hat{z}}.
         \]
 Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\repr{z}}))$, which implies that the two sides of the inequality cannot be the same.
     %     \begin{itemize}
