@@ -970,7 +970,7 @@ and
 For each problem, we also used bounded versions of the form $F\wedge \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$, with $c\in \{1,\dots,5\}$.
 
 We implemented our algorithm in the language Python, using the SMT solver \textsc{z3} for all satisfiability checks. We also applied the \textsc{smt} solvers \textsc{z3} and
-\textsc{cvc5}---with model based quantifier instantiation~\cite{ge-cav09} explicitly turned on---directly to our problems.
+\textsc{cvc5} directly to our problems, explicitly turning on model based quantifier instantiation~\cite{ge-cav09}.
 
 It turned out that our algorithm terminates on all problems in negligible time. Moreover,  the value of the parameter~$c$ does not have a noticeable influence on runtime for the bounded versions of the test problems. We found the former observation surprising, while the latter was to be expected, due to the use of induction.
 
