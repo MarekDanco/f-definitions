@@ -964,7 +964,7 @@ We have prepared a short test suite consisting of 28 small problems such as
 	f(4)=7 \;\land\; \forall x.\; (0 \le x \le 10^c \;\Rightarrow\; f(x+1)=f(x)+1),
 \end{align}
 where we tested how well the state of the art \textsc{smt} solvers \textsc{z3} and
-\textsc{cvc5}\footnote{ran with the argument \texttt{--mbqi}}
+\textsc{cvc5}, with model based quantifier instantiation~\cite{ge-cav09} explicitly turned on
 scale with increasing positive $c$. On this example,
 our algorithm has to check just that for all values of $f(x)$, there exists a value of $f(x+1)$
 such that the equality holds. It suffices to consider the interval $[0,\, 4]$.
