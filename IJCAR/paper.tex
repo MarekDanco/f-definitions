@@ -669,31 +669,18 @@ is satisfiable. Then  $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\wedge 
 \end{enumerate}
 It remains to verify the disjointness conditions of \cref{def:certificate}:
 \[X_z\cap \mathit{def}(I)=\emptyset \text{ and } X_z\cap\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi)=\emptyset.\]
-\begin{itemize}
-    \item For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.    
-    \item For $z > b_{\max}$, any element of $X_z$ has the form $f(I(\subst{t}{x}{\repr{z}}))$ with $f(t) \in \mathcal{S}$.
+For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.  For $z > b_{\max}$, any element of $X_z$ has the form $f(I(\subst{t}{x}{\repr{z}}))$ with $f(t) \in \mathcal{S}$.
     \begin{itemize}
-        \item To prove that this element of $X_z$ cannot be in $\mathit{def}(I)$, let $f'(t')$ be an arbitrary, but fixed element of $\mathit{def}(I)$. We prove that $f'(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}}))$. If $f$ is a different function symbol than $f'$ this is certainly the case, and hence it suffices to prove $f(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}})$, which makes it necessary to prove $I(\subst{t'}{x}{\repr{z}}))\neq I(\subst{t}{x}{\repr{z}})$. The $\mathit{def}(I)$ contains cells of two types:
-        \begin{enumerate}
-            \item Cells $f(I(a))$ for ground arguments $a \in args(F,f)$.
-            \item Cells $f(I(\subst{t_0}{x}{z_0}))$ for $z_0 \in B$ and $f(t_0)$ occurring in $Q$.
-        \end{enumerate}
-        
-        For type (1), the clash condition $a\cmpsignstrict{\coeffsign{f}+}\subst{t}{x}{\ivbound{B}{s}}$ in $\Psi^+(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:\todoSR{missing: $a\in \text{def}(I)$ but $a\not\in args(F,f)$}\todoSN{Done, type (2).}
+    \item To prove that this element of $X_z$ cannot be in $\mathit{def}(I)$, let $f'(n)$ be an arbitrary, but fixed element of $\mathit{def}(I)$ with non-zero arity. We prove that $f'(n)\neq f(I(\subst{t}{x}{\repr{z}}))$. If $f$ is a different function symbol than $f'$ this is certainly the case, and hence it suffices to prove $f(n)\neq f(I(\subst{t}{x}{\repr{z}})$, which makes it necessary to prove $I(n)\neq I(\subst{t}{x}{\repr{z}})$. Due to the construction of the cell interpretation~$I$, $n=I(a)$, with $a\in args(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}, f)$.
+      \begin{itemize}
+      \item       If $a\in args(F, f)$, the clash condition $a\cmpsignstrict{\coeffsign{f}+}\subst{t}{x}{\ivbound{B}{s}}$ in $\Psi^+(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:
         \[
         I\models a\cmpsign{\coeffsign{f}+}  \subst{t}{x}{\repr{b}_{\max}} \cmpsignstrict{\coeffsign{f}+} \subst{t}{x}{\repr{z}},
         \]
         where the strict inequality follows because $t$ is linear, and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$.
-        
-        For type~(2), since $z_0 \le b_{\max} < z$ and $t$ is extremal for $s=+$, we obtain
-        \[
-        \begin{aligned}
-            I \models\;&\subst{t_0}{x}{\repr{z_0}}\cmpsign{\coeffsign{f}+}\subst{t_0}{x}{\repr{b}_{\max}} \\
-            \models\;&\subst{t_0}{x}{\repr{b}_{\max}}\cmpsignstrict{\coeffsign{f}+}\subst{t}{x}{\repr{b}_{\max}+1} \\
-            \models\;&\subst{t}{x}{\repr{b}_{\max}+1}\cmpsign{\coeffsign{f}+}\subst{t}{x}{\repr{z}},
-        \end{aligned}
-        \]
-        and therefore $I\!\left(\subst{t_0}{x}{z_0}\right)\neq I\!\left(\subst{t}{x}{z}\right)$.
+      \item If  $a\not\in args(F, f)$, then there is a $z_B\in B$ such that $a\in args(Q[x\leftarrow \hat{z}_B],f)$.   Now, since $z_B\leq \repr{b}_{\max}<z$,  again  $I\models a\cmpsign{\coeffsign{f}+}  \subst{t}{x}{\repr{b}_{\max}}$, and  $I(a)\neq I(\subst{t}{x}{\repr{z}})$.
+      \end{itemize}
+
         
       \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
         $I(\subst{t'}{x}{\repr{z}'}))\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
@@ -720,9 +707,7 @@ Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\
     %     \end{itemize}        
     \end{itemize}
 
-  \item The case $z < b_{\min}$ is symmetric, using $\Psi^-(B,\mathcal{S}')$.
-\end{itemize}
-Note that the fact that the upward propagation block of elements greater than $b_{\max}$ occurs before the downward propagation block of elements less than $b_{\min}$ in the order $\preceq$ does not create a problem, since  propagation is still restricted to cells not occurring before.
+  The case $z < b_{\min}$ is symmetric, using $\Psi^-(B,\mathcal{S}')$. Note that the fact that the upward propagation block of elements greater than $b_{\max}$ occurs before the downward propagation block of elements less than $b_{\min}$ in the order $\preceq$ does not create a problem, since  propagation is still restricted to cells not occurring before.
 % Finally, we must ensure that the \textbf{satisfiability propagators} can be applied inductively along $\preceq$.  
 % For $z > b_{\max}$, the propagator $\Phi_{\text{prop}}(\mathcal{S})$ requires values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$.  
 % Let $f(t') \in \mathcal{T}\setminus\mathcal{S}$ be such a non‑propagated term. Its corresponding cell is $f(I(\subst{t'}{x}{\repr{z}}))$.  
@@ -738,7 +723,8 @@ Note that the fact that the upward propagation block of elements greater than $b
 % Therefore all non‑propagated cells needed for the propagator at $z$ are already defined, and the propagator can assign values to $X_z$ without circularity. A symmetric argument (without extra constraints) applies to $z < b_{\min}$, because those instantiations occur \emph{after} all $z > b_{\max}$ in $\preceq$, and hence may safely use cells assigned during upward propagation.
 
 Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
-\qedhere\end{proof}}
+\qedhere\end{proof}
+}
 
 The formula in the premise of \cref{thm:interval-certificate-param} belongs to the language of Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the cell interpretation necessary for showing $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}$ to be satisfiable, and the sets $\mathcal{S}$ and $\mathcal{S}'$.
 
