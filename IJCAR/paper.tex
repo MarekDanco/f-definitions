@@ -800,7 +800,7 @@ If the input formula~$\phi$ is satisfiable and it satisfies the \req condition, 
 
 \testlength{
 \begin{proof}
-Assume $\phi$ is satisfiable and satisfies \req condition for $(\mathcal{S}^*,\mathcal{S}'^*)$. Let $\mathcal{M}$ be a model of $\phi$. Define an  interpretation $J$ that agrees with $\mathcal{M}$ on all cells.\todoSR{Why not work directly with $I$?}\todoSN{Done.} For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments. For each $f(t)\in\mathcal{F}$, define:
+  Assume $\phi$ is satisfiable and satisfies \req condition for $(\mathcal{S}^*,\mathcal{S}'^*)$. Let $\mathcal{J}$ be an interpretation with $\mathcal{J}\models\phi$. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments. For each $f(t)\in\mathcal{F}$, define:
 \[
 v_{\max}^f = \max\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
 v_{\min}^f = \min\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
@@ -851,8 +851,7 @@ and set $B = [b_{\min}, b_{\max}]$. We verify that $J$ satisfies:
         \[
         J(a)\cmpsign{\coeffsign{f}-}  c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + J(\subst{t}{x}{0}) = J(\subst{t}{x}{\repr{b}_{\min}}),
         \]
-        which is the clash condition in $\Psi^-(B,\mathcal{S}'^*)$.
-        
+        which is the clash condition in $\Psi^-(B,\mathcal{S}'^*)$.       
     \end{itemize}
     Thus $J \models \Psi^-(B,\mathcal{S}'^*)$.
 \end{enumerate}
