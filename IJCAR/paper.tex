@@ -884,7 +884,7 @@ This formula is unsatisfiable in standard integer arithmetic (applying induction
 
 \section{Propositional Encoding}
 
-The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$. While theoretically elegant, these disjunctions lead to formulas with exponential size, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
+The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$. While theoretically elegant, these disjunctions lead to formulas exponentially growing with the number of terms, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
 
 \paragraph{Encoding Idea.} Instead of enumerating all subset choices we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. For each term $f(t)\in\mathcal{T}$, we create:
 \begin{itemize}
