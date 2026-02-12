@@ -359,11 +359,11 @@ We use the notion of certificate in the following sense~\cite{McConnell:11}: Giv
 \section{Satisfiability Certificates}
 \label{sec:certificate}
 
-In this section, we will define objects that certifies that a formula in the form defined in~\cref{sec:problem-statement} is satisfiable. In the next section, we will then introduce an algorithm to compute such certificates.
+In this section, we will define objects that certify that a formula of the form $F \land \forall \bar{x}.\; Q$ is satisfiable. We will assume that all uninterpreted function symbols have domain~$\domain$ and codomain~$\codomain$, with both having a canonical model of the same name. We also assume~$\domain$ to be countable. In the next section, we will then introduce an algorithm to compute such certificate in the case where both $\domain$ and $\codomain$ are the integers (more specifically, formulas from UFLIA), and under the additional restrictions described in the problem statement. Also in this section, we use the integers for illustration in all examples.
 
-Traditionally, satisfiability of a logical formula is certified by an interpretation that assigns a value to each non-logical symbol in such way that the formula is true. However, the set of integers is infinite. Due to this,  the interpretation of an uninterpreted function symbol with integer domain is a function that assigns values to the infinitely many integers that form this domain. This opens the question of how to represent such a function using a finite object that can be represented on computers.
-
-Our approach does not assign values to the entire infinite domain of uninterpreted function symbols in one step; instead, it assigns values to each individual element of this domain:
+Traditionally, satisfiability of a logical formula is certified by an interpretation that assigns a value to each non-logical symbol in such way that the formula is true. However, the presence of uninterpreted function symbols with infinite domain opens up the question of how to represent such an interpretation.
+%integers is infinite. Due to this,  the interpretation of an uninterpreted function symbol with integer domain is a function that assigns values to the infinitely many integers that form this domain. This opens the question of how to represent such a function using a finite object that can be represented on computers.
+Our approach will not assign values to all elements of the infinite domain of uninterpreted function symbols in one step, but to each individual element of this domain separately:
 \begin{definition}[Cell]\label{def:cell}
 	A \emph{cell} is a term of the form $f(n_1,\dots, n_k)$ where $f$ is an uninterpreted function symbol and $n_1,\dots, n_k\in \domain$.
       \end{definition}
