@@ -127,7 +127,7 @@ The combination of integer arithmetic, uninterpreted function symbols, and unive
 
 Current SMT solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
 
-In this paper, we address this problem for formulas containing universal quantifiers, linear integer arithmetic, and uninterpreted function symbols. Such formulas belong to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current SMT solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite, but large.
+In this paper, we address this problem for formulas containing universal quantifiers, linear integer arithmetic, and uninterpreted function symbols. Such formulas belong to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current SMT solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite yet large.
 
 In this paper, we explore an alternative approach that avoids explicit model construction by proving satisfiability using inductive arguments, instead. More specifically, we
 \begin{itemize}
@@ -224,7 +224,7 @@ Kunčak et al.~\cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation s
 
 
 \paragraph{Decision procedures for arrays and quantified formulas.}
-Bradley et al.~\cite{bradley-vmcai06} present a decision procedure for array properties but explicitly forbid arithmetic on the universally quantified variables. Habermehl et al.~\cite{habermehl-etaps08} allow constraints of the form $a[i+c]$ with difference bounds, but remain limited to offset-bounded indices. Alberti et al.~\cite{alberti2014decision} are restricted to flat formulas with one universally quantified variable. This excludes terms such as $a[i+1]$ that are the main focus of our paper. Elad et al.~\cite{elad2024infinite} prove decidability for a first‑order fragment without arithmetic, unable to express our constraints.
+Bradley et al.~\cite{bradley-vmcai06} present a decision procedure for array properties but explicitly forbid arithmetic on the universally quantified variables. Habermehl et al.~\cite{habermehl-etaps08} allow constraints of the form $a[i+c]$ with difference bounds, but remain limited to offset-bounded indices. Alberti et al.~\cite{alberti2014decision} are restricted to flat formulas with one universally quantified variable. This excludes terms such as $a[i+1]$, which are the main focus of our paper. Elad et al.~\cite{elad2024infinite} prove decidability for a first‑order fragment without arithmetic, unable to express our constraints.
 
 \paragraph{Model-based and instantiation methods.}
 Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model finding techniques for quantified formulas. Their method requires users to ensure admissibility and may introduce many case splits (``merge lemmas'') to satisfy cardinality constraints. Ge and de Moura~\cite{ge-cav09} introduce the Model-Based Quantifier Instantiation (MBQI) but noting that ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA refers to the logic of Habermehl et al.} will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.'' Our work attempts to  address this open question.
@@ -252,16 +252,16 @@ We introduce a method for certifying satisfiability of formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall \bar{x}.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic, where $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables, and where the arguments of all uninterpreted function symbols do not contain any uninterpreted function symbols with non-zero arity (i.e., the arguments may only contain uninterpreted constants).  Based on this method, we will design an algorithm for detecting satisfiability under the following additional assumptions:
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic, where $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables, and where the arguments of all uninterpreted function symbols contain no uninterpreted function symbols of non-zero arity (i.e., the arguments may only contain uninterpreted constants).  Based on this method, we design an algorithm for detecting satisfiability under the following additional assumptions:
 \begin{itemize}
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
     \item All uninterpreted function symbols have maximal arity $1$.  
     \item The number of quantified variables is $1$.
-    \item The coefficient of the quantified variable is the same for all argument terms of the same uninterpreted function symbol in the quantified part~$Q$.\todoSR{I removed the restriction on the sign of the coefficient}
+    \item The coefficient of the quantified variable is uniform across all argument terms of any given uninterpreted function symbol in the quantified part~$Q$.\todoSR{I removed the restriction on the sign of the coefficient}
     \end{itemize}
 
-The algorithm is guaranteed to terminate under an additional semantic condition enabling induction (\cref{def:reqpivot-param}). We illustrate the class of formulas our algorithm can handle using two examples. 
+The algorithm is guaranteed to terminate under an additional semantic condition that enables induction (\cref{def:reqpivot-param}). We illustrate the class of formulas our algorithm can handle using two examples. 
 \begin{example}
   \label{ex:formula}
   \[f(0)=0 \wedge \forall x \,.\, f(-2x+3)=g(x)+f(-2x+c+1)-c,\]
@@ -351,7 +351,7 @@ As usual in an SMT context, we will work with a first-order language that is sor
 We will sometimes work with the signs from the set $\{+,-\}$, where
 for any two signs $s$ and $s'$, $ss'$ is $+$ iff $s=s'$, and $-$, otherwise. We will use such signs to switch between greater and less than relations in the way that for two integers~$z$ and $z'$, $z\cmpsignstrict{+} z'$ iff $z<z'$ and $z\cmpsignstrict{-} z'$ iff $z>z'$. For an interval $B=[b_{\min}, b_{\max}]$, we define $\ivbound{B}{-}= b_{\min}$, and $\ivbound{B}{+}= b_{\max}$.
 
-We will use the classical mathematical notion of a well-order. A well-order on a set $S$ is a total ordering on $S$ such that every non-empty subset of $S$ has a least element. Any well-order allows well-founded induction: For a  proving that a property $P$ holds for all $x$, it suffices to prove that for every $x\in S$, if for all $y\prec x$, $P(y)$ then also $P(x)$.
+We use the classical mathematical notion of a well-order. A well-order on a set $S$ is a total ordering on $S$ such that every non-empty subset of $S$ has a least element. Any well-order allows well-founded induction: For a  proving that a property $P$ holds for all $x$, it suffices to prove that for every $x\in S$, if for all $y\prec x$, $P(y)$ then also $P(x)$.
 
 
 We use the notion of certificate in the following sense~\cite{McConnell:11}: Given a property~$P(x)$ that is typically difficult to check, a certificate for this property is an object $\Pi$ for which we have a property $P'(x,\Pi)$ and a proof that $P'(x,\Pi)$ implies $P(x)$, and for which $P'(x,\Pi)$ is easier to check than $P(x)$. Here, we will not always insist on a precise meaning of the notion of being easy to check. However, the final goal is a certificate $\Pi$, for which $P'(x,\Pi)$ can be checked more efficiently than the original property $P(x)$, using an algorithm that is in some sense simpler then an algorithm for checking $P(x)$. As a consequence, such a certificate will enable an efficient independent check of the correctness of the result of an algorithm for checking~$P(x)$.
@@ -363,7 +363,7 @@ In this section, we will define objects that certifies that a formula in the for
 
 Traditionally, satisfiability of a logical formula is certified by an interpretation that assigns a value to each non-logical symbol in such way that the formula is true. However, the set of integers is infinite. Due to this,  the interpretation of an uninterpreted function symbol with integer domain is a function that assigns values to the infinitely many integers that form this domain. This opens the question of how to represent such a function using a finite object that can be represented on computers.
 
-Our approach will not assign values to the whole infinite domain of uninterpreted function symbols in one step, but to each individual element of this domain:
+Our approach does not assign values to the entire infinite domain of uninterpreted function symbols in one step; instead, it assigns values to each individual element of this domain:
 \begin{definition}[Cell]\label{def:cell}
 	A \emph{cell} is a term of the form $f(n_1,\dots, n_k)$ where $f$ is an uninterpreted function symbol and $n_1,\dots, n_k\in \domain$.
       \end{definition}
@@ -482,7 +482,7 @@ Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenS
 
 Here, the recursive calls go down the order $\prec$ in the following sense:
 \begin{property}
-	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any other cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, $\mathit{inst}(v)\prec \mathit{inst}(u)$.
+	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any other cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, we have $\mathit{inst}(v)\prec \mathit{inst}(u)$.
 \end{property}
 
 \testlength{
@@ -894,7 +894,7 @@ This formula is unsatisfiable in standard integer arithmetic (applying induction
 
 The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$. While theoretically elegant, these disjunctions lead to formulas exponentially growing with the size of the set $\mathcal{T}$, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
 
-Instead of enumerating all subset choices we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. For each term $f(t)\in\mathcal{T}$, we create:
+Instead of enumerating all possible subset choices, we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. For each term $f(t)\in\mathcal{T}$, we create:
 \begin{itemize}
     \item $p_{f(t)}$: true iff $f(t) \in \mathcal{S}$ (for propagation with $s=+$)
     \item $p'_{f(t)}$: true iff $f(t) \in \mathcal{S}'$ (for propagation with $s=-$)
@@ -972,7 +972,7 @@ Our experiments will test the conjecture that the algorithm introduced in the pr
 % However, even in the first case our method may improve upon methods such as MBQI, due to two reasons.
 % First, the models produced by MBQI may be particularly difficult to read. Next, the run-time
 % of MBQI increases with the size of the model.
-We prepared a test suite consisting of 29 problems\footnote{All the data for our experiments can be found at our public repository \\\url{https://github.com/MarekDanco/f-definitions}}
+We prepared a test suite consisting of 29 problems\footnote{All the data for our experiments are available at our public repository \\\url{https://github.com/MarekDanco/f-definitions}}
 such as
 \begin{equation}\label{eq:exp1}
   f(4)=7 \:\land\: \forall x.\: (0 \le x \le 10^c \:\Rightarrow\: f(x+1)=f(x)+1)
