@@ -951,15 +951,15 @@ For any interval $B = [b_{\min}, b_{\max}]$,  and sign~$s\in\{+, -\}$,
 
 \section{Experiments}
 
-Two common reasons for verification conditions to fail are (1) a bug in the program, (2) underlying
-assertions are not inductive. In the first case, the counter-model will typically be finite, since
-program executions modify finite memory. In the second case, the counter-model may be infinite.
-The workings of our method clearly solve the second case.
-However, even in the first case our method may improve upon methods such as MBQI, due to two reasons.
-First, the models produced by MBQI may be particularly difficult to read. Next, the run-time
-of MBQI increases with the size of the model.
-
-We have prepared a short test suite consisting of 28 small problems such as
+Our experiments will test the conjecture that the algorithm introduced in the previous two sections is able to improve upon current SMT solvers concerning the capability of showing formulas in the considered class to be satisfiable.
+% Two common reasons for verification conditions to fail are (1) a bug in the program, (2) underlying
+% assertions are not inductive. In the first case, the counter-model will typically be finite, since
+% program executions modify finite memory. In the second case, the counter-model may be infinite.
+% The workings of our method clearly solve the second case.
+% However, even in the first case our method may improve upon methods such as MBQI, due to two reasons.
+% First, the models produced by MBQI may be particularly difficult to read. Next, the run-time
+% of MBQI increases with the size of the model.
+We prepared a short test suite consisting of 28 small problems such as\todoSR{CFP:``executables of systems, and input data of experiments should be made available'' e.g., via a reference to a website}
 \begin{align}\label{eq:exp1}
 	f(4)=7 \;\land\; \forall x.\; (0 \le x \le 10^c \;\Rightarrow\; f(x+1)=f(x)+1),
 \end{align}
