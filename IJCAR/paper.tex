@@ -646,12 +646,12 @@ is satisfiable, then  $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\wedge 
     \bigl\{ f(I(\subst{t}{x}{\hat{z}})) \mid f(t)\in\mathcal{S}' \bigr\} & \text{if } z < b_{\min}.
     \end{cases}
     \]
-    Note that the maximality and minimality conditions ensure that for $z\not\in B$, $f\in\mathcal{F}$, $|\{ n \mid f(n)\in X_z\}|\leq 1$.
+    Note that the extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S})$ and $\Phi^-_{\text{ext}}(\mathcal{S}')$ ensure that for $z\not\in B$, $f\in\mathcal{F}$, $|\{ n \mid f(n)\in X_z\}|\leq 1$.
 
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
     \item For $z \in B$: In this case, $\subst{(x\not\in B \Rightarrow Q)}{x}{\hat{z}}$ is a tautology and the propagator is trivial.
-        \item For $z\not\in B$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$ values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
+        \item For $z\not\in B$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$, values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
     \end{itemize}
 \end{enumerate}
 It remains to verify the disjointness conditions of \cref{def:certificate}:
@@ -660,14 +660,24 @@ It remains to verify the disjointness conditions of \cref{def:certificate}:
     \item For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.    
     \item For $z > b_{\max}$, any element of $X_z$ has the form $f(I(\subst{t}{x}{\repr{z}}))$ with $f(t) \in \mathcal{S}$.
     \begin{itemize}
-    \item To prove that this element of $X_z$ cannot be in $\mathit{def}(I)$, let $f'(t')$ be an arbitrary, but fixed element of $\mathit{def}(I)$. We prove that $f'(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}}))$. If $f$ is a different function symbol than $f'$ this is certainly the case, and hence it suffices to prove
-      $f(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}})$, which makes it necessary to prove
-      $I(\subst{t'}{x}{\repr{z}}))\neq I(\subst{t}{x}{\repr{z}})$.
-      The clash condition $a\cmpsignstrict{\coeffsign{f}}\subst{t}{x}{\ivbound{B}{s}}$ in $\Psi^+(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:\todoSR{missing: $a\in \text{def}(I)$ but $a\not\in args(F,f)$}
+        \item To prove that this element of $X_z$ cannot be in $\mathit{def}(I)$, let $f'(t')$ be an arbitrary, but fixed element of $\mathit{def}(I)$. We prove that $f'(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}}))$. If $f$ is a different function symbol than $f'$ this is certainly the case, and hence it suffices to prove $f(I(\subst{t'}{x}{\repr{z}}))\neq f(I(\subst{t}{x}{\repr{z}})$, which makes it necessary to prove $I(\subst{t'}{x}{\repr{z}}))\neq I(\subst{t}{x}{\repr{z}})$. The $\mathit{def}(I)$ contains cells of two types:
+        \begin{enumerate}
+            \item Cells $f(I(a))$ for ground arguments $a \in args(F,f)$.
+            \item Cells $f(I(\subst{t_0}{x}{z_0}))$ for $z_0 \in B$ and $f(t_0)$ occurring in $Q$.
+        \end{enumerate}
+        
+        For type (1), the clash condition $a\cmpsignstrict{\coeffsign{f}+}\subst{t}{x}{\ivbound{B}{s}}$ in $\Psi^+(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:\todoSR{missing: $a\in \text{def}(I)$ but $a\not\in args(F,f)$}\todoSN{Done, type (2).}
         \[
-        I\models a\cmpsign{\coeffsign{f}}  \subst{t}{x}{\repr{b}_{\max}} \cmpsignstrict{\coeffsign{f}} \subst{t}{x}{\repr{z}},
+        I\models a\cmpsign{\coeffsign{f}+}  \subst{t}{x}{\repr{b}_{\max}} \cmpsignstrict{\coeffsign{f}+} \subst{t}{x}{\repr{z}},
         \]
-        where the strict inequality follows because $t$ is linear, and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$
+        where the strict inequality follows because $t$ is linear, and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$.
+        
+        For type (2), since $z_0 \leq b_{\max} < z$ and $t$ is extremal for $s=+$, we have:
+
+        \[
+        I\models \subst{t_0}{x}{\repr{z_0}}\cmpsign{\coeffsign{f}+}  \subst{t_0}{x}{\repr{b}_{\max}} \cmpsignstrict{\coeffsign{f}+} \subst{t}{x}{\repr{b}_{max}+1}\cmpsign{\coeffsign{f}+}\subst{t}{x}{\repr{z}},
+        \]      
+        and thus $I(\subst{t_0}{x}{z_0}) \neq I(\subst{t}{x}{z})$.
         
       \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
         $I(\subst{t'}{x}{\repr{z}'}))\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
