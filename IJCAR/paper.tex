@@ -360,14 +360,17 @@ We use the notion of certificate in the following sense~\cite{McConnell:11}: Giv
 \section{Satisfiability Certificates}
 \label{sec:certificate}
 
-In this section, we will define objects that certify that a formula of the form $F \land \forall \bar{x}.\; Q$ is satisfiable. We will assume that all uninterpreted function symbols have domain~$\domain$ and codomain~$\codomain$, with both having a canonical model of the same name. We also assume~$\domain$ to be countable. In the next section, we will then introduce an algorithm to compute such certificate in the case where both $\domain$ and $\codomain$ are the integers (more specifically, formulas from UFLIA), and under the additional restrictions described in the problem statement. Also in this section, we use the integers for illustration in all examples.
+In this section, we will define objects that certify that a formula of the form $F \land \forall \bar{x}.\; Q$ is satisfiable. We will assume that all uninterpreted function symbols have domain~$\domain$ and codomain~$\codomain$, with both having a canonical model of the same name. We also assume~$\domain$ to be countable. In the next section, we will then introduce an algorithm to compute such certificate in the case where both $\domain$ and $\codomain$ are the integers (more specifically, formulas from UFLIA), and under the additional restrictions described in the problem statement. Also, in this section, we use the integers for illustration in all examples.
 
 Traditionally, satisfiability of a logical formula is certified by an interpretation that assigns a value to each non-logical symbol in such way that the formula is true. However, the presence of uninterpreted function symbols with infinite domain opens up the question of how to represent such an interpretation.
 %integers is infinite. Due to this,  the interpretation of an uninterpreted function symbol with integer domain is a function that assigns values to the infinitely many integers that form this domain. This opens the question of how to represent such a function using a finite object that can be represented on computers.
 Our approach does not assign values to all elements of the infinite domain of uninterpreted function symbols in one step, but to each individual element of this domain separately:
 \begin{definition}[Cell]\label{def:cell}
 	A \emph{cell} is a term of the form $f(n_1,\dots, n_k)$ where $f$ is an uninterpreted function symbol and $n_1,\dots, n_k\in \domain$.
-      \end{definition}
+  \mj{sounds like we need to assume that for every $n\in\domain$, there exists
+  an interpreted constant $n$. Might be nitpicky, but I'd make it explicit if
+the domain is aribtrary (for $\mathbb{Z}$ it's kinda standard.}
+\end{definition}
       We denote the set of cells by $C(\domain)$. Examples of cells are $c$, and $f(7)$. The term $f(c+7)$ is not a cell.
 
 \begin{definition}[Cell Interpretation]
@@ -376,8 +379,11 @@ Our approach does not assign values to all elements of the infinite domain of un
 
 Given a cell interpretation $I$, we denote by $\mathit{def}(I)$ the set of cells for which $I$ is defined. Given a term $t$ and a cell interpretation $I$  we define $I(t):=\mathcal{I}(t)$, if  $\mathcal{I}(t)$ is unique for every interpretation $\mathcal{I}$ compatible with $I$, and otherwise $I(t):=\bot$.
 For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but $I(f(1))=\bot$. Also note that $I(f(1)-f(1))=0\neq\bot$. In a similar way, for a formula $\phi$, we define that a cell interpretation~$I$ satisfies $\phi$ iff for every interpretation $\mathcal{I}$ compatible with $I$, $\mathcal{I}$ satisfies $\phi$, in which case we also write $I\models \phi$.
+\mj{$a-a$ is 0 under a theory, but somehow theories are not mentioned here}
 
-In order to allow a computer representation of cell interpretations, we will always work with cell interpretations that are only defined on finitely many cells. However, we will want that at least those cells are defined, that allow us to check satisfaction of parts of formulas without quantifiers, and that for all universally quantified parts and instantiations of the universal quantifier, allow us to determine the value of all arguments of uninterpreted function symbols.
+In order to allow a computer representation of cell interpretations, we will always work with cell interpretations that are only defined on finitely many cells.
+% ORIGINAL: However, we will want that at least those cells are defined, that allow us to check satisfaction of parts of formulas without quantifiers, and that for all universally quantified parts and instantiations of the universal quantifier, allow us to determine the value of all arguments of uninterpreted function symbols.
+However, we require that enough cells are defined to (i)~check satisfaction of quantifier-free parts of formulas, and (ii)~determine the value of all arguments of uninterpreted function symbols for every universally quantified subformula and every instantiation of the universal quantifier.\mj{suggested rewrite, still bit too long}
 
 \begin{definition}
 	\label{def:pre-sat-cert}
@@ -392,6 +398,9 @@ In order to allow a computer representation of cell interpretations, we will alw
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
 Given a pre-satisfiability certificate, we can now certify the satisfiability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
+\mj{in SAT, unit propagation propagates unique, necessary values, which is not
+the case for $f(x)<f(x+1)$, maybe we want to stress that?}
+
 \begin{definition}
 	\label{def:certificate}
 	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate for $\phi$} is
