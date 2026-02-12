@@ -806,9 +806,9 @@ v_{\max}^f = \max\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
 v_{\min}^f = \min\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
 \]
 % where $t_0=\subst{t}{x}{0}$ for each $f(t)\in\mathcal{T}$.
-The extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S}^*)$ and $\Phi^-_{\text{ext}}(\mathcal{S}'^*)$ ensure that:
+The extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S}^*)$ and $\Phi^-_{\text{ext}}(\mathcal{S}'^*)$ ensure that
 \begin{itemize}
-    \item For all $f(t) \in \mathcal{S}^*$: $J(\subst{t}{x}{0}) = v_{\max}^f$,
+    \item For all $f(t) \in \mathcal{S}^*$: $J(\subst{t}{x}{0}) = v_{\max}^f$, and
     \item For all $f(t) \in \mathcal{S}'^*$: $J(\subst{t}{x}{0}) = v_{\min}^f$.
 \end{itemize}
 Now choose
@@ -819,7 +819,6 @@ Now choose
 b_{\min} &= \min\left\{\, \left\lfloor \frac{J(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\},
 \end{align*}
 \end{minipage}
-
 and set $B = [b_{\min}, b_{\max}]$. We verify that $J$ satisfies:
 \begin{enumerate}
     \item \textbf{Base formula}: $J \models F \land \bigwedge_{x \in B} Q[x]$, since $\mathcal{M} \models \phi$ and $J$ agrees with $\mathcal{M}$ on all relevant cells.
