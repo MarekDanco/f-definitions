@@ -372,7 +372,8 @@ Our approach does not assign values to all elements of the infinite domain of un
   an interpreted constant $n$. Might be nitpicky, but I'd make it explicit if
 the domain is aribtrary (for $\mathbb{Z}$ it's kinda standard.}
 \end{definition}
-      We denote the set of cells by $C(\domain)$. Examples of cells are $c$, and $f(7)$. The term $f(c+7)$ is not a cell.
+We denote the set of cells by $C(\domain)$.\marek{this means all cells that exist in the signature and also by plugging in all possible $n$-tuples from $\domain^n$?}
+Examples of cells are $c$, and $f(7)$. The term $f(c+7)$ is not a cell.
 
 \begin{definition}[Cell Interpretation]
 	A \emph{cell interpretation} is a partial function in $C(\domain)\rightharpoonup\codomain$. A cell interpretation $I$ is \emph{compatible} with an interpretation $\mathcal{I}$ iff $I$ and $\mathcal{I}$ agree on all cells where $I$ is defined.
@@ -392,6 +393,8 @@ However, we require that enough cells are defined to (i)~check satisfaction of q
 	\begin{itemize}
 		\item $I\models F$, and
 		\item for all $z\in\domain^{\numvar{\bar{x}}}$, for every uninterpreted function symbol~$f$ and its argument terms $t\in args(Q, f)$, $I(\subst{t}{\bar{x}}{\repr{z}})\neq\bot$
+			\marek{Is the domain of a cell interpretation really limited to be a set of cells?
+			Maybe this should be $I(\subst{f(t)}{\bar{x}}{\repr{z}})\neq\bot$. Do I understand correctly that we place no requirement on $t$ of the form $x + c$?}
 	\end{itemize}
 	a \emph{pre-satisfiability certificate} of $\phi$. For any $z\in\domain^{\numvar{\bar{x}}}$, we denote by $\Gamma_{I,z}(\phi)$
 	the resulting set of cells \[\{ f(I(\subst{t}{\bar{x}}{\repr{z}})) \mid t\in args(Q, f), f \emph{ is an uninterpreted function symbol}\}.\]
