@@ -27,6 +27,7 @@
 \newcommand{\qedhere}{$\blacksquare$}
 \newcommand{\numvar}[1]{|#1|}
 \newcommand{\domain}{\mathbb{D}}
+\newcommand{\codomain}{\mathbb{D}'}
 \newcommand{\cmpsign}[1]{\lesseqgtr^{#1}}
 \newcommand{\cmpsignstrict}[1]{\lessgtr^{#1}}
 \newcommand{\coeffsign}[1]{\sigma(#1)}
@@ -126,7 +127,7 @@ The combination of integer arithmetic, uninterpreted function symbols, and unive
 
 Current SMT solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
 
-In this paper, we address this problem for formulas containing universal quantifiers, linear integer arithmetic, and uninterpreted function symbols. Such formulas belong to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current SMT solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite, but large.
+In this paper, we address this problem for formulas containing universal quantifiers, linear integer arithmetic, and uninterpreted function symbols. Such formulas belong to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current SMT solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite yet large.
 
 In this paper, we explore an alternative approach that avoids explicit model construction by proving satisfiability using inductive arguments, instead. More specifically, we
 \begin{itemize}
@@ -223,7 +224,7 @@ Kunčak et al.~\cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation s
 
 
 \paragraph{Decision procedures for arrays and quantified formulas.}
-Bradley et al.~\cite{bradley-vmcai06} present a decision procedure for array properties but explicitly forbid arithmetic on the universally quantified variables. Habermehl et al.~\cite{habermehl-etaps08} allow constraints of the form $a[i+c]$ with difference bounds, but remain limited to offset-bounded indices. Alberti et al.~\cite{alberti2014decision} are restricted to flat formulas with one universally quantified variable. This excludes terms such as $a[i+1]$ that are the main focus of our paper. Elad et al.~\cite{elad2024infinite} prove decidability for a first‑order fragment without arithmetic, unable to express our constraints.
+Bradley et al.~\cite{bradley-vmcai06} present a decision procedure for array properties but explicitly forbid arithmetic on the universally quantified variables. Habermehl et al.~\cite{habermehl-etaps08} allow constraints of the form $a[i+c]$ with difference bounds, but remain limited to offset-bounded indices. Alberti et al.~\cite{alberti2014decision} are restricted to flat formulas with one universally quantified variable. This excludes terms such as $a[i+1]$, which are the main focus of our paper. Elad et al.~\cite{elad2024infinite} prove decidability for a first‑order fragment without arithmetic, unable to express our constraints.
 
 \paragraph{Model-based and instantiation methods.}
 Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model finding techniques for quantified formulas. Their method requires users to ensure admissibility and may introduce many case splits (``merge lemmas'') to satisfy cardinality constraints. Ge and de Moura~\cite{ge-cav09} introduce the Model-Based Quantifier Instantiation (MBQI) but noting that ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA refers to the logic of Habermehl et al.} will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.'' Our work attempts to  address this open question.
@@ -251,16 +252,16 @@ We introduce a method for certifying satisfiability of formulas of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall \bar{x}.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic, where $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables, and where the arguments of all uninterpreted function symbols do not contain any uninterpreted function symbols with non-zero arity (i.e., the arguments may only contain uninterpreted constants).  Based on this method, we will design an algorithm for detecting satisfiability under the following additional assumptions:
+where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic, where $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables, and where the arguments of all uninterpreted function symbols contain no uninterpreted function symbols of non-zero arity (i.e., the arguments may only contain uninterpreted constants).  Based on this method, we design an algorithm for detecting satisfiability under the following additional assumptions:
 \begin{itemize}
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
     \item All uninterpreted function symbols have maximal arity $1$.  
     \item The number of quantified variables is $1$.
-    \item The coefficient of the quantified variable is the same for all argument terms of the same uninterpreted function symbol in the quantified part~$Q$.\todoSR{I removed the restriction on the sign of the coefficient}
+    \item The coefficient of the quantified variable is uniform across all argument terms of any given uninterpreted function symbol in the quantified part~$Q$.
     \end{itemize}
 
-The algorithm is guaranteed to terminate under an additional semantic condition enabling induction (\cref{def:reqpivot-param}). We illustrate the class of formulas our algorithm can handle using two examples. 
+The algorithm is guaranteed to terminate under an additional semantic condition that enables induction (\cref{def:reqpivot-param}). We illustrate the class of formulas our algorithm can handle using two examples. 
 \begin{example}
   \label{ex:formula}
   \[f(0)=0 \wedge \forall x \,.\, f(-2x+3)=g(x)+f(-2x+c+1)-c,\]
@@ -273,8 +274,8 @@ The algorithm is guaranteed to terminate under an additional semantic condition 
 \end{example}
 
 Note that certain formulas with several quantified variables can be easily transformed to this class by a change of variables. For example, the formula
-\[f(0)=0 \wedge \forall y,z \,.\, f(2y-2z+3)=g(y-z)+f(2y-2z+c+1)-c,\]
-can be reduced to Example~\ref{ex:formula} by the change of variables $x=y-z$.
+\[f(0)=0 \wedge \forall y,z \,.\, f(2y-2z+3)=g(-y+z)+f(2y-2z+c+1)-c,\]
+can be reduced to Example~\ref{ex:formula} by the change of variables $x=-y+z$.
 
 We are not aware of any result showing the decidability of this class. However, we are also not aware of any result proving it to be undecidable. Indeed, our goal is not decidability classification, but an algorithm for showing satisfiability that allows straightforward implementation in SMT solvers, and that is efficient in practice.
 
@@ -350,28 +351,27 @@ As usual in an SMT context, we will work with a first-order language that is sor
 We will sometimes work with the signs from the set $\{+,-\}$, where
 for any two signs $s$ and $s'$, $ss'$ is $+$ iff $s=s'$, and $-$, otherwise. We will use such signs to switch between greater and less than relations in the way that for two integers~$z$ and $z'$, $z\cmpsignstrict{+} z'$ iff $z<z'$ and $z\cmpsignstrict{-} z'$ iff $z>z'$. For an interval $B=[b_{\min}, b_{\max}]$, we define $\ivbound{B}{-}= b_{\min}$, and $\ivbound{B}{+}= b_{\max}$.
 
-We will use the classical mathematical notion of a well-order. A well-order on a set $S$ is a total ordering on $S$
-such that every non-empty subset of $S$ has a least element. Any well-order allows well-founded induction; to prove
+We use the classical mathematical notion of a well-order. A well-order on a set $S$ is a total ordering on $S$
+such that every non-empty subset of $S$ has the least element. Any well-order allows well-founded induction; to prove
 a property $P$ holds for all $x$, it suffices to prove that for every $x\in S$, if for all $y\prec x$, $P(y)$ then also $P(x)$.
-
 
 We use the notion of certificate in the following sense~\cite{McConnell:11}: Given a property~$P(x)$ that is typically difficult to check, a certificate for this property is an object $\Pi$ for which we have a property $P'(x,\Pi)$ and a proof that $P'(x,\Pi)$ implies $P(x)$, and for which $P'(x,\Pi)$ is easier to check than $P(x)$. Here, we will not always insist on a precise meaning of the notion of being easy to check. However, the final goal is a certificate $\Pi$, for which $P'(x,\Pi)$ can be checked more efficiently than the original property $P(x)$, using an algorithm that is in some sense simpler then an algorithm for checking $P(x)$. As a consequence, such a certificate will enable an efficient independent check of the correctness of the result of an algorithm for checking~$P(x)$.
 
 \section{Satisfiability Certificates}
-\label{sec:certificate}\todoSR{The domain is now defined using a macro. It can be changed back to $\mathbb{Z}$ at any time.}
+\label{sec:certificate}
 
-In this section, we will define objects that certifies that a formula in the form defined in~\cref{sec:problem-statement} is satisfiable. In the next section, we will then introduce an algorithm to compute such certificates.
+In this section, we will define objects that certify that a formula of the form $F \land \forall \bar{x}.\; Q$ is satisfiable. We will assume that all uninterpreted function symbols have domain~$\domain$ and codomain~$\codomain$, with both having a canonical model of the same name. We also assume~$\domain$ to be countable. In the next section, we will then introduce an algorithm to compute such certificate in the case where both $\domain$ and $\codomain$ are the integers (more specifically, formulas from UFLIA), and under the additional restrictions described in the problem statement. Also in this section, we use the integers for illustration in all examples.
 
-Traditionally, satisfiability of a logical formula is certified by an interpretation that assigns a value to each non-logical symbol in such way that the formula is true. However, the set of integers is infinite. Due to this,  the interpretation of an uninterpreted function symbol with integer domain is a function that assigns values to the infinitely many integers that form this domain. This opens the question of how to represent such a function using a finite object that can be represented on computers.
-
-Our approach will not assign values to the whole infinite domain of uninterpreted function symbols in one step, but to each individual element of this domain:
+Traditionally, satisfiability of a logical formula is certified by an interpretation that assigns a value to each non-logical symbol in such way that the formula is true. However, the presence of uninterpreted function symbols with infinite domain opens up the question of how to represent such an interpretation.
+%integers is infinite. Due to this,  the interpretation of an uninterpreted function symbol with integer domain is a function that assigns values to the infinitely many integers that form this domain. This opens the question of how to represent such a function using a finite object that can be represented on computers.
+Our approach does not assign values to all elements of the infinite domain of uninterpreted function symbols in one step, but to each individual element of this domain separately:
 \begin{definition}[Cell]\label{def:cell}
-	A \emph{cell} is a term of the form $f(n_1,\dots, n_k)$ where $f$ is an uninterpreted function symbol and $n_1,\dots, n_k$ are integers.
-\end{definition}
-Examples of cells are $c$, and $f(7)$. The term $f(c+7)$ is not a cell.
+	A \emph{cell} is a term of the form $f(n_1,\dots, n_k)$ where $f$ is an uninterpreted function symbol and $n_1,\dots, n_k\in \domain$.
+      \end{definition}
+      We denote the set of cells by $C(\domain)$. Examples of cells are $c$, and $f(7)$. The term $f(c+7)$ is not a cell.
 
 \begin{definition}[Cell Interpretation]
-	A \emph{cell interpretation} is a partial function whose domain is the set of cells. A cell interpretation $I$ is \emph{compatible} with an interpretation $\mathcal{I}$ iff $I$ and $\mathcal{I}$ agree on all cells where $I$ is defined.
+	A \emph{cell interpretation} is a partial function in $C(\domain)\rightharpoonup\codomain$. A cell interpretation $I$ is \emph{compatible} with an interpretation $\mathcal{I}$ iff $I$ and $\mathcal{I}$ agree on all cells where $I$ is defined.
 \end{definition}
 
 Given a cell interpretation $I$, we denote by $\mathit{def}(I)$ the set of cells for which $I$ is defined. Given a term $t$ and a cell interpretation $I$  we define $I(t):=\mathcal{I}(t)$, if  $\mathcal{I}(t)$ is unique for every interpretation $\mathcal{I}$ compatible with $I$, and otherwise $I(t):=\bot$.
@@ -391,7 +391,7 @@ In order to allow a computer representation of cell interpretations, we will alw
 \end{definition}
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$, and $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
-Given a pre-satisfiability certificate, we can now certify the advisability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
+Given a pre-satisfiability certificate, we can now certify the satisfiability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
 \begin{definition}
 	\label{def:certificate}
 	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate for $\phi$} is
@@ -409,7 +409,7 @@ Given a pre-satisfiability certificate, we can now certify the advisability of f
 \end{definition}
 
 \begin{example}\label{ex:certificate-example}
-A satisfiability certificate for the formula \[f(3, a) \geq 4 + g(b) \wedge \forall x, y . f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b\] is 
+A satisfiability certificate for the formula \[f(3, a) \geq 4 + g(b) \wedge \forall x, y \:.\: f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b\] is 
 % \begin{itemize}
 %     \item pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(3,0) \mapsto 4, g(1) \mapsto 0 \}$
 %     \item order $\preceq$: $(3,0) \prec (3,1) \prec (3,2) \prec \cdots \prec (3,-1) \prec \cdots \prec \text{others}$
@@ -432,7 +432,7 @@ given by the pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(
     \[\small
     \begin{array}{|l|l|l|l|}\hline
       & X_{(x,y)} & propagators\\ \hline
-        x=3, y=0  & \{g(0)\} & g(0)\mapsto 5\\
+        x=3, y=0  & \{g(0)\} & g(0)\mapsto 2\\
         x=3,y=1,2,\dots & \{f(3,y), g(y+1)\} & g(y+1)\mapsto g(y)-2, f(x,y)\mapsto y+g(y)-1\\
         x=3, y=-1,-2,\dots &  \{f(3,y), g(y)\} & g(y)\mapsto g(y+1)+2, f(x,y)\mapsto y+g(y+1)+1 \\
        x\neq 3, y \text{ arbitrary}  &   \{f(x,y) \} & f(x,y)\mapsto y+g(y)-1\\ \hline
@@ -459,7 +459,7 @@ Also note that for $z\in\domain^{\numvar{\bar{x}}}$ such that $\Gamma_{I,z}(\phi
 	Now denote for every $z\in\domain^{\numvar{\bar{x}}}$ the cell interpretation  satisfying $\subst{Q}{\bar{x}}{\repr{z}}$ as constructed in the previous paragraph by $I_z$.
 	% From the well-order $\prec$ we get a corresponding well-order on these cell interpretations.
 	% Let $I_{\phi}$ be the cell interpretation that, for any cell $u$, assigns the value to $u$ that $I_{z}$ assigns to it for the smallest $z$ (wrt. $\prec$) that assigns a value to $u$. This smallest $z$ exists, since $\prec$ is a well-order. The cell interpretation $I_{\phi}$ satisfies $\phi$, and any classical interpretation compatible with the values assigned by $I_{\phi}$ satisfies $\phi$, as well.
-    Observe that for every cell~$u$, and for all~$z, z'\in \domain^{\numvar{\bar{x}}}$ with $I_z(u)\neq \bot$ and $I_{z'}(u)\neq \bot$, $I_z(u)=I_{z'}(u)$.      Let $I_\phi$ be the assignment that, for any cell $u$, if there is a $z$ such that $I_z(u)\neq \bot$, then $I_\phi(u)=I_z(u)$, and otherwise $I_\phi(u)=0$. Certainly $I_\phi\models F$. Moreover, for every $z\in\domain$,  $I_\phi\models  \subst{Q}{\bar{x}}{\repr{z}}$, since $I_\phi$ coincides with $I_z$ for all elements, where it is defined. Hence  $I_\phi\models \phi$.
+    Observe that for every cell~$u$, and for all~$z, z'\in \domain^{\numvar{\bar{x}}}$ with $I_z(u)\neq \bot$ and $I_{z'}(u)\neq \bot$, $I_z(u)=I_{z'}(u)$.      Let $I_\phi$ be the (classical) interpretation that, for any cell $u$, if there is a $z$ such that $I_z(u)\neq \bot$, then $I_\phi(u)=I_z(u)$, and otherwise $I_\phi(u)=0$. Certainly $I_\phi\models F$. Moreover, for every $z\in\domain$,  $I_\phi\models  \subst{Q}{\bar{x}}{\repr{z}}$, since $I_\phi$ coincides with $I_z$ for all elements, where it is defined. Hence  $I_\phi\models \phi$.
 \qedhere\end{proof}
 
 A satisfiability certificate only shows that a formula is satisfiable. It does not provide concrete values of the corresponding model. We now show how to compute such values from a given satisfiability certificate containing a pre-satisfiability certificate $I$. For this, we require the satisfiability propagators to be constructive. So, for $z\in\domain^{|x|}$ and for each $u\in X_z$ we assume a function $prop_{u,z}$ such that for
@@ -474,16 +474,16 @@ a cell interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \m
 
 Now, observe that for any cell $u$ there is at most one $z\in\domain^{\numvar{z}}$ with $u\in X_z$ (if there would be more than one then, due to $\preceq$ being a well-order, there is a minimal one, let us say $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any cell $u$, let $\mathit{inst}(u)$ either be the $z\in\domain^{\numvar{\bar{x}}}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
 
-Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenSat}, which satisfies a given formula~$\phi$, and a given cell~$u$, the value of $I_\phi(u)$ can be computed by the following recursive function $val(u)$:
+Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenSat}, which satisfies a given formula~$\phi$, and a given cell~$u$, the value of $I_\phi(u)$ can be computed by the following recursive function $val(u): C(\domain)\rightarrow \codomain$:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
 	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
-	\textbf{if} $\mathit{inst}(u)=\bot$ \textbf{then} \textbf{return} 0\\
+	\textbf{if} $\mathit{inst}(u)=\bot$ \textbf{then} \textbf{return} any element of $\domain$\\
 	\textbf{return} $prop_{u,\mathit{inst}(u)}(I\cup \{ v\mapsto val(v) \mid v\in \Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z\})$
 \end{tabbing}
 
 Here, the recursive calls go down the order $\prec$ in the following sense:
 \begin{property}
-	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any other cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, $\mathit{inst}(v)\prec \mathit{inst}(u)$.
+	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any other cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, we have $\mathit{inst}(v)\prec \mathit{inst}(u)$.
 \end{property}
 
 \testlength{
@@ -499,16 +499,16 @@ So each recursive call of the program $val$ either results in $\mathit{inst}(u)$
 The program $val$ terminates.
 \end{property}
 
-Note that, in general, it is not possible to compute $val(u)$ by computing the values of $X_z, z \in \domain^{\numvar{z}}$, with $z$ being initialized with the minimal $z$ wrt. $\prec$, and then using a loop that increases $z$ from one successor wrt. $\prec$ to the next. For example, if  $\prec$  orders all even numbers before all odd ones, then this loop would have to iterate over infinitely many even numbers before computing the value of an odd one.
+Note that, in general, it is not possible to compute $val(u)$ by computing the values of $X_z, z \in \domain^{\numvar{z}}$, with $z$ being initialized with the minimal $z$ wrt. $\prec$, and then using a loop that increases $z$ from one successor wrt. $\prec$ to the next. For example, if  $\prec$  orders all even integers before all odd ones, then this loop would have to iterate over infinitely many even numbers before computing the value of an odd one.
      
 
-The goal is now an algorithm that computes such satisfiability certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
+%The goal is now an algorithm that computes such satisfiability certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
 
 
 
 \section{Algorithm}\label{sec:alg}
 
-We will now proceed from the  general certification framework to concrete computation. Throughout this section we assume a formula $\phi$ of the form~$F \land \forall \bar{x}.\; Q$, but with the additional restrictions described in the problem statement (\cref{sec:problem-statement}). In particular, we will allow only one quantified variables~$x$. The restrictions also require all arguments of any uninterpreted function symbol $f$ in $Q$ to have the same coefficient, and we will denote the sign of this coefficient by $\coeffsign{f}$.
+We will now proceed from the  general certification framework to concrete computation. Throughout this section we assume a formula $\phi$ of the form~$F \land \forall \bar{x}.\; Q$, but with the additional restrictions described in the problem statement (\cref{sec:problem-statement}). In particular, we will allow only one quantified variable~$x$. The restrictions also require all arguments of any uninterpreted function symbol $f$ in $Q$ to have the same coefficient, and we will denote the sign of this coefficient by $\coeffsign{f}$.
 
 We will introduce an algorithm that checks satisfiability of $\phi$  by computing a satisfiability certificate of a certain form. 
 % While our certificate framework (~\cref{def:certificate}) supports formulas with arbitrary numbers of universally quantified variables, the algorithm presented here focuses on the case of a single universally quantified variable. We also assume that the coefficient of this variable in argument terms is non-negative, and that all non-zero coefficients of this variables are the same for the same uninterpreted function symbol.
@@ -617,7 +617,7 @@ Thus, for any sign $s\in\{-,+\}$ and subset $\mathcal{S}\subseteq\mathcal{T}$, $
 
 \begin{theorem}[Interval Satisfiability]
 \label{thm:interval-certificate-param}
-Let $\phi = F \land \forall x.\, Q$ and let $B$ be a non‑empty integer interval. Assume that
+Let $B$ be a non‑empty integer interval and assume that
 \[
   \Biggl(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\Biggr) \;\land\;
   \Biggl(\bigvee_{\mathcal{S}\subseteq \mathcal{T}}\Psi^+(B,\mathcal{S})\Biggr)\;\land\;
@@ -801,64 +801,63 @@ If the input formula~$\phi$ is satisfiable and it satisfies the \req condition, 
 
 \testlength{
 \begin{proof}
-Assume $\phi$ is satisfiable and satisfies \req for $(\mathcal{S}^*,\mathcal{S}'^*)$. 
-Let $\mathcal{M}$ be a model of $\phi$ and extract the corresponding cell interpretation $I^*$\todoSR{Why not work directly with $I$?}. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments. For each $f(t)\in\mathcal{F}$, define:
+  Assume $\phi$ is satisfiable and satisfies \req condition for $(\mathcal{S}^*,\mathcal{S}'^*)$. Let $J$ be an interpretation with $J\models\phi$. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments. For each $f(t)\in\mathcal{F}$, define:
 \[
-v_{\max}^f = \max\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
-v_{\min}^f = \min\{\, I^*(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
+v_{\max}^f = \max\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
+v_{\min}^f = \min\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
 \]
 % where $t_0=\subst{t}{x}{0}$ for each $f(t)\in\mathcal{T}$.
-The extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S}^*)$ and $\Phi^-_{\text{ext}}(\mathcal{S}'^*)$ ensure that:
+The extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S}^*)$ and $\Phi^-_{\text{ext}}(\mathcal{S}'^*)$ ensure that
 \begin{itemize}
-    \item For all $f(t) \in \mathcal{S}^*$: $I^*(\subst{t}{x}{0}) = v_{\max}^f$,
-    \item For all $f(t) \in \mathcal{S}'^*$: $I^*(\subst{t}{x}{0}) = v_{\min}^f$.
+    \item For all $f(t) \in \mathcal{S}^*$: $J(\subst{t}{x}{0}) = v_{\max}^f$, and
+    \item For all $f(t) \in \mathcal{S}'^*$: $J(\subst{t}{x}{0}) = v_{\min}^f$.
 \end{itemize}
-Now choose\todoSR{what if $c_f$ is negative?}
+Now choose
 \begin{minipage}{\linewidth-2cm}
 \vspace*{-0.5cm}  
 \begin{align*}
-  b_{\max} &= \max\left\{\, \left\lceil \frac{I^*(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}\\
-b_{\min} &= \min\left\{\, \left\lfloor \frac{I^*(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\},
+  b_{\max} &= \max\left\{\, \left\lceil \frac{J(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}\\
+b_{\min} &= \min\left\{\, \left\lfloor \frac{J(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\},
 \end{align*}
 \end{minipage}
-
-and set $B = [b_{\min}, b_{\max}]$. We verify that $I^*$ satisfies:
+and set $B = [b_{\min}, b_{\max}]$. We verify that $J$ satisfies:
 \begin{enumerate}
-    \item \textbf{Base formula}: $I^* \models F \land \bigwedge_{x \in B} Q[x]$ (since $\mathcal{M} \models \phi$).
+    \item \textbf{Base formula}: $J \models F \land \bigwedge_{x \in B} Q[x]$, since $\mathcal{M} \models \phi$ and $J$ agrees with $\mathcal{M}$ on all relevant cells.
     
     \item \textbf{Upward propagation condition}: 
     For the specific $\mathcal{S}^*$, we have:
     \begin{itemize}
         \item $\Phi_{\text{max}}^+(\mathcal{S}^*)$ holds by definition,
         \item $\Phi_{\text{prop}}(\mathcal{S}^*)$ holds by the \req condition,
-        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ By construction of $b_{\max}$ and since $I^*(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
+        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ By construction of $b_{\max}$ and since $J(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
         % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
         % \]
         \[
-        I^*(a) \cmpsign{\coeffsign{f}} c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{\hat{b}_{\max}})
-        \],
-        which is exactly the clash condition in $\Psi^+(B,\mathcal{S}^*)$..
+        J(a) \cmpsign{\coeffsign{f}+} c_f \cdot b_{\max} + v_{\max}^f = c_f \cdot b_{\max} + J(\subst{t}{x}{0}) = J(\subst{t}{x}{\hat{b}_{\max}}),
+        \]
+        which is exactly the clash condition in $\Psi^+(B,\mathcal{S}^*)$.
     \end{itemize}
-    Hence $I^* \models \Psi^+(B,\mathcal{S}^*)$.
+    Hence $J \models \Psi^+(B,\mathcal{S}^*)$.
     
     \item \textbf{Downward propagation condition}: 
     Similarly, for $\mathcal{S}'^*$ we have:
     \begin{itemize}
         \item $\Phi_{\text{max}}^+(\mathcal{S}'^*)$ holds,
-        \item $\Phi_{\text{prop}}(\mathcal{S}'^*)$ holds,
+        \item $\Phi_{\text{prop}}(\mathcal{S}'^*)$ holds by the \req condition,
         \item For each $f(t)\in\mathcal{S}'^{*}$ and $a \in \args(F,f)$:
         % \[
         % I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
         % \]
+        by construction of $b_{\min}$,
         \[
-        I^*(a)\cmpsign{-\coeffsign{f}}  c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + I^*(\subst{t}{x}{0}) = I^*(\subst{t}{x}{b_{\min}})
+        J(a)\cmpsign{\coeffsign{f}-}  c_f \cdot b_{\min} + v_{\min}^f = c_f \cdot b_{\min} + J(\subst{t}{x}{0}) = J(\subst{t}{x}{\repr{b}_{\min}}),
         \]
-        by construction of $b_{\min}$.
+        which is the clash condition in $\Psi^-(B,\mathcal{S}'^*)$.       
     \end{itemize}
-    Thus $I^* \models \Psi^-(B,\mathcal{S}'^*)$.
+    Thus $J \models \Psi^-(B,\mathcal{S}'^*)$.
 \end{enumerate}
 
-Therefore, $I^*$ satisfies
+Therefore, $J$ satisfies
 \[
 F \land \bigwedge_{x \in B} Q[x] \;\land\; \Psi^+(B,\mathcal{S}^*) \;\land\; \Psi^-(B,\mathcal{S}'^*),
 \]
@@ -868,7 +867,7 @@ Let $N = \max(|b_{\min}|, |b_{\max}|)$. \cref{alg:interval-check-param-withBigve
 \[
 F \land \bigwedge_{x=-N}^{N} Q[x] \;\land\; \bigvee_{\mathcal{S}}\Psi^+([-N,N],\mathcal{S}) \;\land\; \bigvee_{\mathcal{S}'}\Psi^-([-N,N],\mathcal{S}').
 \]
-Since $[-N, N]\supseteq B$ and $I^*$ satisfies all three conditions as shown above, this formula is also satisfiable (witnessed by $I^*$). Therefore, the algorithm returns \textsc{Sat}.
+Since $[-N, N]\supseteq B$, $J$ also satisfies this formula. Hence, the algorithm terminates with \textsc{Sat}.
 \qedhere\end{proof}}
 
 While proofs of unsatisfiability are not the main goal of this paper, \Cref{alg:interval-check-param-withBigvee} can also detect unsatisfiability, in some cases.
@@ -894,7 +893,7 @@ This formula is unsatisfiable in standard integer arithmetic (applying induction
 
 The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$. While theoretically elegant, these disjunctions lead to formulas exponentially growing with the size of the set $\mathcal{T}$, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
 
-Instead of enumerating all subset choices we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. For each term $f(t)\in\mathcal{T}$, we create:
+Instead of enumerating all possible subset choices, we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. For each term $f(t)\in\mathcal{T}$, we create:
 \begin{itemize}
     \item $p_{f(t)}$: true iff $f(t) \in \mathcal{S}$ (for propagation with $s=+$)
     \item $p'_{f(t)}$: true iff $f(t) \in \mathcal{S}'$ (for propagation with $s=-$)
@@ -972,7 +971,7 @@ Our experiments will test the conjecture that the algorithm introduced in the pr
 % However, even in the first case our method may improve upon methods such as MBQI, due to two reasons.
 % First, the models produced by MBQI may be particularly difficult to read. Next, the run-time
 % of MBQI increases with the size of the model.
-We prepared a test suite consisting of 29 problems\footnote{All the data for our experiments can be found at our public repository \\\url{https://github.com/MarekDanco/f-definitions}}
+We prepared a test suite consisting of 29 problems\footnote{All the data for our experiments are available at our public repository \\\url{https://github.com/MarekDanco/f-definitions}}
 such as
 \begin{equation}\label{eq:exp1}
   f(4)=7 \:\land\: \forall x.\: (0 \le x \le 10^c \:\Rightarrow\: f(x+1)=f(x)+1)
