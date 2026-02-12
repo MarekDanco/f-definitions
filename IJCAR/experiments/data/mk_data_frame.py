@@ -12,9 +12,6 @@ C_MAP = {
     "bench_2000_40000": "✱",
 }
 
-with open("good.txt") as f:
-    GOOD_BENCHMARKS = {line.strip() for line in f if line.strip()}
-
 
 def parse_tab(path, solver, c):
     rows = []
@@ -28,9 +25,6 @@ def parse_tab(path, solver, c):
             time_part = parts[1]
             status_part = parts[2]
             benchmark = Path(bench_path).stem
-
-            if benchmark not in GOOD_BENCHMARKS:
-                continue
 
             time_tokens = time_part.split()
             time_s = int(time_tokens[0])
@@ -60,64 +54,66 @@ for folder, c in C_MAP.items():
         rows.extend(parse_tab(tab_file, solver, c))
 
 df = pd.DataFrame(rows)
-# Create a numeric mapping for plotting
-c_to_numeric = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, "✱": 6}
-df["c_numeric"] = df["c"].map(c_to_numeric)
-
-solved = df[df["status"] == "sat"].groupby(["c", "solver"]).size().unstack(fill_value=0)
-
-# Create numeric index for plotting
-solved_numeric = (
-    df[df["status"] == "sat"]
-    .assign(c_numeric=df["c_numeric"])
-    .groupby(["c_numeric", "solver"])
-    .size()
-    .unstack(fill_value=0)
-)
-
-fig, ax = plt.subplots()
-for solver in solved_numeric.columns:
-    marker = "^" if solver == "cvc5" else "o"
-    ax.plot(
-        solved_numeric.index,
-        solved_numeric[solver],
-        marker=marker,
-        linestyle="-",
-        label=solver,
-    )
-ax.legend(title=None)
-plt.xlabel("c")
-plt.ylabel("Number of problems solved")
-
-# Set custom tick labels
-tick_positions = sorted(c_to_numeric.values())
-tick_labels = [k for k, v in sorted(c_to_numeric.items(), key=lambda x: x[1])]
-plt.xticks(tick_positions, tick_labels)
-
-plt.tight_layout()
-plt.savefig("scaling_plot.png", dpi=300, bbox_inches="tight")
-plt.close()
-
-TIMEOUT = 1800
-fig, axes = plt.subplots(1, 2, figsize=(9, 3), sharey=True)
-cs = sorted(df[df["c"].isin([2, 3])]["c"].unique())
-for ax, c in zip(axes, cs):
-    sub = df[(df["c"] == c) & (df["solver"] == "cvc5")]
-    solved = sub[sub["status"] == "sat"]["time_s"]
-    times = np.sort(solved.values)
-    x = np.arange(1, len(times) + 1)
-    ax.plot(
-        x,
-        times,
-        marker="^",
-        markersize=4,
-        linewidth=1.5,
-    )
-    ax.set_title(f"c = {c}")
-    ax.set_xlabel("Number of problems solved")
-    ax.set_yscale("symlog", linthresh=0.1)
-    ax.set_ylim(0, TIMEOUT)
-axes[0].set_ylabel("Runtime (s)")
-plt.tight_layout()
-plt.savefig("cactus_plot.png", dpi=300)
-plt.close()
+pd.set_option('display.max_rows', None)
+print(df[df["c"] == "✱"])
+# # Create a numeric mapping for plotting
+# c_to_numeric = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, "✱": 6}
+# df["c_numeric"] = df["c"].map(c_to_numeric)
+#
+# solved = df[df["status"] == "sat"].groupby(["c", "solver"]).size().unstack(fill_value=0)
+#
+# # Create numeric index for plotting
+# solved_numeric = (
+#     df[df["status"] == "sat"]
+#     .assign(c_numeric=df["c_numeric"])
+#     .groupby(["c_numeric", "solver"])
+#     .size()
+#     .unstack(fill_value=0)
+# )
+#
+# fig, ax = plt.subplots()
+# for solver in solved_numeric.columns:
+#     marker = "^" if solver == "cvc5" else "o"
+#     ax.plot(
+#         solved_numeric.index,
+#         solved_numeric[solver],
+#         marker=marker,
+#         linestyle="-",
+#         label=solver,
+#     )
+# ax.legend(title=None)
+# plt.xlabel("c")
+# plt.ylabel("Number of problems solved")
+#
+# # Set custom tick labels
+# tick_positions = sorted(c_to_numeric.values())
+# tick_labels = [k for k, v in sorted(c_to_numeric.items(), key=lambda x: x[1])]
+# plt.xticks(tick_positions, tick_labels)
+#
+# plt.tight_layout()
+# plt.savefig("scaling_plot.png", dpi=300, bbox_inches="tight")
+# plt.close()
+#
+# TIMEOUT = 1800
+# fig, axes = plt.subplots(1, 2, figsize=(9, 3), sharey=True)
+# cs = sorted(df[df["c"].isin([2, 3])]["c"].unique())
+# for ax, c in zip(axes, cs):
+#     sub = df[(df["c"] == c) & (df["solver"] == "cvc5")]
+#     solved = sub[sub["status"] == "sat"]["time_s"]
+#     times = np.sort(solved.values)
+#     x = np.arange(1, len(times) + 1)
+#     ax.plot(
+#         x,
+#         times,
+#         marker="^",
+#         markersize=4,
+#         linewidth=1.5,
+#     )
+#     ax.set_title(f"c = {c}")
+#     ax.set_xlabel("Number of problems solved")
+#     ax.set_yscale("symlog", linthresh=0.1)
+#     ax.set_ylim(0, TIMEOUT)
+# axes[0].set_ylabel("Runtime (s)")
+# plt.tight_layout()
+# plt.savefig("cactus_plot.png", dpi=300)
+# plt.close()
