@@ -258,9 +258,8 @@ where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of 
     \item The number of quantified variables is $1$.
     \item The coefficient of the quantified variable is the same for all argument terms of the same uninterpreted function symbol in the quantified part~$Q$.\todoSR{I removed the restriction on the sign of the coefficient}
     \end{itemize}
-The algorithm is guaranteed to terminate under an additional semantic condition enabling induction (\cref{def:reqpivot-param}).
 
-We illustrate the class of formulas our algorithm can handle using two examples. 
+The algorithm is guaranteed to terminate under an additional semantic condition enabling induction (\cref{def:reqpivot-param}). We illustrate the class of formulas our algorithm can handle using two examples. 
 \begin{example}
   \label{ex:formula}
   \[f(0)=0 \wedge \forall x \,.\, f(-2x+3)=g(x)+f(-2x+c+1)-c,\]
