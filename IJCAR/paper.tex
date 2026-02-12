@@ -720,7 +720,7 @@ Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\
 % \end{itemize}
 % Therefore all non‑propagated cells needed for the propagator at $z$ are already defined, and the propagator can assign values to $X_z$ without circularity. A symmetric argument (without extra constraints) applies to $z < b_{\min}$, because those instantiations occur \emph{after} all $z > b_{\max}$ in $\preceq$, and hence may safely use cells assigned during upward propagation.
 
-% Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
+Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
 \qedhere\end{proof}
 
 The formula in the premise of \cref{thm:interval-certificate-param} belongs to the language of Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the cell interpretation necessary for showing $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}$ to be satisfiable, and the sets $\mathcal{S}$ and $\mathcal{S}'$.
