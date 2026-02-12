@@ -950,7 +950,7 @@ For any interval $B = [b_{\min}, b_{\max}]$,  and sign~$s\in\{+, -\}$,
 
 \section{Experiments}
 
-Our experiments will test the conjecture that the algorithm introduced in the previous two sections is able to improve upon current SMT solvers concerning the capability of showing formulas in the considered class to be satisfiable.
+Our experiments will test the conjecture that the algorithm introduced in the previous two sections is able to improve upon state-of-the-art SMT solvers concerning the capability of showing formulas in the considered class to be satisfiable.
 % Two common reasons for verification conditions to fail are (1) a bug in the program, (2) underlying
 % assertions are not inductive. In the first case, the counter-model will typically be finite, since
 % program executions modify finite memory. In the second case, the counter-model may be infinite.
@@ -958,22 +958,24 @@ Our experiments will test the conjecture that the algorithm introduced in the pr
 % However, even in the first case our method may improve upon methods such as MBQI, due to two reasons.
 % First, the models produced by MBQI may be particularly difficult to read. Next, the run-time
 % of MBQI increases with the size of the model.
-We prepared a short test suite consisting of 28 small problems such as\todoSR{CFP:``executables of systems, and input data of experiments should be made available'' e.g., via a reference to a website}
-\begin{align}\label{eq:exp1}
-	f(4)=7 \;\land\; \forall x.\; (0 \le x \le 10^c \;\Rightarrow\; f(x+1)=f(x)+1),
-\end{align}
-where we tested how well the state of the art \textsc{smt} solvers \textsc{z3} and
-\textsc{cvc5}---with model based quantifier instantiation~\cite{ge-cav09} explicitly turned on---scale with increasing positive $c$. On this example,
+We prepared a test suite consisting of 28 problems such as\todoSR{CFP:``executables of systems, and input data of experiments should be made available'' e.g., via a reference to a website}
+\begin{equation}\label{eq:exp1}
+  f(4)=7 \:\land\: \forall x.\: (0 \le x \le 10^c \:\Rightarrow\: f(x+1)=f(x)+1)
+\end{equation}  
+or
+\begin{equation}\label{eq:exp2}
+ d > 1\:\land\: f(0)=0 \:\land\: g(2) > f(d+1) \land\forall x \:.\: f(x-1)=f(x)+g(x)+g(x+d). 
+\end{equation}
+For each problem, we also used bounded versions of the form $F\wedge \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$, with $c\in \{1,\dots,5\}$.
+
+We implemented our algorithms in the language Python, using the SMT solver \textsc{z3}\todoSR{correct?} for all satisfiability checks. We also studied the capabilities of the \textsc{smt} solvers \textsc{z3} and
+\textsc{cvc5}---with model based quantifier instantiation~\cite{ge-cav09} explicitly turned on---to directly solve the example.
+
+Here, our algorithm terminates right after ensuring that \req holds for the interval $[0,\, 3]$.
+
+On this example,
 our algorithm has to check just that for all values of $f(x)$, there exists a value of $f(x+1)$
 such that the equality holds. It suffices to consider the interval $[0,\, 4]$.
-
-Another problem in our set is
-\begin{align}\label{eq:exp2}
-	F       & = (d > 1)\;\land\; f(0)=0 \;\land\; g(2) > f(d+1)             \notag \\
-	Q(x)    & = (0 \le x \le 10^c \;\Rightarrow\; f(x-1)=f(x)+g(x)+g(x+d))  \notag \\
-	\varphi & = F \;\land\; \forall x.\; Q(x)
-\end{align}
-Here, our algorithm terminates right after ensuring that \req holds for the interval $[0,\, 3]$.
 
 We ran our experiments with a 30-minute time limit.
 When setting $c = 1$, the state of the art \textsc{smt} solvers terminate on our
