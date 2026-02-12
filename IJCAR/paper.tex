@@ -677,7 +677,7 @@ It remains to verify the disjointness conditions of \cref{def:certificate}:
         \[
         I\models \subst{t_0}{x}{\repr{z_0}}\cmpsign{\coeffsign{f}+}  \subst{t_0}{x}{\repr{b}_{\max}} \cmpsignstrict{\coeffsign{f}+} \subst{t}{x}{\repr{b}_{max}+1}\cmpsign{\coeffsign{f}+}\subst{t}{x}{\repr{z}},
         \]      
-        and thus $I(\subst{t_0}{x}{z_0}) \neq I(\subst{t}{x}{z})$.
+        and thus $I(\subst{t_0}{x}{\repr{z_0}}) \neq I(\subst{t}{x}{\repr{z}})$.
         
       \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
         $I(\subst{t'}{x}{\repr{z}'}))\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
