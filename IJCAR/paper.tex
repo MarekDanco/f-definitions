@@ -350,7 +350,9 @@ As usual in an SMT context, we will work with a first-order language that is sor
 We will sometimes work with the signs from the set $\{+,-\}$, where
 for any two signs $s$ and $s'$, $ss'$ is $+$ iff $s=s'$, and $-$, otherwise. We will use such signs to switch between greater and less than relations in the way that for two integers~$z$ and $z'$, $z\cmpsignstrict{+} z'$ iff $z<z'$ and $z\cmpsignstrict{-} z'$ iff $z>z'$. For an interval $B=[b_{\min}, b_{\max}]$, we define $\ivbound{B}{-}= b_{\min}$, and $\ivbound{B}{+}= b_{\max}$.
 
-We will use the classical mathematical notion of a well-order. A well-order on a set $S$ is a total ordering on $S$ such that every non-empty subset of $S$ has a least element. Any well-order allows well-founded induction: For a  proving that a property $P$ holds for all $x$, it suffices to prove that for every $x\in S$, if for all $y\prec x$, $P(y)$ then also $P(x)$.
+We will use the classical mathematical notion of a well-order. A well-order on a set $S$ is a total ordering on $S$
+such that every non-empty subset of $S$ has a least element. Any well-order allows well-founded induction; to prove
+a property $P$ holds for all $x$, it suffices to prove that for every $x\in S$, if for all $y\prec x$, $P(y)$ then also $P(x)$.
 
 
 We use the notion of certificate in the following sense~\cite{McConnell:11}: Given a property~$P(x)$ that is typically difficult to check, a certificate for this property is an object $\Pi$ for which we have a property $P'(x,\Pi)$ and a proof that $P'(x,\Pi)$ implies $P(x)$, and for which $P'(x,\Pi)$ is easier to check than $P(x)$. Here, we will not always insist on a precise meaning of the notion of being easy to check. However, the final goal is a certificate $\Pi$, for which $P'(x,\Pi)$ can be checked more efficiently than the original property $P(x)$, using an algorithm that is in some sense simpler then an algorithm for checking $P(x)$. As a consequence, such a certificate will enable an efficient independent check of the correctness of the result of an algorithm for checking~$P(x)$.
