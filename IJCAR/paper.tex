@@ -473,10 +473,10 @@ a cell interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \m
 
 Now, observe that for any cell $u$ there is at most one $z\in\domain^{\numvar{z}}$ with $u\in X_z$ (if there would be more than one then, due to $\preceq$ being a well-order, there is a minimal one, let us say $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any cell $u$, let $\mathit{inst}(u)$ either be the $z\in\domain^{\numvar{\bar{x}}}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
 
-Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenSat}, which satisfies a given formula~$\phi$, and a given cell~$u$, the value of $I_\phi(u)$ can be computed by the following recursive function $val(u)$:
+Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenSat}, which satisfies a given formula~$\phi$, and a given cell~$u$, the value of $I_\phi(u)$ can be computed by the following recursive function $val(u): C(\domain)\rightarrow \codomain$:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
 	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
-	\textbf{if} $\mathit{inst}(u)=\bot$ \textbf{then} \textbf{return} 0\\
+	\textbf{if} $\mathit{inst}(u)=\bot$ \textbf{then} \textbf{return} any element of $\domain$\\
 	\textbf{return} $prop_{u,\mathit{inst}(u)}(I\cup \{ v\mapsto val(v) \mid v\in \Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z\})$
 \end{tabbing}
 
@@ -498,7 +498,7 @@ So each recursive call of the program $val$ either results in $\mathit{inst}(u)$
 The program $val$ terminates.
 \end{property}
 
-Note that, in general, it is not possible to compute $val(u)$ by computing the values of $X_z, z \in \domain^{\numvar{z}}$, with $z$ being initialized with the minimal $z$ wrt. $\prec$, and then using a loop that increases $z$ from one successor wrt. $\prec$ to the next. For example, if  $\prec$  orders all even numbers before all odd ones, then this loop would have to iterate over infinitely many even numbers before computing the value of an odd one.
+Note that, in general, it is not possible to compute $val(u)$ by computing the values of $X_z, z \in \domain^{\numvar{z}}$, with $z$ being initialized with the minimal $z$ wrt. $\prec$, and then using a loop that increases $z$ from one successor wrt. $\prec$ to the next. For example, if  $\prec$  orders all even integers before all odd ones, then this loop would have to iterate over infinitely many even numbers before computing the value of an odd one.
      
 
 The goal is now an algorithm that computes such satisfiability certificates and a converse of the property that shows for certain classes of satisfiable  formulas this algorithm succeeds.
