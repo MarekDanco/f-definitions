@@ -676,12 +676,12 @@ For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.  For
     \begin{itemize}
     \item To prove that this element of $X_z$ cannot be in $\mathit{def}(I)$, let $f'(n)$ be an arbitrary, but fixed element of $\mathit{def}(I)$ with non-zero arity. We prove that $f'(n)\neq f(I(\subst{t}{x}{\repr{z}}))$. If $f$ is a different function symbol than $f'$ this is certainly the case, and hence it suffices to prove $f(n)\neq f(I(\subst{t}{x}{\repr{z}})$, which makes it necessary to prove $I(n)\neq I(\subst{t}{x}{\repr{z}})$. Due to the construction of the cell interpretation~$I$, $n=I(a)$, with $a\in args(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}, f)$.
       \begin{itemize}
-      \item       If $a\in args(F, f)$, the clash condition $a\cmpsignstrict{\coeffsign{f}+}\subst{t}{x}{\ivbound{B}{s}}$ in $\Psi^+(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:
+      \item       If $a\in args(F, f)$, the clash condition $a\cmpsignstrict{\coeffsign{f}s}\subst{t}{x}{\ivbound{B}{s}}$ in $\Psi^+(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:
         \[
         I\models a\cmpsign{\coeffsign{f}+}  \subst{t}{x}{\repr{b}_{\max}} \cmpsignstrict{\coeffsign{f}+} \subst{t}{x}{\repr{z}},
         \]
         where the strict inequality follows because $t$ is linear, and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$.
-      \item If  $a\not\in args(F, f)$, then there is a $z_B\in B$ such that $a\in args(Q[x\leftarrow \hat{z}_B],f)$.   Now, since $z_B\leq \repr{b}_{\max}<z$,  again  $I\models a\cmpsign{\coeffsign{f}+}  \subst{t}{x}{\repr{b}_{\max}}$, and  $I(a)\neq I(\subst{t}{x}{\repr{z}})$.
+      \item If  $a\not\in args(F, f)$, then there is a $z_B\in B$ such that $a\in args(Q[x\leftarrow \hat{z}_B],f)$.   Now, since $z_B\leq b_{\max}<z$,  again  $I\models a\cmpsign{\coeffsign{f}+}  \subst{t}{x}{\repr{b}_{\max}}$, and  $I(a)\neq I(\subst{t}{x}{\repr{z}})$.
       \end{itemize}
 
         
