@@ -1,4 +1,4 @@
-\documentclass{llncs}
+\documentclass[runningheads]{llncs}
 \usepackage[textwidth=3cm,tickmarkheight=3pt]{todonotes}
 \usepackage[utf8]{inputenc}
 \usepackage{amssymb, amsmath}
@@ -14,7 +14,11 @@
 ,citecolor=citeblue%
 ,urlcolor=blue%
 ,plainpages=false]{hyperref}
-\hypersetup{colorlinks,citecolor=blue,linkcolor=blue,urlcolor=blue}
+% If you use the hyperref package, please uncomment the following two lines
+% to display URLs in blue roman font according to Springer's eBook style:
+\usepackage{color}
+\renewcommand\UrlFont{\color{blue}\rmfamily}
+\urlstyle{rm}
 \AtBeginDocument{\hypersetup{pdfborder={0 0 1}}}
 \usepackage[nameinlink,capitalize,noabbrev]{cleveref} % must come after hyperref
 \usepackage{commath}
@@ -101,8 +105,8 @@
 % \author{Stefan Ratschan \and Anggha Nugraha \and Mikoláš Janota \and Marek Dančo}
 \author{Stefan Ratschan\inst{1}\orcidlink{0000-0003-1710-1513} \and
 Anggha Nugraha\inst{1,2}\orcidlink{0000-0002-7139-4487} \and
-Mikoláš Janota\inst{3}\orcidlink{0000-0003-3487-784X} \and 
-Marek Dančo\inst{3}\orcidlink{0009-0008-3031-113X}}
+Mikol\'s\v{c} Janota\inst{3}\orcidlink{0000-0003-3487-784X} \and 
+Marek Dan\v{c}o\inst{3}\orcidlink{0009-0008-3031-113X}}
 %
 \authorrunning{S. Ratschan et al.}
 % First names are abbreviated in the running head.
@@ -194,18 +198,34 @@ In this paper, we explore an alternative approach that avoids explicit model con
 
 \section{Related Work}\todoSR{potentially relevant PC members: Reynolds, Barrett, Tinelli, Weidenbach, anybody else?}
 
-Our work intersects several areas of automated reasoning: synthesis, decision procedures for arrays, and model-based quantifier instantiation.
+Our work intersects several areas of automated reasoning: synthesis, decision
+procedures for arrays, and model-based quantifier instantiation.
 
-\paragraph{Recursion.}
-\cite{Farzan2021}
-\cite{Kneuss2013}
+\paragraph{Synthesis.}
+\emph{(Program) synthesis} has been studied extensively. Techniques typically rely on
+enumeration of candidates, such as counterexample-guided approaches
+(CEGIS~\cite{cegis}), where some support recursion~\cite{Farzan2021,Kneuss2013}.
+Syntax-Guided Synthesis (SyGuS)~\cite{sygus} provides a unifying framework:
+given a context-free grammar and a logical specification, find a conforming
+expression. Its performance depends crucially on the chosen grammar. SyGuS has
+been extensively studied in the context of
+SMT~\cite{reynolds-fmsd19,abate-jar23,ReynoldsBLT20}.
+Model finding can be phrased as a synthesis problem~\cite{ParsertBJK23}.
 
-\paragraph{Synthesis approaches.}
-Syntax-Guided Synthesis (SyGuS)~\cite{cvc5} enumerates candidate functions from a grammar. Hence its performance depends crucially on the chosen grammar. Moreover, it synthesizes functions in an explicit representation, disallowing recursion\todoSR{right?}. Our method does beyond that, using inductive reasoning.
-Kunčak et al.~\cite{kuncak-pldi10,kuncak-sttt13} introduces single-invocation synthesis. Hozzová et al.~\cite{hozzova-ijcar24} synthesize recursive programs from constraints.\todoSR{Do we want to keep these references? If yes, we need a better description. Do we want to add our CADE paper as a template based approach?}
+Synthesis has also been tackled by providing \emph{templates} for the objects to
+be synthesized, which has also been used in the context of model
+finding~\cite{BrownJO24,elad2024infinite,BrownCJOR25}. 
 
-
-
+Extended study was also carried out for specifications that observe the
+\emph{single-invocation property}, which means that the function to be
+synthesized is always applied to the same exact list of arguments. This means
+that, effectively, the function can be deskolemized and quantifier elimination
+procedures can be adapted to  decide the
+witness~\cite{kuncak-pldi10,kuncak-sttt13,hozzova-fmcad25}.  In this context,
+Hozzová et al.~\cite{hozzova-ijcar24} synthesize recursive functions from proofs
+with induction. Our approach works also outside of the single-invocation
+fragment, e.g.\
+$\forall x.\,f(x)+f(x)>x$ is deskolemizable but $\forall x.\,f(x)+f(x+1)>1$ is not.
 
 
 % While powerful for template-matching problems, it fails on formulas requiring non-template solutions like periodic functions (Equation~\ref{eq:periodic}). 
@@ -1060,7 +1080,7 @@ Improving the algorithm on cases similar to this one is a subject of future work
 
 We have presented a method for certifying satisfiability of formulas with universal quantifiers and uninterpreted function symbols, and a corresponding algorithm for a specific class of formulas in the SMTLIB theory UFLIA. By relying on induction, the method is able to succeed for formulas that do not have a finite model, and for formulas that are satisfiable only by functions that do not have a closed form representation. In addition to current syntactic restrictions, the introduced algorithm is restricted to satisfying the semantic $\req$ condition that enables induction. In future work, we intend to weaken this restriction, for example, using stronger forms of induction. Our long term vision is a general algorithm that is parametric in the used base theory and that only depends on a predicate defining the order in which to apply induction.
 
-\bibliographystyle{abbrv}
+\bibliographystyle{splncs04}
 \bibliography{refs}
 
 \appendix
