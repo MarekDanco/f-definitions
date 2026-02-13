@@ -1024,6 +1024,8 @@ and
 \end{equation}
 To simplify implementation, we used versions that have an additional guard to restrict the range of the universally quantified variable to the naturals instead of the integers. The resulting formulas are of the form $F\land (\forall x \:.\: 0\leq x \Rightarrow Q)$. To study solver behavior over increasing model size, we also used versions where the guard restricts the range to a finite interval with upper bound $10^c$, with  $c\in \{1,\dots,5\}$. The resulting formulas are of the form  $F\land \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$.
 
+Apart from the upper bound $10^c$, our problems do not contain big integers, which would make a smarter initialization of the interval~$[b_{\min},b_{\max}]$ necessary in order to avoid a large number of loop iterations.\todoSR{I added a disclaimer about large integers already here. The issue is more subtle than this, but a discussion of this would probably lead too far.}
+
 We implemented our algorithm using the \textsc{z3} Python API. Our implementation only checks upward induction using~$\Psi^+$, but leaves out downward induction, which is sound due to the guard described in the previous paragraph. We also applied the \textsc{smt} solvers \textsc{z3} and
 \textsc{cvc5} directly to our problems, explicitly turning on model based quantifier instantiation~\cite{ge-cav09}.
 
@@ -1063,15 +1065,17 @@ on all but 5 problems, which get solved immediately.
 	\label{fig:cactus}
 \end{figure}}
 
+
+
 %Note that our algorithm proves the satisfiability of these problems promptly. Only a few LIA calls are needed to prove the \req condition.
-However, our algorithm struggles on
-problems such as
-\begin{align*}
-	f(10000)>0 \;\land \;\forall x. \;f(x+1) = f(x)+1
-\end{align*}
-The clash condition requires $10000 \leq b_{\max} + 1$, therefore
-forcing 10000 expansions of the interval in \cref{alg:interval-check-param-withBigvee}.
-Improving the algorithm on cases similar to this one is a subject of future work.
+% However, our algorithm struggles on
+% problems such as
+% \begin{align*}
+% 	f(10000)>0 \;\land \;\forall x. \;f(x+1) = f(x)+1
+% \end{align*}
+% The clash condition requires $10000 \leq b_{\max} + 1$, therefore
+% forcing 10000 expansions of the interval in \cref{alg:interval-check-param-withBigvee}.
+% Improving the algorithm on cases similar to this one is a subject of future work.
 
 
 \section{Conclusion}\todoSR{rewritten, please have a look}
