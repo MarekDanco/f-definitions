@@ -903,11 +903,8 @@ This formula is unsatisfiable in standard integer arithmetic (applying induction
 
 The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$. While theoretically elegant, these disjunctions lead to formulas exponentially growing with the size of the set $\mathcal{T}$, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
 
-Instead of enumerating all possible subset choices, we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. For each term $f(t)\in\mathcal{T}$, we create:
-\begin{itemize}
-    \item $p_{f(t)}$: true iff $f(t) \in \mathcal{S}$ (for propagation with $s=+$)
-    \item $p'_{f(t)}$: true iff $f(t) \in \mathcal{S}'$ (for propagation with $s=-$)
-\end{itemize}
+Instead of enumerating all possible subset choices, we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. Reducing our presentation to just one of the two cases, for each term $f(t)\in\mathcal{T}$, we create a propositional variable 
+$p_{f(t)}$ that is true iff $f(t) \in \mathcal{S}$.
 
 We then encode the extremal conditions $\Phi^s_{\text{ext}}$, the propagability condition $\Phi_{\text{prop}}$, and the clash conditions using these variables, yielding a compact representation of $\Psi^{s,\text{e}}(B)$ for each sign $s$.
 
@@ -953,11 +950,11 @@ where:
 
 Note that if for some $f\in\mathcal{{F}}$ the ground parts of its argument terms (obtained by substituting $x=0$) are pairwise different, then at most one $p_{f(t)}$ can be true in any satisfying assignment of $\Psi^{s,\text{e}}(B)$. This follows from the extremal condition, which would otherwise require two distinct ground terms to be equal.
 
-\begin{lemma}[Encoding Correctness]
+\begin{property}[Encoding Correctness]
 \label{lem:encoding-correctness}
 For any interval $B = [b_{\min}, b_{\max}]$,  and sign~$s\in\{+, -\}$, 
  $\Psi^{s,\text{e}}(B)$ is satisfiable iff there exists $\mathcal{S}\subseteq\mathcal{T}$ such that $\Psi^{s}(B,\mathcal{S})$ holds.
-\end{lemma}
+\end{property}
 
 % \begin{proof}
 %     ($\Rightarrow$) Suppose $\Psi_\text{up}^\text{e}(B)$ is satisfiable by an assignment $I$. Define $\mathcal{S} = \{f(t) \mid I(s_{f(t)}) = \text{true}\}$. By $\Phi_{\text{max}}^\text{e}$, for each function $f$, all $f(t) \in \mathcal{S}$ have equal ground parts under $I$, and they are strictly greater than those of any $f(t') \in \mathcal{T} \setminus \mathcal{S}$ with the same $f$. Since all terms have the same coefficient of $x$, this implies $\Phi_{\text{max}}(\mathcal{S})$ holds. By $\Phi_{\text{prop}}^\text{e}$, all $f(t) \in \mathcal{S}$ are equal to $v_{f(t)}$, satisfying the substitution in $\Phi_{\text{prop}}(\mathcal{S})$. Finally, $\text{ClashUpEnc}$ ensures the clash condition $a \leq \subst{t}{x}{b_{\max}}$ for all $f(t) \in \mathcal{S}$. Hence $\Psi_{\text{up}}(B,\mathcal{S})$ holds.
