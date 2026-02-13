@@ -1030,7 +1030,7 @@ Thus all certificate requirements are satisfied. By \cref{thm:certThenSat}, $\ph
 \qedhere
 
 \section*{Proof of \cref{thm:completeness-bigvee}:}
-\testlength{
+
 \begin{proof}
   Assume $\phi$ is satisfiable and satisfies \req condition for $(\mathcal{S}^*,\mathcal{S}'^*)$. Let $J$ be an interpretation with $J\models\phi$. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments, and define:
 \[
@@ -1099,7 +1099,7 @@ Let $N = \max(|b_{\min}|, |b_{\max}|)$. \cref{alg:interval-check-param-withBigve
 F \land \bigwedge_{x=-N}^{N} Q[x] \;\land\; \bigvee_{\mathcal{S}}\Psi^+([-N,N],\mathcal{S}) \;\land\; \bigvee_{\mathcal{S}'}\Psi^-([-N,N],\mathcal{S}').
 \]
 Since $[-N, N]\supseteq B$, $J$ also satisfies this formula. Hence, the algorithm terminates with \textsc{Sat}.
-\qedhere\end{proof}}
+\qedhere\end{proof}
 
 
 \end{document}
