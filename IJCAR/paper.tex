@@ -394,7 +394,7 @@ However, we require that enough cells are defined to (i)~check satisfaction of q
 		\item $I\models F$, and
 		\item for all $z\in\domain^{\numvar{\bar{x}}}$, for every uninterpreted function symbol~$f$ and its argument terms $t\in args(Q, f)$, $I(\subst{t}{\bar{x}}{\repr{z}})\neq\bot$
 			\marek{Is the domain of a cell interpretation really limited to be a set of cells?
-			Maybe this should be $I(\subst{f(t)}{\bar{x}}{\repr{z}})\neq\bot$. Do I understand correctly that we place no requirement on $t$ of the form $x + c$?}
+			Maybe this should be $I(\subst{f(t)}{\bar{x}}{\repr{z}})\neq\bot$. Do I understand correctly that we place no requirement on $t$ of the form $x + c$?}\todoSN{Hmm I think the domain of $I$ is indeed a set of cells (Def 2). However, we extend $I$ to evaluate arbitrary ground terms via the unique compatible interpretation mentioned after Def 2.}
 	\end{itemize}
 	a \emph{pre-satisfiability certificate} of $\phi$. For any $z\in\domain^{\numvar{\bar{x}}}$, we denote by $\Gamma_{I,z}(\phi)$
 	the resulting set of cells \[\{ f(I(\subst{t}{\bar{x}}{\repr{z}})) \mid t\in args(Q, f), f \emph{ is an uninterpreted function symbol}\}.\]
