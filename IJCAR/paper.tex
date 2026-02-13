@@ -33,7 +33,7 @@
 \newcommand{\coeffsign}[1]{\sigma(#1)}
 \newcommand{\ivbound}[2]{\text{bd}(#1,#2)}
 
-% \newcommand{\testlength}[1]{}
+%\newcommand{\testlength}[1]{}
 \newcommand{\testlength}[1]{#1}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
@@ -119,7 +119,7 @@ Czech Institute of Informatics, Robotics and Cybernetics, Czech Technical Univer
 \maketitle
 
 \begin{abstract}
-The combination of integer arithmetic, uninterpreted function symbols, and universal quantification occurs in many applications of automated reasoning, for example, due to its ability to reason about arrays. However, the satisfiability of such formulas is, in general, undecidable. In practice, SMT solvers are often successful in the unsatisfiable case, using heuristics. However, in the satisfiable case, they rely on  explicit model construction, which fails for formulas whose smallest model is not small enough. We introduce an alternative approach that certifies satisfiability using induction arguments, and provide an algorithm that is able to prove satisfiability of formulas that are out of reach of current SMT solvers. 
+  The combination of integer arithmetic, uninterpreted function symbols, and universal quantification occurs in many applications of automated reasoning, for example, due to its ability to reason about arrays. However, the satisfiability of such formulas is, in general, undecidable. In practice, SMT solvers are often successful in the unsatisfiable case, using heuristics. However, in the satisfiable case, they rely on  explicit model construction, which fails for formulas whose smallest model is not small enough. We introduce an alternative approach that certifies satisfiability using induction arguments, and apply it to the case of linear integer arithmetic. The resulting algorithm is able to prove satisfiability of formulas that are out of reach for current SMT solvers. 
 
 %\keywords{First keyword  \and Second keyword \and Another keyword.}
 \end{abstract}
@@ -129,7 +129,7 @@ The combination of integer arithmetic, uninterpreted function symbols, and unive
 
 Current SMT solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
 
-In this paper, we address this problem for formulas containing universal quantifiers, linear integer arithmetic, and uninterpreted function symbols. Such formulas belong to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current SMT solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite yet large.
+In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols. We mainly concentrate on the combination with linear arithmetic, which corresponds to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current SMT solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite yet large.
 
 In this paper, we explore an alternative approach that avoids explicit model construction by proving satisfiability using inductive arguments, instead. More specifically, we
 \begin{itemize}
