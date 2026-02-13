@@ -250,8 +250,8 @@ These examples demonstrate the need for a method that handles arithmetic offsets
 \label{sec:problem-statement}
 
 % \paragraph{Formula Class}
-We introduce a method for certifying satisfiability of SMT formulas with uninterpreted function symbols ranging over a countable canonical domain, typically coming from the 
-SMTLIB theory UFLIA that combines uninterpreted function symbols with linear integer arithmetic. The formulas we consider are
+We introduce a method for certifying satisfiability of SMT formulas with uninterpreted function symbols whose domain is a sort associated with a theory that has countable canonical model.\todoSR{I am not sure whether my usage of SMT terminology is OK} In the case where this base theory is linear integer arithmetic, the resulting formulas belong to the 
+SMTLIB theory UFLIA. The formulas we consider are
 of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall \bar{x}.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
@@ -367,7 +367,7 @@ We use the notion of certificate in the following sense~\cite{McConnell:11}: Giv
 \label{sec:certificate}
 
 In this section, we will define objects that certify that a formula of the form $F \land \forall \bar{x}.\; Q$ is satisfiable. We will assume that all uninterpreted function symbols have domain~$\domain$ and codomain~$\codomain$, with both having a canonical model of the same name.
-We also assume that $\domain$ is countable and that for every element $z\in\domain$ there is a corresponding interpreted constant $\repr{z}$ in the language that denotes~$z$. In the next section, we will then introduce an algorithm to compute such a certificate in the case where both $\domain$ and $\codomain$ are the integers (more specifically, formulas from UFLIA), and under the additional restrictions described in the problem statement. Also in the present section, we use the integers for illustration in all examples.
+We also assume that $\domain$ is countable and that for every element $z\in\domain$ there is a corresponding interpreted constant $\repr{z}$ in the language that denotes~$z$. In the next section, we will then introduce an algorithm to compute such certificate in the case where both $\domain$ and $\codomain$ are the integers (more specifically, formulas from UFLIA), and under the additional restrictions described in the problem statement. Also in the present section, we use the integers for illustration in all examples. We will use all semantic notions (e.g., the symbol $\models$) relative to the underlying theory, which is the combination of uninterpreted function symbols, $\domain$ and $\codomain$, in general, and UFLIA, for all examples.\todoSR{I added this sentence to make the dependence on a theory explicit. Please check for correct usage of terminology}
 
 Traditionally, satisfiability of a logical formula is certified by an interpretation that assigns a value to each non-logical symbol in such a way that the formula is true. However, the presence of uninterpreted function symbols with infinite domain opens up the question of how to represent such an interpretation.
 %integers is infinite. Due to this,  the interpretation of an uninterpreted function symbol with integer domain is a function that assigns values to the infinitely many integers that form this domain. This opens the question of how to represent such a function using a finite object that can be represented on computers.
@@ -384,7 +384,6 @@ Examples of cells are $c$ and $f(7)$. The term $f(c+7)$ is not a cell.
 
 Given a cell interpretation $I$, we denote by $\mathit{def}(I)$ the set of cells for which $I$ is defined. Given a term $t$ and a cell interpretation $I$  we define $I(t):=\mathcal{I}(t)$, if  $\mathcal{I}(t)$ is unique for every interpretation $\mathcal{I}$ compatible with $I$, and otherwise $I(t):=\bot$.
 For example, for $I=\{ f(0) \mapsto 7 \}$, $I(f(0))=7$, but $I(f(1))=\bot$. Also note that $I(f(1)-f(1))=0\neq\bot$. In a similar way, for a formula $\phi$, we define that a cell interpretation~$I$ satisfies $\phi$ iff for every interpretation $\mathcal{I}$ compatible with $I$, $\mathcal{I}$ satisfies $\phi$, in which case we also write $I\models \phi$.
-\mj{$a-a$ is 0 under a theory, but somehow theories are not mentioned here}
 
 In order to allow a computer representation of cell interpretations, we will always work with cell interpretations that are only defined on finitely many cells.
 % ORIGINAL: However, we will want that at least those cells are defined, that allow us to check satisfaction of parts of formulas without quantifiers, and that for all universally quantified parts and instantiations of the universal quantifier, allow us to determine the value of all arguments of uninterpreted function symbols.
