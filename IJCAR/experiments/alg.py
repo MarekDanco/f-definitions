@@ -61,10 +61,6 @@ def reqpivot_case(bl, b):
 
 def reqpivot(b):
     return list(map(lambda t: reqpivot_case(t, b), get_bitvectors(len(flatten(p)))))
-    # res = list(map(lambda t: reqpivot_case(t, b), get_bitvectors(len(flatten(p)))))
-    # for r in res:
-    #     print(r)
-    # return res
 
 
 def reqpivot_2(b):  # old implementation of special case
