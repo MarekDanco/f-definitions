@@ -233,7 +233,7 @@ else:
             for f in funcs:
                 print(f)
                 formula.print_func_interp(f, model, bmax, consts)
-            cvc5_sygus = process_formula(b, p, model)
+            cvc5_sygus = process_formula(b, p, model, consts)
             print("otherwise defined recursively as:")
             for synth in cvc5_sygus:
                 print(f"    {synth}")
