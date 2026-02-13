@@ -1039,7 +1039,7 @@ forcing 10000 expansions of the interval in \cref{alg:interval-check-param-withB
 Improving the algorithm on cases similar to this one is a subject of future work.
 
 
-\section{Conclusion}
+\section{Conclusion}\todoSR{rewritten, please have a look}
 \label{sec:conclusion}
 
 We have presented a method for certifying satisfiability of formulas with universal quantifiers and uninterpreted function symbols, and a corresponding algorithm for a specific class of formulas in the SMTLIB theory UFLIA. By relying on induction, the method is able to succeed for formulas that do not have a finite model, and for formulas that are satisfiable only by functions that do not have a closed form representation. In addition to current syntactic restrictions, the introduced algorithm is restricted to satisfying the semantic $\req$ condition that enables induction. In future work, we intend to weaken this restriction, for example, using stronger forms of induction. Our long term vision is a general algorithm that is parametric in the used base theory and that only depends on a predicate defining the order in which to apply induction.
