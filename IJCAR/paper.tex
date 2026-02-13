@@ -37,7 +37,7 @@
 \newcommand{\coeffsign}[1]{\sigma(#1)}
 \newcommand{\ivbound}[2]{\text{bd}(#1,#2)}
 
-%\newcommand{\testlength}[1]{}
+% \newcommand{\testlength}[1]{}
 \newcommand{\testlength}[1]{#1}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
@@ -559,7 +559,7 @@ For any choice of subsets $\mathcal{S}\subseteq\mathcal{T}$ and signs $s\in\{ -,
   \[
         \subst{ \bigwedge_{f\in\mathcal{F}}\left(\bigwedge_{f(t),f(t') \in \mathcal{S}} t = t' \;\land\;
         \bigwedge_{f(t) \in \mathcal{S}, f(t') \in \mathcal{T}\setminus\mathcal{S}} t' \cmpsignstrict{\coeffsign{f}s} t
-        \right)}{x}{0}.
+        \right)}{x}{\repr{0}}.
     \]
     
     \item \textbf{Propagability condition $\Phi_{\text{prop}}(\mathcal{S})$:}
@@ -769,7 +769,7 @@ where:
         \subst{
         \bigwedge_{f \in \mathcal{F}}\ \bigwedge_{\substack{f(t),\, f(t') \in \mathcal{T}}}
         \Bigl( (p^s_{f(t)} \land p^s_{f(t')}) \Rightarrow t = t' \;\land\; 
-        (p^s_{f(t)} \land \neg p^s_{f(t')}) \Rightarrow t' \;\cmpsignstrict{\coeffsign{f}s}\; t \Bigr)}{x}{0}
+        (p^s_{f(t)} \land \neg p^s_{f(t')}) \Rightarrow t' \;\cmpsignstrict{\coeffsign{f}s}\; t \Bigr)}{x}{\repr{0}}
     \end{align*}
    
     \item Propagation encoding $\Phi_{\text{prop}}^{\text{e}}$:%
