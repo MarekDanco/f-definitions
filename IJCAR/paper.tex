@@ -666,8 +666,8 @@ is satisfiable. Then  $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\wedge 
 
     \item \textbf{Satisfiability propagators:}
     \begin{itemize}
-    \item For $z \in B$: In this case, $\subst{(x\not\in B \Rightarrow Q)}{x}{\hat{z}}$ is a tautology and the propagator is trivial.
-        \item For $z\not\in B$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$, values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
+        \item For $z \in B$: In this case, $\subst{(x\not\in B \Rightarrow Q)}{x}{\hat{z}}$ is a tautology and the propagator is trivial.
+        \item For $z\not\in B$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ (if $z > b_{\max}$) or $\Phi_{\text{prop}}(\mathcal{S}')$ (if $z < b_{\min}$) provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$, values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
     \end{itemize}
 \end{enumerate}
 It remains to verify the disjointness conditions of \cref{def:certificate}:
