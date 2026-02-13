@@ -249,12 +249,16 @@ These examples demonstrate the need for a method that handles arithmetic offsets
 \section{Problem Statement}
 \label{sec:problem-statement}
 
-%\paragraph{Formula Class}
-We introduce a method for certifying satisfiability of formulas of the form
+% \paragraph{Formula Class}
+We introduce a method for certifying satisfiability of SMT formulas with uninterpreted function symbols ranging over a countable canonical domain, typically coming from the 
+SMTLIB theory UFLIA that combines uninterpreted function symbols with linear integer arithmetic. The formulas we consider are
+of the form
 \begin{equation}\label{eq:main-fragment}
     F \land \forall \bar{x}.\; Q%\bigl(f_1(x+t^{f_1}_1),\dots,f_1(x+t^{f_1}_{l_1}),\;\dots,\;f_r(x+t^{f_r}_1),\dots,f_r(x+t^{f_r}_{l_r})\bigr),
 \end{equation}
-where $F$  and $Q$ are quantifier‑free formulas in the SMTLIB theory UFLIA of uninterpreted function symbols and linear integer arithmetic, where $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables, and where the arguments of all uninterpreted function symbols contain no uninterpreted function symbols of non-zero arity (i.e., the arguments may only contain uninterpreted constants).  Based on this method, we design an algorithm for detecting satisfiability under the following additional assumptions:
+where $F$ and $Q$ are quantifier‑free,  $\forall \bar{x}$ stands for universal quantification of arbitrarily many variables, and where  the arguments of all uninterpreted function symbols contain no uninterpreted function symbols of non-zero arity (i.e., the arguments may only contain uninterpreted constants).  
+
+Based on the general method for satisfiability certification, we will design an algorithm for detecting satisfiability in UFLIA, under the following additional assumptions:
 \begin{itemize}
 %    \item $f_1,\dots,f_r$ are distinct uninterpreted function symbols,
 %    \item for each $f_i$, the \emph{offset terms} $t^{f_i}_1,\dots,t^{f_i}_{l_i}$ are pairwise distinct LIA ground terms, and
