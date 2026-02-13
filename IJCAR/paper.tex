@@ -484,9 +484,9 @@ The notion of certificate defined here is abstract in the sense that it does not
 
 Also note that for $z\in\domain^{\numvar{\bar{x}}}$ such that $\Gamma_{I,z}(\phi)\subseteq \mathit{def}(I)$, the definition requires the set of propagated cells $X_z$ to be empty. As a consequence, for such $z$, the satisfiability propagator only needs to certify that $I\models \subst{Q}{\bar{x}}{\repr{z}}$. In other words, the cell interpretation~$I$ serving as a pre-satisfiability certificate already plays the role of the satisfiability propagator. 
 
-\begin{property}\label{prop:certThenSat}
+\begin{theorem}\label{thm:certThenSat}
 	Every formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$ that has a satisfiability certificate is satisfiable.
-\end{property}
+\end{theorem}
 
 \begin{proof}
 	Assume a formula of the given form and assume that it  has a satisfiability certificate.
@@ -513,7 +513,7 @@ a cell interpretation $I'$ with $\mathit{def}(I')=\Gamma_{I,z}(\phi)\setminus \m
 
 Observe that for any cell $u$ there is at most one $z\in\domain^{\numvar{\bar{x}}}$ with $u\in X_z$ (if there were two distinct instantiations, then since $\preceq$ is a well-order, there is a minimal one, call it $z_{\min}$, and then, for any $z'\succ z$, the requirements on $X_{z'}$ exclude the possibility of $X_{z'}$ containing $u$, as well). So for any cell $u$, let $\mathit{inst}(u)$ either be the $z\in\domain^{\numvar{\bar{x}}}$ with $u\in X_z$ or $\bot$ if there is no such instantiation.
 
-Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenSat}, which satisfies a given formula~$\phi$, and a given cell~$u$, the value of $I_\phi(u)$ can be computed by the following recursive function $val(u): C(\domain)\rightarrow \codomain$:
+Then, for the assignment $I_\phi$ from the proof of Theorem~\ref{thm:certThenSat}, which satisfies a given formula~$\phi$, and a given cell~$u$, the value of $I_\phi(u)$ can be computed by the following recursive function $val(u): C(\domain)\rightarrow \codomain$:
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
 	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
 	\textbf{if} $\mathit{inst}(u)=\bot$ \textbf{then} \textbf{return} any element of $\domain$\\
@@ -522,16 +522,9 @@ Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenS
 
 Here, the recursive calls go down the order $\prec$ in the following sense:
 \begin{property}
+  \label{prop:recmonot}
 	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any other cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_{\mathit{inst}(u)}$ with $\mathit{inst}(v)\neq\bot$, we have $\mathit{inst}(v)\prec \mathit{inst}(u)$.
 \end{property}
-
-\testlength{
-\begin{proof}
-  Assume a cell $u$ with $\mathit{inst}(u)\neq\bot$, a  cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, and assume that $\mathit{inst}(v)\succeq \mathit{inst}(u)$. Then both $v\in X_{\mathit{inst}(v)}$ and $v \in \Gamma_{I,\mathit{inst}(u)}(\phi)$, and hence $X_{\mathit{inst}(v)}\cap \Gamma_{I,\mathit{inst}(u)}(\phi)\neq\emptyset$. 
-%  Then $u\in X_{\mathit{inst}(u)}\subseteq \Gamma_{I,\mathit{inst}(u)}$ and $v\in X_{\mathit{inst}(v)}$.
-  This contradicts the requirement that $X_{inst(v)}\cap \mathit{def}(I)=\emptyset$ and $X_{inst(v)}\cap\bigcup_{z'\prec inst(v)} \Gamma_{I,z'}(\phi))=\emptyset$.
-  \qedhere
-\end{proof}}
 
 So each recursive call of the program $val$ either results in $\mathit{inst}(u)$ decreasing or being $\bot$. In the latter case, the program terminates immediately, and the former case cannot happen infinitely often, since the used order is well-founded. So we have:
 \begin{property}
@@ -665,96 +658,8 @@ Let $B$ be a non‑empty integer interval and assume that
 is satisfiable. Then  $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}\wedge \forall x\;.\; x\not\in B \Rightarrow Q$ has a satisfiability certificate, and hence $\phi$ is satisfiable.
 \end{theorem}
 
-\testlength{
-\begin{proof}
-  Suppose the conjunction is satisfiable, let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi^+(B,\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi^-(B,\mathcal{S}')$. Assume that  $B = [b_{\min}, b_{\max}]$. We construct a certificate as in \cref{def:certificate}:
 
-\begin{enumerate}
-    \item \textbf{Pre‑satisfiability certificate:} Define the cell interpretation~$I$ as follows:
-      \begin{itemize}
-        \item For every uninterpreted constant $c$ in $\phi$, set $I(c)=I^*(c)$.
-        \item For every $a\in args(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}, f)$,  where $f$ is an uninterpreted function symbol, $I(f(I^*(a)))=I^*(f)(I^{*}(a))$
-    \end{itemize}
-    By construction, $I$ is finite and satisfies $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}$ because $I^*$ satisfies that formula and $I$ agrees with $I^*$ on all relevant cells.
-       
-    \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
-    \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
-    
-  \item \textbf{Propagated cells $X_z$ for $z \in \mathbb{Z}$:}
-    \[
-    X_z = 
-    \begin{cases}
-    \emptyset & \text{if } z \in B, \\[4pt]
-    \bigl\{ f(I(\subst{t}{x}{\hat{z}})) \mid f(t)\in\mathcal{S} \bigr\} & \text{if } z > b_{\max}, \\[4pt]
-    \bigl\{ f(I(\subst{t}{x}{\hat{z}})) \mid f(t)\in\mathcal{S}' \bigr\} & \text{if } z < b_{\min}.
-    \end{cases}
-    \]
-    Note that the extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S})$ and $\Phi^-_{\text{ext}}(\mathcal{S}')$ ensure that for $z\not\in B$, $f\in\mathcal{F}$, $|\{ n \mid f(n)\in X_z\}|\leq 1$.
 
-    \item \textbf{Satisfiability propagators:}
-    \begin{itemize}
-        \item For $z \in B$: In this case, $\subst{(x\not\in B \Rightarrow Q)}{x}{\hat{z}}$ is a tautology and the propagator is trivial.
-        \item For $z\not\in B$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ (if $z > b_{\max}$) or $\Phi_{\text{prop}}(\mathcal{S}')$ (if $z < b_{\min}$) provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$, values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
-    \end{itemize}
-\end{enumerate}
-It remains to verify the disjointness conditions of \cref{def:certificate}:
-\[X_z\cap \mathit{def}(I)=\emptyset \text{ and } X_z\cap\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi)=\emptyset.\]
-For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.  For $z > b_{\max}$, any element of $X_z$ has the form $f(I(\subst{t}{x}{\repr{z}}))$ with $f(t) \in \mathcal{S}$.
-    \begin{itemize}
-    \item To prove that this element of $X_z$ cannot be in $\mathit{def}(I)$, let $f'(n)$ be an arbitrary, but fixed element of $\mathit{def}(I)$ with non-zero arity. We prove that $f'(n)\neq f(I(\subst{t}{x}{\repr{z}}))$. If $f$ is a different function symbol than $f'$ this is certainly the case, and hence it suffices to prove $f(n)\neq f(I(\subst{t}{x}{\repr{z}}))$, which makes it necessary to prove $I(n)\neq I(\subst{t}{x}{\repr{z}})$. Due to the construction of the cell interpretation~$I$, $n=I(a)$, with $a\in args(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}, f)$.
-      \begin{itemize}
-      \item       If $a\in args(F, f)$, the clash condition $a\cmpsignstrict{\coeffsign{f}s}\subst{t}{x}{\ivbound{B}{s}}$ in $\Psi^+(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:
-        \[
-        I\models a\cmpsign{\coeffsign{f}+}  \subst{t}{x}{\repr{b}_{\max}} \cmpsignstrict{\coeffsign{f}+} \subst{t}{x}{\repr{z}},
-        \]
-        where the strict inequality follows because $t$ is linear, and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$.
-      \item If  $a\not\in args(F, f)$, then there is a $z_B\in B$ such that $a\in args(Q[x\leftarrow \hat{z}_B],f)$.   Now, since $z_B\leq b_{\max}<z$,  again  $I\models a\cmpsign{\coeffsign{f}+}  \subst{t}{x}{\repr{b}_{\max}}$, and  $I(a)\neq I(\subst{t}{x}{\repr{z}})$.
-      \end{itemize}
-
-        
-      \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
-        $I(\subst{t'}{x}{\repr{z}'})\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
-        \[
-          I\models \subst{t'}{x}{\hat{z}'}\cmpsignstrict{\coeffsign{f}+} \subst{t'}{x}{\hat{z}}.
-        \]
-        Moreover, $\Phi^{+}_{\text{ext}}(\mathcal{S})$ ensures 
-                \[
-          I\models \subst{t'}{x}{\hat{z}}\cmpsignstrict{\coeffsign{f}+}\subst{t}{x}{\hat{z}}.
-        \]
-Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\repr{z}})$, which implies that the two sides of the inequality cannot be the same.
-    %     \begin{itemize}
-    %         \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
-    %         \[
-    %         I\models\subst{t'}{x}{z'} \leq \subst{t'}{x}{\repr{b}_{\max}} < \subst{t}{x}{\repr{z}},
-    %         \]
-    %         since $t$ is maximal among terms of $f$ in $\mathcal{T}$ by $\Phi_{\text{max}}(\mathcal{S})$ and $z > b_{\max}$.
-            
-    %         \item If $b_{\max} < z' < z$: Then 
-    %         \[
-    %         I(\subst{t'}{x}{z'}) \leq \max_{f(t'') \in \mathcal{T} \text{ with same } f} I(\subst{t''}{x}{z'}) < I(\subst{t}{x}{\repr{z}})
-    %         \]
-    %         since $t$ is maximal and $z' < z$.
-    %     \end{itemize}        
-    \end{itemize}
-
-  The case $z < b_{\min}$ is symmetric, using $\Psi^-(B,\mathcal{S}')$. Note that the fact that the upward propagation block of elements greater than $b_{\max}$ occurs before the downward propagation block of elements less than $b_{\min}$ in the order $\preceq$ does not create a problem, since  propagation is still restricted to cells not occurring before.
-% Finally, we must ensure that the \textbf{satisfiability propagators} can be applied inductively along $\preceq$.  
-% For $z > b_{\max}$, the propagator $\Phi_{\text{prop}}(\mathcal{S})$ requires values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$.  
-% Let $f(t') \in \mathcal{T}\setminus\mathcal{S}$ be such a non‑propagated term. Its corresponding cell is $f(I(\subst{t'}{x}{\repr{z}}))$.  
-% By the last conjunct in $\Psi^+(B,\mathcal{S})$, we have $I \models \subst{t'}{x}{z} \geq b_{\min}$.  
-% Thus $I(\subst{t'}{x}{\repr{z}})$ is either in $B$ (if $\leq b_{\max}$) or satisfies $I(\subst{t'}{x}{\repr{z}}) > b_{\max}$.  
-
-% In the well‑order $\preceq$, all indices $w$ with $w > b_{\max}$ appear \emph{before} any $w < b_{\min}$.  
-% Hence $f(I(\subst{t'}{x}{\repr{z}}))$ has already been assigned when processing $z$:
-% \begin{itemize}
-%     \item If $I(\subst{t'}{x}{\repr{z}}) \in B$, the cell is defined in the base assignment $I$.
-%     \item If $I(\subst{t'}{x}{\repr{z}}) > b_{\max}$, it is a propagated cell from some earlier $z' < z$ (since $t'$ has the same coefficient of $x$ as $t$, and $I(\subst{t'}{x}{\repr{z}}) < I(\subst{t}{x}{\repr{z}})$ by maximality).
-% \end{itemize}
-% Therefore all non‑propagated cells needed for the propagator at $z$ are already defined, and the propagator can assign values to $X_z$ without circularity. A symmetric argument (without extra constraints) applies to $z < b_{\min}$, because those instantiations occur \emph{after} all $z > b_{\max}$ in $\preceq$, and hence may safely use cells assigned during upward propagation.
-
-Thus all certificate requirements are satisfied. By Property \ref{prop:certThenSat}, $\phi$ is satisfiable.
-\qedhere\end{proof}
-}
 
 The formula in the premise of \cref{thm:interval-certificate-param} belongs to the language of Presburger arithmetic (i.e., SMTLIB LIA), and hence its satisfiability can be algorithmically checked. Due to this, an interval $[b_{\min},b_{\max}]$ such that this formula is satisfiable is an algorithmically checkable certificate for the satisfiability of $\phi$. In order to make the algorithmic check more efficient, one can also include the cell interpretation necessary for showing $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}$ to be satisfiable, and the sets $\mathcal{S}$ and $\mathcal{S}'$.
 
@@ -823,77 +728,6 @@ The correctness of the result \textsc{Sat} of the algorithm is an immediate cons
 \label{thm:completeness-bigvee}
 If the input formula~$\phi$ is satisfiable and it satisfies the \req condition, then \cref{alg:interval-check-param-withBigvee} terminates and returns \textsc{Sat}.
 \end{theorem}
-
-\testlength{
-\begin{proof}
-  Assume $\phi$ is satisfiable and satisfies \req condition for $(\mathcal{S}^*,\mathcal{S}'^*)$. Let $J$ be an interpretation with $J\models\phi$. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments, and define:
-\[
-v_{\max}^f = \max\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
-v_{\min}^f = \min\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
-\]
-% where $t_0=\subst{t}{x}{0}$ for each $f(t)\in\mathcal{T}$.
-The extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S}^*)$ and $\Phi^-_{\text{ext}}(\mathcal{S}'^*)$ ensure that
-\begin{itemize}
-    \item For all $f(t) \in \mathcal{S}^*$: $J(\subst{t}{x}{0}) = v_{\max}^f$, and
-    \item For all $f(t) \in \mathcal{S}'^*$: $J(\subst{t}{x}{0}) = v_{\min}^f$.
-\end{itemize}
-Now choose
-\begin{minipage}{\linewidth-2cm}
-\vspace*{-0.5cm}  
-\begin{align*}
-  b_{\max} &= \max\left\{\, \left\lceil \frac{J(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}\\
-b_{\min} &= \min\left\{\, \left\lfloor \frac{J(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\},
-\end{align*}
-\end{minipage}
-and set $B = [b_{\min}, b_{\max}]$. We verify that $J$ satisfies:
-\begin{enumerate}
-    \item \textbf{Base formula}: $J \models F \land \bigwedge_{x \in B} Q[x]$, since $J \models \phi$.
-    
-    \item \textbf{Upward propagation condition}: 
-    For the specific $\mathcal{S}^*$, we have:
-    \begin{itemize}
-        \item $\Phi_{\text{ext}}^+(\mathcal{S}^*)$ holds by definition,
-        \item $\Phi_{\text{prop}}(\mathcal{S}^*)$ holds by the \req condition,
-        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ By construction of $b_{\max}$ and since $J(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
-        % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
-        % \]
-        \[
-        J(a) \cmpsign{\coeffsign{f}+} c_f b_{\max} + v_{\max}^f = c_f  b_{\max} + J(\subst{t}{x}{0}) = J(\subst{t}{x}{\hat{b}_{\max}}),
-        \]
-        which is exactly the clash condition in $\Psi^+(B,\mathcal{S}^*)$.
-    \end{itemize}
-    Hence $J \models \Psi^+(B,\mathcal{S}^*)$.
-    
-    \item \textbf{Downward propagation condition}: 
-    Similarly, for $\mathcal{S}'^*$ we have:
-    \begin{itemize}
-        \item $\Phi_{\text{ext}}^-(\mathcal{S}'^*)$ holds,
-        \item $\Phi_{\text{prop}}(\mathcal{S}'^*)$ holds by the \req condition,
-        \item For each $f(t)\in\mathcal{S}'^{*}$ and $a \in \args(F,f)$:
-        % \[
-        % I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
-        % \]
-        by construction of $b_{\min}$,
-        \[
-        J(a)\cmpsign{\coeffsign{f}-}  c_f b_{\min} + v_{\min}^f = c_f b_{\min} + J(\subst{t}{x}{0}) = J(\subst{t}{x}{\repr{b}_{\min}}),
-        \]
-        which is the clash condition in $\Psi^-(B,\mathcal{S}'^*)$.       
-    \end{itemize}
-    Thus $J \models \Psi^-(B,\mathcal{S}'^*)$.
-\end{enumerate}
-
-Therefore, $J$ satisfies
-\[
-F \land \bigwedge_{x \in B} Q[x] \;\land\; \Psi^+(B,\mathcal{S}^*) \;\land\; \Psi^-(B,\mathcal{S}'^*),
-\]
-and consequently also satisfies the disjunctions $\bigvee_{\mathcal{S}}\Psi^+(B,\mathcal{S})$ and $\bigvee_{\mathcal{S}'}\Psi^-(B,\mathcal{S}')$.
-
-Let $N = \max(|b_{\min}|, |b_{\max}|)$. \cref{alg:interval-check-param-withBigvee} expands the interval symmetrically from $[0,0]$. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$. At this iteration, line 5 will check the satisfiability of:
-\[
-F \land \bigwedge_{x=-N}^{N} Q[x] \;\land\; \bigvee_{\mathcal{S}}\Psi^+([-N,N],\mathcal{S}) \;\land\; \bigvee_{\mathcal{S}'}\Psi^-([-N,N],\mathcal{S}').
-\]
-Since $[-N, N]\supseteq B$, $J$ also satisfies this formula. Hence, the algorithm terminates with \textsc{Sat}.
-\qedhere\end{proof}}
 
 While proofs of unsatisfiability are not the main goal of this paper, \Cref{alg:interval-check-param-withBigvee} can also detect unsatisfiability, in some cases.
 
@@ -1087,6 +921,179 @@ We have presented a method for certifying satisfiability of formulas with univer
 \bibliography{refs}
 
 \appendix
+
+\section{Appendix}
+
+\subsection*{Proof of Property~\ref{prop:recmonot}:}
+
+  Assume a cell $u$ with $\mathit{inst}(u)\neq\bot$, a  cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, and assume that $\mathit{inst}(v)\succeq \mathit{inst}(u)$. Then both $v\in X_{\mathit{inst}(v)}$ and $v \in \Gamma_{I,\mathit{inst}(u)}(\phi)$, and hence $X_{\mathit{inst}(v)}\cap \Gamma_{I,\mathit{inst}(u)}(\phi)\neq\emptyset$. 
+%  Then $u\in X_{\mathit{inst}(u)}\subseteq \Gamma_{I,\mathit{inst}(u)}$ and $v\in X_{\mathit{inst}(v)}$.
+  This contradicts the requirement that $X_{inst(v)}\cap \mathit{def}(I)=\emptyset$ and $X_{inst(v)}\cap\bigcup_{z'\prec inst(v)} \Gamma_{I,z'}(\phi))=\emptyset$.
+  \qedhere
+
+
+\subsection*{Proof of \cref{thm:interval-certificate-param}:}
+
+  Suppose the conjunction is satisfiable, let $I^*$ be an interpretation satisfying it, and let $\mathcal{S}$ be such that $I^*\models \Psi^+(B,\mathcal{S})$, and $\mathcal{S}'$ such that $I^*\models \Psi^-(B,\mathcal{S}')$. Assume that  $B = [b_{\min}, b_{\max}]$. We construct a certificate as in \cref{def:certificate}:
+
+\begin{enumerate}
+    \item \textbf{Pre‑satisfiability certificate:} Define the cell interpretation~$I$ as follows:
+      \begin{itemize}
+        \item For every uninterpreted constant $c$ in $\phi$, set $I(c)=I^*(c)$.
+        \item For every $a\in args(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}, f)$,  where $f$ is an uninterpreted function symbol, $I(f(I^*(a)))=I^*(f)(I^{*}(a))$
+    \end{itemize}
+    By construction, $I$ is finite and satisfies $F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}$ because $I^*$ satisfies that formula and $I$ agrees with $I^*$ on all relevant cells.
+       
+    \item \textbf{Well‑order $\preceq$ on $\mathbb{Z}$:}
+    \[0, 1, -1, 2, -2, 3, -3, \dots, b_{\max}, b_{\min},b_{\max}+1, b_{\max}+2, \dots,b_{\min}-1, b_{\min}-2, \dots\]		
+    
+  \item \textbf{Propagated cells $X_z$ for $z \in \mathbb{Z}$:}
+    \[
+    X_z = 
+    \begin{cases}
+    \emptyset & \text{if } z \in B, \\[4pt]
+    \bigl\{ f(I(\subst{t}{x}{\hat{z}})) \mid f(t)\in\mathcal{S} \bigr\} & \text{if } z > b_{\max}, \\[4pt]
+    \bigl\{ f(I(\subst{t}{x}{\hat{z}})) \mid f(t)\in\mathcal{S}' \bigr\} & \text{if } z < b_{\min}.
+    \end{cases}
+    \]
+    Note that the extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S})$ and $\Phi^-_{\text{ext}}(\mathcal{S}')$ ensure that for $z\not\in B$, $f\in\mathcal{F}$, $|\{ n \mid f(n)\in X_z\}|\leq 1$.
+
+    \item \textbf{Satisfiability propagators:}
+    \begin{itemize}
+        \item For $z \in B$: In this case, $\subst{(x\not\in B \Rightarrow Q)}{x}{\hat{z}}$ is a tautology and the propagator is trivial.
+        \item For $z\not\in B$: the condition $\Phi_{\text{prop}}(\mathcal{S})$ (if $z > b_{\max}$) or $\Phi_{\text{prop}}(\mathcal{S}')$ (if $z < b_{\min}$) provides, for any given values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$ and each $f(t)\in\mathcal{S}$, values $v_{f(t)}$  such that assigning these values to each corresponding cells in $X_z$ satisfies~$\subst{Q}{x}{\repr{z}}$.
+    \end{itemize}
+\end{enumerate}
+It remains to verify the disjointness conditions of \cref{def:certificate}:
+\[X_z\cap \mathit{def}(I)=\emptyset \text{ and } X_z\cap\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi)=\emptyset.\]
+For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.  For $z > b_{\max}$, any element of $X_z$ has the form $f(I(\subst{t}{x}{\repr{z}}))$ with $f(t) \in \mathcal{S}$.
+    \begin{itemize}
+    \item To prove that this element of $X_z$ cannot be in $\mathit{def}(I)$, let $f'(n)$ be an arbitrary, but fixed element of $\mathit{def}(I)$ with non-zero arity. We prove that $f'(n)\neq f(I(\subst{t}{x}{\repr{z}}))$. If $f$ is a different function symbol than $f'$ this is certainly the case, and hence it suffices to prove $f(n)\neq f(I(\subst{t}{x}{\repr{z}}))$, which makes it necessary to prove $I(n)\neq I(\subst{t}{x}{\repr{z}})$. Due to the construction of the cell interpretation~$I$, $n=I(a)$, with $a\in args(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}, f)$.
+      \begin{itemize}
+      \item       If $a\in args(F, f)$, the clash condition $a\cmpsignstrict{\coeffsign{f}s}\subst{t}{x}{\ivbound{B}{s}}$ in $\Psi^+(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:
+        \[
+        I\models a\cmpsign{\coeffsign{f}+}  \subst{t}{x}{\repr{b}_{\max}} \cmpsignstrict{\coeffsign{f}+} \subst{t}{x}{\repr{z}},
+        \]
+        where the strict inequality follows because $t$ is linear, and $z > b_{\max}$. Hence $I(a)\neq I(\subst{t}{x}{\repr{z}})$.
+      \item If  $a\not\in args(F, f)$, then there is a $z_B\in B$ such that $a\in args(Q[x\leftarrow \hat{z}_B],f)$.   Now, since $z_B\leq b_{\max}<z$,  again  $I\models a\cmpsign{\coeffsign{f}+}  \subst{t}{x}{\repr{b}_{\max}}$, and  $I(a)\neq I(\subst{t}{x}{\repr{z}})$.
+      \end{itemize}
+
+        
+      \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
+        $I(\subst{t'}{x}{\repr{z}'})\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
+        \[
+          I\models \subst{t'}{x}{\hat{z}'}\cmpsignstrict{\coeffsign{f}+} \subst{t'}{x}{\hat{z}}.
+        \]
+        Moreover, $\Phi^{+}_{\text{ext}}(\mathcal{S})$ ensures 
+                \[
+          I\models \subst{t'}{x}{\hat{z}}\cmpsignstrict{\coeffsign{f}+}\subst{t}{x}{\hat{z}}.
+        \]
+Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\repr{z}})$, which implies that the two sides of the inequality cannot be the same.
+    %     \begin{itemize}
+    %         \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
+    %         \[
+    %         I\models\subst{t'}{x}{z'} \leq \subst{t'}{x}{\repr{b}_{\max}} < \subst{t}{x}{\repr{z}},
+    %         \]
+    %         since $t$ is maximal among terms of $f$ in $\mathcal{T}$ by $\Phi_{\text{max}}(\mathcal{S})$ and $z > b_{\max}$.
+            
+    %         \item If $b_{\max} < z' < z$: Then 
+    %         \[
+    %         I(\subst{t'}{x}{z'}) \leq \max_{f(t'') \in \mathcal{T} \text{ with same } f} I(\subst{t''}{x}{z'}) < I(\subst{t}{x}{\repr{z}})
+    %         \]
+    %         since $t$ is maximal and $z' < z$.
+    %     \end{itemize}        
+    \end{itemize}
+
+  The case $z < b_{\min}$ is symmetric, using $\Psi^-(B,\mathcal{S}')$. Note that the fact that the upward propagation block of elements greater than $b_{\max}$ occurs before the downward propagation block of elements less than $b_{\min}$ in the order $\preceq$ does not create a problem, since  propagation is still restricted to cells not occurring before.
+% Finally, we must ensure that the \textbf{satisfiability propagators} can be applied inductively along $\preceq$.  
+% For $z > b_{\max}$, the propagator $\Phi_{\text{prop}}(\mathcal{S})$ requires values for all non‑propagated cells in $\Gamma_{I,z}(\phi)$.  
+% Let $f(t') \in \mathcal{T}\setminus\mathcal{S}$ be such a non‑propagated term. Its corresponding cell is $f(I(\subst{t'}{x}{\repr{z}}))$.  
+% By the last conjunct in $\Psi^+(B,\mathcal{S})$, we have $I \models \subst{t'}{x}{z} \geq b_{\min}$.  
+% Thus $I(\subst{t'}{x}{\repr{z}})$ is either in $B$ (if $\leq b_{\max}$) or satisfies $I(\subst{t'}{x}{\repr{z}}) > b_{\max}$.  
+
+% In the well‑order $\preceq$, all indices $w$ with $w > b_{\max}$ appear \emph{before} any $w < b_{\min}$.  
+% Hence $f(I(\subst{t'}{x}{\repr{z}}))$ has already been assigned when processing $z$:
+% \begin{itemize}
+%     \item If $I(\subst{t'}{x}{\repr{z}}) \in B$, the cell is defined in the base assignment $I$.
+%     \item If $I(\subst{t'}{x}{\repr{z}}) > b_{\max}$, it is a propagated cell from some earlier $z' < z$ (since $t'$ has the same coefficient of $x$ as $t$, and $I(\subst{t'}{x}{\repr{z}}) < I(\subst{t}{x}{\repr{z}})$ by maximality).
+% \end{itemize}
+% Therefore all non‑propagated cells needed for the propagator at $z$ are already defined, and the propagator can assign values to $X_z$ without circularity. A symmetric argument (without extra constraints) applies to $z < b_{\min}$, because those instantiations occur \emph{after} all $z > b_{\max}$ in $\preceq$, and hence may safely use cells assigned during upward propagation.
+
+Thus all certificate requirements are satisfied. By \cref{thm:certThenSat}, $\phi$ is satisfiable.
+\qedhere
+
+\section*{Proof of \cref{thm:completeness-bigvee}:}
+\testlength{
+\begin{proof}
+  Assume $\phi$ is satisfiable and satisfies \req condition for $(\mathcal{S}^*,\mathcal{S}'^*)$. Let $J$ be an interpretation with $J\models\phi$. For each function $f \in \mathcal{F}$, let $c_f$ be the common coefficient of $x$ in all its arguments, and define:
+\[
+v_{\max}^f = \max\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T}\,\}, \qquad
+v_{\min}^f = \min\{\, J(\subst{t}{x}{0}) \mid f(t) \in \mathcal{T} \,\}.
+\]
+% where $t_0=\subst{t}{x}{0}$ for each $f(t)\in\mathcal{T}$.
+The extremal conditions $\Phi^+_{\text{ext}}(\mathcal{S}^*)$ and $\Phi^-_{\text{ext}}(\mathcal{S}'^*)$ ensure that
+\begin{itemize}
+    \item For all $f(t) \in \mathcal{S}^*$: $J(\subst{t}{x}{0}) = v_{\max}^f$, and
+    \item For all $f(t) \in \mathcal{S}'^*$: $J(\subst{t}{x}{0}) = v_{\min}^f$.
+\end{itemize}
+Now choose
+\begin{minipage}{\linewidth-2cm}
+\vspace*{-0.5cm}  
+\begin{align*}
+  b_{\max} &= \max\left\{\, \left\lceil \frac{J(a) - v_{\max}^f}{c_f} \right\rceil \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\}\\
+b_{\min} &= \min\left\{\, \left\lfloor \frac{J(a) - v_{\min}^f}{c_f} \right\rfloor \;\middle|\; a \in \args(F,f), f \in \mathcal{F} \,\right\},
+\end{align*}
+\end{minipage}
+and set $B = [b_{\min}, b_{\max}]$. We verify that $J$ satisfies:
+\begin{enumerate}
+    \item \textbf{Base formula}: $J \models F \land \bigwedge_{x \in B} Q[x]$, since $J \models \phi$.
+    
+    \item \textbf{Upward propagation condition}: 
+    For the specific $\mathcal{S}^*$, we have:
+    \begin{itemize}
+        \item $\Phi_{\text{ext}}^+(\mathcal{S}^*)$ holds by definition,
+        \item $\Phi_{\text{prop}}(\mathcal{S}^*)$ holds by the \req condition,
+        \item For each $f(t)\in\mathcal{S}^*$ and $a \in \args(F,f)$:\\ By construction of $b_{\max}$ and since $J(\subst{t}{x}{0})=v_{\max}^f$, we have:   % \[
+        % I^*(t_g) \leq b_{\max} + v_{\max}^f = b_{\max} + I^*(t)
+        % \]
+        \[
+        J(a) \cmpsign{\coeffsign{f}+} c_f b_{\max} + v_{\max}^f = c_f  b_{\max} + J(\subst{t}{x}{0}) = J(\subst{t}{x}{\hat{b}_{\max}}),
+        \]
+        which is exactly the clash condition in $\Psi^+(B,\mathcal{S}^*)$.
+    \end{itemize}
+    Hence $J \models \Psi^+(B,\mathcal{S}^*)$.
+    
+    \item \textbf{Downward propagation condition}: 
+    Similarly, for $\mathcal{S}'^*$ we have:
+    \begin{itemize}
+        \item $\Phi_{\text{ext}}^-(\mathcal{S}'^*)$ holds,
+        \item $\Phi_{\text{prop}}(\mathcal{S}'^*)$ holds by the \req condition,
+        \item For each $f(t)\in\mathcal{S}'^{*}$ and $a \in \args(F,f)$:
+        % \[
+        % I^*(t_g) \geq b_{\min} + v_{\min}^i = b_{\min} + I^*(t)
+        % \]
+        by construction of $b_{\min}$,
+        \[
+        J(a)\cmpsign{\coeffsign{f}-}  c_f b_{\min} + v_{\min}^f = c_f b_{\min} + J(\subst{t}{x}{0}) = J(\subst{t}{x}{\repr{b}_{\min}}),
+        \]
+        which is the clash condition in $\Psi^-(B,\mathcal{S}'^*)$.       
+    \end{itemize}
+    Thus $J \models \Psi^-(B,\mathcal{S}'^*)$.
+\end{enumerate}
+
+Therefore, $J$ satisfies
+\[
+F \land \bigwedge_{x \in B} Q[x] \;\land\; \Psi^+(B,\mathcal{S}^*) \;\land\; \Psi^-(B,\mathcal{S}'^*),
+\]
+and consequently also satisfies the disjunctions $\bigvee_{\mathcal{S}}\Psi^+(B,\mathcal{S})$ and $\bigvee_{\mathcal{S}'}\Psi^-(B,\mathcal{S}')$.
+
+Let $N = \max(|b_{\min}|, |b_{\max}|)$. \cref{alg:interval-check-param-withBigvee} expands the interval symmetrically from $[0,0]$. When it reaches iteration $n = N$, the interval becomes $[-N, N]$, which contains $B$. At this iteration, line 5 will check the satisfiability of:
+\[
+F \land \bigwedge_{x=-N}^{N} Q[x] \;\land\; \bigvee_{\mathcal{S}}\Psi^+([-N,N],\mathcal{S}) \;\land\; \bigvee_{\mathcal{S}'}\Psi^-([-N,N],\mathcal{S}').
+\]
+Since $[-N, N]\supseteq B$, $J$ also satisfies this formula. Hence, the algorithm terminates with \textsc{Sat}.
+\qedhere\end{proof}}
+
 
 \end{document}
 
