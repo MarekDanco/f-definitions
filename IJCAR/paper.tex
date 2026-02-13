@@ -277,7 +277,7 @@ These examples demonstrate the need for a method that handles arithmetic offsets
 \label{sec:problem-statement}
 
 % \paragraph{Formula Class}
-We introduce a method for certifying satisfiability of $\smt$ formulas with uninterpreted function symbols whose domain is a sort associated with a theory that has countable canonical model.\todoSR{I am not sure whether my usage of $\smt$ terminology is OK} In the case where this base theory is linear integer arithmetic, the resulting formulas belong to the 
+We introduce a method for certifying satisfiability of $\smt$ formulas with uninterpreted function symbols whose domain is a sort associated with a theory that has a countable canonical model.\todoSR{I am not sure whether my usage of $\smt$ terminology is OK} In the case where this theory is linear integer arithmetic, the resulting formulas belong to the 
 SMTLIB theory UFLIA. The formulas we consider are
 of the form
 \begin{equation}\label{eq:main-fragment}
@@ -922,7 +922,7 @@ on all but 5 problems, which get solved immediately.
 \section{Conclusion}\todoSR{rewritten, please have a look}
 \label{sec:conclusion}
 
-We have presented a method for certifying satisfiability of formulas with universal quantifiers and uninterpreted function symbols, and a corresponding algorithm for a specific class of formulas in the SMTLIB theory UFLIA. By relying on induction, the method is able to succeed for formulas that do not have a finite model, and for formulas that are satisfiable only by functions that do not have a closed form representation. In addition to current syntactic restrictions, the introduced algorithm is restricted to satisfying the semantic $\req$ condition that enables induction. In future work, we intend to weaken this restriction, for example, using stronger forms of induction. Our long term vision is a general algorithm that is parametric in the used base theory and that only depends on a predicate defining the order in which to apply induction.
+We have presented a method for certifying satisfiability of formulas with universal quantifiers and uninterpreted function symbols, and a corresponding algorithm for a specific class of formulas in the SMTLIB theory UFLIA. By relying on induction, the method is able to succeed for formulas that do not have a finite model, and for formulas that are satisfiable only by functions that do not have a closed form representation. In addition to current syntactic restrictions, the introduced algorithm is restricted to satisfying the semantic $\req$ condition that enables induction. In future work, we intend to weaken this restriction, for example, using stronger forms of induction. Our long term vision is a general algorithm that is parametric in the theories associated with the domain and codomain of the uninterpreted function symbols, and that only depends on a predicate defining the order in which to apply induction.
 
 \bibliographystyle{splncs04}
 \bibliography{refs}
