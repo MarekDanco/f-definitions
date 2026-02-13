@@ -421,6 +421,11 @@ the case for $f(x)<f(x+1)$, maybe we want to stress that?}
        \end{itemize}                
 \end{definition}
 
+Intuitively, a satisfiability certificate encodes an induction proof, where the well-order~$\preceq$ sets the direction of induction and each step of the induction shows satisfiability of the universal quantifier for another choice $z$ for $\bar{x}$. Such a step is allowed to fix the values of the propagated cells~$X_z$. These cells must be chosen in such a way that these propagated cells neither have already been given a value by the pre-satisfiability certificate~$I$ nor by an earlier induction step.\todoSR{I added this. Suggestions for improvements are very welcome}
+
+
+
+
 \begin{example}\label{ex:certificate-example}
 A satisfiability certificate for the formula \[f(3, a) \geq 4 + g(b) \wedge \forall x, y \:.\: f(x, y) < x + g(y) \wedge g(y) = g(y+b) + 2b\] is 
 % \begin{itemize}
