@@ -367,7 +367,7 @@ We use the notion of certificate in the following sense~\cite{McConnell:11}: Giv
 \label{sec:certificate}
 
 In this section, we will define objects that certify that a formula of the form $F \land \forall \bar{x}.\; Q$ is satisfiable. We will assume that all uninterpreted function symbols have domain~$\domain$ and codomain~$\codomain$, with both having a canonical model of the same name.
-We also assume that $\domain$ is countable and that for every element $z\in\domain$ there is a corresponding interpreted constant $\repr{z}$ in the language that denotes~$z$. In the next section, we will then introduce an algorithm to compute such certificate in the case where both $\domain$ and $\codomain$ are the integers (more specifically, formulas from UFLIA), and under the additional restrictions described in the problem statement. Also in this section, we use the integers for illustration in all examples.
+We also assume that $\domain$ is countable and that for every element $z\in\domain$ there is a corresponding interpreted constant $\repr{z}$ in the language that denotes~$z$. In the next section, we will then introduce an algorithm to compute such certificate in the case where both $\domain$ and $\codomain$ are the integers (more specifically, formulas from UFLIA), and under the additional restrictions described in the problem statement. Also in the present section, we use the integers for illustration in all examples.
 
 Traditionally, satisfiability of a logical formula is certified by an interpretation that assigns a value to each non-logical symbol in such way that the formula is true. However, the presence of uninterpreted function symbols with infinite domain opens up the question of how to represent such an interpretation.
 %integers is infinite. Due to this,  the interpretation of an uninterpreted function symbol with integer domain is a function that assigns values to the infinitely many integers that form this domain. This opens the question of how to represent such a function using a finite object that can be represented on computers.
@@ -427,9 +427,7 @@ the case for $f(x)<f(x+1)$, maybe we want to stress that?}
        \end{itemize}                
 \end{definition}
 
-Intuitively, a satisfiability certificate encodes an induction proof, where the well-order~$\preceq$ sets the direction of induction and each step of the induction shows satisfiability of the universal quantifier for another choice $z$ for $\bar{x}$. Such a step is allowed to fix the values of the propagated cells~$X_z$. These cells must be chosen in such a way that these propagated cells neither have already been given a value by the pre-satisfiability certificate~$I$ nor by an earlier induction step.
-
-
+Intuitively, a satisfiability certificate encodes an induction proof, where the well-order~$\preceq$ sets the direction of induction and each step of the induction shows satisfiability of the universally quantified part~$Q$ when enforcing another choice~$z$ for $\bar{x}$. Such a step is allowed to choose values for the propagated cells~$X_z$. These cells must be chosen in such a way that the propagated cells neither have already been given a value by the pre-satisfiability certificate~$I$ nor by an earlier induction step. The satisfiability propagator is only required to show the existence of appropriate values for the propagated cells. In practice, it will usually assign a value to these cells.
 
 
 \begin{example}\label{ex:certificate-example}
@@ -464,7 +462,7 @@ given by the pre-satisfiability certificate $I = \{ a \mapsto 0, b \mapsto 1, f(
   \]
 \end{example}
 
-The notion of certificate defined here is abstract in the sense that it does not fix a concrete finite representation that allows for an independent check whether a given object is indeed a satisfiability certificate. For arriving at concrete independently checkable certificates, it suffices to fix a well-order and decide on a representation of propagated cells and satisfiability propagator that allows for such an independent check. For example, all these definitions could be written in the language of Presburger arithmetic, which allows the independent check to be done using a decision procedure for Presburger arithmetic. We will illustrate this in the next section for the special class of formulas described in \cref{sec:problem-statement}.
+The notion of certificate defined here is abstract in the sense that it does not fix a concrete finite representation that allows for an independent check whether a given object is indeed a satisfiability certificate. For arriving at concrete independently checkable certificates, it suffices to fix a well-order and decide on a representation of propagated cells and satisfiability propagator that allows for such an independent check. For example, all these definitions could be written in the language of linear integer arithmetic, which allows the independent check to be done using a corresponding decision procedure. We will illustrate this in the next section for the special class of formulas described in \cref{sec:problem-statement}.
 
 % For the sake of generality, the satisfiability propagator only shows existence of values for the propagated cells. At this point we do not require it to be constructive. Still, below we will work with algorithms computing actual values. In addition, the definition allows infinitely many different sets of propagated cells and satisfiability propagators. In practice, for allowing computer representation, we will only work with finitely many different ones.
 
