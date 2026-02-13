@@ -502,12 +502,12 @@ Then, for the assignment $I_\phi$ from the proof of Property~\ref{prop:certThenS
 \begin{tabbing}\hspace*{0.4cm}\=\hspace*{0.4cm}\=\kill
 	\textbf{if} $I$ assigns a value $x$ to $u$ \textbf{then} \textbf{return} $x$\\
 	\textbf{if} $\mathit{inst}(u)=\bot$ \textbf{then} \textbf{return} any element of $\domain$\\
-	\textbf{return} $prop_{u,\mathit{inst}(u)}(I\cup \{ v\mapsto val(v) \mid v\in \Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z\})$
+	\textbf{return} $prop_{u,\mathit{inst}(u)}(I\cup \{ v\mapsto val(v) \mid v\in \Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_{\mathit{inst}(u)}\})$
 \end{tabbing}
 
 Here, the recursive calls go down the order $\prec$ in the following sense:
 \begin{property}
-	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any other cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, we have $\mathit{inst}(v)\prec \mathit{inst}(u)$.
+	Let $u$ be a cell such that $\mathit{inst}(u)\neq\bot$. Then for any other cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_{\mathit{inst}(u)}$ with $\mathit{inst}(v)\neq\bot$, we have $\mathit{inst}(v)\prec \mathit{inst}(u)$.
 \end{property}
 
 \testlength{
