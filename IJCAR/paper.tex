@@ -999,7 +999,7 @@ with increasing $c$.
 %over this range, solving 6 to 7 instances.
 We also tested the performance of the two solvers on unbounded problems, that is with the
 bound $0 \le x \le 10^c$ removed. \textsc{z3} solved 5 of those problems while \textsc{cvc5}
-solved 2.
+solved 2.\todoSR{Can we say anything more about this? My guess is that CVC5 needs the model to be finite, and z3 needs it to be piecewise linear.}
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.6\linewidth]{experiments/data/scaling_plot.png}
