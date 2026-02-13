@@ -1002,9 +1002,9 @@ and
 \begin{equation}\label{eq:exp2}
 	d > 1\:\land\: f(0)=0 \:\land\: g(2) > f(d+1) \land\forall x \:.\: f(x-1)=f(x)+g(x)+g(x+d).
 \end{equation}
-For each problem, we also used bounded versions of the form $F\wedge \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$, with $c\in \{1,\dots,5\}$.
+To simplify implementation, we used versions that have an additional guard to restrict the range of the universally quantified variable to the naturals instead of the integers. The resulting formulas are of the form $F\land (\forall x \:.\: 0\leq x \Rightarrow Q)$. To study solver behavior over increasing model size, we also used versions where the guard restricts the range to a finite interval with upper bound $10^c$, with  $c\in \{1,\dots,5\}$. The resulting formulas are of the form  $F\land \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$.
 
-We implemented our algorithm using the \textsc{z3} Python API. We also applied the \textsc{smt} solvers \textsc{z3} and
+We implemented our algorithm using the \textsc{z3} Python API. Our implementation only checks upward induction using~$\Psi^+$, but leaves out downward induction, which is sound due to the guard described in the previous paragraph. We also applied the \textsc{smt} solvers \textsc{z3} and
 \textsc{cvc5} directly to our problems, explicitly turning on model based quantifier instantiation~\cite{ge-cav09}.
 
 It turned out that our algorithm terminates on all problems in negligible time. Moreover,  the value of the parameter~$c$ does not have a noticeable influence on runtime for the bounded versions of the test problems. We found the former observation surprising, while the latter was to be expected, due to the use of induction.
