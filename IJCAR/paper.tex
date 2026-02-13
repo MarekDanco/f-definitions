@@ -514,7 +514,7 @@ Here, the recursive calls go down the order $\prec$ in the following sense:
 \begin{proof}
   Assume a cell $u$ with $\mathit{inst}(u)\neq\bot$, a  cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, and assume that $\mathit{inst}(v)\succeq \mathit{inst}(u)$. Then both $v\in X_{\mathit{inst}(v)}$ and $v \in \Gamma_{I,\mathit{inst}(u)}(\phi)$, and hence $X_{\mathit{inst}(v)}\cap \Gamma_{I,\mathit{inst}(u)}(\phi)\neq\emptyset$. 
 %  Then $u\in X_{\mathit{inst}(u)}\subseteq \Gamma_{I,\mathit{inst}(u)}$ and $v\in X_{\mathit{inst}(v)}$.
-  This contradicts the requirement that $X_{inst(v)}\cap (\mathit{def}(I)\cup\bigcup_{z'\prec inst(v)} \Gamma_{I,z'}(\phi))=\emptyset$.
+  This contradicts the requirement that $X_{inst(v)}\cap \mathit{def}(I)=\emptyset$ and $X_{inst(v)}\cap\bigcup_{z'\prec inst(v)} \Gamma_{I,z'}(\phi))=\emptyset$.
   \qedhere
 \end{proof}}
 
@@ -903,8 +903,8 @@ This formula is unsatisfiable in standard integer arithmetic (applying induction
 
 The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$. While theoretically elegant, these disjunctions lead to formulas exponentially growing with the size of the set $\mathcal{T}$, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
 
-Instead of enumerating all possible subset choices, we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. Reducing our presentation to just one of the two cases, for each term $f(t)\in\mathcal{T}$, we create a propositional variable 
-$p_{f(t)}$ that is true iff $f(t) \in \mathcal{S}$.
+Instead of enumerating all possible subset choices, we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. For each term $f(t)\in\mathcal{T}$, we create a propositional variable 
+$p_{f(t)}^+$ that is true iff $f(t) \in \mathcal{S}$, and another variable~$p_{f(t)}^-$ that is true iff $f(t) \in \mathcal{S}'$.
 
 We then encode the extremal conditions $\Phi^s_{\text{ext}}$, the propagability condition $\Phi_{\text{prop}}$, and the clash conditions using these variables, yielding a compact representation of $\Psi^{s,\text{e}}(B)$ for each sign $s$.
 
