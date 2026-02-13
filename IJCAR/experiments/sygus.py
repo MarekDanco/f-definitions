@@ -58,7 +58,9 @@ def format_offset(x, offset):
         return f"{x} + {offset}"
 
 
-def sygus2string(sygus, x, pvt_function, pvt_offset, u_vars_functions, u_vars_offsets):
+def sygus2string(
+    sygus, x, consts, pvt_function, pvt_offset, u_vars_functions, u_vars_offsets
+):
     match = re.search(r"Int\s+(.+)\)\s*$", sygus)
     if not match:
         return "Format error"
@@ -67,6 +69,8 @@ def sygus2string(sygus, x, pvt_function, pvt_offset, u_vars_functions, u_vars_of
         f"arg{i}": (
             f"{x.sexpr()}"
             if str(f) == str(x.sexpr())
+            else f
+            if any(str(f) == str(c) for c in consts)
             else f"{f}({format_offset(x, o)})"
         )
         for i, (f, o) in enumerate(zip(u_vars_functions, u_vars_offsets))
@@ -112,8 +116,10 @@ def sygus2string(sygus, x, pvt_function, pvt_offset, u_vars_functions, u_vars_of
         return f"Parsing Error: {e}"
 
 
-def get_name(var, b):
+def get_name(var, b, consts):
     if var.eq(b.x):
+        return var.sexpr()
+    if var.decl() in consts:
         return var.sexpr()
     occ_str = var.sexpr()
     return occ_str[3]
@@ -146,16 +152,17 @@ def split(flat_p, model):
     return pivots, non_pivots
 
 
-def process_formula(b, p, model):
+def process_formula(b, p, model, consts):
     flat_p = flatten(p)
     pivots, non_pivots = split(flat_p, model)
     pvt_vars = [z3.Int(f"{str(p)[:-1]}") for p in pivots]
     pvt_offsets = [get_offset(p, b) for p in pvt_vars]
-    pvt_functions = [get_name(p, b) for p in pvt_vars]
+    pvt_functions = [get_name(p, b, consts) for p in pvt_vars]
     u_vars = [z3.Int(f"{str(np)[:-1]}") for np in non_pivots]
     u_vars.append(b.x)
+    u_vars.extend([z3.Int(f"{str(c)}") for c in consts])
     u_vars_offsets = [get_offset(v, b) for v in u_vars]
-    u_vars_functions = [get_name(v, b) for v in u_vars]
+    u_vars_functions = [get_name(v, b, consts) for v in u_vars]
     fs = [
         z3.Function(f"{pvt_f}", *[z3.IntSort() for _ in u_vars], z3.IntSort())
         for pvt_f in pvt_functions
@@ -166,7 +173,6 @@ def process_formula(b, p, model):
     s.add(prob)
     prob_smt = s.to_smt2()
     res = run_cvc5(3, prob_smt)
-    # print(res)
     if isinstance(res, Res):
         return res
     ret = []
@@ -175,6 +181,7 @@ def process_formula(b, p, model):
             sygus2string(
                 synth,
                 b.x,
+                consts,
                 pvt_functions[i],
                 pvt_offsets[i],
                 u_vars_functions,
