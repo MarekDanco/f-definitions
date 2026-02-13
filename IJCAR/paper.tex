@@ -232,7 +232,7 @@ Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model
 
 \paragraph{Proof certificates and model representation.} move \cite{elad2024infinite} here? \cite{Ratschan:23} \cite{Barbosa:23}
 
-
+\testlength{
 \paragraph{Limitations illustrated.}\todoSN{In the previous version, there is a sentence: ``Here, I am considering the works~\cite{bradley-vmcai06,ge-cav09,habermehl-etaps08}." }
 To see where existing methods fall short, consider:
 \begin{itemize}
@@ -243,7 +243,7 @@ To see where existing methods fall short, consider:
 \textsc{Z3} cannot solve this -- Compactness section in~\cite{ge-cav09}.
 \end{itemize}
 
-These examples demonstrate the need for a method that handles arithmetic offsets while providing finite certificates for satisfiability.
+These examples demonstrate the need for a method that handles arithmetic offsets while providing finite certificates for satisfiability.}
 
 \section{Problem Statement}
 \label{sec:problem-statement}
@@ -418,7 +418,7 @@ the case for $f(x)<f(x+1)$, maybe we want to stress that?}
                     %that are neither assigned a value by $I$, nor occur in any $\Gamma_{I,z'}(\phi)$ for any $z'\prec z$
                   \item a certificate (the \emph{satisfiability propagator}) showing that for all values of cells in $\Gamma_{I,z}(\phi)\setminus \mathit{def}(I)\setminus X_z$ there exist values for the cells in $X_z$ such that for the cell interpretation $I_{X_z}$ assigning these values to $X_z$, $I\cup I_{X_z}\models \subst{Q}{\bar{x}}{\repr{z}}$.
                   \end{itemize}
-	\end{itemize}
+       \end{itemize}                
 \end{definition}
 
 \begin{example}\label{ex:certificate-example}
