@@ -4,12 +4,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 C_MAP = {
-    "bench10_2000_40000": 1,
-    "bench100_2000_40000": 2,
-    "bench1000_2000_40000": 3,
-    "bench10000_2000_40000": 4,
-    "bench100000_2000_40000": 5,
-    "bench_2000_40000": "✱",
+    "bench10_1000_40000": 1,
+    "bench100_1000_40000": 2,
+    "bench1000_1000_40000": 3,
+    "bench10000_1000_40000": 4,
+    "bench100000_1000_40000": 5,
+    "bench_1000_40000": "✱",
+}
+
+C_MAP_MIN = {
+    "bench10_75_40000": 1,
+    "bench100_75_40000": 2,
+    "bench1000_75_40000": 3,
+    "bench10000_75_40000": 4,
+    "bench100000_75_40000": 5,
+    "bench_75_40000": "✱",
 }
 
 
@@ -46,16 +55,23 @@ def parse_tab(path, solver, c):
     return rows
 
 
-base = Path("tables")
+base1 = Path("tables")
+base2 = Path("tables_min")
 rows = []
 for folder, c in C_MAP.items():
-    for solver in ["cvc5", "z3"]:
-        tab_file = base / folder / f"{solver}.tab"
+    for solver in ["cvc5", "cvc5-sg", "z3"]:
+        tab_file = base1 / folder / f"{solver}.tab"
         rows.extend(parse_tab(tab_file, solver, c))
+
+for folder, c in C_MAP_MIN.items():
+    tab_file = base2 / folder / "cvc5.tab"
+    rows.extend(parse_tab(tab_file, "cvc5-min", c))
+
+
 
 df = pd.DataFrame(rows)
 pd.set_option('display.max_rows', None)
-print(df[df["c"] == "✱"])
+# print(df[df["c"] == "✱"])
 c_to_numeric = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, "✱": 6}
 df["c_numeric"] = df["c"].map(c_to_numeric)
 
@@ -72,7 +88,7 @@ solved_numeric = (
 
 fig, ax = plt.subplots()
 for solver in solved_numeric.columns:
-    marker = "^" if solver == "cvc5" else "o"
+    marker = "^" if solver == "cvc5" or "cvc5-sg" else "o"
     ax.plot(
         solved_numeric.index,
         solved_numeric[solver],
