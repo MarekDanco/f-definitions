@@ -131,17 +131,17 @@ Czech Institute of Informatics, Robotics and Cybernetics, Czech Technical Univer
 
 \section{Introduction}
 
-Current SMT solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
+Current $\smt$ solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
 
-In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols. We mainly concentrate on the combination with linear arithmetic, which corresponds to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current SMT solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite yet large.
+In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols. We mainly concentrate on the combination with linear arithmetic, which corresponds to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current $\smt$ solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite yet large.
 
 In this paper, we explore an alternative approach that avoids explicit model construction by proving satisfiability using inductive arguments, instead. More specifically, we
 \begin{itemize}
 \item introduce a notion of satisfiability certificate that represents inductive arguments for satisfiability of such formulas,
 \item present an algorithm that proves satisfiability by synthesizing such a satisfiability certificate for a sub-class of UFLIA formulas,
 \item prove the algorithm's soundness and completeness under the assumption that the input formula satisfies a certain semantic condition enabling inductive reasoning,
-\item provide an SMT encoding for formulas solved by this algorithm, and 
-\item demonstrate through computational experiments that our approach can prove satisfiability of formulas beyond the reach for current SMT solvers.
+\item provide an $\smt$ encoding for formulas solved by this algorithm, and 
+\item demonstrate through computational experiments that our approach can prove satisfiability of formulas beyond the reach for current $\smt$ solvers.
 \end{itemize}
 
 % \paragraph{How We Solve It.} Our approach is based on \emph{inductive cell propagation}. We view each quantifier instantiation as imposing constraints on \emph{cells}—terms $f(n_1,\dots,n_k)$ with integer arguments. The key insight is that if we can: 1) Find a finite interval $[b_{\min}, b_{\max}]$ where all instantiations are simultaneously satisfiable, and 2) Ensure that from this base, solutions can be \emph{propagated} outward in both directions without conflicts, then the entire universally quantified formula is satisfiable. This reduces the infinite satisfiability problem to checking two finite conditions: base satisfiability and a propagation property formalized as the \emph{multi-ReqPivot condition}.
@@ -270,7 +270,7 @@ These examples demonstrate the need for a method that handles arithmetic offsets
 \label{sec:problem-statement}
 
 % \paragraph{Formula Class}
-We introduce a method for certifying satisfiability of SMT formulas with uninterpreted function symbols whose domain is a sort associated with a theory that has countable canonical model.\todoSR{I am not sure whether my usage of SMT terminology is OK} In the case where this base theory is linear integer arithmetic, the resulting formulas belong to the 
+We introduce a method for certifying satisfiability of $\smt$ formulas with uninterpreted function symbols whose domain is a sort associated with a theory that has countable canonical model.\todoSR{I am not sure whether my usage of $\smt$ terminology is OK} In the case where this base theory is linear integer arithmetic, the resulting formulas belong to the 
 SMTLIB theory UFLIA. The formulas we consider are
 of the form
 \begin{equation}\label{eq:main-fragment}
@@ -303,7 +303,7 @@ Note that certain formulas with several quantified variables can be easily trans
 \[f(0)=0 \wedge \forall y,z \,.\, f(2y-2z+3)=g(-y+z)+f(2y-2z+c+1)-c,\]
 can be reduced to Example~\ref{ex:formula} by the change of variables $x=-y+z$.
 
-We are not aware of any result showing the decidability of this class. However, we are also not aware of any result proving it to be undecidable. Indeed, our goal is not decidability classification, but an algorithm for showing satisfiability that allows straightforward implementation in SMT solvers, and that is efficient in practice.
+We are not aware of any result showing the decidability of this class. However, we are also not aware of any result proving it to be undecidable. Indeed, our goal is not decidability classification, but an algorithm for showing satisfiability that allows straightforward implementation in $\smt$ solvers, and that is efficient in practice.
 
 
 
@@ -314,7 +314,7 @@ We are not aware of any result showing the decidability of this class. However, 
 % \end{quote}
 
 % \paragraph{Why is this Hard?}\todoSN{Not sure about this part! I'm just trying to summarize it from what's written in the Intro and Related Work sections.}
-% Although UFLIA is undecidable in general, formulas of the above form constitute a fragment that appears frequently in verification conditions (e.g.\ for programs with arrays or recursive functions). Yet, existing SMT techniques struggle:
+% Although UFLIA is undecidable in general, formulas of the above form constitute a fragment that appears frequently in verification conditions (e.g.\ for programs with arrays or recursive functions). Yet, existing $\smt$ techniques struggle:
 % \begin{itemize}
 %     \item \textbf{Finite instantiation} may not terminate because the universal quantifier ranges over the infinite domain $\mathbb{Z}$.
 %     \item \textbf{Synthesis-based approaches} (SyGuS) rely on syntactic templates and fail when the required function does not match the template.
@@ -372,7 +372,7 @@ We are not aware of any result showing the decidability of this class. However, 
 
 \section{Notation and Terminology}
 
-As usual in an SMT context, we will work with a first-order language that is sorted. We also assume that variables occur only in positions where they are bound by a quantifier. We already used the notation $\forall \bar{x}$ as an abbreviation for universal quantification over several variables. In this case, we will write $\numvar{\bar{x}}$ for the number of those variables. For a formula $F$ and uninterpreted function symbol $f$, $args(F, f)$ will denote the set of argument terms of $f$ in $F$. We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the term or formula~$s$. Here, $v$ may again represent several variables, in which case we require $t$ to represent a $\numvar{v}$-vector of terms, and assume substitution to be parallel. 
+As usual in an $\smt$ context, we will work with a first-order language that is sorted. We also assume that variables occur only in positions where they are bound by a quantifier. We already used the notation $\forall \bar{x}$ as an abbreviation for universal quantification over several variables. In this case, we will write $\numvar{\bar{x}}$ for the number of those variables. For a formula $F$ and uninterpreted function symbol $f$, $args(F, f)$ will denote the set of argument terms of $f$ in $F$. We will write $\subst{s}{v}{t}$ for the result of substituting the term $t$ for $v$ in the term or formula~$s$. Here, $v$ may again represent several variables, in which case we require $t$ to represent a $\numvar{v}$-vector of terms, and assume substitution to be parallel. 
 
 We will sometimes work with the signs from the set $\{+,-\}$, where
 for any two signs $s$ and $s'$, $ss'$ is $+$ iff $s=s'$, and $-$ otherwise. We will use such signs to switch between greater and less than relations in the way that for two integers~$z$ and $z'$, $z\cmpsignstrict{+} z'$ iff $z<z'$ and $z\cmpsignstrict{-} z'$ iff $z>z'$. For an interval $B=[b_{\min}, b_{\max}]$, we define $\ivbound{B}{-}= b_{\min}$ and $\ivbound{B}{+}= b_{\max}$.
@@ -1005,7 +1005,7 @@ For any interval $B = [b_{\min}, b_{\max}]$,  and sign~$s\in\{+, -\}$,
 
 \section{Experiments}
 
-Our experiments will test the conjecture that the algorithm introduced in the previous two sections is able to improve upon state-of-the-art SMT solvers concerning the capability of showing formulas in the considered class to be satisfiable.
+Our experiments will test the conjecture that the algorithm introduced in the previous two sections is able to improve upon state-of-the-art $\smt$ solvers concerning the capability of showing formulas in the considered class to be satisfiable.
 % Two common reasons for verification conditions to fail are (1) a bug in the program, (2) underlying
 % assertions are not inductive. In the first case, the counter-model will typically be finite, since
 % program executions modify finite memory. In the second case, the counter-model may be infinite.
@@ -1032,7 +1032,7 @@ We implemented our algorithm using the \textsc{z3} Python API. Our implementatio
 It turned out that our algorithm terminates on all problems in negligible time. Moreover,  the value of the parameter~$c$ does not have a noticeable influence on runtime for the bounded versions of the test problems. We found the former observation surprising, while the latter was to be expected, due to the use of induction.
 
 \todoSR{Maybe we should partially replace some of the text by two more lines in Figure~\ref{fig:scaling} corresponding to a timeout of 1 minute?}
-For studying the behavior of direct application of SMT solvers to our problems, and the influence of the parameter~$c$ on their runtime we ran our experiments with a 30-minute time limit.
+For studying the behavior of direct application of $\smt$ solvers to our problems, and the influence of the parameter~$c$ on their runtime we ran our experiments with a 30-minute time limit.
 When setting $c = 1$, the state of the art \textsc{smt} solvers terminate on our
 problems immediately. On problem~\eqref{eq:exp1} with $c = 3$, \textsc{cvc5} takes
 64 seconds to return \textsc{sat}, and for $c \geq 4$, the solver times out. With
