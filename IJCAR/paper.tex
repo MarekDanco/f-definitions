@@ -901,16 +901,16 @@ This formula is unsatisfiable in standard integer arithmetic (applying induction
 
 \section{Propositional Encoding}
 
-The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$. While theoretically elegant, these disjunctions lead to formulas exponentially growing with the size of the set $\mathcal{T}$, making them computationally impractical. In this subsection, we present a compact CNF encoding that avoids this issue.
+The algorithm presented so far relies on large disjunctions over all possible subset choices $\mathcal{S}\subseteq\mathcal{T}$ and $\mathcal{S}'\subseteq\mathcal{T}$. While theoretically elegant, these disjunctions lead to formulas exponentially growing with the size of the set $\mathcal{T}$, making them computationally impractical. We now present a compact CNF encoding that avoids this issue.
 
 Instead of enumerating all possible subset choices, we introduce auxiliary Boolean variables that represent membership in the subsets $\mathcal{S}$ and $\mathcal{S}'$. For each term $f(t)\in\mathcal{T}$, we create a propositional variable 
 $p_{f(t)}^+$ that is true iff $f(t) \in \mathcal{S}$, and another variable~$p_{f(t)}^-$ that is true iff $f(t) \in \mathcal{S}'$.
 
-We then encode the extremal conditions $\Phi^s_{\text{ext}}$, the propagability condition $\Phi_{\text{prop}}$, and the clash conditions using these variables, yielding a compact representation of $\Psi^{s,\text{e}}(B)$ for each sign $s$.
+We then encode the extremal condition $\Phi^s_{\text{ext}}$, the propagability condition $\Phi_{\text{prop}}$, and the clash conditions using these variables, yielding a compact representation of $\Psi^{s,\text{e}}(B)$ for each sign $s$.
 
 \begin{definition}[CNF Encoding of Interval Extension Formulas]
 \label{def:interval-extension-formulas-CNF}
-For an interval $B = [b_{\min}, b_{\max}]$, define the encoded formulas:
+For an interval $B = [b_{\min}, b_{\max}]$ and a sign~$s\in\{+,-\}$, define:
 \[\Psi^{s,\text{e}}(B) \;\equiv\; \Phi^{s,\text{e}}_{\text{ext}} \;\land\; \Phi_{\text{prop}}^{\text{e}} \;\land\; \text{ClashEnc}^s\]
 %\Psi_{\text{down}}^\text{e}(B) &\equiv \Phi_\text{min}^\text{e} \land \Phi_\text{prop}^\text{e} \land 
 where:
@@ -919,14 +919,14 @@ where:
     \begin{align*}
         \subst{
         \bigwedge_{f \in \mathcal{F}}\ \bigwedge_{\substack{f(t),\, f(t') \in \mathcal{T}}}
-        \Bigl( (p_{f(t)} \land p_{f(t')}) \Rightarrow t = t' \;\land\; 
-        (p_{f(t)} \land \neg p_{f(t')}) \Rightarrow t' \;\cmpsignstrict{\coeffsign{f}s}\; t \Bigr)}{x}{0}
+        \Bigl( (p^s_{f(t)} \land p^s_{f(t')}) \Rightarrow t = t' \;\land\; 
+        (p^s_{f(t)} \land \neg p^s_{f(t')}) \Rightarrow t' \;\cmpsignstrict{\coeffsign{f}s}\; t \Bigr)}{x}{0}
     \end{align*}
    
     \item Propagation encoding $\Phi_{\text{prop}}^{\text{e}}$:%
     \[
     \bigwedge_{\mathcal{T}_{\!-}\subseteq\mathcal{T}}
-    \left(\bigwedge_{f(t)\in\mathcal{T}_{\!-}} \neg p_{f(t)} \;\wedge\; \bigwedge_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}} p_{f(t)}\;\Rightarrow\; \forall x\, \forall \bar{u}\, \exists \bar{v}\; Q^{\mathcal{T}_{\!-}}\right),
+    \left(\bigwedge_{f(t)\in\mathcal{T}_{\!-}} \neg p^s_{f(t)} \;\wedge\; \bigwedge_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}} p^s_{f(t)}\;\Rightarrow\; \forall x\, \forall \bar{u}\, \exists \bar{v}\; Q^{\mathcal{T}_{\!-}}\right),
     \]
     where $\bar{u}=(u_{f(t)})_{f(t)\in\mathcal{T}_{\!-}}$ and $\bar{v}=(v_{f(t)})_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}}$, and $Q^{\mathcal{T}_{\!-}}$ is obtained from $Q$ by simultaneously replacing each $f(t)\in\mathcal{T}_{\!-}$ by $u_{f(t)}$ and each $f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}$ by $v_{f(t)}$.
 
@@ -941,14 +941,14 @@ where:
         
     \item Clash condition encoding $\text{ClashEnc}^s$:
       % \begin{align*}
-\[  \bigwedge_{f(t)\in\mathcal {T}}\bigwedge_{a \in \args(F,f)} \left(p_{f(t)} \Rightarrow a\cmpsignstrict{\coeffsign{f}s}  \subst{t}{x}{\ivbound{B}{s}}\right)    \]
+\[  \bigwedge_{f(t)\in\mathcal {T}}\bigwedge_{a \in \args(F,f)} \left(p^s_{f(t)} \Rightarrow a\cmpsignstrict{\coeffsign{f}s}  \subst{t}{x}{\ivbound{B}{s}}\right)    \]
 %\[    \text{ClashDownEnc} \equiv \bigwedge_{f(t)\in\mathcal
 %        {T}}\bigwedge_{a \in \args(F,f_i)} \big(p'_{f(t)} \Rightarrow (a \geq \subst{t}{x}{b_{\min}})\big)\]
 %    \end{align*}
 \end{itemize}
 \end{definition}
 
-Note that if for some $f\in\mathcal{{F}}$ the ground parts of its argument terms (obtained by substituting $x=0$) are pairwise different, then at most one $p_{f(t)}$ can be true in any satisfying assignment of $\Psi^{s,\text{e}}(B)$. This follows from the extremal condition, which would otherwise require two distinct ground terms to be equal.
+Note that if for some $f\in\mathcal{{F}}$ the ground parts of its argument terms (obtained by substituting $x=0$) are pairwise different, then at most one $p^s_{f(t)}$ can be true in any satisfying assignment of $\Psi^{s,\text{e}}(B)$. This follows from the extremal condition, which would otherwise require two distinct ground terms to be equal.
 
 \begin{property}[Encoding Correctness]
 \label{lem:encoding-correctness}
