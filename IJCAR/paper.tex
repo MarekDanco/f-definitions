@@ -410,9 +410,6 @@ A pre-satisfiability  certificate interprets all arguments of uninterpreted func
 Continuing the example, since $I$ sets the value of $c$ to $5$, $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
 Given a pre-satisfiability certificate, we can now certify the satisfiability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
-\mj{in SAT, unit propagation propagates unique, necessary values, which is not
-the case for $f(x)<f(x+1)$, maybe we want to stress that?}
-
 \begin{definition}
 	\label{def:certificate}
 	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate for $\phi$} is
