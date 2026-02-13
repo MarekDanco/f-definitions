@@ -251,7 +251,13 @@ Bradley et al.~\cite{bradley-vmcai06} present a decision procedure for array pro
 \paragraph{Model-based and instantiation methods.}
 Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model finding techniques for quantified formulas. Their method requires users to ensure admissibility and may introduce many case splits (``merge lemmas'') to satisfy cardinality constraints. Ge and de Moura~\cite{ge-cav09} introduce the Model-Based Quantifier Instantiation (MBQI) but noting that ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA refers to the logic of Habermehl et al.} will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.'' Our work attempts to  address this open question.
 
-\paragraph{Proof certificates and model representation.} move \cite{elad2024infinite} here? \cite{Ratschan:23} \cite{Barbosa:23}
+\paragraph{Proof certificates and model representation.}
+Representation and certification of refutation proofs and models is a
+long-standing and ongoing challenge in the automated reasoning communities.
+There has been recent efforts in TPTP~\cite{SteenSFM23} and SMT2~\cite{Barbosa:23,BarbosaROTB19}
+facing both technical but also theoretical challenges~\cite{BrownJK22} (recall
+that interpretations of FOL formulas are not recursively enumerable).
+\todo{\cite{Ratschan:23}}
 
 \testlength{
 \paragraph{Limitations illustrated.}\todoSN{In the previous version, there is a sentence: ``Here, I am considering the works~\cite{bradley-vmcai06,ge-cav09,habermehl-etaps08}." }
