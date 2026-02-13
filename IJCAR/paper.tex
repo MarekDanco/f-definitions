@@ -681,7 +681,7 @@ It remains to verify the disjointness conditions of \cref{def:certificate}:
 \[X_z\cap \mathit{def}(I)=\emptyset \text{ and } X_z\cap\bigcup_{z'\prec z} \Gamma_{I,z'}(\phi)=\emptyset.\]
 For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.  For $z > b_{\max}$, any element of $X_z$ has the form $f(I(\subst{t}{x}{\repr{z}}))$ with $f(t) \in \mathcal{S}$.
     \begin{itemize}
-    \item To prove that this element of $X_z$ cannot be in $\mathit{def}(I)$, let $f'(n)$ be an arbitrary, but fixed element of $\mathit{def}(I)$ with non-zero arity. We prove that $f'(n)\neq f(I(\subst{t}{x}{\repr{z}}))$. If $f$ is a different function symbol than $f'$ this is certainly the case, and hence it suffices to prove $f(n)\neq f(I(\subst{t}{x}{\repr{z}})$, which makes it necessary to prove $I(n)\neq I(\subst{t}{x}{\repr{z}})$. Due to the construction of the cell interpretation~$I$, $n=I(a)$, with $a\in args(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}, f)$.
+    \item To prove that this element of $X_z$ cannot be in $\mathit{def}(I)$, let $f'(n)$ be an arbitrary, but fixed element of $\mathit{def}(I)$ with non-zero arity. We prove that $f'(n)\neq f(I(\subst{t}{x}{\repr{z}}))$. If $f$ is a different function symbol than $f'$ this is certainly the case, and hence it suffices to prove $f(n)\neq f(I(\subst{t}{x}{\repr{z}}))$, which makes it necessary to prove $I(n)\neq I(\subst{t}{x}{\repr{z}})$. Due to the construction of the cell interpretation~$I$, $n=I(a)$, with $a\in args(F \land \bigwedge_{x \in B} \subst{Q}{x}{\repr{x}}, f)$.
       \begin{itemize}
       \item       If $a\in args(F, f)$, the clash condition $a\cmpsignstrict{\coeffsign{f}s}\subst{t}{x}{\ivbound{B}{s}}$ in $\Psi^+(B,\mathcal{S})$ guarantees that for every ground argument $a \in \args(F,f)$:
         \[
@@ -693,7 +693,7 @@ For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.  For
 
         
       \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
-        $I(\subst{t'}{x}{\repr{z}'}))\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
+        $I(\subst{t'}{x}{\repr{z}'})\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
         \[
           I\models \subst{t'}{x}{\hat{z}'}\cmpsignstrict{\coeffsign{f}+} \subst{t'}{x}{\hat{z}}.
         \]
@@ -701,7 +701,7 @@ For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.  For
                 \[
           I\models \subst{t'}{x}{\hat{z}}\cmpsignstrict{\coeffsign{f}+}\subst{t}{x}{\hat{z}}.
         \]
-Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\repr{z}}))$, which implies that the two sides of the inequality cannot be the same.
+Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\repr{z}})$, which implies that the two sides of the inequality cannot be the same.
     %     \begin{itemize}
     %         \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
     %         \[
