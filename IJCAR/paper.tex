@@ -955,12 +955,32 @@ For any interval $B = [b_{\min}, b_{\max}]$,  and sign~$s\in\{+, -\}$,
 \end{property}
 
 % \begin{proof}
-%     ($\Rightarrow$) Suppose $\Psi_\text{up}^\text{e}(B)$ is satisfiable by an assignment $I$. Define $\mathcal{S} = \{f(t) \mid I(s_{f(t)}) = \text{true}\}$. By $\Phi_{\text{max}}^\text{e}$, for each function $f$, all $f(t) \in \mathcal{S}$ have equal ground parts under $I$, and they are strictly greater than those of any $f(t') \in \mathcal{T} \setminus \mathcal{S}$ with the same $f$. Since all terms have the same coefficient of $x$, this implies $\Phi_{\text{max}}(\mathcal{S})$ holds. By $\Phi_{\text{prop}}^\text{e}$, all $f(t) \in \mathcal{S}$ are equal to $v_{f(t)}$, satisfying the substitution in $\Phi_{\text{prop}}(\mathcal{S})$. Finally, $\text{ClashUpEnc}$ ensures the clash condition $a \leq \subst{t}{x}{b_{\max}}$ for all $f(t) \in \mathcal{S}$. Hence $\Psi_{\text{up}}(B,\mathcal{S})$ holds.
+% ($\Rightarrow$) Suppose $\Psi^{s,\text{e}}(B)$ is satisfiable, and let $\alpha$ be a satisfying assignment. Define $\mathcal{S} = \{ f(t) \in \mathcal{T} \mid \alpha(p_{f(t)}^s) = \text{true} \}$. We show that $\Psi^{s}(B,\mathcal{S})$ holds.
 
-%     ($\Leftarrow$) Suppose $\Psi_{\text{up}}(B,\mathcal{S})$ holds for some $\mathcal{S} \subseteq \mathcal{T}$. Set $s_{f(t)}$ true iff $f(t) \in \mathcal{S}$. By $\Phi_{\text{max}}(\mathcal{S})$, for each function $f$, all selected terms have equal ground parts (after $x=0$ substitution) and these are greater than non-selected ones, so $\Phi_{\text{max}}^\text{e}$ holds. Let $v_{f(t)}$ be the common value for $f(t) \in \mathcal{S}$ (guaranteed by $\Phi_{\text{prop}}(\mathcal{S})$), then $\Phi_{\text{prop}}^\text{e}$ holds. The clash condition from $\Psi_{\text{up}}(B,\mathcal{S})$ ensures $\text{ClashUpEnc}$. Thus $\Psi_\text{up}^\text{e}(B)$ is satisfiable.
-    
-%     The proof for $\Psi_\text{down}^\text{e}(B)$ is symmetric.
-% \qedhere\end{proof}
+% The extremal encoding $\Phi^{s,\text{e}}_{\text{ext}}$ ensures that for each function $f \in \mathcal{F}$:
+% \begin{itemize}
+%     \item For any $f(t), f(t') \in \mathcal{S}$, we have $\alpha(p_{f(t)}^s) = \alpha(p_{f(t')}^s) = \text{true}$, so the implication $(p_{f(t)}^s \land p_{f(t')}^s) \Rightarrow t = t'$ guarantees $t = t'$ after substituting $x=0$. Hence all terms in $\mathcal{S}$ for the same $f$ have equal ground parts.
+%     \item For any $f(t) \in \mathcal{S}$ and $f(t') \in \mathcal{T}\setminus\mathcal{S}$, we have $\alpha(p_{f(t)}^s) = \text{true}$ and $\alpha(p_{f(t')}^s) = \text{false}$, so $(p_{f(t)}^s \land \neg p_{f(t')}^s) \Rightarrow t' \cmpsignstrict{\coeffsign{f}s} t$ gives $t' \cmpsignstrict{\coeffsign{f}s} t$ after substituting $x=0$.
+% \end{itemize}
+% Thus $\Phi^{s}_{\text{ext}}(\mathcal{S})$ holds.
+
+% The propagation encoding $\Phi_{\text{prop}}^{\text{e}}$ directly encodes $\Phi_{\text{prop}}(\mathcal{S})$: for each partition $\mathcal{T}_{\!-}\subseteq\mathcal{T}$, if $\mathcal{T}_{\!-}$ is exactly the set of terms not in $\mathcal{S}$ (i.e., $\bigwedge_{f(t)\in\mathcal{T}_{\!-}} \neg p_{f(t)}^s \land \bigwedge_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}} p_{f(t)}^s$ holds), then the implication ensures $\forall x \forall \bar{u} \exists \bar{v}. Q^{\mathcal{T}_{\!-}}$, which is precisely $\Phi_{\text{prop}}(\mathcal{S})$.
+
+% The clash encoding $\text{ClashEnc}^s$ gives, for each $f(t)\in\mathcal{S}$ and each $a \in \args(F,f)$, the implication $p_{f(t)}^s \Rightarrow a \cmpsignstrict{\coeffsign{f}s} \subst{t}{x}{\ivbound{B}{s}}$. Since $p_{f(t)}^s$ is true for all $f(t)\in\mathcal{S}$, this yields exactly the clash condition in $\Psi^{s}(B,\mathcal{S})$.
+
+% Hence $\Psi^{s}(B,\mathcal{S})$ holds.
+
+% ($\Leftarrow$) Suppose $\Psi^{s}(B,\mathcal{S})$ holds for some $\mathcal{S}\subseteq\mathcal{T}$. Define an assignment $\alpha$ by setting $\alpha(p_{f(t)}^s) = \text{true}$ iff $f(t) \in \mathcal{S}$. We show that $\alpha$ satisfies $\Psi^{s,\text{e}}(B)$.
+
+% From $\Phi^{s}_{\text{ext}}(\mathcal{S})$, we know that all terms in $\mathcal{S}$ for the same $f$ have equal ground parts, and for any $f(t)\in\mathcal{S}$, $f(t')\notin\mathcal{S}$, we have $t' \cmpsignstrict{\coeffsign{f}s} t$ after substituting $x=0$. This directly implies $\Phi^{s,\text{e}}_{\text{ext}}$ holds under $\alpha$.
+
+% The condition $\Phi_{\text{prop}}(\mathcal{S})$ states that for the specific partition where $\mathcal{T}_{\!-} = \mathcal{T}\setminus\mathcal{S}$, we have $\forall x \forall \bar{u} \exists \bar{v}. Q^{\mathcal{T}_{\!-}}$. Under $\alpha$, this partition satisfies $\bigwedge_{f(t)\in\mathcal{T}_{\!-}} \neg p_{f(t)}^s \land \bigwedge_{f(t)\in\mathcal{T}\setminus\mathcal{T}_{\!-}} p_{f(t)}^s$, so $\Phi_{\text{prop}}^{\text{e}}$ holds. (For other partitions, the antecedent is false, making the implication vacuously true.)
+
+% The clash condition in $\Psi^{s}(B,\mathcal{S})$ gives, for each $f(t)\in\mathcal{S}$ and each $a \in \args(F,f)$, the inequality $a \cmpsignstrict{\coeffsign{f}s} \subst{t}{x}{\ivbound{B}{s}}$. Since $\alpha(p_{f(t)}^s)$ is true exactly for $f(t)\in\mathcal{S}$, this is precisely $\text{ClashEnc}^s$.
+
+% Thus $\alpha$ satisfies $\Psi^{s,\text{e}}(B)$.
+% \qedhere
+% \end{proof}
 
 % \paragraph{Practical Considerations.}
 % The exponential disjunctions in \cref{alg:interval-check-param-withBigvee} 
