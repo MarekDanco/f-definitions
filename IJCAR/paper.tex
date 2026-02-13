@@ -1042,18 +1042,7 @@ Improving the algorithm on cases similar to this one is a subject of future work
 \section{Conclusion}
 \label{sec:conclusion}
 
-\testlength{
-We have presented a novel approach to certifying satisfiability for universally quantified integer arithmetic formulas with uninterpreted functions—a fragment of UFLIA that appears naturally in verification of arrays and recursive programs. Unlike traditional $\smt$ methods that construct explicit models, our technique replaces infinite models with finite inductive certificates based on propagation arguments.
-
-At the foundation lies a general certificate framework that decouples the logical structure of satisfiability proofs from algorithmic details. A certificate consists of a finite base assignment, a well‑order, and propagators that extend the assignment stepwise along that order. This framework is sound for any well‑founded order and any number of quantified variables, providing a flexible basis for future extensions.
-
-For the single‑variable fragment we instantiate the framework with a concrete, implementable algorithm. The algorithm searches for a base interval~$B$ and term subsets~$\mathcal{S},\mathcal{S}'$ satisfying the \req condition—a propagation property that ensures the assignment on~$B$ can be extended outward without conflict. By encoding the search as ordinary $\smt$ queries, and employing a compact CNF encoding to avoid exponential blow‑up, we obtain a procedure that is sound, relatively complete for formulas satisfying \req, and directly executable on existing $\smt$ solvers.
-
-Our experiments...
-
-The main limitations of the current algorithm—its restriction to one quantified variable and to uniform coefficients per function—point to natural directions for future work. Generalizing the propagation condition to handle multiple variables, non‑collinear coefficients, or nested function calls would significantly widen its applicability.
-
-In summary, by shifting from explicit model construction to inductive propagation we offer a viable, certificate‑based alternative for deciding satisfiability in a practically relevant fragment of UFLIA. The approach bridges the gap between decidable special cases and purely heuristic methods, opening new avenues for verification tools that require both scalability and verifiable correctness.}
+We have presented a method for certifying satisfiability of formulas with universal quantifiers and uninterpreted function symbols, and a corresponding algorithm for a specific class of formulas in the SMTLIB theory UFLIA. By relying on induction, the method is able to succeed for formulas that do not have a finite model, and for formulas that are satisfiable only by functions that do not have a closed form representation. In addition to current syntactic restrictions, the introduced algorithm is restricted to satisfying the semantic $\req$ condition that enables induction. In future work, we intend to weaken this restriction, for example, using stronger forms of induction. Our long term vision is a general algorithm that is parametric in the used base theory and that only depends on a predicate defining the order in which to apply induction.
 
 \bibliographystyle{abbrv}
 \bibliography{refs}
