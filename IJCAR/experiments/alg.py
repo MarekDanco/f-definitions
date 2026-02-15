@@ -204,7 +204,6 @@ else:
         solver.reset()
         solver.add(*maximality(b))
         solver.add(*reqpivot(b))
-        # print(clash())
         solver.add(*clash(b))
         subs = [
             (b.x, IntVal(i)) for i in range(0, bmax + 1)
@@ -213,10 +212,9 @@ else:
         # print(list(map(lambda x : substitute(Q, x), subs)))
         solver.add(b.F)
         solver.add(list(map(lambda x: substitute(Q, x), subs)))
+        # print("solving", [0, bmax])
         res = solver.check()
         if res == sat:
-            # print(solver)
-            # print(solver.model())
             print("model:")
             model = solver.model()
             funcs = [f for f in model.decls() if f.arity() > 0]

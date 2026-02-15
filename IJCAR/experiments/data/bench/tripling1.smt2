@@ -1,12 +1,14 @@
 (set-logic UFLIA)
 (declare-fun f (Int) Int)
-(assert (= (f 0) 0))
+(declare-fun c () Int)
+(assert (> c 1))
+(assert (= (f 0) c))
 (assert (forall ((x Int))
   (=>
     (<=
       0 x
     )
-    (= (f (+ x 2)) (+ (f (+ x 0)) 2 x))
+    (= (f (+ x 1)) (+ c (* 3 (f (+ x 0)))))
   )
 ))
 (check-sat)
