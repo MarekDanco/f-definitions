@@ -134,7 +134,7 @@ Czech Institute of Informatics, Robotics and Cybernetics, Czech Technical Univer
 
 Current $\smt$ solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
 
-In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols. We mainly concentrate on the combination with linear arithmetic, which corresponds to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays\cite{bradley-manna07}. Current $\smt$ solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite yet large.
+In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols. We mainly concentrate on the combination with linear arithmetic, which corresponds to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays~\cite{bradley-manna07}. Current $\smt$ solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite yet large.
 
 In this paper, we explore an alternative approach: instead of explicit model construction, we prove satisfiability using inductive arguments. More specifically, we
 \begin{itemize}
@@ -250,12 +250,12 @@ $\forall x.\,f(x)+f(x)>x$ is deskolemizable but $\forall x.\,f(x)+f(x+1)>1$ is n
 Bradley et al.~\cite{bradley-vmcai06} present a decision procedure for array properties but explicitly forbid arithmetic on the universally quantified variables. Habermehl et al.~\cite{habermehl-etaps08} allow constraints of the form $a[i+c]$ with difference bounds, but remain limited to offset-bounded indices. Alberti et al.~\cite{alberti2014decision} are restricted to flat formulas with one universally quantified variable. This excludes terms such as $a[i+1]$, which are the main focus of our paper. Elad et al.~\cite{elad2024infinite} prove decidability for a first‑order fragment without arithmetic, unable to express our constraints.
 
 \paragraph{Model-based and instantiation methods.}
-Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model finding techniques for quantified formulas. Their method requires users to ensure admissibility and may introduce many case splits (``merge lemmas'') to satisfy cardinality constraints. Ge and de Moura~\cite{ge-cav09} introduce the Model-Based Quantifier Instantiation (MBQI) but noting that ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA refers to the logic of Habermehl et al.} will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.'' Our work attempts to  address this open question.
+Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model finding techniques for quantified formulas. Their method requires users to ensure admissibility and may introduce many case splits (``merge lemmas'') to satisfy cardinality constraints. Ge and de Moura~\cite{ge-cav09} introduce Model-Based Quantifier Instantiation (MBQI), noting that ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA refers to the logic of Habermehl et al.} will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.'' Our work attempts to  address this open question.
 
 \paragraph{Proof certificates and model representation.}
 Representation and certification of refutation proofs and models is a
 long-standing and ongoing challenge in the automated reasoning communities.
-There has been recent efforts in TPTP~\cite{SteenSFM23} and SMT~\cite{Barbosa:23,BarbosaROTB19,lachnitt_et_al:LIPIcs.ITP.2025.26,leansmt}
+There have been recent efforts in TPTP~\cite{SteenSFM23} and SMT~\cite{Barbosa:23,BarbosaROTB19,lachnitt_et_al:LIPIcs.ITP.2025.26,leansmt}
 facing both technical but also theoretical challenges~\cite{BrownJK22} (recall
 that interpretations of FOL formulas are not recursively enumerable).
 \todo{\cite{Ratschan:23}}
@@ -434,7 +434,7 @@ A pre-satisfiability  certificate interprets all arguments of uninterpreted func
 \end{definition}
 Continuing the example, since $I$ sets the value of $c$ to $5$, $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
-Given a pre-satisfiability certificate, we can now certify the satisfiability of formulas by propagating the values given by a pre-satisfiablity certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
+Given a pre-satisfiability certificate, we can now certify the satisfiability of formulas by propagating the values given by a pre-satisfiability certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
 \begin{definition}[propagation]%
 	\label{def:certificate}
 	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate for $\phi$} is
