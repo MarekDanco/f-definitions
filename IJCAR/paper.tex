@@ -416,7 +416,7 @@ In order to allow a computer representation of cell interpretations, we will alw
 % % ORIGINAL: However, we will want that at least those cells are defined, that allow us to check satisfaction of parts of formulas without quantifiers, and that for all universally quantified parts and instantiations of the universal quantifier, allow us to determine the value of all arguments of uninterpreted function symbols.
 However, we require that enough cells are defined to (i)~check satisfaction of the quantifier-free part of formulas, and (ii)~determine the value of all arguments of uninterpreted function symbols in the universally quantified part for every instantiation of the universal quantifier.
 
-\begin{definition}[pre-satisfiability certificate]%
+\begin{definition}[Pre-satisfiability Certificate]%
 	\label{def:pre-sat-cert}
 	Given a formula $\phi$ of the form $F\wedge \forall \bar{x}\;.\; Q$, we call a cell interpretation $I$ such that
 	\begin{itemize}
@@ -428,14 +428,14 @@ However, we require that enough cells are defined to (i)~check satisfaction of t
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$.
 
 A pre-satisfiability  certificate interprets all arguments of uninterpreted function symbols in $F$ to a value in the domain $\domain$, and---together with a value for the quantified variables---also in $Q$. This fixes a set of cells.
-\begin{definition}[fixed cells]
+\begin{definition}[Fixed Cells]
   For any $z\in\domain^{\numvar{\bar{x}}}$, $\Gamma_{I,z}(F\wedge \forall \bar{x}\;.\; Q):=$
 \[\{ f(I(\subst{t}{\bar{x}}{\repr{z}})) \mid t\in args(Q, f), f \emph{ is an uninterpreted function symbol}\}.\]
 \end{definition}
 Continuing the example, since $I$ sets the value of $c$ to $5$, $\Gamma_{I,10}(\phi)=\{ f(15), f(16)\}$.
 
 Given a pre-satisfiability certificate, we can now certify the satisfiability of formulas by propagating the values given by a pre-satisfiability certificate in such a way that for each value of the universally quantified variables, the corresponding quantified sub-formula holds.
-\begin{definition}[propagation]%
+\begin{definition}[Satisfiability Certificate]%
 	\label{def:certificate}
 	Given a formula $\phi$  of the form $F\wedge \forall \bar{x}\;.\; Q$, a \emph{satisfiability certificate for $\phi$} is
 	\begin{itemize}
