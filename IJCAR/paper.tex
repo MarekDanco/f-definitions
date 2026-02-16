@@ -134,7 +134,7 @@ Czech Institute of Informatics, Robotics and Cybernetics, Czech Technical Univer
 
 Current $\smt$ solvers have mainly been designed to prove unsatisfiability. As a consequence,  they have limited capabilities to detect satisfiability of formulas not belonging to known decidable classes. However, the ability to detect satisfiability is important for identifying counter-examples, which is indispensable in many applications~\cite{clarke25}.
 
-In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols. We mainly concentrate on the combination with linear arithmetic, which corresponds to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays~\cite{bradley-manna07}. Current $\smt$ solvers mainly rely on heuristics~\cite{Reynolds:17}\todoSR{Mikoláš, do you want to add some of your work?} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite yet large.
+In this paper, we address this problem for formulas containing universal quantifiers and uninterpreted function symbols. We mainly concentrate on the combination with linear arithmetic, which corresponds to the SMTLIB logic UFLIA, which is undecidable~\cite{Downey:72,Horbach:17}. However, such formulas occur in important applications, for example, in program verification, where uninterpreted function symbols play an important role in reasoning about arrays~\cite{bradley-manna07}. Current $\smt$ solvers mainly rely on heuristics~\cite{Reynolds:17} to prove unsatisfiability of such formulas. To prove satisfiability, they explicitly construct a model~\cite{ge-cav09,reynolds2013finite}. This fails for formulas as simple as $f(0)=0\wedge \forall x \;.\; f(x+1)=f(x)+1$, which do not have a finite model, and is costly for formulas whose smallest model is finite yet large.
 
 In this paper, we explore an alternative approach: instead of explicit model construction, we prove satisfiability using inductive arguments. More specifically, we
 \begin{itemize}
@@ -743,7 +743,7 @@ While proofs of unsatisfiability are not the main goal of this paper, \Cref{alg:
 If there exists a finite set $Z\subseteq\mathbb{Z}$ such that $F \land \bigwedge_{z\in Z} Q[x \mapsto \repr{z}]$ is unsatisfiable, then \cref{alg:interval-check-param-withBigvee} will terminate and return \textsc{Unsat}.
 \end{theorem}
 
-However, there are formulas that are not satisfiable in a standard model\todoSR{Should we make a more general statement? (see the discussion in the MBQI paper)}, for which the algorithm does not terminate.
+However, there are formulas that are not satisfiable in a standard model, for which the algorithm does not terminate.
 %This occurs when the unsatisfiability relies on reasoning that cannot be captured by finite instantiation alone.
 
 \begin{example}[Formula Requiring Induction]
