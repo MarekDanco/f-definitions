@@ -872,7 +872,7 @@ To simplify the implementation, we used versions that have an additional guard t
 
 Apart from the upper bound $10^c$, our problems do not contain big integers in function arguments, which would make a smarter
 initialization of the interval~$[b_{\min},b_{\max}]$ necessary in order to avoid numerous loop
-iterations of the while cycle in \cref{alg:interval-check-param-withBigvee}.
+iterations of the while loop in \cref{alg:interval-check-param-withBigvee}.
 
 We implemented our algorithm using the \textsc{z3} Python API. Our implementation checks only upward induction using~$\Psi^+$,
 but leaves out downward induction, which is sound due to the guard described in the previous paragraph.
