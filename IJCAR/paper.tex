@@ -37,8 +37,8 @@
 \newcommand{\coeffsign}[1]{\sigma(#1)}
 \newcommand{\ivbound}[2]{\text{bd}(#1,#2)}
 
-% \newcommand{\testlength}[1]{}
-\newcommand{\testlength}[1]{#1}
+\newcommand{\testlength}[1]{}
+%\newcommand{\testlength}[1]{#1}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
@@ -258,7 +258,7 @@ long-standing and ongoing challenge in the automated reasoning communities.
 There have been recent efforts in TPTP~\cite{SteenSFM23} and SMT~\cite{Barbosa:23,BarbosaROTB19,lachnitt_et_al:LIPIcs.ITP.2025.26,leansmt}
 facing both technical but also theoretical challenges~\cite{BrownJK22} (recall
 that interpretations of FOL formulas are not recursively enumerable).
-\todo{\cite{Ratschan:23}}
+%\todo{\cite{Ratschan:23}}
 
 \testlength{
 \paragraph{Limitations illustrated.}\todoSN{In the previous version, there is a sentence: ``Here, I am considering the works~\cite{bradley-vmcai06,ge-cav09,habermehl-etaps08}." }
@@ -277,7 +277,7 @@ These examples demonstrate the need for a method that handles arithmetic offsets
 \label{sec:problem-statement}
 
 % \paragraph{Formula Class}
-We introduce a method for certifying satisfiability of $\smt$ formulas with uninterpreted function symbols whose domain is a sort associated with a theory that has a countable canonical model.\todoSR{I am not sure whether my usage of $\smt$ terminology is OK} In the case where this theory is linear integer arithmetic, the resulting formulas belong to the 
+We introduce a method for certifying satisfiability of $\smt$ formulas with uninterpreted function symbols whose domain is a sort associated with a theory that has a countable canonical model. In the case where this theory is linear integer arithmetic, the resulting formulas belong to the 
 SMTLIB theory UFLIA. The formulas we consider are
 of the form
 \begin{equation}\label{eq:main-fragment}
@@ -947,7 +947,7 @@ solution in the unbounded problems.
 % Improving the algorithm on cases similar to this one is a subject of future work.
 
 
-\section{Conclusion}\todoSR{rewritten, please have a look}
+\section{Conclusion}
 \label{sec:conclusion}
 
 We have presented a method for certifying satisfiability of formulas with universal quantifiers and uninterpreted function symbols, and a corresponding algorithm for a specific class of formulas in the SMTLIB theory UFLIA. By relying on induction, the method succeeds for formulas without finite models and for formulas satisfiable only by functions lacking closed-form representations.
