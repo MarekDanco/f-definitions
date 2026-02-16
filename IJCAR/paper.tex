@@ -871,45 +871,52 @@ To simplify the implementation, we used versions that have an additional guard t
 
 Apart from the upper bound $10^c$, our problems do not contain big integers in function arguments, which would make a smarter
 initialization of the interval~$[b_{\min},b_{\max}]$ necessary in order to avoid numerous loop
-iterations in \cref{alg:interval-check-param-withBigvee}.
+iterations of the while cycle in \cref{alg:interval-check-param-withBigvee}.
 
-We implemented our algorithm using the \textsc{z3} Python API. Our implementation only checks upward induction using~$\Psi^+$,
+We implemented our algorithm using the \textsc{z3} Python API. Our implementation checks only upward induction using~$\Psi^+$,
 but leaves out downward induction, which is sound due to the guard described in the previous paragraph.
 It turned out that our algorithm terminates on all problems in negligible time.
-Moreover,  the value of the parameter~$c$ does not have a noticeable influence on runtime
+Moreover, the value of the parameter~$c$ does not have a noticeable influence on runtime
 for the bounded versions of the test problems. We found the former observation surprising,
 while the latter was to be expected, due to the use of induction.
 
 We also applied the \textsc{smt} solvers \textsc{z3} and \textsc{cvc5}
 directly to our problems, explicitly turning on model based quantifier instantiation~\cite{ge-cav09}.
-Additionally, we ran \textsc{cvc5} in \textsc{sygus} inference mode.
-To study the behavior of direct application of $\smt$ solvers to our problems, and the influence
-of the parameter~$c$ on their runtime, we ran our experiments with a 15-minute time limit.
-When setting $c = 1$, the state of the art \textsc{smt} solvers terminate on our
+Additionally, we also ran \textsc{cvc5} in \textsc{sygus} inference mode.
+To study the behavior of direct application of the three $\smt$ solvers to our problems, and the influence
+of the parameter~$c$ on their runtime, we ran our experiments with a 10-minute time limit.
+When setting $c = 1$, the \textsc{smt} solvers terminate on our
 problems immediately. On problem~\eqref{eq:exp1} with $c = 3$, \textsc{cvc5} takes
-64 seconds to return \textsc{sat}, and for $c \geq 4$, the solver times out. With
-$c \geq 2$, \textsc{z3} returns \textsc{unknown} after 12 seconds. On problem~\eqref{eq:exp2},
-\textsc{cvc5} times out with $c \geq 3$ and \textsc{z3} returns \textsc{unknown} starting
-from $c = 2$. Figure~\ref{fig:scaling} further depicts how the two solvers perform on our problems
-with increasing $c$.
-We also tested the performance of the two solvers on unbounded problems, that is with the
-bound $0 \le x \le 10^c$ removed. \textsc{z3} solved 5 of those problems while \textsc{cvc5}
-solved 2.
+54 seconds to return \textsc{sat}, and for $c \geq 4$, the solver times out.
+With $c \geq 2$, \textsc{z3} returns \textsc{unknown} after 12 seconds. For problem~\eqref{eq:exp2},
+both solvers fail as $c$ increases: \textsc{cvc5} reaches the timeout when $c \geq 3$,
+and \textsc{z3} returns \textsc{unknown} for $c \geq 2$ (typically within 44–50 seconds).
+Figure~\ref{fig:scaling} further depicts how the two solvers perform on our problems with increasing $c$.
+We also tested the performance of the three solvers on unbounded problems, that is with the
+bound $0 \le x \le 10^c$ removed. \textsc{z3} solved 4 of those problems while \textsc{cvc5}
+solved none.
 
-\textsc{cvc5} in \textsc{sygus} mode solved all except two of our problems regardless
+\textsc{cvc5} in \textsc{sygus} mode solved 15 of our problems regardless
 of the asserted bounds.
-The first problem is
+One of the problems that \textsc{cvc5} in \textsc{sygus} mode did not solve is
 \begin{align*}
 	f(0) = 1 \;\land \:\forall x \:. \:f(x+1) = 2*f(x).
 \end{align*}
-The second one is similar to the previous one with added integer constant in the quantified part.
-We assume the reason for this is that the function $\lambda x. \:2^{x}$ is not in \textsc{cvc5}
-default \textsc{sygus} grammar.
+It is reasonable to assume that the function $\lambda x. \:2^{x}$ is not in \textsc{cvc5}
+default \textsc{sygus} grammar. Further, Figure~\ref{fig:scaling} clearly shows
+that \textsc{sygus} approach is fast and consistent, but only on problems where
+the functions conform to the pre-defined grammar.
+
+We further tested the performance of the three solvers within 1 minute time limit
+(denoted by the -min suffix in Figure~\ref{fig:scaling}).
+The performance of \textsc{z3} was the same. \textsc{cvc5} loses 1 solution for
+$c = 2$ and $c = 3$. Additionally, \textsc{cvc5} in \textsc{sygus} mode loses 1
+solution in the unbounded problems.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.6\linewidth]{experiments/data/scaling_plot.png}
-	\caption{Problems solved with increasing $c$, with $*$ referring to unbounded problems.}
+	\caption{Problems solved with increasing $c$. $*$ reffers to unbounded problems.}
 	\label{fig:scaling}
 \end{figure}
 
