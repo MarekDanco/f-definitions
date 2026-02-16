@@ -1,2 +1,7 @@
 __pycache__/
 indent.log
+/*.py
+/*.smt2
+scripts/
+notes/
+examples/

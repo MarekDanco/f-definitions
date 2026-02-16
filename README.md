@@ -1,2 +1,2 @@
 Code and data for our IJCAR26 submission
-Certifying Satisfiability of Universally Quantified Integer Arithmetic with Uninterpreted Function Symbols
+Inductive Satisfiability Certification for Universal Quantifiers and Uninterpreted Function Symbols
