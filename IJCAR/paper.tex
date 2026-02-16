@@ -895,12 +895,13 @@ solved none.
 
 \textsc{cvc5} in \sygus mode solved 15 of our problems regardless
 of the asserted bounds.
-One problem that \textsc{cvc5} in \sygus mode did not solve is
+One of the problems that \textsc{cvc5} in \sygus mode did not solve is
 \begin{align*}
 	f(0) = 1 \;\land \:\forall x \:. \:f(x+1) = 2*f(x).
 \end{align*}
 It is reasonable to assume that the function $\lambda x. \:2^{x}$ is not in \textsc{cvc5}
-default \sygus grammar. Further, Figure~\ref{fig:scaling} clearly shows
+default \sygus grammar. In total, 13 problems remain unsolved by this solver.
+Figure~\ref{fig:scaling} clearly shows
 that the \sygus approach is fast and consistent, but only on problems where
 the functions conform to the pre-defined grammar.
 
