@@ -867,21 +867,17 @@ and
 \begin{equation}\label{eq:exp2}
 	d > 1\:\land\: f(0)=0 \:\land\: g(2) > f(d+1) \land\forall x \:.\: f(x-1)=f(x)+g(x)+g(x+d).
 \end{equation}
-To simplify the implementation, we used versions that have an additional guard to restrict the range of the universally quantified variable to the naturals instead of the integers. The resulting formulas are of the form $F\land (\forall x \:.\: 0\leq x \Rightarrow Q)$. To study solver behavior over increasing model size, we also used versions where the guard restricts the range to a finite interval with upper bound $10^c$, with  $c\in \{1,\dots,5\}$. The resulting formulas are of the form  $F\land \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$.
+To simplify implementation, we used versions that have an additional guard to restrict the range of the universally quantified variable to the naturals instead of the integers. The resulting formulas are of the form $F\land (\forall x \:.\: 0\leq x \Rightarrow Q)$. To study solver behavior over increasing model size, we also used versions where the guard restricts the range to a finite interval with upper bound $10^c$, with  $c\in \{1,\dots,5\}$. The resulting formulas are of the form  $F\land \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$.
 
-Apart from the upper bound $10^c$, our problems do not contain big integers in function arguments, which would make a smarter
-initialization of the interval~$[b_{\min},b_{\max}]$ necessary in order to avoid numerous loop
-iterations of the while loop in \cref{alg:interval-check-param-withBigvee}.
+Apart from the upper bound $10^c$, our problems do not contain big integers in function arguments, which would necessitate smarter initialization of the interval~$[b_{\min},b_{\max}]$ in order to avoid numerous loop iterations of the while loop in \cref{alg:interval-check-param-withBigvee}.
 
-We implemented our algorithm using the \textsc{z3} Python API. Our implementation checks only upward induction using~$\Psi^+$,
-but leaves out downward induction, which is sound due to the guard described in the previous paragraph.
-It turned out that our algorithm terminates on all problems in negligible time.
-Moreover, the value of the parameter~$c$ does not have a noticeable influence on runtime
+We implemented our algorithm using the \textsc{z3} Python API. Our implementation checks only upward induction using~$\Psi^+$, omitting downward induction, which is sound due to the guard described in the previous paragraph. It turned out that our algorithm terminates on all problems in negligible time.
+Moreover, the value of the parameter~$c$ does not noticeably influence on runtime
 for the bounded versions of the test problems. We found the former observation surprising,
 while the latter was to be expected, due to the use of induction.
 
 We also applied the \textsc{smt} solvers \textsc{z3} and \textsc{cvc5}
-directly to our problems, explicitly turning on model based quantifier instantiation~\cite{ge-cav09}.
+directly to our problems, explicitly enabling model based quantifier instantiation~\cite{ge-cav09}.
 Additionally, we also ran \textsc{cvc5} in \textsc{sygus} inference mode.
 To study the behavior of direct application of the three $\smt$ solvers to our problems, and the influence
 of the parameter~$c$ on their runtime, we ran our experiments with a 10-minute time limit.
@@ -898,7 +894,7 @@ solved none.
 
 \textsc{cvc5} in \textsc{sygus} mode solved 15 of our problems regardless
 of the asserted bounds.
-One of the problems that \textsc{cvc5} in \textsc{sygus} mode did not solve is
+One problem that \textsc{cvc5} in \textsc{sygus} mode did not solve is
 \begin{align*}
 	f(0) = 1 \;\land \:\forall x \:. \:f(x+1) = 2*f(x).
 \end{align*}
@@ -907,7 +903,7 @@ default \textsc{sygus} grammar. Further, Figure~\ref{fig:scaling} clearly shows
 that \textsc{sygus} approach is fast and consistent, but only on problems where
 the functions conform to the pre-defined grammar.
 
-We further tested the performance of the three solvers within 1 minute time limit
+We further tested the performance of the three solvers within a 1-minute time limit
 (denoted by the -min suffix in Figure~\ref{fig:scaling}).
 The performance of \textsc{z3} was the same. \textsc{cvc5} loses 1 solution for
 $c = 2$ and $c = 3$. Additionally, \textsc{cvc5} in \textsc{sygus} mode loses 1
@@ -916,7 +912,7 @@ solution in the unbounded problems.
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.6\linewidth]{experiments/data/scaling_plot.png}
-	\caption{Problems solved with increasing $c$. $*$ reffers to unbounded problems.}
+	\caption{Problems solved with increasing $c$. $*$ refers to unbounded problems.}
 	\label{fig:scaling}
 \end{figure}
 
