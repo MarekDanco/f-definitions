@@ -1,6 +1,0 @@
-; Contradictory inequalities: forall x. f(cons(0,x)) > f(x) AND f(cons(0,x)) < f(x)
-; Expected: UNSAT (impossible to be both greater and less)
-(declare-datatypes ((MyList 0)) (((nil) (cons (head Int) (tail MyList)))))
-(declare-fun f (MyList) Int)
-(assert (forall ((x MyList)) (and (> (f (cons 0 x)) (f x)) (< (f (cons 0 x)) (f x)))))
-(check-sat)
