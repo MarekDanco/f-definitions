@@ -897,7 +897,7 @@ One problem that \textsc{cvc5} in \textsc{sygus} mode did not solve is
 \end{align*}
 It is reasonable to assume that the function $\lambda x. \:2^{x}$ is not in \textsc{cvc5}
 default \textsc{sygus} grammar. Further, Figure~\ref{fig:scaling} clearly shows
-that \textsc{sygus} approach is fast and consistent, but only on problems where
+that the \textsc{sygus} approach is fast and consistent, but only on problems where
 the functions conform to the pre-defined grammar.
 
 We further tested the performance of the three solvers within a 1-minute time limit
@@ -958,7 +958,7 @@ stronger forms of induction. Our long term vision is a general algorithm that is
 
   Assume a cell $u$ with $\mathit{inst}(u)\neq\bot$, a  cell~$v\in\Gamma_{I,\mathit{inst}(u)}(\phi)\setminus \mathit{def}(I)\setminus X_z$ with $\mathit{inst}(v)\neq\bot$, and assume that $\mathit{inst}(v)\succeq \mathit{inst}(u)$. Then both $v\in X_{\mathit{inst}(v)}$ and $v \in \Gamma_{I,\mathit{inst}(u)}(\phi)$, and hence $X_{\mathit{inst}(v)}\cap \Gamma_{I,\mathit{inst}(u)}(\phi)\neq\emptyset$. 
 %  Then $u\in X_{\mathit{inst}(u)}\subseteq \Gamma_{I,\mathit{inst}(u)}$ and $v\in X_{\mathit{inst}(v)}$.
-  This contradicts the requirement that $X_{inst(v)}\cap \mathit{def}(I)=\emptyset$ and $X_{inst(v)}\cap\bigcup_{z'\prec inst(v)} \Gamma_{I,z'}(\phi)=\emptyset$.
+  This contradicts the requirement that $X_{\mathit{inst}(v)}\cap \mathit{def}(I)=\emptyset$ and $X_{\mathit{inst}(v)}\cap\bigcup_{z'\prec inst(v)} \Gamma_{I,z'}(\phi)=\emptyset$.
   \qedhere
 
 
@@ -1018,7 +1018,7 @@ For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.  For
                 \[
           I\models \subst{t'}{x}{\hat{z}}\cmpsignstrict{\coeffsign{f}+}\subst{t}{x}{\hat{z}}.
         \]
-Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}} I(\subst{t}{x}{\repr{z}})$, which implies that the two sides of the inequality cannot be the same.
+Hence $I(\subst{t'}{x}{\repr{z}'})\cmpsignstrict{\coeffsign{f}+} I(\subst{t}{x}{\repr{z}})$, which implies that the two sides of the inequality cannot be the same.
     %     \begin{itemize}
     %         \item If $z' \leq b_{\max}$: For any $t'$ with $f(t') \in \mathcal{T}$, 
     %         \[
