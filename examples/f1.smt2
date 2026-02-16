@@ -1,8 +1,0 @@
-(set-logic UFLIA)
-(declare-fun f (Int) Int)
-(declare-const a Int)
-(assert (forall ((x Int)) (=> (= (mod x 2) 0) (< (f x) (f (+ 1 x))))))
-(assert (forall ((x Int)) (=> (= (mod x 2) 1) (= (f x) (f (+ 1 x))))))
-(assert (not (= (f a) (f (+ a 2)))))
-(check-sat)
-(get-model)
