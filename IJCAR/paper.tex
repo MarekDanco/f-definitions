@@ -870,25 +870,25 @@ and
 \end{equation}
 To simplify implementation, we used versions that have an additional guard to restrict the range of the universally quantified variable to the naturals instead of the integers. The resulting formulas are of the form $F\land (\forall x \:.\: 0\leq x \Rightarrow Q)$. To study solver behavior over increasing model size, we also used versions where the guard restricts the range to a finite interval with upper bound $10^c$, with  $c\in \{1,\dots,5\}$. The resulting formulas are of the form  $F\land \forall x \:.\: (0\leq x \leq 10^c\Rightarrow Q)$.
 
-Apart from the upper bound $10^c$, our problems do not contain big integers in function arguments, which would necessitate smarter initialization of the interval~$[b_{\min},b_{\max}]$ in order to avoid numerous loop iterations of the while loop in \cref{alg:interval-check-param-withBigvee}.
+Apart from the upper bound $10^c$, our problems do not contain big integers in function arguments, which would necessitate smarter initialization of the interval~$[b_{\min},b_{\max}]$ to avoid numerous loop iterations of the while loop in \cref{alg:interval-check-param-withBigvee}.
 
 We implemented our algorithm using the \textsc{z3} Python API. Our implementation checks only upward induction using~$\Psi^+$, omitting downward induction, which is sound due to the guard described in the previous paragraph. It turned out that our algorithm terminates on all problems in negligible time.
-Moreover, the value of the parameter~$c$ does not noticeably influence on runtime
+Moreover, the value of the parameter~$c$ does not noticeably influence runtime
 for the bounded versions of the test problems. We found the former observation surprising,
 while the latter was to be expected, due to the use of induction.
 
 We also applied the \textsc{smt} solvers \textsc{z3} and \textsc{cvc5}
-directly to our problems, explicitly enabling model based quantifier instantiation~\cite{ge-cav09}.
-Additionally, we also ran \textsc{cvc5} in \textsc{sygus} inference mode.
+directly to our problems, explicitly enabling model-based quantifier instantiation~\cite{ge-cav09}.
+Additionally, we ran \textsc{cvc5} in \textsc{sygus} inference mode.
 To study the behavior of direct application of the three $\smt$ solvers to our problems, and the influence
 of the parameter~$c$ on their runtime, we ran our experiments with a 10-minute time limit.
 When setting $c = 1$, the \textsc{smt} solvers terminate on our
 problems immediately. On problem~\eqref{eq:exp1} with $c = 3$, \textsc{cvc5} takes
 54 seconds to return \textsc{sat}, and for $c \geq 4$, the solver times out.
 With $c \geq 2$, \textsc{z3} returns \textsc{unknown} after 12 seconds. For problem~\eqref{eq:exp2},
-both solvers fail as $c$ increases: \textsc{cvc5} reaches the timeout when $c \geq 3$,
+both solvers fail as $c$ increases: \textsc{cvc5} times out when $c \geq 3$,
 and \textsc{z3} returns \textsc{unknown} for $c \geq 2$ (typically within 44–50 seconds).
-Figure~\ref{fig:scaling} further depicts how the two solvers perform on our problems with increasing $c$.
+Figure~\ref{fig:scaling} depicts how the two solvers perform on our problems with increasing $c$.
 We also tested the performance of the three solvers on unbounded problems, that is with the
 bound $0 \le x \le 10^c$ removed. \textsc{z3} solved 4 of those problems while \textsc{cvc5}
 solved none.
