@@ -199,8 +199,14 @@ In this paper, we explore an alternative approach: instead of explicit model con
 
 \section{Related Work}
 
-Our work intersects several areas of automated reasoning: synthesis, decision
-procedures for arrays, and model-based quantifier instantiation.
+Our work intersects several areas of automated reasoning: model-based quantifier instantiation, decision
+procedures for arrays, synthesis, and proof certificates.
+
+\paragraph{Model-based and instantiation methods.}
+Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model finding techniques for quantified formulas. Their method requires users to ensure admissibility and may introduce many case splits (``merge lemmas'') to satisfy cardinality constraints. Ge and de Moura~\cite{ge-cav09} introduce Model-Based Quantifier Instantiation (MBQI), noting that ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA refers to the logic of Habermehl et al.} will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.'' Our work attempts to  address this open question.
+
+\paragraph{Decision procedures for arrays and quantified formulas.}
+Bradley et al.~\cite{bradley-vmcai06} present a decision procedure for array properties but explicitly forbid arithmetic on the universally quantified variables. Habermehl et al.~\cite{habermehl-etaps08} allow constraints of the form $a[i+c]$ with difference bounds, but remain limited to offset-bounded indices. Alberti et al.~\cite{alberti2014decision} are restricted to flat formulas with one universally quantified variable. This excludes terms such as $a[i+1]$, which are the main focus of our paper. Elad et al.~\cite{elad2024infinite} prove decidability for a first‑order fragment without arithmetic, unable to express our constraints.
 
 \paragraph{Synthesis.}
 \emph{(Program) synthesis} has been studied extensively. Techniques typically rely on
@@ -245,12 +251,6 @@ $\forall x.\,f(x)+f(x)>x$ is deskolemizable but $\forall x.\,f(x)+f(x+1)>1$ is n
 % These constraints allow only periodic functions whose neighboring values alternate. For such functions the \sygus grammar would have to guess an \textit{ite} term of the form $\mathit{ite}(x\,\mathit{mod}\,2 = 0\enspace a\enspace b)$, for integers $a \not = b$.
 %Even if \sygus tools were improved, they could not yield a decision procedure for full UFLIA due to the inherent undecidability of integer arithmetic combines with uninterpreted functions. 
 
-
-\paragraph{Decision procedures for arrays and quantified formulas.}
-Bradley et al.~\cite{bradley-vmcai06} present a decision procedure for array properties but explicitly forbid arithmetic on the universally quantified variables. Habermehl et al.~\cite{habermehl-etaps08} allow constraints of the form $a[i+c]$ with difference bounds, but remain limited to offset-bounded indices. Alberti et al.~\cite{alberti2014decision} are restricted to flat formulas with one universally quantified variable. This excludes terms such as $a[i+1]$, which are the main focus of our paper. Elad et al.~\cite{elad2024infinite} prove decidability for a first‑order fragment without arithmetic, unable to express our constraints.
-
-\paragraph{Model-based and instantiation methods.}
-Reynolds et al.~\cite{reynolds2016model,reynolds2013finite} develop finite model finding techniques for quantified formulas. Their method requires users to ensure admissibility and may introduce many case splits (``merge lemmas'') to satisfy cardinality constraints. Ge and de Moura~\cite{ge-cav09} introduce Model-Based Quantifier Instantiation (MBQI), noting that ``For certain cases containing offsets on array indices, our procedure will result in an infinite set of instantiations, while a decision procedure of LIA\footnote{LIA refers to the logic of Habermehl et al.} will terminate. It leaves an open question for future research on how to reason about this type of formulas within an instantiation-based approach.'' Our work attempts to  address this open question.
 
 \paragraph{Proof certificates and model representation.}
 Representation and certification of refutation proofs and models is a
@@ -429,7 +429,7 @@ However, we require that enough cells are defined to (i)~check satisfaction of t
 \end{definition}
 For example, $I=\{ c\mapsto 5 \}$ is a pre-satisfiability certificate of $c\geq 5 \wedge \forall x \;.\; f(x+c+1)= f(x+c)+1$.
 
-A pre-satisfiability  certificate interprets all arguments of uninterpreted function symbols in $F$ to a value in the domain $\domain$, and---together with a value for the quantified variables---also in $Q$. This allows us to identify, for each instantiation, the set of cells that become relevant.\todoSN{For now until Stefan R has new inspiration. :)}
+A pre-satisfiability  certificate interprets all arguments of uninterpreted function symbols in $F$ to a value in the domain $\domain$, and---together with a value for the quantified variables---also in $Q$. This allows us to identify, for each instantiation, the set of cells that become relevant.
 \begin{definition}[Relevant Cells]
   For any pre-satisfiability certificate~$I$, and $z\in\domain^{\numvar{\bar{x}}}$, the set of \emph{relevant cells} $\Gamma_{I,z}(F\wedge \forall \bar{x}\;.\; Q):=$
 \[\{ f(I(\subst{t}{\bar{x}}{\repr{z}})) \mid t\in args(Q, f), f \emph{ is an uninterpreted function symbol}\}.\]
