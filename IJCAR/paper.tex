@@ -859,7 +859,7 @@ upon state-of-the-art $\smt$ solvers concerning the capability of showing formul
 We prepared a test suite consisting of 28 handcrafted satisfiable
 problems\footnote{All the data for our experiments are available at our public repository \\\url{https://github.com/MarekDanco/f-definitions}}
 that, in addition, satisfy the \req condition. All problems in our set contain up to two constants, one or two function
-symbols of arity 1, simple ground constraints and one universally qunatified assertion.
+symbols of arity 1, simple ground constraints and one universally quantified assertion.
 Two examples of the problems in our set are
 \begin{equation}\label{eq:exp1}
 	f(4)=7 \:\land\: \forall x.\: f(x+1)=f(x)+1
@@ -1017,7 +1017,7 @@ For $z \in B$, $X_z = \emptyset$, and hence both conditions hold trivially.  For
       \end{itemize}
 
         
-      \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol and $t'\in args(Q,f)$  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
+      \item To prove that this element of $X_z$ cannot appear in any $\Gamma_{I,z'}(\phi)$ with $z' \prec z$, let $f'$ be an uninterpreted function symbol, $t'\in args(Q,f')$,  and prove that $f'(I(\subst{t'}{x}{\repr{z}'}))\neq f(I(\subst{t}{x}{\repr{z}}))$. Again it suffices to analyze the case where $f$ and $f'$ are the same function symbols, and to prove that
         $I(\subst{t'}{x}{\repr{z}'})\neq I(\subst{t}{x}{\repr{z}})$. Observe that since $t'$ and $t$ are arguments of the same function symbol, the respective coefficients of $x$ in $t$ and $t'$ are the same. Also observe that $z'\prec z$ and $b_{\max}<z$ implies that $z'<z$. Due to this,
         \[
           I\models \subst{t'}{x}{\hat{z}'}\cmpsignstrict{\coeffsign{f}+} \subst{t'}{x}{\hat{z}}.
