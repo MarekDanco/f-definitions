@@ -212,9 +212,9 @@ Bradley et al.~\cite{bradley-vmcai06} present a decision procedure for array pro
 \emph{(Program) synthesis} has been studied extensively. Techniques typically rely on
 enumeration of candidates, such as counterexample-guided approaches
 (CEGIS~\cite{cegis}), where some support recursion~\cite{Farzan2021,Kneuss2013}.
-Syntax-Guided Synthesis (SyGuS)~\cite{sygus} provides a unifying framework:
+Syntax-Guided Synthesis (\sygus)~\cite{sygus} provides a unifying framework:
 given a context-free grammar and a logical specification, find a conforming
-expression. Its performance depends crucially on the chosen grammar. SyGuS has
+expression. Its performance depends crucially on the chosen grammar. \sygus has
 been extensively studied in the context of
 SMT~\cite{reynolds-fmsd19,abate-jar23,ReynoldsBLT20}.
 Model finding can be phrased as a synthesis problem~\cite{ParsertBJK23}.
@@ -879,7 +879,7 @@ while the latter was to be expected, due to the use of induction.
 
 We also applied the \textsc{smt} solvers \textsc{z3} and \textsc{cvc5}
 directly to our problems, explicitly enabling model-based quantifier instantiation~\cite{ge-cav09}.
-Additionally, we ran \textsc{cvc5} in \textsc{sygus} inference mode.
+Additionally, we ran \textsc{cvc5} in \sygus inference mode.
 To study the behavior of direct application of the three $\smt$ solvers to our problems, and the influence
 of the parameter~$c$ on their runtime, we ran our experiments with a 10-minute time limit.
 When setting $c = 1$, the \textsc{smt} solvers terminate on our
@@ -893,26 +893,27 @@ We also tested the performance of the three solvers on unbounded problems, that 
 bound $0 \le x \le 10^c$ removed. \textsc{z3} solved 4 of those problems while \textsc{cvc5}
 solved none.
 
-\textsc{cvc5} in \textsc{sygus} mode solved 15 of our problems regardless
+\textsc{cvc5} in \sygus mode solved 15 of our problems regardless
 of the asserted bounds.
-One problem that \textsc{cvc5} in \textsc{sygus} mode did not solve is
+One of the problems that \textsc{cvc5} in \sygus mode did not solve is
 \begin{align*}
 	f(0) = 1 \;\land \:\forall x \:. \:f(x+1) = 2*f(x).
 \end{align*}
 It is reasonable to assume that the function $\lambda x. \:2^{x}$ is not in \textsc{cvc5}
-default \textsc{sygus} grammar. Further, Figure~\ref{fig:scaling} clearly shows
-that the \textsc{sygus} approach is fast and consistent, but only on problems where
+default \sygus grammar. In total, 13 problems remain unsolved by this solver.
+Figure~\ref{fig:scaling} clearly shows
+that the \sygus approach is fast and consistent, but only on problems where
 the functions conform to the pre-defined grammar.
 
 We further tested the performance of the three solvers within a 1-minute time limit
 (denoted by the -min suffix in Figure~\ref{fig:scaling}).
 The performance of \textsc{z3} was the same. \textsc{cvc5} lost one solution for
-$c = 2$ and $c = 3$. Additionally, \textsc{cvc5} in \textsc{sygus} mode lost one
+$c = 2$ and $c = 3$. Additionally, \textsc{cvc5} in \sygus mode lost one
 solution for the unbounded problems.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.6\linewidth]{experiments/data/scaling_plot.png}
+	\includegraphics[width=0.8\linewidth]{experiments/data/scaling_plot.png}
 	\caption{Problems solved with increasing $c$. $*$ refers to unbounded problems.}
 	\label{fig:scaling}
 \end{figure}
