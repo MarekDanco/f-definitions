@@ -1,0 +1,14 @@
+(set-logic UFLIA)
+(declare-fun f (Int) Int)
+(declare-fun g (Int) Int)
+(declare-fun c () Int)
+(assert (= (f 0) 0))
+(assert (forall ((x Int)) 
+  (=>
+    (<=
+      0 x 10000
+    )
+    (= (f (+ x 1)) (+ (f (+ x 0)) (g (+ x c))))
+  )
+))
+(check-sat)
